@@ -100,12 +100,14 @@ class Trainer:
         for _ in range(self._test_episodes):
             obs = self._test_env.reset()
             done = False
-            while not done:
+            for _ in range(self._episode_max_steps):
                 action = self._policy.get_action(obs, test=True)
                 obs, reward, done, _ = self._test_env.step(action)
                 if self._show_test_progress:
                     self._test_env.render()
                 avg_test_return += reward
+                if done:
+                    break
 
         return avg_test_return / self._test_episodes
 
