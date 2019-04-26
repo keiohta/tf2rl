@@ -83,12 +83,12 @@ class Trainer:
 
                 if total_steps >= self._policy.n_warmup:
                     self._policy.train(self.replay_buffer)
-                    if total_steps % self._test_interval == 0:
+                    if int(total_steps) % self._test_interval == 0:
                         with tf.contrib.summary.always_record_summaries():
                             avg_test_return = self.evaluate_policy()
                             self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                                 int(total_steps), avg_test_return, self._test_episodes))
-                            tf.contrib.summary.scalar(name="Average Test Return", tensor=avg_test_return, family="loss")
+                            tf.contrib.summary.scalar(name="AverageTestReturn", tensor=avg_test_return, family="loss")
                             tf.contrib.summary.scalar(name="FPS", tensor=fps, family="loss")
 
                         self.writer.flush()
