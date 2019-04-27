@@ -54,7 +54,6 @@ class Trainer:
                     action = self._env.action_space.sample()
                 else:
                     action = self._policy.get_action(obs)
-                action = action.clip(self._env.action_space.low, self._env.action_space.high)
 
                 next_obs, reward, done, _ = self._env.step(action)
                 if self._show_progress:

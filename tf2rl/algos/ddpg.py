@@ -94,7 +94,7 @@ class DDPG(OffPolicyAgent):
         if not test:
             action += np.random.normal(0, self.sigma, size=action.shape)
 
-        return action
+        return action.clip(-self.actor.max_action, self.actor.max_action)
 
     @tf.contrib.eager.defun
     def _get_action_body(self, state):
