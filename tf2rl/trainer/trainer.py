@@ -115,7 +115,6 @@ class Trainer:
         self._max_steps = args.max_steps
         self._episode_max_steps = args.episode_max_steps if args.episode_max_steps is not None else args.max_steps
         self._show_progress = args.show_progress
-        self._device = "/gpu:{}".format(args.gpu) if args.gpu >= 0 else "/cpu:0"
         # replay buffer
         self._use_prioritized_rb = args.use_prioritized_rb
         self._use_nstep_rb = args.use_nstep_rb

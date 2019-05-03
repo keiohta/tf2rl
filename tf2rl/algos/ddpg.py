@@ -98,7 +98,7 @@ class DDPG(OffPolicyAgent):
 
     @tf.contrib.eager.defun
     def _get_action_body(self, state):
-        return self.actor(state)
+        return self.actor(state, device=self.device)
 
     def train(self, replay_buffer):
         samples = replay_buffer.sample(self.batch_size)
@@ -112,23 +112,24 @@ class DDPG(OffPolicyAgent):
         return actor_loss, critic_loss
 
     @tf.contrib.eager.defun
-    def _train_body(self, states, actions, next_states, rewards, done, device="/gpu:0"):
-        with tf.device(device):
+    def _train_body(self, states, actions, next_states, rewards, done):
+        with tf.device(self.device):
             not_done = 1. - done
 
             with tf.GradientTape() as tape:
-                target_Q = self.critic_target([next_states, self.actor_target(next_states)])
+                target_Q = self.critic_target([next_states, self.actor_target(next_states)],
+                                              device=self.device)
                 target_Q = rewards + (not_done * self.discount * target_Q)
                 target_Q = tf.stop_gradient(target_Q)
-                current_Q = self.critic([states, actions])
+                current_Q = self.critic([states, actions], device=self.device)
                 critic_loss = tf.reduce_mean(tf.keras.losses.MSE(current_Q, target_Q))
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
 
             with tf.GradientTape() as tape:
-                next_action = self.actor(states)
-                actor_loss = -tf.reduce_mean(self.critic([states, next_action]))
+                next_action = self.actor(states, device=self.device)
+                actor_loss = -tf.reduce_mean(self.critic([states, next_action], device=self.device))
 
             actor_grad = tape.gradient(actor_loss, self.actor.trainable_variables)
             self.actor_optimizer.apply_gradients(zip(actor_grad, self.actor.trainable_variables))

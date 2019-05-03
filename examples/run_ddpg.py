@@ -10,6 +10,7 @@ if __name__ == '__main__':
     test_env = gym.make("RoboschoolAnt-v1")
     policy = DDPG(
         state_dim=env.observation_space.high.size,
-        action_dim=env.action_space.high.size)
+        action_dim=env.action_space.high.size,
+        gpu=args.gpu)
     trainer = Trainer(policy, env, args, test_env=test_env)
     trainer()
