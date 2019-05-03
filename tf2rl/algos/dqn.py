@@ -73,7 +73,8 @@ class DQN(OffPolicyAgent):
 
     def train(self, replay_buffer):
         samples = replay_buffer.sample(self.batch_size)
-        state, next_state, action, reward, done = samples["obs"], samples["next_obs"], samples["act"], samples["rew"], samples["done"]
+        state, next_state, action, reward, done = \
+            samples["obs"], samples["next_obs"], samples["act"], samples["rew"], samples["done"]
         done = np.array(done, dtype=np.float64)
         q_func_loss = self._train_body(state, action, next_state, reward, done)
 
@@ -92,7 +93,7 @@ class DQN(OffPolicyAgent):
                 current_Q = self.q_func(states, device=self.device)
                 target_Q = np.asarray(current_Q).copy()
                 target_Q[np.arange(actions.shape[0]), actions] = \
-                    np.ravel(rewards + (not_done * self.discount * tf.reduce_max(self.q_func_target(next_states, device=self.device), keepdims=1)))
+                    np.ravel(rewards + (not_done * self.discount * tf.reduce_max(self.q_func_target(next_states, device=self.device), keepdims=True, axis=1)))
                 target_Q = tf.stop_gradient(target_Q)
                 q_func_loss = tf.reduce_mean(tf.keras.losses.MSE(current_Q, target_Q))
 
