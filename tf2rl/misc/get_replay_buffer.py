@@ -13,9 +13,10 @@ def get_space_size(space):
     if isinstance(space, Box):
         return space.low.size
     elif isinstance(space, Discrete):
-        return space.n
+        return 1  # space.n
     else:
         raise NotImplementedError("Assuming to use Box or Discrete")
+
 
 def get_replay_buffer(policy, env, args):
     kwargs = {
