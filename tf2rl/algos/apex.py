@@ -163,10 +163,12 @@ def learner(global_rb, trained_steps, is_training_done,
                 print("[Error] process raised error but continue")
                 continue
             with tf.contrib.summary.always_record_summaries():
-                policy.train(global_rb)
+                td_error = policy.train(
+                    samples["obs"], samples["act"], samples["next_obs"],
+                    samples["rew"], np.array(samples["done"], dtype=np.float64),
+                    samples["weights"])
                 writer.flush()
-            # new_priorities = np.abs(td_errors)[:,0] + 1e-6
-            # global_rb.update_priorities(samples["indexes"], new_priorities)
+            global_rb.update_priorities(samples["indexes"], np.abs(td_errors) + 1e-6)
             lock.release()
 
             # Put updated weights to queue
