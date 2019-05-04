@@ -139,3 +139,20 @@ class DDPG(OffPolicyAgent):
             target_update.update_target_variables(self.actor_target.weights, self.actor.weights, self.tau)
 
             return actor_loss, critic_loss
+
+    def compute_td_error(self, states, actions, next_states, rewards, done):
+        td_errors, critic_loss = self._compute_td_error_body(states, actions, next_states, rewards, done)
+        print(critic_loss.numpy())
+        return td_errors.numpy()
+
+    @tf.contrib.eager.defun
+    def _compute_td_error_body(self, states, actions, next_states, rewards, done):
+        with tf.device(self.device):
+            not_done = 1. - done
+            target_Q = self.critic_target(
+                [next_states, self.actor_target(next_states)], device=self.device)
+            target_Q = rewards + (not_done * self.discount * target_Q)
+            target_Q = tf.stop_gradient(target_Q)
+            current_Q = self.critic([states, actions], device=self.device)
+            td_errors = target_Q - current_Q
+        return td_errors, tf.reduce_mean(tf.keras.losses.MSE(current_Q, target_Q))
