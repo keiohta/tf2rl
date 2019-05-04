@@ -11,6 +11,7 @@ from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
+from tf2rl.misc.target_update_ops import update_target_variables
 
 config = tf.ConfigProto(allow_soft_placement=True)
 config.gpu_options.allow_growth = True
@@ -64,9 +65,12 @@ def explorer(global_rb, queue, trained_steps, n_transition,
     sample_at_start = 0
 
     while not is_training_done.is_set():
-        # Copy weights if learner updates
+        # Periodically copy weights of explorer
         if not queue.empty():
-            policy.set_weights(queue.get())
+            actor_weights, critic_weights, critic_target_weights = queue.get()
+            update_target_variables(policy.actor.weights, actor_weights, tau=1.)
+            update_target_variables(policy.critic.weights, critic_weights, tau=1.)
+            update_target_variables(policy.critic_target.weights, critic_target_weights, tau=1.)
 
         n_transition.value += 1
         episode_steps += 1
@@ -166,7 +170,10 @@ def learner(global_rb, trained_steps, is_training_done,
 
             # Put updated weights to queue
             if trained_steps.value > update_step:
-                weights = policy.actor.weights
+                weights = []
+                weights.append(policy.actor.weights)
+                weights.append(policy.critic.weights)
+                weights.append(policy.critic_target.weights)
                 for queue in queues:
                     queue.put(weights)
                 update_step += update_freq
