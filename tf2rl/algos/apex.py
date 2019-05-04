@@ -159,16 +159,13 @@ def learner(global_rb, trained_steps, is_training_done,
             total_steps.assign(trained_steps.value)
             lock.acquire()
             samples = global_rb.sample(policy.batch_size)
-            if samples is None:
-                print("[Error] process raised error but continue")
-                continue
             with tf.contrib.summary.always_record_summaries():
                 td_error = policy.train(
                     samples["obs"], samples["act"], samples["next_obs"],
                     samples["rew"], np.array(samples["done"], dtype=np.float64),
                     samples["weights"])
                 writer.flush()
-            global_rb.update_priorities(samples["indexes"], np.abs(td_errors) + 1e-6)
+            global_rb.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
             lock.release()
 
             # Put updated weights to queue
