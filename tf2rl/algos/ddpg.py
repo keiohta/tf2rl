@@ -141,9 +141,8 @@ class DDPG(OffPolicyAgent):
             return actor_loss, critic_loss
 
     def compute_td_error(self, states, actions, next_states, rewards, done):
-        td_errors, critic_loss = self._compute_td_error_body(states, actions, next_states, rewards, done)
-        print(critic_loss.numpy())
-        return td_errors.numpy()
+        td_errors = self._compute_td_error_body(states, actions, next_states, rewards, done)
+        return np.ravel(td_errors.numpy())
 
     @tf.contrib.eager.defun
     def _compute_td_error_body(self, states, actions, next_states, rewards, done):
@@ -155,4 +154,4 @@ class DDPG(OffPolicyAgent):
             target_Q = tf.stop_gradient(target_Q)
             current_Q = self.critic([states, actions], device=self.device)
             td_errors = target_Q - current_Q
-        return td_errors, tf.reduce_mean(tf.keras.losses.MSE(current_Q, target_Q))
+        return td_errors

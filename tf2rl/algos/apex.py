@@ -86,9 +86,10 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             total_reward = 0
             episode_steps = 0
 
+        # Add collected experiences to global replay buffer
         if local_rb.get_stored_size() == buffer_size - 1:
             temp_n_transition = n_transition.value
-            samples = global_rb.sample(policy.batch_size)
+            samples = local_rb.sample(local_rb.get_stored_size())
             states, next_states, actions, rewards, done = samples["obs"], samples["next_obs"], samples["act"], samples["rew"], samples["done"]
             done = np.array(done, dtype=np.float64)
             td_errors = policy.compute_td_error(
@@ -99,8 +100,8 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             total_rewards = []
             lock.acquire()
             global_rb.add(
-                states, actions, rewards[:,0], next_states, done[:,0],)
-                # priorities=np.abs(td_errors) + 1e-6)
+                states, actions, rewards[:,0], next_states, done[:,0],
+                priorities=np.abs(td_errors) + 1e-6)
             lock.release()
             local_rb.clear()
             start = time.time()
@@ -177,7 +178,10 @@ def learner(global_rb, trained_steps, is_training_done,
                 for queue in queues:
                     queue.put(weights)
                 update_step += update_freq
-                print("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(update_freq / (time.time() - start_time), trained_steps.value))
+                with tf.contrib.summary.always_record_summaries():
+                    fps = update_freq / (time.time() - start_time)
+                    tf.contrib.summary.scalar(name="FPS", tensor=fps, family="loss")
+                    print("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(fps, trained_steps.value))
                 start_time = time.time()
 
         if trained_steps.value >= n_training:
