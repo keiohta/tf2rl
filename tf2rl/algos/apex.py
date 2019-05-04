@@ -76,8 +76,11 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         episode_steps += 1
         a = policy.get_action(s)
         s_, r, done, _ = env.step(a)
+        done_flag = done
+        if episode_steps == env._max_episode_steps:
+            done_flag = False
         total_reward += r
-        local_rb.add(s, a, r, s_, done)
+        local_rb.add(s, a, r, s_, done_flag)
 
         s = s_
         if done or episode_steps == episode_max_steps:
@@ -100,8 +103,8 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             total_rewards = []
             lock.acquire()
             global_rb.add(
-                states, actions, rewards[:,0], next_states, done[:,0],
-                priorities=np.abs(td_errors) + 1e-6)
+                states, actions, rewards, next_states, done,
+                priorities=np.abs(td_errors)+1e-6)
             lock.release()
             local_rb.clear()
             start = time.time()
