@@ -16,7 +16,7 @@ If you are developer, set `-e` option, then local modification affects
 your installation.
 
 # Example
-- Train TD3 agent
+- Train DDPG agent
   - If you want to train with only CPU, set `--gpu -1`
 
 ```bash
