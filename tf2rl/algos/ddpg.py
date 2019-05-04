@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.policy_base import OffPolicyAgent
-import tf2rl.misc.target_update_ops as target_update
+from tf2rl.misc.target_update_ops import update_target_variables
 
 
 class Actor(tf.keras.Model):
@@ -135,8 +135,8 @@ class DDPG(OffPolicyAgent):
             self.actor_optimizer.apply_gradients(zip(actor_grad, self.actor.trainable_variables))
 
             # Update target networks
-            target_update.update_target_variables(self.critic_target.weights, self.critic.weights, self.tau)
-            target_update.update_target_variables(self.actor_target.weights, self.actor.weights, self.tau)
+            update_target_variables(self.critic_target.weights, self.critic.weights, self.tau)
+            update_target_variables(self.actor_target.weights, self.actor.weights, self.tau)
 
             return actor_loss, critic_loss
 
