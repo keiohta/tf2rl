@@ -113,16 +113,10 @@ class DDPG(OffPolicyAgent):
     @tf.contrib.eager.defun
     def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
-            not_done = 1. - done
-
             with tf.GradientTape() as tape:
-                target_Q = self.critic_target([next_states, self.actor_target(next_states)],
-                                              device=self.device)
-                target_Q = rewards + (not_done * self.discount * target_Q)
-                target_Q = tf.stop_gradient(target_Q)
-                current_Q = self.critic([states, actions], device=self.device)
-                td_error = current_Q - target_Q
-                critic_loss = tf.reduce_mean(tf.square(td_error * weights) * 0.5)
+                td_errors = self._compute_td_error_body(
+                    states, actions, next_states, rewards, done)
+                critic_loss = tf.reduce_mean(tf.square(td_errors * weights) * 0.5)
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
@@ -138,7 +132,7 @@ class DDPG(OffPolicyAgent):
             update_target_variables(self.critic_target.weights, self.critic.weights, self.tau)
             update_target_variables(self.actor_target.weights, self.actor.weights, self.tau)
 
-            return actor_loss, critic_loss, td_error
+            return actor_loss, critic_loss, td_errors
 
     def compute_td_error(self, states, actions, next_states, rewards, done):
         td_errors = self._compute_td_error_body(states, actions, next_states, rewards, done)
