@@ -71,19 +71,18 @@ class DQN(OffPolicyAgent):
     def _get_action_body(self, state):
         return self.q_func(state)
 
-    def train(self, replay_buffer):
-        samples = replay_buffer.sample(self.batch_size)
-        state, next_state, action, reward, done = \
-            samples["obs"], samples["next_obs"], samples["act"], samples["rew"], samples["done"]
-        done = np.array(done, dtype=np.float64)
-        q_func_loss = self._train_body(state, action, next_state, reward, done)
+    def train(self, states, actions, next_states, rewards, done, weights=None):
+        if weights is None:
+            weights = np.ones_like(rewards)
+        td_error, q_func_loss = self._train_body(
+            states, actions, next_states, rewards, done, weights)
 
         tf.contrib.summary.scalar(name="QFuncLoss", tensor=q_func_loss, family="loss")
 
-        return q_func_loss
+        return td_error
 
     # @tf.contrib.eager.defun
-    def _train_body(self, states, actions, next_states, rewards, done):
+    def _train_body(self, states, actions, next_states, rewards, done, weights):
         # TODO: Enable to run with TensorFlow graph mode (currently use np.ndarray)
         with tf.device(self.device):
             not_done = 1. - done
@@ -95,7 +94,8 @@ class DQN(OffPolicyAgent):
                 target_Q[np.arange(actions.shape[0]), actions] = \
                     np.ravel(rewards + (not_done * self.discount * tf.reduce_max(self.q_func_target(next_states, device=self.device), keepdims=True, axis=1)))
                 target_Q = tf.stop_gradient(target_Q)
-                q_func_loss = tf.reduce_mean(tf.keras.losses.MSE(current_Q, target_Q))
+                td_error = current_Q - target_Q
+                q_func_loss = tf.reduce_mean(tf.square(td_error * weights) * 0.5)
 
             q_func_grad = tape.gradient(q_func_loss, self.q_func.trainable_variables)
             self.q_func_optimizer.apply_gradients(zip(q_func_grad, self.q_func.trainable_variables))
@@ -105,4 +105,4 @@ class DQN(OffPolicyAgent):
             if self.n_update % self.target_replace_interval == 0:
                 target_update.update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
 
-            return q_func_loss
+            return td_error, q_func_loss
