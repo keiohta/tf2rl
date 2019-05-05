@@ -1,4 +1,4 @@
-import roboschool,gym
+import roboschool, gym
 
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.trainer.trainer import Trainer
