@@ -13,15 +13,14 @@ class QFunc(tf.keras.Model):
         self.l2 = tf.keras.layers.Dense(units[1], name="L2")
         self.l3 = tf.keras.layers.Dense(action_dim, name="L3")
 
-        self(inputs=tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64)),
-             device="/cpu:0")
+        with tf.device("/cpu:0"):
+            self(inputs=tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64)))
 
-    def call(self, inputs, device="/gpu:0"):
-        with tf.device(device):
-            features = tf.concat(inputs, axis=1)
-            features = tf.nn.relu(self.l1(features))
-            features = tf.nn.relu(self.l2(features))
-            features = self.l3(features)
+    def call(self, inputs):
+        features = tf.concat(inputs, axis=1)
+        features = tf.nn.relu(self.l1(features))
+        features = tf.nn.relu(self.l2(features))
+        features = self.l3(features)
         return features
 
 
@@ -89,10 +88,10 @@ class DQN(OffPolicyAgent):
             actions = np.asarray(np.ravel(actions), np.int32)
 
             with tf.GradientTape() as tape:
-                current_Q = self.q_func(states, device=self.device)
+                current_Q = self.q_func(states)
                 target_Q = np.asarray(current_Q).copy()
                 target_Q[np.arange(actions.shape[0]), actions] = \
-                    np.ravel(rewards + (not_done * self.discount * tf.reduce_max(self.q_func_target(next_states, device=self.device), keepdims=True, axis=1)))
+                    np.ravel(rewards + (not_done * self.discount * tf.reduce_max(self.q_func_target(next_states), keepdims=True, axis=1)))
                 target_Q = tf.stop_gradient(target_Q)
                 td_error = current_Q - target_Q
                 q_func_loss = tf.reduce_mean(tf.square(td_error * weights) * 0.5)
