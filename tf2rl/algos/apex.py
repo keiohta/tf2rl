@@ -214,11 +214,11 @@ def env_fn():
     return gym.make('HalfCheetah-v2')
 
 
-def policy_fn(env, name, memory_capacity):
+def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
     return DDPG(
         state_dim=env.observation_space.high.size,
         action_dim=env.action_space.high.size,
-        gpu=-1,
+        gpu=gpu,
         name=name,
         batch_size=100,
         memory_capacity=memory_capacity)
