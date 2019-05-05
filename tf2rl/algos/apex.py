@@ -4,7 +4,7 @@ import tensorflow as tf
 import argparse
 
 import multiprocessing
-from multiprocessing import Process, Manager, Queue, Value, Event, Lock
+from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
 
 from cpprb import ReplayBuffer, PrioritizedReplayBuffer
@@ -26,30 +26,30 @@ def explorer(global_rb, queue, trained_steps, n_transition,
     Collect transitions and store them to prioritized replay buffer.
     Args:
         global_rb:
-            prioritized replay buffer sharing with explorers and only one learner.
-            This object is shared over processes, so you must lock it when trying to
+            Prioritized replay buffer sharing with multiple explorers and only one learner.
+            This object is shared over processes, so it must be locked when trying to
             operate something with `lock` object.
         queue:
-            a FIFO shared with the learner to get latest network parameters.
+            A FIFO shared with the learner to get latest network parameters.
             This is process safe, so you don't need to lock process when use this.
         trained_steps:
-            number of steps to apply gradients.
+            Number of steps to apply gradients.
         n_transition:
-            number of collected transitions.
+            Number of collected transitions.
         is_training_done:
             multiprocessing.Event object to share the status of training.
         lock:
             multiprocessing.Lock to lock other processes. You must release after process is done.
         env_fn:
-            method object to generate an environment.
+            Method object to generate an environment.
         policy_fn:
-            method object to generate an explorer.
+            Method object to generate an explorer.
         buffer_size:
-            the size of local buffer. If it is filled with transitions, add them to `global_rb`
+            Size of local buffer. If it is filled with transitions, add them to `global_rb`
         max_transition:
-            maximum number of steps to explorer. Default value is None.
+            Maximum number of steps to explorer. Default value is None.
         episode_max_steps:
-            maximum steps for an episode.
+            Maximum number of steps of an episode.
     """
     env = env_fn()
     policy = policy_fn(env, "Explorer", global_rb.get_buffer_size())
@@ -120,24 +120,25 @@ def learner(global_rb, trained_steps, is_training_done,
     Collect transitions and store them to prioritized replay buffer.
     Args:
         global_rb:
-            prioritized replay buffer sharing with explorers and only one learner.
-            This object is shared over processes, so you must lock it when trying to
+            Prioritized replay buffer sharing with multiple explorers and only one learner.
+            This object is shared over processes, so it must be locked when trying to
             operate something with `lock` object.
         trained_steps:
-            number of steps to apply gradients.
+            Number of times to apply gradients.
         is_training_done:
-            multiprocessing.Event object to share the status of training.
+            multiprocessing.Event object to share if training is done or not.
         lock:
-            multiprocessing.Lock to lock other processes. You must release after process is done.
+            multiprocessing.Lock to lock other processes.
+            It must be released after process is done.
         env_fn:
-            method object to generate an environment.
+            Method object to generate an environment.
         policy_fn:
-            method object to generate an explorer.
+            Method object to generate an explorer.
         n_training:
-            number of times to apply gradients. If number of applying gradients is over this value,
-            training is done by setting `is_training_done` to `True`
+            Maximum number of times to apply gradients. If number of applying gradients
+            is over this value, training will be done by setting `is_training_done` to `True`
         update_freq:
-            frequency to update parameters, i.e., set network parameters to `queues`
+            Frequency to update parameters, i.e., put network parameters to `queues`
         queues:
             FIFOs shared with explorers to send latest network parameters.
     """
@@ -228,16 +229,20 @@ def main(args_):
         n_explorer = multiprocessing.cpu_count() - 1
     else:
         n_explorer = args_.n_explorer
-    assert n_explorer > 0, "[error] number of cpu must be positive integer"
+    assert n_explorer > 0, "[error] number of explorers must be positive integer"
 
     env = env_fn()
 
-    # prepare Manager
+    # Manager to share PER between a learner and explorers
     SyncManager.register('PrioritizedReplayBuffer', PrioritizedReplayBuffer)
     manager = SyncManager()
     manager.start()
+    global_rb = manager.PrioritizedReplayBuffer(
+        obs_dim=env.observation_space.low.size,
+        act_dim=env.action_space.low.size,
+        size=args_.replay_buffer_size)
 
-    # queues to share network architectures between learner and explorers
+    # queues to share network parameters between a learner and explorers
     queues = [Queue() for _ in range(n_explorer)]
 
     # Event object to share training status. if event is set True, all exolorers stop sampling transitions
@@ -246,14 +251,9 @@ def main(args_):
     # Lock
     lock = manager.Lock()
 
-    # shared memory objects to count number of samples and applied gradients
+    # Shared memory objects to count number of samples and applied gradients
     trained_steps = Value('i', 0)
     n_transition = Value('i', 0)
-
-    global_rb = manager.PrioritizedReplayBuffer(
-        obs_dim=env.observation_space.low.size,
-        act_dim=env.action_space.low.size,
-        size=args_.replay_buffer_size)
 
     tasks = []
     # Add explorers
