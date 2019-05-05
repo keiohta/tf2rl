@@ -15,14 +15,14 @@ class Actor(tf.keras.Model):
 
         self.max_action = max_action
 
-        self(tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64)), device="/cpu:0")
+        with tf.device("/cpu:0"):
+            self(tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64)))
 
-    def call(self, inputs, device="/gpu:0"):
-        with tf.device(device):
-            features = tf.nn.relu(self.l1(inputs))
-            features = tf.nn.relu(self.l2(features))
-            features = self.l3(features)
-            action = self.max_action * tf.nn.tanh(features)
+    def call(self, inputs):
+        features = tf.nn.relu(self.l1(inputs))
+        features = tf.nn.relu(self.l2(features))
+        features = self.l3(features)
+        action = self.max_action * tf.nn.tanh(features)
         return action
 
 
@@ -36,15 +36,15 @@ class Critic(tf.keras.Model):
 
         dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64))
         dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
-        self([dummy_state, dummy_action], device="/cpu:0")
+        with tf.device("/cpu:0"):
+            self([dummy_state, dummy_action])
 
-    def call(self, inputs, device="/gpu:0"):
-        with tf.device(device):
-            states, actions = inputs
-            features = tf.concat([states, actions], axis=1)
-            features = tf.nn.relu(self.l1(features))
-            features = tf.nn.relu(self.l2(features))
-            features = self.l3(features)
+    def call(self, inputs):
+        states, actions = inputs
+        features = tf.concat([states, actions], axis=1)
+        features = tf.nn.relu(self.l1(features))
+        features = tf.nn.relu(self.l2(features))
+        features = self.l3(features)
         return features
 
 
@@ -98,7 +98,8 @@ class DDPG(OffPolicyAgent):
 
     @tf.contrib.eager.defun
     def _get_action_body(self, state):
-        return self.actor(state, device=self.device)
+        with tf.device(self.device):
+            return self.actor(state)
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
         if weights is None:
@@ -122,8 +123,8 @@ class DDPG(OffPolicyAgent):
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
 
             with tf.GradientTape() as tape:
-                next_action = self.actor(states, device=self.device)
-                actor_loss = -tf.reduce_mean(self.critic([states, next_action], device=self.device))
+                next_action = self.actor(states)
+                actor_loss = -tf.reduce_mean(self.critic([states, next_action]))
 
             actor_grad = tape.gradient(actor_loss, self.actor.trainable_variables)
             self.actor_optimizer.apply_gradients(zip(actor_grad, self.actor.trainable_variables))
@@ -143,9 +144,9 @@ class DDPG(OffPolicyAgent):
         with tf.device(self.device):
             not_done = 1. - done
             target_Q = self.critic_target(
-                [next_states, self.actor_target(next_states)], device=self.device)
+                [next_states, self.actor_target(next_states)])
             target_Q = rewards + (not_done * self.discount * target_Q)
             target_Q = tf.stop_gradient(target_Q)
-            current_Q = self.critic([states, actions], device=self.device)
+            current_Q = self.critic([states, actions])
             td_errors = target_Q - current_Q
         return td_errors
