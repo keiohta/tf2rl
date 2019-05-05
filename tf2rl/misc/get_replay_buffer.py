@@ -18,7 +18,10 @@ def get_space_size(space):
         raise NotImplementedError("Assuming to use Box or Discrete")
 
 
-def get_replay_buffer(policy, env, args):
+def get_replay_buffer(policy, env, use_prioritized_rb, use_nstep_rb, n_step):
+    if policy is None or env is None:
+        return None
+
     kwargs = {
         "obs_dim": get_space_size(env.observation_space),
         "act_dim": get_space_size(env.action_space),
@@ -33,17 +36,17 @@ def get_replay_buffer(policy, env, args):
     kwargs["size"] = policy.memory_capacity
 
     # N-step prioritized
-    if args.use_prioritized_rb and args.use_nstep_rb:
-        kwargs["n_step"] = args.n_step
+    if use_prioritized_rb and use_nstep_rb:
+        kwargs["n_step"] = n_step
         kwargs["discount"] = policy.discount
         return NstepPrioritizedReplayBuffer(**kwargs)
 
     # prioritized
-    if args.use_prioritized_rb:
+    if use_prioritized_rb:
         return PrioritizedReplayBuffer(**kwargs)
 
     # N-step
-    if args.use_nstep_rb:
+    if use_nstep_rb:
         kwargs["n_step"] = args.n_step
         kwargs["discount"] = policy.discount
         return NstepReplayBuffer(**kwargs)

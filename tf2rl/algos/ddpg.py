@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.policy_base import OffPolicyAgent
-import tf2rl.misc.target_update_ops as target_update
+from tf2rl.misc.target_update_ops import update_target_variables
 
 
 class Actor(tf.keras.Model):
@@ -100,19 +100,18 @@ class DDPG(OffPolicyAgent):
     def _get_action_body(self, state):
         return self.actor(state, device=self.device)
 
-    def train(self, replay_buffer):
-        samples = replay_buffer.sample(self.batch_size)
-        state, next_state, action, reward, done = samples["obs"], samples["next_obs"], samples["act"], samples["rew"], samples["done"]
-        done = np.array(done, dtype=np.float64)
-        actor_loss, critic_loss = self._train_body(state, action, next_state, reward, done)
+    def train(self, states, actions, next_states, rewards, done, weights=None):
+        if weights is None:
+            weights = np.ones_like(rewards)
+        actor_loss, critic_loss, td_error = self._train_body(states, actions, next_states, rewards, done, weights)
 
         tf.contrib.summary.scalar(name="ActorLoss", tensor=actor_loss, family="loss")
         tf.contrib.summary.scalar(name="CriticLoss", tensor=critic_loss, family="loss")
 
-        return actor_loss, critic_loss
+        return td_error
 
     @tf.contrib.eager.defun
-    def _train_body(self, states, actions, next_states, rewards, done):
+    def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
             not_done = 1. - done
 
@@ -122,7 +121,8 @@ class DDPG(OffPolicyAgent):
                 target_Q = rewards + (not_done * self.discount * target_Q)
                 target_Q = tf.stop_gradient(target_Q)
                 current_Q = self.critic([states, actions], device=self.device)
-                critic_loss = tf.reduce_mean(tf.keras.losses.MSE(current_Q, target_Q))
+                td_error = current_Q - target_Q
+                critic_loss = tf.reduce_mean(tf.square(td_error * weights) * 0.5)
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
@@ -135,7 +135,23 @@ class DDPG(OffPolicyAgent):
             self.actor_optimizer.apply_gradients(zip(actor_grad, self.actor.trainable_variables))
 
             # Update target networks
-            target_update.update_target_variables(self.critic_target.weights, self.critic.weights, self.tau)
-            target_update.update_target_variables(self.actor_target.weights, self.actor.weights, self.tau)
+            update_target_variables(self.critic_target.weights, self.critic.weights, self.tau)
+            update_target_variables(self.actor_target.weights, self.actor.weights, self.tau)
 
-            return actor_loss, critic_loss
+            return actor_loss, critic_loss, td_error
+
+    def compute_td_error(self, states, actions, next_states, rewards, done):
+        td_errors = self._compute_td_error_body(states, actions, next_states, rewards, done)
+        return np.ravel(td_errors.numpy())
+
+    @tf.contrib.eager.defun
+    def _compute_td_error_body(self, states, actions, next_states, rewards, done):
+        with tf.device(self.device):
+            not_done = 1. - done
+            target_Q = self.critic_target(
+                [next_states, self.actor_target(next_states)], device=self.device)
+            target_Q = rewards + (not_done * self.discount * target_Q)
+            target_Q = tf.stop_gradient(target_Q)
+            current_Q = self.critic([states, actions], device=self.device)
+            td_errors = target_Q - current_Q
+        return td_errors
