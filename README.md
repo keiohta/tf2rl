@@ -5,6 +5,7 @@ TF2RL is a deep reinforcement learning library that implements various deep rein
 Following algorithms are supported:
 - DQN
 - DDPG
+- Bi-Res-DDPG
 - TD3
 - ApeX (DDPG or TD3)
 
