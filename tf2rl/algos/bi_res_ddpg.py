@@ -1,3 +1,8 @@
+"""
+This is an implementation of Bi-Res-DDPG
+https://arxiv.org/abs/1905.01072
+"""
+
 import numpy as np
 import tensorflow as tf
 
