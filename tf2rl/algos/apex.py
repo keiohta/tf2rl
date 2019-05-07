@@ -9,7 +9,7 @@ from multiprocessing.managers import SyncManager
 
 from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
-from tf2rl.algos.ddpg import DDPG
+from tf2rl.algos.td3 import TD3
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.target_update_ops import update_target_variables
 
@@ -215,7 +215,7 @@ def env_fn():
 
 
 def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
-    return DDPG(
+    return TD3(
         state_dim=env.observation_space.high.size,
         action_dim=env.action_space.high.size,
         gpu=gpu,
