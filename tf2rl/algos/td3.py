@@ -43,6 +43,7 @@ class TD3(DDPG):
             self,
             state_dim,
             action_dim,
+            name="TD3",
             actor_update_freq=2,
             policy_noise=0.2,
             noise_clip=0.5,
@@ -50,7 +51,7 @@ class TD3(DDPG):
             critic_units=[400, 300],
             lr_critic=0.001,
             **kwargs):
-        super().__init__(name="TD3", state_dim=state_dim, action_dim=action_dim,
+        super().__init__(name=name, state_dim=state_dim, action_dim=action_dim,
                          actor_units=actor_units, critic_units=critic_units,
                          lr_critic=lr_critic, **kwargs)
 
@@ -94,6 +95,10 @@ class TD3(DDPG):
             update_target_variables(self.actor_target.weights, self.actor.weights, self.tau)
 
             return actor_loss, critic_loss, np.abs(td_error1) + np.abs(td_error2)
+
+    def compute_td_error(self, states, actions, next_states, rewards, done):
+        td_error1, td_error2 = self._compute_td_error_body(states, actions, next_states, rewards, done)
+        return np.ravel(np.abs(td_error1.numpy()) + np.abs(td_error2.numpy()))
 
     @tf.contrib.eager.defun
     def _compute_td_error_body(self, states, actions, next_states, rewards, done):
