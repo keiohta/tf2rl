@@ -29,6 +29,7 @@ class DQN(OffPolicyAgent):
             self,
             state_dim,
             action_dim,
+            q_func=None,
             name="DQN",
             lr=0.001,
             units=[32, 32],
@@ -39,9 +40,10 @@ class DQN(OffPolicyAgent):
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
+        q_func = q_func if q_func is not None else QFunc
         # Define and initialize Q-function network
-        self.q_func = QFunc(state_dim, action_dim, units)
-        self.q_func_target = QFunc(state_dim, action_dim, units)
+        self.q_func = q_func(state_dim, action_dim, units)
+        self.q_func_target = q_func(state_dim, action_dim, units)
         self.q_func_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
         for param, target_param in zip(self.q_func.weights, self.q_func_target.weights):
             target_param.assign(param)
