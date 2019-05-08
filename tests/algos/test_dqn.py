@@ -1,5 +1,6 @@
 import unittest
 import gym
+import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.dqn import DQN
@@ -46,7 +47,9 @@ class DQNTest(unittest.TestCase):
             obs = next_obs
 
         for _ in range(100):
-            agent.train(replay_buffer)
+            samples = replay_buffer.sample(agent.batch_size)
+            agent.train(samples["obs"], samples["act"], samples["next_obs"],
+                        samples["rew"], np.array(samples["done"], dtype=np.float64))
 
 
 if __name__ == '__main__':
