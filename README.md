@@ -10,7 +10,7 @@ Following algorithms are supported:
 
 ## Installation
 ```bash
-$ git clone https://github.com/keiohta/tf2rl.git tf2tl
+$ git clone https://github.com/keiohta/tf2rl.git tf2rl
 $ cd tf2rl
 $ pip install -U numpy pip
 $ pip install .
