@@ -12,13 +12,13 @@ class DQNTest(unittest.TestCase):
         cls.env = gym.make("CartPole-v0")
 
     def test__init__(self):
-        DQN(state_dim=self.env.observation_space.low.size,
+        DQN(state_shape=self.env.observation_space.shape,
             action_dim=self.env.action_space.n,
             gpu=-1)
 
     def test_get_action(self):
         agent = DQN(
-            state_dim=self.env.observation_space.low.size,
+            state_shape=self.env.observation_space.shape,
             action_dim=self.env.action_space.n,
             gpu=-1)
         state = self.env.reset()
@@ -27,13 +27,13 @@ class DQNTest(unittest.TestCase):
 
     def test_train(self):
         agent = DQN(
-            state_dim=self.env.observation_space.low.size,
+            state_shape=self.env.observation_space.shape,
             action_dim=self.env.action_space.n,
             memory_capacity=100,
             gpu=-1)
         from cpprb import ReplayBuffer
         replay_buffer = ReplayBuffer(
-            obs_dim=self.env.observation_space.low.size,
+            obs_dim=self.env.observation_space.shape,
             act_dim=1,
             size=agent.memory_capacity)
 

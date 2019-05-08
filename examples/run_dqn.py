@@ -14,7 +14,7 @@ if __name__ == '__main__':
     env = gym.make("CartPole-v0")
     test_env = gym.make("CartPole-v0")
     policy = DQN(
-        state_dim=env.observation_space.low.size,
+        state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
         n_warmup=500,
         target_replace_interval=100,
