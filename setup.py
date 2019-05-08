@@ -7,7 +7,7 @@ install_requires = [
 extras_require = {
     "tf": ["tensorflow==1.12"],
     "tf_gpu": ["tensorflow-gpu==1.12"],
-    "examples": ["gym", "roboschool"]
+    "examples": ["gym", "gym[atari]", "roboschool"]
 }
 
 setup(
