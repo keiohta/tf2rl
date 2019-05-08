@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.policy_base import OffPolicyAgent
+from tf2rl.envs.atari_wrapper import LazyFrames
 import tf2rl.misc.target_update_ops as target_update
 
 
@@ -56,6 +57,8 @@ class DQN(OffPolicyAgent):
         self.n_update = 0
 
     def get_action(self, state, test=False):
+        if isinstance(state, LazyFrames):
+            state = np.array(state)
         assert isinstance(state, np.ndarray)
 
         if not test and np.random.rand() < self.epsilon:
