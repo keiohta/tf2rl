@@ -7,7 +7,7 @@ from tf2rl.misc.target_update_ops import update_target_variables
 
 
 class Critic(tf.keras.Model):
-    def __init__(self, state_dim, action_dim, units=[400, 300], name="Critic"):
+    def __init__(self, state_shape, action_dim, units=[400, 300], name="Critic"):
         super().__init__(name=name)
 
         self.l1 = tf.keras.layers.Dense(units[0], name="L1")
@@ -18,7 +18,7 @@ class Critic(tf.keras.Model):
         self.l5 = tf.keras.layers.Dense(units[1], name="L5")
         self.l6 = tf.keras.layers.Dense(1, name="L6")
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
         dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
         with tf.device("/cpu:0"):
             self([dummy_state, dummy_action])
@@ -41,7 +41,7 @@ class Critic(tf.keras.Model):
 class TD3(DDPG):
     def __init__(
             self,
-            state_dim,
+            state_shape,
             action_dim,
             name="TD3",
             actor_update_freq=2,
@@ -51,12 +51,12 @@ class TD3(DDPG):
             critic_units=[400, 300],
             lr_critic=0.001,
             **kwargs):
-        super().__init__(name=name, state_dim=state_dim, action_dim=action_dim,
+        super().__init__(name=name, state_shape=state_shape, action_dim=action_dim,
                          actor_units=actor_units, critic_units=critic_units,
                          lr_critic=lr_critic, **kwargs)
 
-        self.critic = Critic(state_dim, action_dim, critic_units)
-        self.critic_target = Critic(state_dim, action_dim, critic_units)
+        self.critic = Critic(state_shape, action_dim, critic_units)
+        self.critic_target = Critic(state_shape, action_dim, critic_units)
         update_target_variables(self.critic.weights, self.critic_target.weights, tau=1.)
         self.critic_optimizer = tf.train.AdamOptimizer(learning_rate=lr_critic)
 

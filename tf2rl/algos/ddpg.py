@@ -6,7 +6,7 @@ from tf2rl.misc.target_update_ops import update_target_variables
 
 
 class Actor(tf.keras.Model):
-    def __init__(self, state_dim, action_dim, max_action, units=[400, 300], name="Actor"):
+    def __init__(self, state_shape, action_dim, max_action, units=[400, 300], name="Actor"):
         super().__init__(name=name)
 
         self.l1 = tf.keras.layers.Dense(units[0], name="L1")
@@ -16,7 +16,7 @@ class Actor(tf.keras.Model):
         self.max_action = max_action
 
         with tf.device("/cpu:0"):
-            self(tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64)))
+            self(tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
 
     def call(self, inputs):
         features = tf.nn.relu(self.l1(inputs))
@@ -27,14 +27,14 @@ class Actor(tf.keras.Model):
 
 
 class Critic(tf.keras.Model):
-    def __init__(self, state_dim, action_dim, units=[400, 300], name="Critic"):
+    def __init__(self, state_shape, action_dim, units=[400, 300], name="Critic"):
         super().__init__(name=name)
 
         self.l1 = tf.keras.layers.Dense(units[0], name="L1")
         self.l2 = tf.keras.layers.Dense(units[1], name="L2")
         self.l3 = tf.keras.layers.Dense(1, name="L3")
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
         dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
         with tf.device("/cpu:0"):
             self([dummy_state, dummy_action])
@@ -51,7 +51,7 @@ class Critic(tf.keras.Model):
 class DDPG(OffPolicyAgent):
     def __init__(
             self,
-            state_dim,
+            state_shape,
             action_dim,
             name="DDPG",
             max_action=1.,
@@ -67,15 +67,15 @@ class DDPG(OffPolicyAgent):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
         # Define and initialize Actor network
-        self.actor = Actor(state_dim, action_dim, max_action, actor_units)
-        self.actor_target = Actor(state_dim, action_dim, max_action, actor_units)
+        self.actor = Actor(state_shape, action_dim, max_action, actor_units)
+        self.actor_target = Actor(state_shape, action_dim, max_action, actor_units)
         self.actor_optimizer = tf.train.AdamOptimizer(learning_rate=lr_actor)
         for param, target_param in zip(self.actor.weights, self.actor_target.weights):
             target_param.assign(param)
 
         # Define and initialize Critic network
-        self.critic = Critic(state_dim, action_dim, critic_units)
-        self.critic_target = Critic(state_dim, action_dim, critic_units)
+        self.critic = Critic(state_shape, action_dim, critic_units)
+        self.critic_target = Critic(state_shape, action_dim, critic_units)
         self.critic_optimizer = tf.train.AdamOptimizer(learning_rate=lr_critic)
         for param, target_param in zip(self.critic.weights, self.critic_target.weights):
             target_param.assign(param)
