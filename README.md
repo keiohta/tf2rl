@@ -6,7 +6,8 @@ Following algorithms are supported:
 - DQN
 - DDPG
 - TD3
-- ApeX (DDPG or TD3)
+- SAC
+- ApeX (DDPG or TD3 or SAC)
 
 ## Installation
 ```bash
