@@ -70,15 +70,13 @@ class DDPG(OffPolicyAgent):
         self.actor = Actor(state_dim, action_dim, max_action, actor_units)
         self.actor_target = Actor(state_dim, action_dim, max_action, actor_units)
         self.actor_optimizer = tf.train.AdamOptimizer(learning_rate=lr_actor)
-        for param, target_param in zip(self.actor.weights, self.actor_target.weights):
-            target_param.assign(param)
+        update_target_variables(self.actor_target.weights, self.actor.weights, tau=1.)
 
         # Define and initialize Critic network
         self.critic = Critic(state_dim, action_dim, critic_units)
         self.critic_target = Critic(state_dim, action_dim, critic_units)
         self.critic_optimizer = tf.train.AdamOptimizer(learning_rate=lr_critic)
-        for param, target_param in zip(self.critic.weights, self.critic_target.weights):
-            target_param.assign(param)
+        update_target_variables(self.critic_target.weights, self.critic.weights, tau=1.)
 
         # Set hyperparameters
         self.sigma = sigma
@@ -104,14 +102,14 @@ class DDPG(OffPolicyAgent):
     def train(self, states, actions, next_states, rewards, done, weights=None):
         if weights is None:
             weights = np.ones_like(rewards)
-        actor_loss, critic_loss, td_error = self._train_body(
+        actor_loss, critic_loss, td_errors = self._train_body(
             states, actions, next_states, rewards, done, weights)
 
         if actor_loss is not None:
             tf.contrib.summary.scalar(name="ActorLoss", tensor=actor_loss, family="loss")
         tf.contrib.summary.scalar(name="CriticLoss", tensor=critic_loss, family="loss")
 
-        return td_error
+        return td_errors
 
     @tf.contrib.eager.defun
     def _train_body(self, states, actions, next_states, rewards, done, weights):

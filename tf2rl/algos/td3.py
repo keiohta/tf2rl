@@ -57,7 +57,7 @@ class TD3(DDPG):
 
         self.critic = Critic(state_dim, action_dim, critic_units)
         self.critic_target = Critic(state_dim, action_dim, critic_units)
-        update_target_variables(self.critic.weights, self.critic_target.weights, tau=1.)
+        update_target_variables(self.critic_target.weights, self.critic.weights, tau=1.)
         self.critic_optimizer = tf.train.AdamOptimizer(learning_rate=lr_critic)
 
         self._policy_noise = policy_noise
