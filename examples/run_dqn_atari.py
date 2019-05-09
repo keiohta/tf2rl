@@ -41,20 +41,23 @@ class QFunc(tf.keras.Model):
 if __name__ == '__main__':
     parser = Trainer.get_argument()
     parser.set_defaults()
-    parser.set_defaults(test_interval=2000)
+    parser.set_defaults(test_interval=10000)
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
 
     env = wrap_deepmind(gym.make('SpaceInvaders-v0'), frame_stack=True)
     test_env = wrap_deepmind(gym.make('SpaceInvaders-v0'), frame_stack=True)
+    # Following parameters are equivalent to DeepMind DQN paper
+    # https://www.nature.com/articles/nature14236
     policy = DQN(
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
-        n_warmup=500,
-        target_replace_interval=100,
+        n_warmup=50000,
+        target_replace_interval=10000,
         batch_size=32,
         memory_capacity=10000,
-        discount=0.9,
+        discount=0.99,
+        lr=0.00025,
         q_func=QFunc,
         gpu=args.gpu)
     trainer = Trainer(policy, env, args, test_env=test_env)
