@@ -199,7 +199,7 @@ class SAC(OffPolicyAgent):
 
                 target_V = tf.stop_gradient(current_Q - log_pi)
                 td_errors = target_V - current_V
-                vf_loss_t = 0.5 * tf.square(td_errors * weights) * 0.5
+                vf_loss_t = 0.5 * tf.square(td_errors) * weights
 
                 # TODO: Add reguralizer
                 policy_loss = tf.reduce_mean(log_pi - current_Q1)

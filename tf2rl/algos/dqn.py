@@ -94,7 +94,7 @@ class DQN(OffPolicyAgent):
                     np.ravel(rewards + (not_done * self.discount * tf.reduce_max(self.q_func_target(next_states), keepdims=True, axis=1)))
                 target_Q = tf.stop_gradient(target_Q)
                 td_error = current_Q - target_Q
-                q_func_loss = tf.reduce_mean(tf.square(td_error * weights) * 0.5)
+                q_func_loss = tf.reduce_mean(tf.square(td_error) * weights * 0.5)
 
             q_func_grad = tape.gradient(q_func_loss, self.q_func.trainable_variables)
             self.q_func_optimizer.apply_gradients(zip(q_func_grad, self.q_func.trainable_variables))
