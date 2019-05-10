@@ -2,11 +2,12 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.policy_base import OffPolicyAgent
+from tf2rl.envs.atari_wrapper import LazyFrames
 import tf2rl.misc.target_update_ops as target_update
 
 
 class QFunc(tf.keras.Model):
-    def __init__(self, state_dim, action_dim, units=[32, 32], name="QFunc"):
+    def __init__(self, state_shape, action_dim, units=[32, 32], name="QFunc"):
         super().__init__(name=name)
 
         self.l1 = tf.keras.layers.Dense(units[0], name="L1")
@@ -14,7 +15,7 @@ class QFunc(tf.keras.Model):
         self.l3 = tf.keras.layers.Dense(action_dim, name="L3")
 
         with tf.device("/cpu:0"):
-            self(inputs=tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64)))
+            self(inputs=tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
 
     def call(self, inputs):
         features = tf.concat(inputs, axis=1)
@@ -27,8 +28,9 @@ class QFunc(tf.keras.Model):
 class DQN(OffPolicyAgent):
     def __init__(
             self,
-            state_dim,
+            state_shape,
             action_dim,
+            q_func=None,
             name="DQN",
             lr=0.001,
             units=[32, 32],
@@ -39,9 +41,10 @@ class DQN(OffPolicyAgent):
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
+        q_func = q_func if q_func is not None else QFunc
         # Define and initialize Q-function network
-        self.q_func = QFunc(state_dim, action_dim, units)
-        self.q_func_target = QFunc(state_dim, action_dim, units)
+        self.q_func = q_func(state_shape, action_dim, units)
+        self.q_func_target = q_func(state_shape, action_dim, units)
         self.q_func_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
         for param, target_param in zip(self.q_func.weights, self.q_func_target.weights):
             target_param.assign(param)
@@ -54,8 +57,9 @@ class DQN(OffPolicyAgent):
         self.n_update = 0
 
     def get_action(self, state, test=False):
+        if isinstance(state, LazyFrames):
+            state = np.array(state)
         assert isinstance(state, np.ndarray)
-        assert len(state.shape) == 1
 
         if not test and np.random.rand() < self.epsilon:
             action = np.random.randint(self._action_dim)
