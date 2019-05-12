@@ -19,7 +19,7 @@ $ pip install .
 
 TF2RL is built on Google's TensorFlow and requires that either `tensorflow` or `tensorflow-gpu` is installed.
 To include the TensorFlow with the installation of TF2RL, add the flag `tf` for the normal CPU version or `tf_gpu` for the GPU version.
-Note that we DO'NT actually use TF2.0 but TF1.12 because it has not been officially released yet.
+Note that we DON'T actually use TF2.0 but TF1.12 because it has not been officially released yet.
 ```bash
 # Install TF2RL with TensorFlow CPU version
 $ pip install -e .[tf]
