@@ -3,7 +3,7 @@ import tensorflow as tf
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.envs.atari_wrapper import LazyFrames
-import tf2rl.misc.target_update_ops as target_update
+from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.misc.huber_loss import huber_loss
 
 
@@ -58,8 +58,7 @@ class DQN(OffPolicyAgent):
         self.q_func = q_func(state_shape, action_dim, units)
         self.q_func_target = q_func(state_shape, action_dim, units)
         self.q_func_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
-        for param, target_param in zip(self.q_func.weights, self.q_func_target.weights):
-            target_param.assign(param)
+        update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
 
         self._action_dim = action_dim
 
@@ -98,10 +97,11 @@ class DQN(OffPolicyAgent):
 
         tf.contrib.summary.scalar(name="QFuncLoss", tensor=q_func_loss, family="loss")
 
+        # Remove following by using tf.global_step
         self.n_update += 1
         # Update target networks
         if self.n_update % self.target_replace_interval == 0:
-            target_update.update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
+            update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
 
         return td_error
 
