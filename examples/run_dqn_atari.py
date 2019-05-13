@@ -40,6 +40,7 @@ class QFunc(tf.keras.Model):
 
 if __name__ == '__main__':
     parser = Trainer.get_argument()
+    parser = DQN.get_argument(parser)
     parser.add_argument("--replay-buffer-size", type=int, default=int(1e6))
     parser.set_defaults()
     parser.set_defaults(test_interval=10000)
@@ -51,6 +52,8 @@ if __name__ == '__main__':
     # Following parameters are equivalent to DeepMind DQN paper
     # https://www.nature.com/articles/nature14236
     policy = DQN(
+        enable_double_dqn=args.enable_double_dqn,
+        enable_dueling_dqn=args.enable_dueling_dqn,
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
         n_warmup=50000,
