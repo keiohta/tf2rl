@@ -53,9 +53,9 @@ def explorer(global_rb, queue, trained_steps, n_transition,
     """
     env = env_fn()
     policy = policy_fn(env, "Explorer", global_rb.get_buffer_size())
-    local_rb = ReplayBuffer(obs_dim=env.observation_space.low.size,
-                                act_dim=env.action_space.low.size,
-                                size=buffer_size)
+    local_rb = ReplayBuffer(obs_shape=env.observation_space.shape,
+                            act_dim=env.action_space.low.size,
+                            size=buffer_size)
 
     s = env.reset()
     episode_steps = 0
@@ -216,7 +216,7 @@ def env_fn():
 
 def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
     return TD3(
-        state_dim=env.observation_space.high.size,
+        state_shape=env.observation_space.shape,
         action_dim=env.action_space.high.size,
         gpu=gpu,
         name=name,
@@ -238,7 +238,7 @@ def main(args_):
     manager = SyncManager()
     manager.start()
     global_rb = manager.PrioritizedReplayBuffer(
-        obs_dim=env.observation_space.low.size,
+        obs_shape=env.observation_space.shape,
         act_dim=env.action_space.low.size,
         size=args_.replay_buffer_size)
 

@@ -11,7 +11,7 @@ from tf2rl.algos.policy_base import OffPolicyAgent
 
 def get_space_size(space):
     if isinstance(space, Box):
-        return space.low.size
+        return space.shape
     elif isinstance(space, Discrete):
         return 1  # space.n
     else:
@@ -23,7 +23,7 @@ def get_replay_buffer(policy, env, use_prioritized_rb, use_nstep_rb, n_step):
         return None
 
     kwargs = {
-        "obs_dim": get_space_size(env.observation_space),
+        "obs_shape": get_space_size(env.observation_space),
         "act_dim": get_space_size(env.action_space),
         "size": policy.update_interval
     }
@@ -47,10 +47,12 @@ def get_replay_buffer(policy, env, use_prioritized_rb, use_nstep_rb, n_step):
 
     # N-step
     if use_nstep_rb:
-        kwargs["n_step"] = args.n_step
+        kwargs["n_step"] = n_step
         kwargs["discount"] = policy.discount
         return NstepReplayBuffer(**kwargs)
 
+    if isinstance(kwargs["act_dim"], tuple):
+        kwargs["act_dim"] = kwargs["act_dim"][0]
     return ReplayBuffer(**kwargs)
 
 

@@ -1,6 +1,6 @@
 import roboschool, gym
 
-from tf2rl.algos.ddpg import DDPG
+from tf2rl.algos.sac import SAC
 from tf2rl.trainer.trainer import Trainer
 
 
@@ -11,8 +11,8 @@ if __name__ == '__main__':
 
     env = gym.make(args.env_name)
     test_env = gym.make(args.env_name)
-    policy = DDPG(
-        state_shape=env.observation_space.shape,
+    policy = SAC(
+        state_dim=env.observation_space.high.size,
         action_dim=env.action_space.high.size,
         gpu=args.gpu,
         batch_size=100)

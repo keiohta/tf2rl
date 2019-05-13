@@ -65,7 +65,8 @@ class Trainer:
                 total_steps.assign_add(1)
 
                 done_flag = done
-                if episode_steps == self._env._max_episode_steps:
+                if hasattr(self._env, "_max_episode_steps") and \
+                        episode_steps == self._env._max_episode_steps:
                     done_flag = False
                 replay_buffer.add(obs=obs, act=action, next_obs=next_obs, rew=reward, done=done_flag)
                 obs = next_obs

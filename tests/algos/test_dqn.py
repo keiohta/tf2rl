@@ -1,5 +1,6 @@
 import unittest
 import gym
+import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.dqn import DQN
@@ -11,13 +12,13 @@ class DQNTest(unittest.TestCase):
         cls.env = gym.make("CartPole-v0")
 
     def test__init__(self):
-        DQN(state_dim=self.env.observation_space.low.size,
+        DQN(state_shape=self.env.observation_space.shape,
             action_dim=self.env.action_space.n,
             gpu=-1)
 
     def test_get_action(self):
         agent = DQN(
-            state_dim=self.env.observation_space.low.size,
+            state_shape=self.env.observation_space.shape,
             action_dim=self.env.action_space.n,
             gpu=-1)
         state = self.env.reset()
@@ -26,13 +27,13 @@ class DQNTest(unittest.TestCase):
 
     def test_train(self):
         agent = DQN(
-            state_dim=self.env.observation_space.low.size,
+            state_shape=self.env.observation_space.shape,
             action_dim=self.env.action_space.n,
             memory_capacity=100,
             gpu=-1)
         from cpprb import ReplayBuffer
         replay_buffer = ReplayBuffer(
-            obs_dim=self.env.observation_space.low.size,
+            obs_dim=self.env.observation_space.shape,
             act_dim=1,
             size=agent.memory_capacity)
 
@@ -46,7 +47,9 @@ class DQNTest(unittest.TestCase):
             obs = next_obs
 
         for _ in range(100):
-            agent.train(replay_buffer)
+            samples = replay_buffer.sample(agent.batch_size)
+            agent.train(samples["obs"], samples["act"], samples["next_obs"],
+                        samples["rew"], np.array(samples["done"], dtype=np.float64))
 
 
 if __name__ == '__main__':
