@@ -82,30 +82,38 @@ class DQN(OffPolicyAgent):
 
         tf.contrib.summary.scalar(name="QFuncLoss", tensor=q_func_loss, family="loss")
 
+        self.n_update += 1
+        # Update target networks
+        if self.n_update % self.target_replace_interval == 0:
+            target_update.update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
+
         return td_error
 
-    # @tf.contrib.eager.defun
+    @tf.contrib.eager.defun
     def _train_body(self, states, actions, next_states, rewards, done, weights):
-        # TODO: Enable to run with TensorFlow graph mode (currently use np.ndarray)
         with tf.device(self.device):
-            not_done = 1. - done
-            actions = np.asarray(np.ravel(actions), np.int32)
-
             with tf.GradientTape() as tape:
-                current_Q = self.q_func(states)
-                target_Q = np.asarray(current_Q).copy()
-                target_Q[np.arange(actions.shape[0]), actions] = \
-                    np.ravel(rewards + (not_done * self.discount * tf.reduce_max(self.q_func_target(next_states), keepdims=True, axis=1)))
-                target_Q = tf.stop_gradient(target_Q)
-                td_error = current_Q - target_Q
-                q_func_loss = tf.reduce_mean(tf.square(td_error) * weights * 0.5)
+                td_errors = self._compute_td_error_body(states, actions, next_states, rewards, done)
+                q_func_loss = tf.reduce_mean(tf.square(td_errors) * weights * 0.5)
 
             q_func_grad = tape.gradient(q_func_loss, self.q_func.trainable_variables)
             self.q_func_optimizer.apply_gradients(zip(q_func_grad, self.q_func.trainable_variables))
 
-            self.n_update += 1
-            # Update target networks
-            if self.n_update % self.target_replace_interval == 0:
-                target_update.update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
+            return td_errors, q_func_loss
 
-            return td_error, q_func_loss
+    @tf.contrib.eager.defun
+    def _compute_td_error_body(self, states, actions, next_states, rewards, done):
+        not_done = 1. - tf.cast(done, dtype=tf.float64)
+        actions = tf.cast(actions, dtype=tf.int32)
+        with tf.device(self.device):
+            indices = tf.concat(
+                values=[tf.expand_dims(tf.range(self.batch_size), axis=1),
+                        actions], axis=1)
+            current_Q = tf.expand_dims(
+                tf.gather_nd(self.q_func(states), indices), axis=1)
+
+            target_Q = rewards + not_done * self.discount * tf.reduce_max(
+                self.q_func_target(next_states), keepdims=True, axis=1)
+            target_Q = tf.stop_gradient(target_Q)
+            td_errors = current_Q - target_Q
+        return td_errors
