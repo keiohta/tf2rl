@@ -48,6 +48,7 @@ class DQN(OffPolicyAgent):
             n_warmup=int(1e4),
             target_replace_interval=int(5e3),
             memory_capacity=int(1e6),
+            enable_double_dqn=False,
             enable_dueling_dqn=False,
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
@@ -68,6 +69,7 @@ class DQN(OffPolicyAgent):
         self.n_update = 0
 
         # DQN variants
+        self._enable_double_dqn = enable_double_dqn
         self._enable_dueling_dqn = enable_dueling_dqn
 
     def get_action(self, state, test=False):
@@ -118,6 +120,7 @@ class DQN(OffPolicyAgent):
 
     @tf.contrib.eager.defun
     def _compute_td_error_body(self, states, actions, next_states, rewards, done):
+        # TODO: Clean code
         not_done = 1. - tf.cast(done, dtype=tf.float64)
         actions = tf.cast(actions, dtype=tf.int32)
         with tf.device(self.device):
@@ -127,8 +130,19 @@ class DQN(OffPolicyAgent):
             current_Q = tf.expand_dims(
                 tf.gather_nd(self.q_func(states), indices), axis=1)
 
-            target_Q = rewards + not_done * self.discount * tf.reduce_max(
-                self.q_func_target(next_states), keepdims=True, axis=1)
+            if self._enable_double_dqn:
+                max_q_indexes = tf.argmax(self.q_func_target(next_states),
+                                          axis=1, output_type=tf.int32)
+                # TODO: Reuse predefined `indices`
+                indices = tf.concat(
+                    values=[tf.expand_dims(tf.range(self.batch_size), axis=1),
+                            tf.expand_dims(max_q_indexes, axis=1)], axis=1)
+                target_Q = tf.expand_dims(
+                    tf.gather_nd(self.q_func(next_states), indices), axis=1)
+                target_Q = rewards + not_done * self.discount * target_Q
+            else:
+                target_Q = rewards + not_done * self.discount * tf.reduce_max(
+                    self.q_func_target(next_states), keepdims=True, axis=1)
             target_Q = tf.stop_gradient(target_Q)
             td_errors = current_Q - target_Q
         return td_errors
@@ -138,5 +152,6 @@ class DQN(OffPolicyAgent):
         import argparse
         if parser is None:
             parser = argparse.ArgumentParser(conflict_handler='resolve')
+        parser.add_argument('--enable-double-dqn', action='store_true')
         parser.add_argument('--enable-dueling-dqn', action='store_true')
         return parser

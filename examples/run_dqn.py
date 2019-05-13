@@ -14,6 +14,7 @@ if __name__ == '__main__':
     env = gym.make("CartPole-v0")
     test_env = gym.make("CartPole-v0")
     policy = DQN(
+        enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
