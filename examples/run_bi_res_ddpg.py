@@ -13,7 +13,7 @@ if __name__ == '__main__':
     env = gym.make(args.env_name)
     test_env = gym.make(args.env_name)
     policy = BiResDDPG(
-        state_dim=env.observation_space.high.size,
+        state_shape=env.observation_space.shape,
         action_dim=env.action_space.high.size,
         gpu=args.gpu,
         eta=args.eta,
