@@ -3,25 +3,36 @@ TF2RL is a deep reinforcement learning library that implements various deep rein
 
 ## Algorithms
 Following algorithms are supported:
-- DQN
+- DQN variants
+    - Double DQN, Dueling DQN
 - DDPG
 - Bi-Res-DDPG
 - TD3
-- ApeX (DDPG or TD3)
+- SAC
+- ApeX (DDPG or TD3 or SAC)
 
 ## Installation
 ```bash
-$ git clone https://github.com/keiohta/tf2rl.git tf2tl
+$ git clone https://github.com/keiohta/tf2rl.git tf2rl
 $ cd tf2rl
 $ pip install -U numpy pip
 $ pip install .
 ```
 
-If you want to run example codes, you need `pip install .[examples]`
-which install additional dependencies.
+TF2RL is built on Google's TensorFlow and requires that either `tensorflow` or `tensorflow-gpu` is installed.
+To include the TensorFlow with the installation of TF2RL, add the flag `tf` for the normal CPU version or `tf_gpu` for the GPU version.
+Note that we DON'T actually use TF2.0 but TF1.12 because it has not been officially released yet.
+```bash
+# Install TF2RL with TensorFlow CPU version
+$ pip install -e .[tf]
+```
 
-If you are developer, set `-e` option, then local modification affects
-your installation.
+Also, if you want to run example codes, add the flag `examples` that install additional dependencies.
+If you are developer, set `-e` option, then local modification affects your installation.
+```bash
+# Install developer mode TF2RL plus TensorFlow GPU version and additional dependencies to run examples
+$ pip install -e .[tf-gpu, examples]
+```
 
 ## Example
 - Train DDPG agent
