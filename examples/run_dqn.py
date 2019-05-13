@@ -6,7 +6,7 @@ from tf2rl.trainer.trainer import Trainer
 
 if __name__ == '__main__':
     parser = Trainer.get_argument()
-    parser.set_defaults()
+    parser = DQN.get_argument(parser)
     parser.set_defaults(test_interval=2000)
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
@@ -14,6 +14,7 @@ if __name__ == '__main__':
     env = gym.make("CartPole-v0")
     test_env = gym.make("CartPole-v0")
     policy = DQN(
+        enable_dueling_dqn=args.enable_dueling_dqn,
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
         n_warmup=500,

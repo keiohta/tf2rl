@@ -8,12 +8,16 @@ from tf2rl.misc.huber_loss import huber_loss
 
 
 class QFunc(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=[32, 32], name="QFunc"):
+    def __init__(self, state_shape, action_dim, units=[32, 32], name="QFunc", enable_dueling_dqn=False):
         super().__init__(name=name)
+        self._enable_dueling_dqn = enable_dueling_dqn
 
         self.l1 = tf.keras.layers.Dense(units[0], name="L1")
         self.l2 = tf.keras.layers.Dense(units[1], name="L2")
         self.l3 = tf.keras.layers.Dense(action_dim, name="L3")
+
+        if enable_dueling_dqn:
+            self.l4 = tf.keras.layers.Dense(1, name="L3")
 
         with tf.device("/cpu:0"):
             self(inputs=tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
@@ -22,8 +26,13 @@ class QFunc(tf.keras.Model):
         features = tf.concat(inputs, axis=1)
         features = tf.nn.relu(self.l1(features))
         features = tf.nn.relu(self.l2(features))
-        features = self.l3(features)
-        return features
+        if self._enable_dueling_dqn:
+            advantages = self.l3(features)
+            v_values = self.l4(features)
+            q_values = v_values + (advantages - tf.reduce_mean(advantages, axis=1, keep_dims=True))
+        else:
+            q_values = self.l3(features)
+        return q_values
 
 
 class DQN(OffPolicyAgent):
@@ -39,6 +48,7 @@ class DQN(OffPolicyAgent):
             n_warmup=int(1e4),
             target_replace_interval=int(5e3),
             memory_capacity=int(1e6),
+            enable_dueling_dqn=False,
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
@@ -56,6 +66,9 @@ class DQN(OffPolicyAgent):
         self.epsilon = epsilon
         self.target_replace_interval = target_replace_interval
         self.n_update = 0
+
+        # DQN variants
+        self._enable_dueling_dqn = enable_dueling_dqn
 
     def get_action(self, state, test=False):
         if isinstance(state, LazyFrames):
@@ -119,3 +132,11 @@ class DQN(OffPolicyAgent):
             target_Q = tf.stop_gradient(target_Q)
             td_errors = current_Q - target_Q
         return td_errors
+
+    @staticmethod
+    def get_argument(parser=None):
+        import argparse
+        if parser is None:
+            parser = argparse.ArgumentParser(conflict_handler='resolve')
+        parser.add_argument('--enable-dueling-dqn', action='store_true')
+        return parser
