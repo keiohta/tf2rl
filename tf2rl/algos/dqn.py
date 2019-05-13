@@ -4,6 +4,7 @@ import tensorflow as tf
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.envs.atari_wrapper import LazyFrames
 import tf2rl.misc.target_update_ops as target_update
+from tf2rl.misc.huber_loss import huber_loss
 
 
 class QFunc(tf.keras.Model):
@@ -95,6 +96,7 @@ class DQN(OffPolicyAgent):
             with tf.GradientTape() as tape:
                 td_errors = self._compute_td_error_body(states, actions, next_states, rewards, done)
                 q_func_loss = tf.reduce_mean(tf.square(td_errors) * weights * 0.5)
+                # q_func_loss = tf.reduce_mean(huber_loss(diff=td_errors) * weights)
 
             q_func_grad = tape.gradient(q_func_loss, self.q_func.trainable_variables)
             self.q_func_optimizer.apply_gradients(zip(q_func_grad, self.q_func.trainable_variables))
