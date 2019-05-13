@@ -131,14 +131,14 @@ class DQN(OffPolicyAgent):
                 tf.gather_nd(self.q_func(states), indices), axis=1)
 
             if self._enable_double_dqn:
-                max_q_indexes = tf.argmax(self.q_func_target(next_states),
+                max_q_indexes = tf.argmax(self.q_func(next_states),
                                           axis=1, output_type=tf.int32)
                 # TODO: Reuse predefined `indices`
                 indices = tf.concat(
                     values=[tf.expand_dims(tf.range(self.batch_size), axis=1),
                             tf.expand_dims(max_q_indexes, axis=1)], axis=1)
                 target_Q = tf.expand_dims(
-                    tf.gather_nd(self.q_func(next_states), indices), axis=1)
+                    tf.gather_nd(self.q_func_target(next_states), indices), axis=1)
                 target_Q = rewards + not_done * self.discount * target_Q
             else:
                 target_Q = rewards + not_done * self.discount * tf.reduce_max(
