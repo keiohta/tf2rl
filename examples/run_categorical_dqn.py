@@ -1,12 +1,12 @@
 import gym
 
-from tf2rl.algos.distributoral_dqn import DistributoralDQN
+from tf2rl.algos.categorical_dqn import CategoricalDQN
 from tf2rl.trainer.trainer import Trainer
 
 
 if __name__ == '__main__':
     parser = Trainer.get_argument()
-    parser = DistributoralDQN.get_argument(parser)
+    parser = CategoricalDQN.get_argument(parser)
     parser.set_defaults(test_interval=2000)
     parser.set_defaults(max_steps=int(5e5))
     parser.set_defaults(gpu=-1)
@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     env = gym.make("CartPole-v0")
     test_env = gym.make("CartPole-v0")
-    policy = DistributoralDQN(
+    policy = CategoricalDQN(
         enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
         state_shape=env.observation_space.shape,
