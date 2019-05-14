@@ -55,8 +55,8 @@ class DQN(OffPolicyAgent):
 
         q_func = q_func if q_func is not None else QFunc
         # Define and initialize Q-function network
-        self.q_func = q_func(state_shape, action_dim, units, enable_dueling_dqn=enable_dueling_dqn)
-        self.q_func_target = q_func(state_shape, action_dim, units, enable_dueling_dqn=enable_dueling_dqn)
+        self.q_func = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn)
+        self.q_func_target = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn)
         self.q_func_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
         update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
 
