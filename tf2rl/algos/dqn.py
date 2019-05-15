@@ -29,7 +29,7 @@ class QFunc(tf.keras.Model):
         if self._enable_dueling_dqn:
             advantages = self.l3(features)
             v_values = self.l4(features)
-            q_values = v_values + (advantages - tf.reduce_mean(advantages, axis=1, keep_dims=True))
+            q_values = v_values + (advantages - tf.reduce_mean(advantages, axis=1, keepdims=True))
         else:
             q_values = self.l3(features)
         return q_values
