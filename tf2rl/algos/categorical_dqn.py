@@ -52,7 +52,7 @@ class CategoricalDQN(DQN):
             state = np.expand_dims(state, axis=0).astype(np.float64)
             action_probs = self._get_action_body(tf.constant(state))
             action = tf.argmax(
-                tf.reduce_sum(action_probs * self.z_list_broadcasted, axis=2), axis=1)
+                tf.reduce_sum(action_probs * self.z_list_broadcasted, axis=2), axis=1).numpy()[0]
 
         return action
 
