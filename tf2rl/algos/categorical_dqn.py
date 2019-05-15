@@ -37,7 +37,7 @@ class CategoricalDQN(DQN):
         self._z_list = tf.constant(
             [self._v_min + i * self._delta_z for i in range(self.q_func._n_atoms)],
             dtype=tf.float64)
-        self.z_list_broadcasted = tf.tile(
+        self._z_list_broadcasted = tf.tile(
             tf.reshape(self._z_list, [1, self.q_func._n_atoms]),
                        tf.constant([self._action_dim, 1]))
 
@@ -51,6 +51,7 @@ class CategoricalDQN(DQN):
         else:
             state = np.expand_dims(state, axis=0).astype(np.float64)
             action_probs = self._get_action_body(tf.constant(state))
+            # TODO: reduce_mean?
             action = tf.argmax(
                 tf.reduce_sum(action_probs * self.z_list_broadcasted, axis=2), axis=1).numpy()[0]
 
@@ -61,7 +62,8 @@ class CategoricalDQN(DQN):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
                 td_errors = self._compute_td_error_body(states, actions, next_states, rewards, done)
-                q_func_loss = tf.reduce_mean(tf.square(td_errors) * weights * 0.5)
+                # TODO: reduce_mean?
+                q_func_loss = tf.negative(td_errors) # * weights)
 
             q_func_grad = tape.gradient(q_func_loss, self.q_func.trainable_variables)
             self.q_func_optimizer.apply_gradients(zip(q_func_grad, self.q_func.trainable_variables))
@@ -75,11 +77,6 @@ class CategoricalDQN(DQN):
             indices = tf.concat(
                 values=[tf.expand_dims(tf.range(self.batch_size), axis=1),
                         actions], axis=1)
-            current_Q = tf.expand_dims(
-                tf.gather_nd(self.q_func(states), indices), axis=1)
-            print("         current Q: ", self.q_func(states).shape, self.q_func(states).dtype)
-            print("reshaped current Q: ", current_Q.shape, current_Q.dtype)
-            print("           indices: ", indices.shape, indices.dtype)
 
             if self._enable_double_dqn:
                 raise NotImplementedError
@@ -94,9 +91,40 @@ class CategoricalDQN(DQN):
                     tf.reshape(self.discount, [-1, 1]), tf.float64)
                 target_Q = tf.reshape(
                     self._z_list, [1, self.q_func._n_atoms])
-                print(rewards.shape, not_done.shape, discounts.shape, target_Q.shape)
-                print(rewards.dtype, not_done.dtype, discounts.dtype, target_Q.dtype)
-                target_Q = rewards + not_done * discounts * target_Q
-            target_Q = tf.stop_gradient(target_Q)
-            td_errors = current_Q - target_Q
+                target_Q = rewards + not_done * discounts * target_Q 
+                b = (target_Q - self._v_min) / self._delta_z
+
+                index_help = tf.expand_dims(
+                    tf.tile(
+                        tf.reshape(tf.range(self.batch_size), [-1, 1]),
+                        tf.constant([1, self.q_func._n_atoms])),
+                    -1)
+                u, l = tf.ceil(b), tf.floor(b)
+                u_id = tf.concat(
+                    [index_help, tf.expand_dims(tf.cast(u, tf.int32), -1)],
+                    axis=2)
+                l_id = tf.concat(
+                    [index_help, tf.expand_dims(tf.cast(l, tf.int32), -1)],
+                    axis=2)
+
+                current_Q = tf.gather_nd(
+                    self.q_func(states), indices)
+                target_Q_next = self.q_func_target(next_states)
+                target_Q_next_sum = tf.reduce_sum(
+                    target_Q_next * self._z_list_broadcasted, axis=2)
+                actions_by_target_Q = tf.cast(
+                    tf.argmax(target_Q_next_sum, axis=1),
+                    tf.int32)
+                target_Q_next = tf.gather_nd(
+                    target_Q_next,
+                    tf.concat(
+                        [tf.reshape(tf.range(self.batch_size), [-1, 1]),
+                         tf.reshape(actions_by_target_Q, [-1, 1])],
+                        axis=1))
+
+                td_errors = tf.reduce_sum(
+                    current_Q * (u - b) * tf.log(tf.gather_nd(current_Q, l_id)) + \
+                    current_Q * (b - l) * tf.log(tf.gather_nd(current_Q, u_id)),
+                    axis=1)
+
         return td_errors
