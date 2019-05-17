@@ -12,20 +12,20 @@ class QFunc(tf.keras.Model):
         super().__init__(name=name)
         self._enable_dueling_dqn = enable_dueling_dqn
 
-        self.l1 = tf.keras.layers.Dense(units[0], name="L1")
-        self.l2 = tf.keras.layers.Dense(units[1], name="L2")
-        self.l3 = tf.keras.layers.Dense(action_dim, name="L3")
+        self.l1 = tf.keras.layers.Dense(units[0], name="L1", activation="relu")
+        self.l2 = tf.keras.layers.Dense(units[1], name="L2", activation="relu")
+        self.l3 = tf.keras.layers.Dense(action_dim, name="L3", activation="linear")
 
         if enable_dueling_dqn:
-            self.l4 = tf.keras.layers.Dense(1, name="L3")
+            self.l4 = tf.keras.layers.Dense(1, name="L3", activation="linear")
 
         with tf.device("/cpu:0"):
             self(inputs=tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
 
     def call(self, inputs):
         features = tf.concat(inputs, axis=1)
-        features = tf.nn.relu(self.l1(features))
-        features = tf.nn.relu(self.l2(features))
+        features = self.l1(features)
+        features = self.l2(features)
         if self._enable_dueling_dqn:
             advantages = self.l3(features)
             v_values = self.l4(features)

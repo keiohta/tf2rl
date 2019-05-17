@@ -3,6 +3,7 @@ import tensorflow as tf
 
 from tf2rl.algos.dqn import DQN, QFunc
 from tf2rl.envs.atari_wrapper import LazyFrames
+from tf2rl.misc.huber_loss import huber_loss
 
 
 class CategoricalQFunc(QFunc):
@@ -15,16 +16,18 @@ class CategoricalQFunc(QFunc):
             **kwargs)
 
     def call(self, inputs):
+        """Compute probability
+        """
         features = tf.concat(inputs, axis=1)
-        features = tf.nn.relu(self.l1(features))
-        features = tf.nn.relu(self.l2(features))
+        features = self.l1(features)
+        features = self.l2(features)
         if self._enable_dueling_dqn:
             raise NotImplementedError
         else:
-            features = tf.nn.relu(self.l3(features))
-            features = tf.reshape(features, (-1, self._action_dim, self._n_atoms))
-            return tf.clip_by_value(
-                tf.keras.activations.softmax(features, axis=2), 1e-8, 1.0-1e-8)
+            features = self.l3(features)  # [batch_size, action_dim * n_atoms]
+            features = tf.reshape(features, (-1, self._action_dim, self._n_atoms))  # [batch_size, action_dim, n_atoms]
+            features = tf.keras.activations.softmax(features, axis=2)  # [batch_size, action_dim, n_atoms]
+            return tf.clip_by_value(features, 1e-8, 1.0-1e-8)
 
 
 class CategoricalDQN(DQN):
@@ -38,7 +41,7 @@ class CategoricalDQN(DQN):
             dtype=tf.float64)
         self._z_list_broadcasted = tf.tile(
             tf.reshape(self._z_list, [1, self.q_func._n_atoms]),
-                       tf.constant([self._action_dim, 1]))
+            tf.constant([self._action_dim, 1]))
 
     def get_action(self, state, test=False):
         if isinstance(state, LazyFrames):
@@ -61,9 +64,9 @@ class CategoricalDQN(DQN):
     def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
-                td_errors = self._compute_td_error_body(states, actions, next_states, rewards, done)
-                # TODO: reduce_mean?
-                q_func_loss = tf.negative(td_errors) # * weights)
+                td_errors = self._compute_td_error_body(
+                    states, actions, next_states, rewards, done)
+                q_func_loss = tf.reduce_mean(huber_loss(diff=tf.negative(td_errors), max_grad=self.max_grad) * weights)
 
             q_func_grad = tape.gradient(q_func_loss, self.q_func.trainable_variables)
             self.q_func_optimizer.apply_gradients(zip(q_func_grad, self.q_func.trainable_variables))
@@ -92,6 +95,7 @@ class CategoricalDQN(DQN):
                 z = tf.reshape(
                     self._z_list, [1, self.q_func._n_atoms])  # [1, n_atoms]
                 z = rewards + not_done * discounts * z  # [batch_size, n_atoms]
+                z = tf.clip_by_value(z, self._v_min, self._v_max)  # [batch_size, n_atoms]
                 b = (z - self._v_min) / self._delta_z  # [batch_size, n_atoms]
 
                 index_help = tf.expand_dims(
@@ -107,25 +111,27 @@ class CategoricalDQN(DQN):
                     [index_help, tf.expand_dims(tf.cast(l, tf.int32), -1)],
                     axis=2)  # [batch_size, n_atoms, 2]
 
-                target_Q_next = self.q_func_target(next_states)
+                target_Q_next_dist = self.q_func_target(next_states)  # [batch_size, n_action, n_atoms]
                 target_Q_next_sum = tf.reduce_sum(
-                    target_Q_next * self._z_list_broadcasted, axis=2)
+                    target_Q_next_dist * self._z_list_broadcasted, axis=2)  # [batch_size, n_action]
                 actions_by_target_Q = tf.cast(
                     tf.argmax(target_Q_next_sum, axis=1),
-                    tf.int32)
-                target_Q_next = tf.gather_nd(
-                    target_Q_next,
+                    tf.int32)  # [batch_size,]
+                target_Q_next_dist = tf.gather_nd(
+                    target_Q_next_dist,
                     tf.concat(
                         [tf.reshape(tf.range(self.batch_size), [-1, 1]),
                          tf.reshape(actions_by_target_Q, [-1, 1])],
-                        axis=1))
+                        axis=1))  # [batch_size, n_atoms]
 
-                current_Q = tf.gather_nd(
-                    self.q_func(states), action_indices)
+                current_Q_dist = tf.gather_nd(
+                    self.q_func(states), action_indices)  # [batch_size, n_atoms]
 
                 td_errors = tf.reduce_sum(
-                    target_Q_next * (u - b) * tf.log(tf.gather_nd(current_Q, l_id)) + \
-                    target_Q_next * (b - l) * tf.log(tf.gather_nd(current_Q, u_id)),
+                    target_Q_next_dist * (u - b) * tf.log(
+                        tf.gather_nd(current_Q_dist, l_id)) + \
+                    target_Q_next_dist * (b - l) * tf.log(
+                        tf.gather_nd(current_Q_dist, u_id)),
                     axis=1)
 
         return td_errors
