@@ -77,41 +77,43 @@ class CategoricalDQN(DQN):
     def _compute_td_error_body(self, states, actions, next_states, rewards, done):
         actions = tf.cast(actions, dtype=tf.int32)
         with tf.device(self.device):
-            action_indices = tf.concat(
-                values=[tf.expand_dims(tf.range(self.batch_size), axis=1),
-                        actions], axis=1)
+            rewards = tf.tile(
+                tf.reshape(rewards, [-1, 1]),
+                tf.constant([1, self.q_func._n_atoms]))  # [batch_size, n_atoms]
+            not_done = 1.0 - tf.tile(
+                tf.reshape(done ,[-1, 1]),
+                tf.constant([1, self.q_func._n_atoms]))  # [batch_size, n_atoms]
+            discounts = tf.cast(
+                tf.reshape(self.discount, [-1, 1]), tf.float64)
+            z = tf.reshape(
+                self._z_list, [1, self.q_func._n_atoms])  # [1, n_atoms]
+            z = rewards + not_done * discounts * z  # [batch_size, n_atoms]
+            z = tf.clip_by_value(z, self._v_min, self._v_max)  # [batch_size, n_atoms]
+            b = (z - self._v_min) / self._delta_z  # [batch_size, n_atoms]
 
+            index_help = tf.expand_dims(
+                tf.tile(
+                    tf.reshape(tf.range(self.batch_size), [-1, 1]),
+                    tf.constant([1, self.q_func._n_atoms])),
+                -1)  # [batch_size, n_atoms, 1]
+            u, l = tf.ceil(b), tf.floor(b)  # [batch_size, n_atoms]
+            u_id = tf.concat(
+                [index_help, tf.expand_dims(tf.cast(u, tf.int32), -1)],
+                axis=2)  # [batch_size, n_atoms, 2]
+            l_id = tf.concat(
+                [index_help, tf.expand_dims(tf.cast(l, tf.int32), -1)],
+                axis=2)  # [batch_size, n_atoms, 2]
+
+            target_Q_next_dist = self.q_func_target(next_states)  # [batch_size, n_action, n_atoms]
             if self._enable_double_dqn:
-                raise NotImplementedError
+                # TODO: Check this implementation is valid
+                target_Q_next_dist = tf.gather_nd(
+                    target_Q_next_dist,
+                    tf.concat(
+                        [tf.reshape(tf.range(self.batch_size), [-1, 1]),
+                         tf.reshape(actions, [-1, 1])],
+                        axis=1))
             else:
-                rewards = tf.tile(
-                    tf.reshape(rewards, [-1, 1]),
-                    tf.constant([1, self.q_func._n_atoms]))  # [batch_size, n_atoms]
-                not_done = 1.0 - tf.tile(
-                    tf.reshape(done ,[-1, 1]),
-                    tf.constant([1, self.q_func._n_atoms]))  # [batch_size, n_atoms]
-                discounts = tf.cast(
-                    tf.reshape(self.discount, [-1, 1]), tf.float64)
-                z = tf.reshape(
-                    self._z_list, [1, self.q_func._n_atoms])  # [1, n_atoms]
-                z = rewards + not_done * discounts * z  # [batch_size, n_atoms]
-                z = tf.clip_by_value(z, self._v_min, self._v_max)  # [batch_size, n_atoms]
-                b = (z - self._v_min) / self._delta_z  # [batch_size, n_atoms]
-
-                index_help = tf.expand_dims(
-                    tf.tile(
-                        tf.reshape(tf.range(self.batch_size), [-1, 1]),
-                        tf.constant([1, self.q_func._n_atoms])),
-                    -1)  # [batch_size, n_atoms, 1]
-                u, l = tf.ceil(b), tf.floor(b)  # [batch_size, n_atoms]
-                u_id = tf.concat(
-                    [index_help, tf.expand_dims(tf.cast(u, tf.int32), -1)],
-                    axis=2)  # [batch_size, n_atoms, 2]
-                l_id = tf.concat(
-                    [index_help, tf.expand_dims(tf.cast(l, tf.int32), -1)],
-                    axis=2)  # [batch_size, n_atoms, 2]
-
-                target_Q_next_dist = self.q_func_target(next_states)  # [batch_size, n_action, n_atoms]
                 target_Q_next_sum = tf.reduce_sum(
                     target_Q_next_dist * self._z_list_broadcasted, axis=2)  # [batch_size, n_action]
                 actions_by_target_Q = tf.cast(
@@ -124,14 +126,17 @@ class CategoricalDQN(DQN):
                          tf.reshape(actions_by_target_Q, [-1, 1])],
                         axis=1))  # [batch_size, n_atoms]
 
-                current_Q_dist = tf.gather_nd(
-                    self.q_func(states), action_indices)  # [batch_size, n_atoms]
+            action_indices = tf.concat(
+                values=[tf.expand_dims(tf.range(self.batch_size), axis=1),
+                        actions], axis=1)
+            current_Q_dist = tf.gather_nd(
+                self.q_func(states), action_indices)  # [batch_size, n_atoms]
 
-                td_errors = tf.reduce_sum(
-                    target_Q_next_dist * (u - b) * tf.log(
-                        tf.gather_nd(current_Q_dist, l_id)) + \
-                    target_Q_next_dist * (b - l) * tf.log(
-                        tf.gather_nd(current_Q_dist, u_id)),
-                    axis=1)
+            td_errors = tf.reduce_sum(
+                target_Q_next_dist * (u - b) * tf.log(
+                    tf.gather_nd(current_Q_dist, l_id)) + \
+                target_Q_next_dist * (b - l) * tf.log(
+                    tf.gather_nd(current_Q_dist, u_id)),
+                axis=1)
 
         return td_errors
