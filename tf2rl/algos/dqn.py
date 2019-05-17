@@ -12,24 +12,24 @@ class QFunc(tf.keras.Model):
         super().__init__(name=name)
         self._enable_dueling_dqn = enable_dueling_dqn
 
-        self.l1 = tf.keras.layers.Dense(units[0], name="L1")
-        self.l2 = tf.keras.layers.Dense(units[1], name="L2")
-        self.l3 = tf.keras.layers.Dense(action_dim, name="L3")
+        self.l1 = tf.keras.layers.Dense(units[0], name="L1", activation="relu")
+        self.l2 = tf.keras.layers.Dense(units[1], name="L2", activation="relu")
+        self.l3 = tf.keras.layers.Dense(action_dim, name="L3", activation="linear")
 
         if enable_dueling_dqn:
-            self.l4 = tf.keras.layers.Dense(1, name="L3")
+            self.l4 = tf.keras.layers.Dense(1, name="L3", activation="linear")
 
         with tf.device("/cpu:0"):
             self(inputs=tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
 
     def call(self, inputs):
         features = tf.concat(inputs, axis=1)
-        features = tf.nn.relu(self.l1(features))
-        features = tf.nn.relu(self.l2(features))
+        features = self.l1(features)
+        features = self.l2(features)
         if self._enable_dueling_dqn:
             advantages = self.l3(features)
             v_values = self.l4(features)
-            q_values = v_values + (advantages - tf.reduce_mean(advantages, axis=1, keep_dims=True))
+            q_values = v_values + (advantages - tf.reduce_mean(advantages, axis=1, keepdims=True))
         else:
             q_values = self.l3(features)
         return q_values
@@ -55,8 +55,8 @@ class DQN(OffPolicyAgent):
 
         q_func = q_func if q_func is not None else QFunc
         # Define and initialize Q-function network
-        self.q_func = q_func(state_shape, action_dim, units)
-        self.q_func_target = q_func(state_shape, action_dim, units)
+        self.q_func = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn)
+        self.q_func_target = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn)
         self.q_func_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
         update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
 
@@ -69,7 +69,6 @@ class DQN(OffPolicyAgent):
 
         # DQN variants
         self._enable_double_dqn = enable_double_dqn
-        self._enable_dueling_dqn = enable_dueling_dqn
 
     def get_action(self, state, test=False):
         if isinstance(state, LazyFrames):

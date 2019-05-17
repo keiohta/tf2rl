@@ -10,8 +10,10 @@ from tf2rl.trainer.trainer import Trainer
 
 
 class QFunc(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=None, name="QFunc"):
+    def __init__(self, state_shape, action_dim, units=None,
+                 name="QFunc", enable_dueling_dqn=False):
         super().__init__(name=name)
+        self._enable_dueling_dqn = enable_dueling_dqn
 
         self.conv1 = Conv2D(32, kernel_size=(8, 8), strides=(4, 4),
                             padding='valid', activation='relu')
@@ -21,7 +23,10 @@ class QFunc(tf.keras.Model):
                             padding='valid', activation='relu')
         self.flat = Flatten()
         self.fc1 = Dense(512, activation='relu')
-        self.out = Dense(action_dim, activation='linear')
+        self.fc2 = Dense(action_dim, activation='linear')
+
+        if self._enable_dueling_dqn:
+            self.fc3 = Dense(1, activation='linear')
 
         input_shape = (1,) + state_shape
         with tf.device("/cpu:0"):
@@ -34,8 +39,13 @@ class QFunc(tf.keras.Model):
         features = self.conv3(features)
         features = self.flat(features)
         features = self.fc1(features)
-        features = self.out(features)
-        return features
+        if self._enable_dueling_dqn:
+            advantages = self.fc2(features)
+            v_values = self.fc3(features)
+            q_values = v_values + (advantages - tf.reduce_mean(advantages, axis=1, keepdims=True))
+        else:
+            q_values = self.fc2(features)
+        return q_values
 
 
 if __name__ == '__main__':
