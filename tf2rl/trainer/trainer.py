@@ -1,3 +1,4 @@
+import os
 import time
 import numpy as np
 import logging
@@ -30,9 +31,17 @@ class Trainer:
         logging.basicConfig(level=logging.getLevelName(args.logging_level))
         self.logger = logging.getLogger(__name__)
 
-        # prepare TensorBoard output
+        # Save and restore model
+        checkpoint = tf.train.Checkpoint(policy=self._policy)
         self.checkpoint_manager = tf.contrib.checkpoint.CheckpointManager(
-            tf.train.Checkpoint(policy=self._policy), directory=self._output_dir, max_to_keep=5)
+            checkpoint, directory=self._output_dir, max_to_keep=5)
+        if args.model_dir is not None:
+            assert os.path.isdir(args.model_dir)
+            path_ckpt = tf.train.latest_checkpoint(args.model_dir)
+            checkpoint.restore(path_ckpt)
+            self.logger.info("Restored {}".format(path_ckpt))
+
+        # prepare TensorBoard output
         self.writer = tf.contrib.summary.create_file_writer(self._output_dir)
         self.writer.set_as_default()
         tf.contrib.summary.initialize()
@@ -101,6 +110,9 @@ class Trainer:
 
                         self.writer.flush()
 
+                if int(total_steps) % self._model_save_interval == 0:
+                    self.checkpoint_manager.save()
+
             tf.contrib.summary.flush()
 
     def evaluate_policy(self):
@@ -124,6 +136,7 @@ class Trainer:
         self._max_steps = args.max_steps
         self._episode_max_steps = args.episode_max_steps if args.episode_max_steps is not None else args.max_steps
         self._show_progress = args.show_progress
+        self._model_save_interval = args.save_model_interval
         # replay buffer
         self._use_prioritized_rb = args.use_prioritized_rb
         self._use_nstep_rb = args.use_nstep_rb
@@ -142,6 +155,8 @@ class Trainer:
         parser.add_argument('--episode-max-steps', type=int, default=int(1e3))
         parser.add_argument('--show-progress', action='store_true')
         parser.add_argument('--gpu', type=int, default=0)
+        parser.add_argument('--save-model-interval', type=int, default=int(1e4))
+        parser.add_argument('--model-dir', type=str, default=None)
         # test settings
         parser.add_argument('--test-interval', type=int, default=int(1e4))
         parser.add_argument('--show-test-progress', action='store_true')
