@@ -3,7 +3,6 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
 from tensorflow.contrib.distributions import MultivariateNormalDiag
-from tensorflow.contrib.layers import xavier_initializer
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
@@ -14,7 +13,8 @@ class GaussianActor(tf.keras.Model):
     LOG_SIG_CAP_MIN = -20
     EPS = 1e-6
 
-    def __init__(self, state_dim, action_dim, max_action, units=[256, 256], name='GaussianPolicy'):
+    def __init__(self, state_dim, action_dim, max_action, units=[256, 256],
+                 name='GaussianPolicy'):
         super().__init__(name=name)
 
         self.l1 = Dense(units[0], name="L1", activation='relu')
