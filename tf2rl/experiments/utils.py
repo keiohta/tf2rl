@@ -10,9 +10,9 @@ def save_path(samples, filename):
     joblib.dump(samples, filename, compress=3)
 
 
-def restore_latest_n_traj(dirname):
+def restore_latest_n_traj(dirname, n=10):
     assert os.path.isdir(dirname)
-    filenames = get_filenames(dirname)
+    filenames = get_filenames(dirname, n)
     return load_trajectories(filenames)
 
 
