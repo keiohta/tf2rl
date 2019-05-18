@@ -167,22 +167,35 @@ class Trainer:
         if parser is None:
             parser = argparse.ArgumentParser(conflict_handler='resolve')
         # experiment settings
-        parser.add_argument('--max-steps', type=int, default=int(1e6))
-        parser.add_argument('--episode-max-steps', type=int, default=int(1e3))
-        parser.add_argument('--show-progress', action='store_true')
-        parser.add_argument('--gpu', type=int, default=0)
-        parser.add_argument('--save-model-interval', type=int, default=int(1e4))
-        parser.add_argument('--model-dir', type=str, default=None)
+        parser.add_argument('--max-steps', type=int, default=int(1e6),
+                            help='Maximum number steps to interact with env.')
+        parser.add_argument('--episode-max-steps', type=int, default=int(1e3),
+                            help='Maximum steps in an episode')
+        parser.add_argument('--show-progress', action='store_true',
+                            help='Call `render` in training process')
+        parser.add_argument('--gpu', type=int, default=0,
+                            help='GPU id')
+        parser.add_argument('--save-model-interval', type=int, default=int(1e4),
+                            help='Interval to save model')
+        parser.add_argument('--model-dir', type=str, default=None,
+                            help='Directory to restore model')
         # test settings
-        parser.add_argument('--test-interval', type=int, default=int(1e4))
-        parser.add_argument('--show-test-progress', action='store_true')
-        parser.add_argument('--test-episodes', type=int, default=5)
-        parser.add_argument('--save-test-path', action='store_true')
+        parser.add_argument('--test-interval', type=int, default=int(1e4),
+                            help='Interval to evaluate trained model')
+        parser.add_argument('--show-test-progress', action='store_true',
+                            help='Call `render` in evaluation process')
+        parser.add_argument('--test-episodes', type=int, default=5,
+                            help='Number of episodes to evaluate at once')
+        parser.add_argument('--save-test-path', action='store_true',
+                            help='Save trajectories of evaluation')
         # replay buffer
-        parser.add_argument('--use-prioritized-rb', action='store_true')
-        parser.add_argument('--use-nstep-rb', action='store_true')
-        parser.add_argument('--n-step', type=int, default=4)
+        parser.add_argument('--use-prioritized-rb', action='store_true',
+                            help='Flag to use prioritized experience replay')
+        parser.add_argument('--use-nstep-rb', action='store_true',
+                            help='Flag to use nstep experience replay')
+        parser.add_argument('--n-step', type=int, default=4,
+                            help='Number of steps to look over')
         # others
         parser.add_argument('--logging-level', choices=['DEBUG', 'INFO', 'WARNING'],
-                            default='INFO')
+                            default='INFO', help='Logging level')
         return parser

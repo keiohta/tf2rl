@@ -42,3 +42,6 @@ $ pip install -e .[tf-gpu, examples]
 $ cd examples # You must change directory to avoid importing local files.
 $ python run_ddpg.py --gpu -1
 ```
+
+## Usage
+- You can see options defined in `Trainer.get_argument`
