@@ -7,12 +7,15 @@ from tf2rl.misc.huber_loss import huber_loss
 
 
 class CategoricalQFunc(QFunc):
-    def __init__(self, state_shape, action_dim, n_atoms=51, **kwargs):
+    def __init__(self, state_shape, action_dim, n_atoms=51,
+                 enable_dueling_dqn=False, **kwargs):
         self._n_atoms = n_atoms
         self._action_dim = action_dim
+        n_action_units = (action_dim + int(enable_dueling_dqn)) * n_atoms
         super().__init__(
             state_shape=state_shape,
-            action_dim=action_dim*n_atoms,
+            action_dim=n_action_units,
+            enable_dueling_dqn=enable_dueling_dqn,
             **kwargs)
 
     def call(self, inputs):
@@ -22,12 +25,21 @@ class CategoricalQFunc(QFunc):
         features = self.l1(features)
         features = self.l2(features)
         if self._enable_dueling_dqn:
-            raise NotImplementedError
+            features = self.l3(features)  # [batch_size, action_dim * n_atoms]
+            features = tf.reshape(
+                features, (-1, self._action_dim+1, self._n_atoms))  # [batch_size, action_dim, n_atoms]
+            v_values = tf.reshape(
+                features[:, 0], (-1, 1, self._n_atoms))
+            advantages = tf.reshape(
+                features[:, 1:], [-1, self._action_dim, self._n_atoms])
+            features = v_values + (advantages - tf.expand_dims(
+                tf.reduce_mean(advantages, axis=1), axis=1))
         else:
             features = self.l3(features)  # [batch_size, action_dim * n_atoms]
-            features = tf.reshape(features, (-1, self._action_dim, self._n_atoms))  # [batch_size, action_dim, n_atoms]
-            features = tf.keras.activations.softmax(features, axis=2)  # [batch_size, action_dim, n_atoms]
-            return tf.clip_by_value(features, 1e-8, 1.0-1e-8)
+            features = tf.reshape(
+                features, (-1, self._action_dim, self._n_atoms))  # [batch_size, action_dim, n_atoms]
+        q_dist = tf.keras.activations.softmax(features, axis=2)  # [batch_size, action_dim, n_atoms]
+        return tf.clip_by_value(q_dist, 1e-8, 1.0-1e-8)
 
 
 class CategoricalDQN(DQN):
@@ -106,7 +118,7 @@ class CategoricalDQN(DQN):
 
             target_Q_next_dist = self.q_func_target(next_states)  # [batch_size, n_action, n_atoms]
             if self._enable_double_dqn:
-                # TODO: Check this implementation is valid
+                # TODO: Check this implementation is correct
                 target_Q_next_dist = tf.gather_nd(
                     target_Q_next_dist,
                     tf.concat(
