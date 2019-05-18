@@ -153,4 +153,5 @@ class DQN(OffPolicyAgent):
             parser = argparse.ArgumentParser(conflict_handler='resolve')
         parser.add_argument('--enable-double-dqn', action='store_true')
         parser.add_argument('--enable-dueling-dqn', action='store_true')
+        parser.add_argument('--enable-categorical-dqn', action='store_true')
         return parser
