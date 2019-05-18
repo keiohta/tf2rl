@@ -1,7 +1,7 @@
 import roboschool, gym
 
 from tf2rl.algos.td3 import TD3
-from tf2rl.trainer.trainer import Trainer
+from tf2rl.experiments.trainer import Trainer
 
 
 if __name__ == '__main__':

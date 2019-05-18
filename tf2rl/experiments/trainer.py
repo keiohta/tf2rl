@@ -2,6 +2,7 @@ import os
 import time
 import numpy as np
 import logging
+import joblib
 import argparse
 import tensorflow as tf
 
@@ -102,7 +103,7 @@ class Trainer:
                         replay_buffer.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
                     if int(total_steps) % self._test_interval == 0:
                         with tf.contrib.summary.always_record_summaries():
-                            avg_test_return = self.evaluate_policy()
+                            avg_test_return = self.evaluate_policy(int(total_steps))
                             self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                                 int(total_steps), avg_test_return, self._test_episodes))
                             tf.contrib.summary.scalar(name="AverageTestReturn", tensor=avg_test_return, family="loss")
@@ -115,19 +116,33 @@ class Trainer:
 
             tf.contrib.summary.flush()
 
-    def evaluate_policy(self):
+    def evaluate_policy(self, total_steps):
         avg_test_return = 0.
-        for _ in range(self._test_episodes):
+        if self._save_test_path:
+            replay_buffer = get_replay_buffer(
+                self._policy, self._test_env, size=self._episode_max_steps)
+        for i in range(self._test_episodes):
+            episode_return = 0.
             obs = self._test_env.reset()
             done = False
             for _ in range(self._episode_max_steps):
                 action = self._policy.get_action(obs, test=True)
-                obs, reward, done, _ = self._test_env.step(action)
+                next_obs, reward, done, _ = self._test_env.step(action)
+                if self._save_test_path:
+                    replay_buffer.add(obs=obs, act=action, next_obs=next_obs, rew=reward, done=done)
                 if self._show_test_progress:
                     self._test_env.render()
-                avg_test_return += reward
+                episode_return += reward
+                obs = next_obs
                 if done:
                     break
+            if self._save_test_path:
+                filename = "step_{0:08d}_epi_{1:02d}_return_{2:05.4f}.pkl".format(
+                    total_steps, i, episode_return)
+                save_path(replay_buffer.sample(self._episode_max_steps),
+                          os.path.join(self._output_dir, filename))
+                replay_buffer.clear()
+            avg_test_return += episode_return
 
         return avg_test_return / self._test_episodes
 
@@ -145,6 +160,7 @@ class Trainer:
         self._test_interval = args.test_interval
         self._show_test_progress = args.show_test_progress
         self._test_episodes = args.test_episodes
+        self._save_test_path = args.save_test_path
 
     @staticmethod
     def get_argument(parser=None):
@@ -161,6 +177,7 @@ class Trainer:
         parser.add_argument('--test-interval', type=int, default=int(1e4))
         parser.add_argument('--show-test-progress', action='store_true')
         parser.add_argument('--test-episodes', type=int, default=5)
+        parser.add_argument('--save-test-path', action='store_true')
         # replay buffer
         parser.add_argument('--use-prioritized-rb', action='store_true')
         parser.add_argument('--use-nstep-rb', action='store_true')
@@ -169,3 +186,7 @@ class Trainer:
         parser.add_argument('--logging-level', choices=['DEBUG', 'INFO', 'WARNING'],
                             default='INFO')
         return parser
+
+
+def save_path(samples, filename):
+    joblib.dump(samples, filename, compress=3)

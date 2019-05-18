@@ -1,7 +1,8 @@
 from setuptools import setup, Extension, find_packages
 
 install_requires = [
-    "cpprb"
+    "cpprb",
+    "joblib"
 ]
 
 extras_require = {
