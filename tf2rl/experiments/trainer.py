@@ -2,12 +2,12 @@ import os
 import time
 import numpy as np
 import logging
-import joblib
 import argparse
 import tensorflow as tf
 
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
+from tf2rl.experiments.utils import save_path
 
 
 config = tf.ConfigProto(allow_soft_placement=True)
@@ -186,7 +186,3 @@ class Trainer:
         parser.add_argument('--logging-level', choices=['DEBUG', 'INFO', 'WARNING'],
                             default='INFO')
         return parser
-
-
-def save_path(samples, filename):
-    joblib.dump(samples, filename, compress=3)
