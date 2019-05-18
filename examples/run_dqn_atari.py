@@ -6,7 +6,7 @@ from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.algos.dqn import DQN
 from tf2rl.envs.atari_wrapper import wrap_deepmind
-from tf2rl.trainer.trainer import Trainer
+from tf2rl.experiments.trainer import Trainer
 
 
 class QFunc(tf.keras.Model):

@@ -18,7 +18,8 @@ def get_space_size(space):
         raise NotImplementedError("Assuming to use Box or Discrete")
 
 
-def get_replay_buffer(policy, env, use_prioritized_rb, use_nstep_rb, n_step):
+def get_replay_buffer(policy, env, use_prioritized_rb=False,
+                      use_nstep_rb=False, n_step=1, size=None):
     if policy is None or env is None:
         return None
 
@@ -33,7 +34,8 @@ def get_replay_buffer(policy, env, use_prioritized_rb, use_nstep_rb, n_step):
         return ReplayBuffer(**kwargs)
 
     # off-policy policy
-    kwargs["size"] = policy.memory_capacity
+    kwargs["size"] = policy.memory_capacity \
+        if size is None else size
 
     # N-step prioritized
     if use_prioritized_rb and use_nstep_rb:
