@@ -9,14 +9,14 @@ from tf2rl.misc.target_update_ops import update_target_variables
 
 
 class CriticV(tf.keras.Model):
-    def __init__(self, state_dim, name='vf'):
+    def __init__(self, state_shape, name='vf'):
         super().__init__(name=name)
 
         self.l1 = Dense(256, name="L1", activation='relu')
         self.l2 = Dense(256, name="L2", activation='relu')
         self.l3 = Dense(1, name="L3", activation='linear')
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
         self(dummy_state)
 
     def call(self, states):
@@ -28,14 +28,14 @@ class CriticV(tf.keras.Model):
 
 
 class CriticQ(tf.keras.Model):
-    def __init__(self, state_dim, action_dim, name='qf'):
+    def __init__(self, state_shape, action_dim, name='qf'):
         super().__init__(name=name)
 
         self.l1 = Dense(256, name="L1", activation='relu')
         self.l2 = Dense(256, name="L2", activation='relu')
         self.l3 = Dense(1, name="L2", activation='linear')
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
         dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
         self([dummy_state, dummy_action])
 
@@ -52,7 +52,7 @@ class CriticQ(tf.keras.Model):
 class SAC(OffPolicyAgent):
     def __init__(
             self,
-            state_dim,
+            state_shape,
             action_dim,
             name="SAC",
             max_action=1.,
@@ -65,16 +65,16 @@ class SAC(OffPolicyAgent):
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
-        self.actor = GaussianActor(state_dim, action_dim, max_action)
+        self.actor = GaussianActor(state_shape, action_dim, max_action)
         self.actor_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
 
-        self.vf = CriticV(state_dim)
-        self.vf_target = CriticV(state_dim)
+        self.vf = CriticV(state_shape)
+        self.vf_target = CriticV(state_shape)
         update_target_variables(self.vf_target.weights, self.vf.weights, tau=1.)
         self.vf_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
 
-        self.qf1 = CriticQ(state_dim, action_dim, name="qf1")
-        self.qf2 = CriticQ(state_dim, action_dim, name="qf2")
+        self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
+        self.qf2 = CriticQ(state_shape, action_dim, name="qf2")
         self.qf1_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
         self.qf2_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
 

@@ -9,7 +9,7 @@ class GaussianActor(tf.keras.Model):
     LOG_SIG_CAP_MIN = -20
     EPS = 1e-6
 
-    def __init__(self, state_dim, action_dim, max_action, units=[256, 256],
+    def __init__(self, state_shape, action_dim, max_action, units=[256, 256],
                  name='GaussianPolicy'):
         super().__init__(name=name)
 
@@ -20,8 +20,8 @@ class GaussianActor(tf.keras.Model):
 
         self._max_action = max_action
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64))
-        self(dummy_state)
+        self(tf.constant(
+            np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
 
     def _compute_dist(self, states):
         features = self.l1(states)
