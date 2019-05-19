@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
+# TODO: Replace following with tensorflow_probability
 from tensorflow.contrib.distributions import MultivariateNormalDiag
 
 
@@ -24,6 +25,13 @@ class GaussianActor(tf.keras.Model):
             np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
 
     def _compute_dist(self, states):
+        """Compute multivariate normal distribution
+        Args:
+            states: Inputs to neural network. NN outputs mu and sigma
+                    to compute the distribution
+        Return:
+            Multivariate normal distribution
+        """
         features = self.l1(states)
         features = self.l2(features)
 
