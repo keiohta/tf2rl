@@ -40,25 +40,30 @@ class GAIL(Policy):
             learning_rate=lr, beta1=0.5)
 
     def train(self, agent_states, agent_acts, expert_states, expert_acts):
-        loss = self._train_body(agent_states, agent_acts,
+        loss, accuracy = self._train_body(agent_states, agent_acts,
                                 expert_states, expert_acts)
         tf.contrib.summary.scalar(
             name="DiscriminatorLoss", tensor=loss, family="loss")
+        tf.contrib.summary.scalar(
+            name="Accuracy", tensor=accuracy, family="loss")
         # TODO: Summarize kl-divergence and classification accuracy
 
-    # @tf.contrib.eager.defun
+    @tf.contrib.eager.defun
     def _train_body(self, agent_states, agent_acts, expert_states, expert_acts):
         epsilon = 1e-8
         with tf.device(self.device):
             with tf.GradientTape() as tape:
-                true_logit = self.disc([expert_states, expert_acts])
+                real_logit = self.disc([expert_states, expert_acts])
                 fake_logit = self.disc([agent_states, expert_acts])
-                loss = -(tf.reduce_mean(tf.log(true_logit + epsilon)) + \
+                loss = -(tf.reduce_mean(tf.log(real_logit + epsilon)) + \
                          tf.reduce_mean(tf.log(1. - fake_logit + epsilon)))
+                accuracy = \
+                    tf.reduce_mean(tf.to_float(real_logit > 0.5)) / 2. + \
+                    tf.reduce_mean(tf.to_float(fake_logit < 0.5)) / 2.
             grads = tape.gradient(loss, self.disc.trainable_variables)
             self.optimizer.apply_gradients(
                 zip(grads, self.disc.trainable_variables))
-        return loss
+        return loss, accuracy
 
     @tf.contrib.eager.defun
     def inference(self, states, actions):
