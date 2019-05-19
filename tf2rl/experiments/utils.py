@@ -10,15 +10,15 @@ def save_path(samples, filename):
     joblib.dump(samples, filename, compress=3)
 
 
-def restore_latest_n_traj(dirname):
+def restore_latest_n_traj(dirname, n_path=10, max_steps=None):
     assert os.path.isdir(dirname)
-    filenames = get_filenames(dirname)
-    return load_trajectories(filenames)
+    filenames = get_filenames(dirname, n_path)
+    return load_trajectories(filenames, None)
 
 
 def get_filenames(dirname, n_path=None):
     import re
-    itr_reg = re.compile(r"step_(?P<step>[0-9]+)_epi_(?P<episodes>[0-9]+)_return_(?P<return_u>[0-9]+).(?P<return_l>[0-9]+).pkl")
+    itr_reg = re.compile(r"step_(?P<step>[0-9]+)_epi_(?P<episodes>[0-9]+)_return_(-?)(?P<return_u>[0-9]+).(?P<return_l>[0-9]+).pkl")
 
     itr_files = []
     for _, filename in enumerate(os.listdir(dirname)):
@@ -36,6 +36,7 @@ def get_filenames(dirname, n_path=None):
 
 
 def load_trajectories(filenames, max_steps=None):
+    assert len(filenames) > 0
     paths = []
     for filename in filenames:
         paths.append(joblib.load(filename))

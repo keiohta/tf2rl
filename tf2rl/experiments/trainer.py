@@ -137,7 +137,7 @@ class Trainer:
                 if done:
                     break
             if self._save_test_path:
-                filename = "step_{0:08d}_epi_{1:02d}_return_{2:05.4f}.pkl".format(
+                filename = "step_{0:08d}_epi_{1:02d}_return_{2:010.4f}.pkl".format(
                     total_steps, i, episode_return)
                 save_path(replay_buffer.sample(self._episode_max_steps),
                           os.path.join(self._output_dir, filename))
@@ -149,7 +149,9 @@ class Trainer:
     def _set_from_args(self, args):
         # experiment settings
         self._max_steps = args.max_steps
-        self._episode_max_steps = args.episode_max_steps if args.episode_max_steps is not None else args.max_steps
+        self._episode_max_steps = args.episode_max_steps \
+            if args.episode_max_steps is not None \
+            else args.max_steps
         self._show_progress = args.show_progress
         self._model_save_interval = args.save_model_interval
         # replay buffer

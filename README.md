@@ -10,6 +10,7 @@ Following algorithms are supported:
 - TD3
 - SAC
 - ApeX (DDPG or TD3 or SAC)
+- GAIL
 
 ## Installation
 ```bash
