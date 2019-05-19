@@ -5,7 +5,6 @@ from tf2rl.algos.ddpg import DDPG, Actor
 from tf2rl.misc.target_update_ops import update_target_variables
 
 
-
 class Critic(tf.keras.Model):
     def __init__(self, state_shape, action_dim, units=[400, 300], name="Critic"):
         super().__init__(name=name)
