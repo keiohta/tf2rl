@@ -16,7 +16,7 @@ if __name__ == '__main__':
         print("Plaese generate demonstrations first")
         exit()
 
-    units = [4, 4]
+    units = [100, 100]
 
     env = gym.make(args.env_name)
     test_env = gym.make(args.env_name)
@@ -33,7 +33,8 @@ if __name__ == '__main__':
         action_dim=env.action_space.high.size,
         units=units,
         gpu=args.gpu)
-    expert_trajs = restore_latest_n_traj(args.expert_path_dir)
+    expert_trajs = restore_latest_n_traj(
+        args.expert_path_dir, n_path=20, max_steps=100)
     trainer = IRLTrainer(policy, env, args, irl, expert_trajs["obses"],
                          expert_trajs["acts"], test_env)
     trainer()
