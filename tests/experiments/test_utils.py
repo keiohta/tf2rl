@@ -16,7 +16,7 @@ class TestUtils(unittest.TestCase):
         policy = DQN(
             state_shape=cls.env.observation_space.shape,
             action_dim=cls.env.action_space.n,
-            memory_capacity=10)
+            memory_capacity=2**4)
         cls.replay_buffer = get_replay_buffer(
             policy, cls.env)
         cls.output_dir = os.path.join(
