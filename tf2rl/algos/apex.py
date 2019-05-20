@@ -19,7 +19,7 @@ tf.enable_eager_execution(config=config)
 
 
 def explorer(global_rb, queue, trained_steps, n_transition,
-             is_training_done, lock, env_fn, policy_fn,
+             is_training_done, lock, env, policy_fn, noise,
              buffer_size=1024, max_transition=None,
              episode_max_steps=1000):
     """
@@ -51,8 +51,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         episode_max_steps:
             Maximum number of steps of an episode.
     """
-    env = env_fn()
-    policy = policy_fn(env, "Explorer", global_rb.get_buffer_size())
+    policy = policy_fn(env, "Explorer", global_rb.get_buffer_size(), sigma=noise)
     local_rb = ReplayBuffer(obs_shape=env.observation_space.shape,
                             act_dim=env.action_space.low.size,
                             size=buffer_size)
@@ -115,7 +114,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
 
 
 def learner(global_rb, trained_steps, is_training_done,
-            lock, env_fn, policy_fn, n_training, update_freq, *queues):
+            lock, env, policy_fn, n_training, update_freq, *queues):
     """
     Collect transitions and store them to prioritized replay buffer.
     Args:
@@ -131,7 +130,7 @@ def learner(global_rb, trained_steps, is_training_done,
             multiprocessing.Lock to lock other processes.
             It must be released after process is done.
         env_fn:
-            Method object to generate an environment.
+            Environment.
         policy_fn:
             Method object to generate an explorer.
         n_training:
@@ -142,7 +141,6 @@ def learner(global_rb, trained_steps, is_training_done,
         queues:
             FIFOs shared with explorers to send latest network parameters.
     """
-    env = env_fn()
     policy = policy_fn(env, "Learner", global_rb.get_buffer_size())
     update_step = update_freq
 
@@ -206,22 +204,6 @@ def apex_argument(parser=None):
                         help='size of local replay buffer for explorer')
     parser.add_argument('--gpu', type=int, default=0)
     return parser
-
-
-# prepare env and policy function
-def env_fn():
-    import gym
-    return gym.make('HalfCheetah-v2')
-
-
-def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
-    return TD3(
-        state_shape=env.observation_space.shape,
-        action_dim=env.action_space.high.size,
-        gpu=gpu,
-        name=name,
-        batch_size=100,
-        memory_capacity=memory_capacity)
 
 
 def main(args_):
