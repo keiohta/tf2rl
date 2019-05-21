@@ -13,7 +13,7 @@ def get_space_size(space):
     if isinstance(space, Box):
         return space.shape
     elif isinstance(space, Discrete):
-        return 1  # space.n
+        return [1,]  # space.n
     else:
         raise NotImplementedError("Assuming to use Box or Discrete")
 
@@ -25,7 +25,7 @@ def get_replay_buffer(policy, env, use_prioritized_rb=False,
 
     kwargs = {
         "obs_shape": get_space_size(env.observation_space),
-        "act_dim": get_space_size(env.action_space),
+        "act_dim": get_space_size(env.action_space)[0],
         "size": policy.update_interval
     }
 
