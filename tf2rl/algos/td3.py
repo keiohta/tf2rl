@@ -96,7 +96,8 @@ class TD3(DDPG):
             return actor_loss, critic_loss, np.abs(td_error1) + np.abs(td_error2)
 
     def compute_td_error(self, states, actions, next_states, rewards, done):
-        td_error1, td_error2 = self._compute_td_error_body(states, actions, next_states, rewards, done)
+        td_error1, td_error2 = self._compute_td_error_body(
+            states, actions, next_states, rewards, done)
         return np.ravel(np.abs(td_error1.numpy()) + np.abs(td_error2.numpy()))
 
     @tf.contrib.eager.defun
