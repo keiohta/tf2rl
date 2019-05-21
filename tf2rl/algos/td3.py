@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.ddpg import DDPG, Actor
 from tf2rl.misc.target_update_ops import update_target_variables
@@ -10,13 +11,13 @@ class Critic(tf.keras.Model):
     def __init__(self, state_shape, action_dim, units=[400, 300], name="Critic"):
         super().__init__(name=name)
 
-        self.l1 = tf.keras.layers.Dense(units[0], name="L1")
-        self.l2 = tf.keras.layers.Dense(units[1], name="L2")
-        self.l3 = tf.keras.layers.Dense(1, name="L3")
+        self.l1 = Dense(units[0], name="L1")
+        self.l2 = Dense(units[1], name="L2")
+        self.l3 = Dense(1, name="L3")
 
-        self.l4 = tf.keras.layers.Dense(units[0], name="L4")
-        self.l5 = tf.keras.layers.Dense(units[1], name="L5")
-        self.l6 = tf.keras.layers.Dense(1, name="L6")
+        self.l4 = Dense(units[0], name="L4")
+        self.l5 = Dense(units[1], name="L5")
+        self.l6 = Dense(1, name="L6")
 
         dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
         dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))

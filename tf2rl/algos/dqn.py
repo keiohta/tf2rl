@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.envs.atari_wrapper import LazyFrames
@@ -12,12 +13,12 @@ class QFunc(tf.keras.Model):
         super().__init__(name=name)
         self._enable_dueling_dqn = enable_dueling_dqn
 
-        self.l1 = tf.keras.layers.Dense(units[0], name="L1", activation="relu")
-        self.l2 = tf.keras.layers.Dense(units[1], name="L2", activation="relu")
-        self.l3 = tf.keras.layers.Dense(action_dim, name="L3", activation="linear")
+        self.l1 = Dense(units[0], name="L1", activation="relu")
+        self.l2 = Dense(units[1], name="L2", activation="relu")
+        self.l3 = Dense(action_dim, name="L3", activation="linear")
 
         if enable_dueling_dqn:
-            self.l4 = tf.keras.layers.Dense(1, name="L3", activation="linear")
+            self.l4 = Dense(1, name="L3", activation="linear")
 
         with tf.device("/cpu:0"):
             self(inputs=tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64)))

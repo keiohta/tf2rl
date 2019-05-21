@@ -1,3 +1,5 @@
+# This is an implementation of noisy linear layer defined in following paper:
+# Noisy Networks for Exploration, https://arxiv.org/abs/1706.10295
 # Forked from https://github.com/KNakane/tensorflow/blob/master/network/eager_module.py
 # Edited by Kei Ohta
 
@@ -19,7 +21,7 @@ class NoisyDense(tf.keras.layers.Layer):
             activity_regularizer=None,
             kernel_constraint=None,
             bias_constraint=None,
-            trainable=False,
+            trainable=True,
             **kwargs):
         if 'input_shape' not in kwargs and 'input_dim' in kwargs:
             kwargs['input_shape'] = (kwargs.pop('input_dim'),)
