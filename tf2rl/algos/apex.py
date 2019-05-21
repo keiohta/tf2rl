@@ -9,7 +9,6 @@ from multiprocessing.managers import SyncManager
 
 from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
-from tf2rl.algos.td3 import TD3
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.target_update_ops import update_target_variables
 
@@ -64,13 +63,6 @@ def explorer(global_rb, queue, trained_steps, n_transition,
     sample_at_start = 0
 
     while not is_training_done.is_set():
-        # Periodically copy weights of explorer
-        if not queue.empty():
-            actor_weights, critic_weights, critic_target_weights = queue.get()
-            update_target_variables(policy.actor.weights, actor_weights, tau=1.)
-            update_target_variables(policy.critic.weights, critic_weights, tau=1.)
-            update_target_variables(policy.critic_target.weights, critic_target_weights, tau=1.)
-
         n_transition.value += 1
         episode_steps += 1
         a = policy.get_action(s)
@@ -88,14 +80,24 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             total_reward = 0
             episode_steps = 0
 
+            # Periodically copy weights of explorer
+            if not queue.empty():
+                # TODO: Adopt different agents other than actor-critic (e.g. DQN)
+                actor_weights, critic_weights, critic_target_weights = queue.get()
+                update_target_variables(policy.actor.weights, actor_weights, tau=1.)
+                update_target_variables(policy.critic.weights, critic_weights, tau=1.)
+                update_target_variables(policy.critic_target.weights, critic_target_weights, tau=1.)
+
+        # TODO: Clean code
         # Add collected experiences to global replay buffer
         if local_rb.get_stored_size() == buffer_size - 1:
             temp_n_transition = n_transition.value
             samples = local_rb.sample(local_rb.get_stored_size())
-            states, next_states, actions, rewards, done = samples["obs"], samples["next_obs"], samples["act"], samples["rew"], samples["done"]
-            done = np.array(done, dtype=np.float64)
+            states, next_states, actions, rewards, done = \
+                samples["obs"], samples["next_obs"], samples["act"], samples["rew"], samples["done"]
             td_errors = policy.compute_td_error(
-                states, actions, next_states, rewards, done)
+                states, actions, next_states, rewards,
+                np.array(done, dtype=np.float64))
             print("Grad: {0: 6d}\tSamples: {1: 7d}\tTDErr: {2:.5f}\tAveEpiRew: {3:.3f}\tFPS: {4:.2f}".format(
                 trained_steps.value, n_transition.value, np.average(np.abs(td_errors).flatten()),
                 sum(total_rewards) / len(total_rewards), (temp_n_transition - sample_at_start) / (time.time() - start)))
@@ -206,23 +208,16 @@ def apex_argument(parser=None):
     return parser
 
 
-def main(args_):
-    if args_.n_explorer is None:
-        n_explorer = multiprocessing.cpu_count() - 1
-    else:
-        n_explorer = args_.n_explorer
-    assert n_explorer > 0, "[error] number of explorers must be positive integer"
-
-    env = env_fn()
-
+def prepare_experiment(n_explorer, env, args):
     # Manager to share PER between a learner and explorers
-    SyncManager.register('PrioritizedReplayBuffer', PrioritizedReplayBuffer)
+    SyncManager.register('PrioritizedReplayBuffer',
+                         PrioritizedReplayBuffer)
     manager = SyncManager()
     manager.start()
     global_rb = manager.PrioritizedReplayBuffer(
         obs_shape=env.observation_space.shape,
         act_dim=env.action_space.low.size,
-        size=args_.replay_buffer_size)
+        size=args.replay_buffer_size)
 
     # queues to share network parameters between a learner and explorers
     queues = [Queue() for _ in range(n_explorer)]
@@ -237,27 +232,4 @@ def main(args_):
     trained_steps = Value('i', 0)
     n_transition = Value('i', 0)
 
-    tasks = []
-    # Add explorers
-    for i in range(n_explorer):
-        tasks.append(Process(
-            target=explorer,
-            args=[global_rb, queues[i], trained_steps, n_transition, is_training_done, lock, 
-                  env_fn, policy_fn, args_.local_buffer_size]))
-
-    # Add learner
-    tasks.append(Process(
-        target=learner,
-        args=[global_rb, trained_steps, is_training_done, lock, env_fn, policy_fn,
-              args_.max_batch, args_.param_update_freq, *queues]))
-
-    for task in tasks:
-        task.start()
-    for task in tasks:
-        task.join()
-
-
-if __name__ == '__main__':
-    parser = apex_argument()
-    args_ = parser.parse_args()
-    main(args_)
+    return global_rb, queues, is_training_done, lock, trained_steps, n_transition
