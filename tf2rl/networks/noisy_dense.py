@@ -50,16 +50,16 @@ class NoisyDense(tf.keras.layers.Layer):
             regularizer=self.kernel_regularizer,
             constraint=self.kernel_constraint,
             trainable=self.trainable)
-        
+
         self.sigma_kernel = self.add_weight(
             shape=(self.input_dim, self.units),
             initializer=tf.keras.initializers.Constant(value=self.sigma_init),
             name='sigma_kernel',
             trainable=self.trainable)
-        
+
         self.epsilon_kernel = tf.keras.backend.zeros(
             shape=(self.input_dim, self.units), name='epsilon_kernel')
-        
+
         if self.use_bias:
             self.bias = self.add_weight(
                 shape=(self.units,),
@@ -68,13 +68,13 @@ class NoisyDense(tf.keras.layers.Layer):
                 regularizer=self.bias_regularizer,
                 constraint=self.bias_constraint,
                 trainable=self.trainable)
-            
+
             self.sigma_bias = self.add_weight(
                 shape=(self.units,),
                 initializer=tf.keras.initializers.Constant(value=self.sigma_init),
                 name='sigma_bias',
                 trainable=self.trainable)
-            
+
             self.epsilon_bias = tf.keras.backend.zeros(
                 shape=(self.units,), name='epsilon_bias')
 
@@ -89,17 +89,17 @@ class NoisyDense(tf.keras.layers.Layer):
 
         super().build(input_shape)
 
-    def call(self, input):
-        perturbation = self.sigma_kernel * self.epsilon_kernel
-        perturbed_kernel = self.kernel + perturbation
-        output = tf.keras.backend.dot(input, perturbed_kernel)
-        if self.use_bias:
-            bias_perturbation = self.sigma_bias * self.epsilon_bias
-            perturbed_bias = self.bias + bias_perturbation
-            output = tf.keras.backend.bias_add(output, perturbed_bias)
+    def call(self, inputs, test=False):
+        # Implement Eq.(9)
+        perturbed_kernel = self.kernel + \
+            self.sigma_kernel * self.epsilon_kernel
+        outputs = tf.keras.backend.dot(inputs, perturbed_kernel)
+        if self.use_bias and not test:
+            perturbed_bias = self.bias + self.sigma_bias * self.epsilon_bias
+            outputs = tf.keras.backend.bias_add(outputs, perturbed_bias)
         if self.activation is not None:
-            output = self.activation(output)
-        return output
+            outputs = self.activation(outputs)
+        return outputs
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0], self.units)
