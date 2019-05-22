@@ -6,7 +6,7 @@ import multiprocessing
 from multiprocessing import Process
 
 from tf2rl.algos.apex import apex_argument, explorer, learner, prepare_experiment
-from tf2rl.algos.td3 import TD3
+from tf2rl.algos.ddpg import DDPG
 
 
 if __name__ == '__main__':
@@ -24,8 +24,8 @@ if __name__ == '__main__':
         return gym.make('HalfCheetah-v2')
 
     def policy_fn(env, name, memory_capacity=int(1e6),
-                  gpu=-1, sigma=0.1):
-        return TD3(
+                  gpu=-1, sigma=0.3):
+        return DDPG(
             state_shape=env.observation_space.shape,
             action_dim=env.action_space.high.size,
             gpu=gpu,
@@ -41,7 +41,8 @@ if __name__ == '__main__':
         prepare_experiment(n_explorer, env, args)
 
     tasks = []
-    noises = np.linspace(0.01, 0.3, n_explorer)
+    # noises = np.linspace(0.01, 0.3, n_explorer)
+    noises = np.ones(n_explorer, np.float64) * 0.3
     # Add explorers
     for i in range(n_explorer):
         env = env_fn()
