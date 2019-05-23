@@ -61,8 +61,8 @@ if __name__ == '__main__':
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
 
-    env = wrap_deepmind(gym.make('SpaceInvaders-v0'), frame_stack=True, scale=True)
-    test_env = wrap_deepmind(gym.make('SpaceInvaders-v0'), frame_stack=True, scale=True)
+    env = wrap_deepmind(gym.make('SpaceInvaders-v0'), frame_stack=True)
+    test_env = wrap_deepmind(gym.make('SpaceInvaders-v0'), frame_stack=True)
     # Following parameters are equivalent to DeepMind DQN paper
     # https://www.nature.com/articles/nature14236
     policy = DQN(
