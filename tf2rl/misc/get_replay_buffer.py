@@ -1,3 +1,5 @@
+import numpy as np
+
 from gym.spaces.box import Box
 from gym.spaces.discrete import Discrete
 from gym.spaces.dict import Dict
@@ -5,6 +7,8 @@ from gym.spaces.dict import Dict
 from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 from cpprb import NstepReplayBuffer
 from cpprb import NstepPrioritizedReplayBuffer
+from cpprb.experimental import ReplayBuffer as ImgReplayBuffer
+from cpprb.experimental import PrioritizedReplayBuffer as ImgPrioritizedReplayBuffer
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 
@@ -43,7 +47,17 @@ def get_replay_buffer(policy, env, use_prioritized_rb, use_nstep_rb, n_step):
 
     # prioritized
     if use_prioritized_rb:
-        return PrioritizedReplayBuffer(**kwargs)
+        if len(kwargs["obs_shape"]) == 3:
+            return ImgPrioritizedReplayBuffer(
+                kwargs["size"],
+                {"obs": {"shape": kwargs["obs_shape"],
+                         "dtype": np.ubyte},
+                 "act": {"shape": kwargs["act_dim"]},
+                 "rew": {},
+                 "done": {}},
+                 next_of="obs")
+        else:
+            return PrioritizedReplayBuffer(**kwargs)
 
     # N-step
     if use_nstep_rb:
@@ -53,16 +67,15 @@ def get_replay_buffer(policy, env, use_prioritized_rb, use_nstep_rb, n_step):
 
     if isinstance(kwargs["act_dim"], tuple):
         kwargs["act_dim"] = kwargs["act_dim"][0]
-    return ReplayBuffer(**kwargs)
 
-
-if __name__ == '__main__':
-    from cpprb import ReplayBuffer
-    import numpy as np
-
-    rb = ReplayBuffer(obs_dim=3, act_dim=3, size=10)
-    for i in range(10):
-        obs_act = np.array([i for _ in range(3)], dtype=np.float64)
-        print(obs_act)
-        rb.add(obs=obs_act, act=obs_act, next_obs=obs_act, rew=float(i), done=False)
-    print(rb.sample(10))
+    if len(kwargs["obs_shape"]) == 3:
+        return ImgReplayBuffer(
+            kwargs["size"],
+            {"obs": {"shape": kwargs["obs_shape"],
+                     "dtype": np.ubyte},
+             "act": {"shape": kwargs["act_dim"]},
+             "rew": {},
+             "done": {}},
+            next_of="obs")
+    else:
+        return ReplayBuffer(**kwargs)
