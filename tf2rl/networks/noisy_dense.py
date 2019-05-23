@@ -11,7 +11,7 @@ class NoisyDense(tf.keras.layers.Layer):
     def __init__(
             self, 
             units,
-            sigma_init=0.02,
+            sigma_init=0.017,
             activation=None,
             use_bias=True,
             kernel_initializer='glorot_uniform',
@@ -93,12 +93,12 @@ class NoisyDense(tf.keras.layers.Layer):
 
         super().build(input_shape)
 
-    def call(self, inputs, test=False):
+    def call(self, inputs):
         # Implement Eq.(9)
         perturbed_kernel = self.kernel + \
             self.sigma_kernel * self.epsilon_kernel
         outputs = tf.keras.backend.dot(inputs, perturbed_kernel)
-        if self.use_bias and not test:
+        if self.use_bias:
             perturbed_bias = self.bias + self.sigma_bias * self.epsilon_bias
             outputs = tf.keras.backend.bias_add(outputs, perturbed_bias)
         if self.activation is not None:

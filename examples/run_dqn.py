@@ -17,6 +17,7 @@ if __name__ == '__main__':
     policy = DQN(
         enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
+        enable_noisy_dqn=args.enable_noisy_dqn,
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
         n_warmup=500,
