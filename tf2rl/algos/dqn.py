@@ -3,25 +3,31 @@ import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OffPolicyAgent
+from tf2rl.networks.noisy_dense import NoisyDense
 from tf2rl.envs.atari_wrapper import LazyFrames
 from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.misc.huber_loss import huber_loss
 
 
 class QFunc(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=[32, 32], name="QFunc", enable_dueling_dqn=False):
+    def __init__(self, state_shape, action_dim, units=[32, 32],
+                 name="QFunc", enable_dueling_dqn=False,
+                 enable_noisy_dqn=False):
         super().__init__(name=name)
         self._enable_dueling_dqn = enable_dueling_dqn
+        self._enable_noisy_dqn = enable_noisy_dqn
+        DenseLayer = NoisyDense if enable_noisy_dqn else Dense
 
-        self.l1 = Dense(units[0], name="L1", activation="relu")
-        self.l2 = Dense(units[1], name="L2", activation="relu")
-        self.l3 = Dense(action_dim, name="L3", activation="linear")
+        self.l1 = DenseLayer(units[0], name="L1", activation="relu")
+        self.l2 = DenseLayer(units[1], name="L2", activation="relu")
+        self.l3 = DenseLayer(action_dim, name="L3", activation="linear")
 
         if enable_dueling_dqn:
-            self.l4 = Dense(1, name="L3", activation="linear")
+            self.l4 = DenseLayer(1, name="L3", activation="linear")
 
         with tf.device("/cpu:0"):
-            self(inputs=tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
+            self(inputs=tf.constant(np.zeros(shape=(1,)+state_shape,
+                                             dtype=np.float64)))
 
     def call(self, inputs):
         features = tf.concat(inputs, axis=1)
@@ -51,29 +57,34 @@ class DQN(OffPolicyAgent):
             memory_capacity=int(1e6),
             enable_double_dqn=False,
             enable_dueling_dqn=False,
+            enable_noisy_dqn = False,
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
         q_func = q_func if q_func is not None else QFunc
         # Define and initialize Q-function network
-        self.q_func = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn)
-        self.q_func_target = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn)
+        self.q_func = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn, enable_noisy_dqn=enable_noisy_dqn)
+        self.q_func_target = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn, enable_noisy_dqn=enable_noisy_dqn)
         self.q_func_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
         update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
 
         self._action_dim = action_dim
 
         # Set hyperparameters
-        self.epsilon = epsilon
+        self.epsilon = epsilon if not enable_noisy_dqn else 0.
         self.target_replace_interval = target_replace_interval
         self.n_update = 0
 
         # DQN variants
         self._enable_double_dqn = enable_double_dqn
+        self._enable_noisy_dqn = enable_noisy_dqn
+        self._is_image_inputs = len(state_shape) == 3
 
     def get_action(self, state, test=False):
         if isinstance(state, LazyFrames):
             state = np.array(state)
+        if self._is_image_inputs:
+            state = np.asarray(state / 255., dtype=np.float64)
         assert isinstance(state, np.ndarray)
 
         if not test and np.random.rand() < self.epsilon:
@@ -92,6 +103,10 @@ class DQN(OffPolicyAgent):
     def train(self, states, actions, next_states, rewards, done, weights=None):
         if weights is None:
             weights = np.ones_like(rewards)
+        if self._is_image_inputs:
+            states = np.asarray(states / 255., dtype=np.float64)
+            next_states = np.asarray(next_states / 255., dtype=np.float64)
+
         td_error, q_func_loss = self._train_body(
             states, actions, next_states, rewards, done, weights)
 
@@ -155,4 +170,5 @@ class DQN(OffPolicyAgent):
         parser.add_argument('--enable-double-dqn', action='store_true')
         parser.add_argument('--enable-dueling-dqn', action='store_true')
         parser.add_argument('--enable-categorical-dqn', action='store_true')
+        parser.add_argument('--enable-noisy-dqn', action='store_true')
         return parser
