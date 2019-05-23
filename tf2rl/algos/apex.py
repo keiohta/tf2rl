@@ -94,7 +94,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             temp_n_transition = n_transition.value
             samples = local_rb.sample(local_rb.get_stored_size())
             states, next_states, actions, rewards, done = samples["obs"], samples["next_obs"], samples["act"], samples["rew"], samples["done"]
-            done = np.array(done, dtype=np.float64)
+            done = np.array(done, dtype=np.float32)
             td_errors = policy.compute_td_error(
                 states, actions, next_states, rewards, done)
             print("Grad: {0: 6d}\tSamples: {1: 7d}\tTDErr: {2:.5f}\tAveEpiRew: {3:.3f}\tFPS: {4:.2f}".format(
@@ -166,7 +166,7 @@ def learner(global_rb, trained_steps, is_training_done,
             with tf.contrib.summary.always_record_summaries():
                 td_error = policy.train(
                     samples["obs"], samples["act"], samples["next_obs"],
-                    samples["rew"], np.array(samples["done"], dtype=np.float64),
+                    samples["rew"], np.array(samples["done"], dtype=np.float32),
                     samples["weights"])
                 writer.flush()
             global_rb.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)

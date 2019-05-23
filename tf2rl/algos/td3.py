@@ -19,8 +19,8 @@ class Critic(tf.keras.Model):
         self.l5 = Dense(units[1], name="L5")
         self.l6 = Dense(1, name="L6")
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
-        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
         with tf.device("/cpu:0"):
             self([dummy_state, dummy_action])
 
@@ -110,7 +110,7 @@ class TD3(DDPG):
             next_action = self.actor_target(next_states)
             noise = tf.cast(tf.clip_by_value(
                 tf.random.normal(shape=tf.shape(next_action), stddev=self._policy_noise),
-                -self._noise_clip, self._noise_clip), tf.float64)
+                -self._noise_clip, self._noise_clip), tf.float32)
             next_action = tf.clip_by_value(
                 next_action + noise, -self.actor_target.max_action, self.actor_target.max_action)
 
