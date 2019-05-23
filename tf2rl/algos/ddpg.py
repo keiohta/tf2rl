@@ -17,7 +17,7 @@ class Actor(tf.keras.Model):
         self.max_action = max_action
 
         with tf.device("/cpu:0"):
-            self(tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
+            self(tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
     def call(self, inputs):
         features = tf.nn.relu(self.l1(inputs))
@@ -35,8 +35,8 @@ class Critic(tf.keras.Model):
         self.l2 = Dense(units[1], name="L2")
         self.l3 = Dense(1, name="L3")
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
-        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
         with tf.device("/cpu:0"):
             self([dummy_state, dummy_action])
 
@@ -87,7 +87,7 @@ class DDPG(OffPolicyAgent):
         assert isinstance(state, np.ndarray)
         assert len(state.shape) == 1
 
-        state = np.expand_dims(state, axis=0).astype(np.float64)
+        state = np.expand_dims(state, axis=0).astype(np.float32)
         action = self._get_action_body(tf.constant(state))
         action = action.numpy()[0]
         if not test:

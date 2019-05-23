@@ -24,7 +24,7 @@ class GaussianActor(tf.keras.Model):
 
         self._max_action = max_action
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float32))
         self(dummy_state)
 
     def _compute_dist(self, states):
@@ -67,7 +67,7 @@ class CriticV(tf.keras.Model):
         self.l2 = Dense(256, name="L2", activation='relu')
         self.l3 = Dense(1, name="L3", activation='linear')
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float32))
         self(dummy_state)
 
     def call(self, states):
@@ -86,8 +86,8 @@ class CriticQ(tf.keras.Model):
         self.l2 = Dense(256, name="L2", activation='relu')
         self.l3 = Dense(1, name="L2", activation='linear')
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float64))
-        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float32))
+        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
         self([dummy_state, dummy_action])
 
     def call(self, inputs):
@@ -137,7 +137,7 @@ class SAC(OffPolicyAgent):
         assert isinstance(state, np.ndarray)
         assert len(state.shape) == 1
 
-        state = np.expand_dims(state, axis=0).astype(np.float64)
+        state = np.expand_dims(state, axis=0).astype(np.float32)
         action = self._get_action_body(tf.constant(state), test)
 
         return action.numpy()[0]
@@ -168,7 +168,7 @@ class SAC(OffPolicyAgent):
     def _train_body(self, states, actions, next_states, rewards, done, weights=None):
         with tf.device(self.device):
             rewards = tf.squeeze(rewards, axis=1)
-            not_done = 1. - tf.cast(done, dtype=tf.float64)
+            not_done = 1. - tf.cast(done, dtype=tf.float32)
 
             # Update Critic
             with tf.GradientTape(persistent=True) as tape:
