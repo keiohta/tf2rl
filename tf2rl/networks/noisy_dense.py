@@ -44,9 +44,9 @@ class NoisyDense(tf.keras.layers.Layer):
         self.input_dim = input_shape[-1]
         self.kernel = self.add_weight(
             shape=[self.input_dim, self.units],
-            initializer=tf.initializers.orthogonal(dtype=tf.float64),
+            initializer=tf.initializers.orthogonal(dtype=tf.float32),
             name='kernel',
-            dtype=tf.float64,
+            dtype=tf.float32,
             regularizer=self.kernel_regularizer,
             constraint=self.kernel_constraint,
             trainable=self.trainable)
@@ -60,7 +60,7 @@ class NoisyDense(tf.keras.layers.Layer):
         self.epsilon_kernel = tf.keras.backend.zeros(
             shape=(self.input_dim, self.units),
             name='epsilon_kernel',
-            dtype=tf.float64)
+            dtype=tf.float32)
 
         if self.use_bias:
             self.bias = self.add_weight(
@@ -80,7 +80,7 @@ class NoisyDense(tf.keras.layers.Layer):
             self.epsilon_bias = tf.keras.backend.zeros(
                 shape=(self.units,),
                 name='epsilon_bias',
-                dtype=tf.float64)
+                dtype=tf.float32)
 
         else:
             self.bias = None

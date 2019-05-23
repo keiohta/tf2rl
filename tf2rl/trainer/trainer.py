@@ -96,7 +96,7 @@ class Trainer:
                     samples = replay_buffer.sample(self._policy.batch_size)
                     td_error = self._policy.train(
                         samples["obs"], samples["act"], samples["next_obs"],
-                        samples["rew"], np.array(samples["done"], dtype=np.float64),
+                        samples["rew"], np.array(samples["done"], dtype=np.float32),
                         None if not self._use_prioritized_rb else samples["weights"])
                     if self._use_prioritized_rb:
                         replay_buffer.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)

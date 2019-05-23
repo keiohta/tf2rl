@@ -35,7 +35,7 @@ class QFunc(tf.keras.Model):
         input_shape = (1,) + state_shape
         with tf.device("/cpu:0"):
             self(inputs=tf.constant(np.zeros(shape=input_shape,
-                                             dtype=np.float64)))
+                                             dtype=np.float32)))
 
     def call(self, inputs):
         features = self.conv1(inputs)

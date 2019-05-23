@@ -49,7 +49,7 @@ class DQNTest(unittest.TestCase):
         for _ in range(100):
             samples = replay_buffer.sample(agent.batch_size)
             agent.train(samples["obs"], samples["act"], samples["next_obs"],
-                        samples["rew"], np.array(samples["done"], dtype=np.float64))
+                        samples["rew"], np.array(samples["done"], dtype=np.float32))
 
 
 if __name__ == '__main__':
