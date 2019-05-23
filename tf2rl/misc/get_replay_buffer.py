@@ -74,7 +74,7 @@ def get_replay_buffer(policy, env, use_prioritized_rb, use_nstep_rb, n_step):
             {"obs": {"shape": kwargs["obs_shape"],
                      "dtype": np.ubyte},
              "act": {"shape": kwargs["act_dim"]},
-             "rew": {},
+             "rew": {"dtype": np.float32},
              "done": {}},
             next_of="obs")
     else:

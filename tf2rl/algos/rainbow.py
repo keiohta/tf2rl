@@ -27,7 +27,7 @@ class Rainbow(DQN):
         if not test and np.random.rand() < self.epsilon:
             action = np.random.randint(self._action_dim)
         else:
-            state = np.expand_dims(state, axis=0).astype(np.float64)
+            state = np.expand_dims(state, axis=0).astype(np.float32)
             action_probs = self._get_action_body(tf.constant(state))
             action = tf.argmax(
                 tf.reduce_sum(action_probs * self._z_list_broadcasted, axis=2),
@@ -47,7 +47,7 @@ class Rainbow(DQN):
                 tf.reshape(done ,[-1, 1]),
                 tf.constant([1, self.q_func._n_atoms]))  # [batch_size, n_atoms]
             discounts = tf.cast(
-                tf.reshape(self.discount, [-1, 1]), tf.float64)
+                tf.reshape(self.discount, [-1, 1]), tf.float32)
             z = tf.reshape(
                 self._z_list, [1, self.q_func._n_atoms])  # [1, n_atoms]
             z = rewards + not_done * discounts * z  # [batch_size, n_atoms]

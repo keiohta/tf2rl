@@ -27,7 +27,7 @@ class QFunc(tf.keras.Model):
 
         with tf.device("/cpu:0"):
             self(inputs=tf.constant(np.zeros(shape=(1,)+state_shape,
-                                             dtype=np.float64)))
+                                             dtype=np.float32)))
 
     def call(self, inputs):
         features = tf.concat(inputs, axis=1)
@@ -84,13 +84,13 @@ class DQN(OffPolicyAgent):
         if isinstance(state, LazyFrames):
             state = np.array(state)
         if self._is_image_inputs:
-            state = np.asarray(state / 255., dtype=np.float64)
+            state = np.asarray(state / 255., dtype=np.float32)
         assert isinstance(state, np.ndarray)
 
         if not test and np.random.rand() < self.epsilon:
             action = np.random.randint(self._action_dim)
         else:
-            state = np.expand_dims(state, axis=0).astype(np.float64)
+            state = np.expand_dims(state, axis=0).astype(np.float32)
             action = self._get_action_body(tf.constant(state))
             action = np.argmax(action)
 
@@ -104,8 +104,8 @@ class DQN(OffPolicyAgent):
         if weights is None:
             weights = np.ones_like(rewards)
         if self._is_image_inputs:
-            states = np.asarray(states / 255., dtype=np.float64)
-            next_states = np.asarray(next_states / 255., dtype=np.float64)
+            states = np.asarray(states / 255., dtype=np.float32)
+            next_states = np.asarray(next_states / 255., dtype=np.float32)
 
         td_error, q_func_loss = self._train_body(
             states, actions, next_states, rewards, done, weights)
@@ -136,7 +136,7 @@ class DQN(OffPolicyAgent):
     @tf.contrib.eager.defun
     def _compute_td_error_body(self, states, actions, next_states, rewards, done):
         # TODO: Clean code
-        not_done = 1. - tf.cast(done, dtype=tf.float64)
+        not_done = 1. - tf.cast(done, dtype=tf.float32)
         actions = tf.cast(actions, dtype=tf.int32)
         with tf.device(self.device):
             indices = tf.concat(
