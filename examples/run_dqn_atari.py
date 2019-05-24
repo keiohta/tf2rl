@@ -84,7 +84,7 @@ if __name__ == '__main__':
         discount=0.99,
         epsilon=1.,
         epsilon_min=0.1,
-        epsilon_decay_step=int(1e4),
+        epsilon_decay_step=int(1e6),
         optimizer=optimizer,
         update_interval=4,
         q_func=QFunc,
