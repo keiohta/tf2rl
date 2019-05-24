@@ -52,6 +52,8 @@ class DQN(OffPolicyAgent):
             lr=0.001,
             units=[32, 32],
             epsilon=0.1,
+            epsilon_min=None,
+            epsilon_decay_step=int(1e6),
             n_warmup=int(1e4),
             target_replace_interval=int(5e3),
             memory_capacity=int(1e6),
@@ -74,7 +76,16 @@ class DQN(OffPolicyAgent):
         self._action_dim = action_dim
 
         # Set hyperparameters
-        self.epsilon = epsilon if not enable_noisy_dqn else 0.
+        if epsilon_min is not None and not enable_noisy_dqn:
+            assert epsilon > epsilon_min
+            self.epsilon_min = epsilon_min
+            self.epsilon_decay_rate = (epsilon - epsilon_min) / epsilon_decay_step
+            self.epsilon = max(epsilon - self.epsilon_decay_rate * self.n_warmup,
+                               self.epsilon_min)
+        else:
+            self.epsilon_min = epsilon
+            self.epsilon_decay_rate = 0.
+            self.epsilon = epsilon if not enable_noisy_dqn else 0.
         self.target_replace_interval = target_replace_interval
         self.n_update = 0
 
@@ -109,11 +120,16 @@ class DQN(OffPolicyAgent):
 
         tf.contrib.summary.scalar(name="QFuncLoss", tensor=q_func_loss, family="loss")
 
-        # Remove following by using tf.global_step
+        # TODO: Remove following by using tf.global_step
         self.n_update += 1
         # Update target networks
         if self.n_update % self.target_replace_interval == 0:
             update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
+
+        # Update exploration rate
+        self.epsilon = max(self.epsilon - self.epsilon_decay_rate * self.update_interval,
+                           self.epsilon_min)
+        tf.contrib.summary.scalar(name="Epsilon", tensor=self.epsilon, family="loss")
 
         return td_error
 
