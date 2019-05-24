@@ -6,7 +6,7 @@ from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.algos.dqn import DQN
 from tf2rl.networks.noisy_dense import NoisyDense
-from tf2rl.envs.atari_wrapper import wrap_deepmind
+from tf2rl.envs.atari_wrapper import wrap_dqn
 from tf2rl.trainer.trainer import Trainer
 
 
@@ -59,14 +59,14 @@ if __name__ == '__main__':
     parser = Trainer.get_argument()
     parser = DQN.get_argument(parser)
     parser.add_argument("--replay-buffer-size", type=int, default=int(1e6))
-    parser.add_argument('--env-name', type=str, default="SpaceInvaders-v0")
+    parser.add_argument('--env-name', type=str, default="SpaceInvadersNoFrameskip-v4")
     parser.set_defaults()
     parser.set_defaults(test_interval=10000)
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
 
-    env = wrap_deepmind(gym.make(args.env_name), frame_stack=True)
-    test_env = wrap_deepmind(gym.make(args.env_name), frame_stack=True)
+    env = wrap_dqn(gym.make(args.env_name))
+    test_env = wrap_dqn(gym.make(args.env_name))
     # Following parameters are equivalent to DeepMind DQN paper
     # https://www.nature.com/articles/nature14236
     optimizer = tf.train.RMSPropOptimizer(
