@@ -33,6 +33,10 @@ if __name__ == '__main__':
             name=name,
             sigma=sigma,
             batch_size=100,
+            lr_actor=0.0001,
+            lr_critic=0.0001,
+            actor_units=[300, 200],
+            critic_units=[400, 300],
             memory_capacity=memory_capacity)
 
     def get_weights_fn(policy):
@@ -56,8 +60,7 @@ if __name__ == '__main__':
         prepare_experiment(n_explorer, env, args)
 
     tasks = []
-    # noises = np.linspace(0.01, 0.3, n_explorer)
-    noises = np.ones(n_explorer, np.float64) * 0.3
+    noise = 0.3
     # Add explorers
     for i in range(n_explorer):
         env = env_fn()
