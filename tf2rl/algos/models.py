@@ -59,8 +59,12 @@ class GaussianActor(tf.keras.Model):
         dist = self._compute_dist(states)
         raw_actions = dist.mean()
         actions = tf.tanh(raw_actions) * self._max_action
-
         return actions
+
+    def compute_log_probs(self, states, actions):
+        dist = self._compute_dist(states)
+        log_probs = dist.log_prob(actions)
+        return log_probs
 
 
 class CategoricalActor(tf.keras.Model):

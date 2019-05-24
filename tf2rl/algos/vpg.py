@@ -56,16 +56,19 @@ class VPG(OnPolicyAgent):
                 return self.actor.mean_action(state)
 
     def train(self, states, actions, next_states, rewards, done):
-        loss, entropy = self._train_body(states, actions, next_states, rewards, done)
+        _ = self._train_body(states, actions, next_states, rewards, done)
 
-        tf.contrib.summary.scalar(name="Loss", tensor=loss, family="loss")
-        tf.contrib.summary.scalar(name="Entropy", tensor=entropy, family="loss")
+        # tf.contrib.summary.scalar(name="Loss", tensor=loss, family="loss")
+        # tf.contrib.summary.scalar(name="Entropy", tensor=entropy, family="loss")
 
-        return loss
+        # return loss
 
     @tf.contrib.eager.defun
     def _train_body(self, states, actions, next_states, rewards, done):
         with tf.device(self.device):
+            log_probs = self.actor.compute_log_probs(states, actions)
+            print(log_probs)
+            return
             # loss = - log_likelihood * advantage + lambda * entropy
             if self._is_discrete:
                 raise NotImplementedError
