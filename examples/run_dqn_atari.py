@@ -59,13 +59,14 @@ if __name__ == '__main__':
     parser = Trainer.get_argument()
     parser = DQN.get_argument(parser)
     parser.add_argument("--replay-buffer-size", type=int, default=int(1e6))
+    parser.add_argument('--env-name', type=str, default="SpaceInvaders-v0")
     parser.set_defaults()
     parser.set_defaults(test_interval=10000)
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
 
-    env = wrap_deepmind(gym.make('SpaceInvaders-v0'), frame_stack=True)
-    test_env = wrap_deepmind(gym.make('SpaceInvaders-v0'), frame_stack=True)
+    env = wrap_deepmind(gym.make(args.env_name), frame_stack=True)
+    test_env = wrap_deepmind(gym.make(args.env_name), frame_stack=True)
     # Following parameters are equivalent to DeepMind DQN paper
     # https://www.nature.com/articles/nature14236
     optimizer = tf.train.RMSPropOptimizer(
