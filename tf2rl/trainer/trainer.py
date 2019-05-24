@@ -92,7 +92,7 @@ class Trainer:
                     episode_return = 0
                     episode_start_time = time.time()
 
-                if total_steps >= self._policy.n_warmup:
+                if int(total_steps) >= self._policy.n_warmup and int(total_steps) % self._policy.update_interval == 0:
                     samples = replay_buffer.sample(self._policy.batch_size)
                     td_error = self._policy.train(
                         samples["obs"], samples["act"], samples["next_obs"],
