@@ -65,6 +65,8 @@ if __name__ == '__main__':
     test_env = wrap_deepmind(gym.make('SpaceInvaders-v0'), frame_stack=True)
     # Following parameters are equivalent to DeepMind DQN paper
     # https://www.nature.com/articles/nature14236
+    optimizer = tf.train.RMSPropOptimizer(
+        learning_rate=0.00025, momentum=0.95, epsilon=0.01)
     policy = DQN(
         enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
@@ -76,7 +78,8 @@ if __name__ == '__main__':
         batch_size=32,
         memory_capacity=args.replay_buffer_size,
         discount=0.99,
-        lr=0.00025,
+        optimizer=optimizer,
+        update_interval=4,
         q_func=QFunc,
         gpu=args.gpu)
     trainer = Trainer(policy, env, args, test_env=test_env)
