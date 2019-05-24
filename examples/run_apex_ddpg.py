@@ -7,6 +7,7 @@ from multiprocessing import Process
 
 from tf2rl.algos.apex import apex_argument, explorer, learner, prepare_experiment
 from tf2rl.algos.ddpg import DDPG
+from tf2rl.misc.target_update_ops import update_target_variables
 
 
 if __name__ == '__main__':
@@ -34,6 +35,20 @@ if __name__ == '__main__':
             batch_size=100,
             memory_capacity=memory_capacity)
 
+    def get_weights_fn(policy):
+        return [policy.actor.weights,
+                policy.critic.weights,
+                policy.critic_target.weights]
+
+    def set_weights_fn(policy, weights):
+        actor_weights, critic_weights, critic_target_weights = weights
+        update_target_variables(
+            policy.actor.weights, actor_weights, tau=1.)
+        update_target_variables(
+            policy.critic.weights, critic_weights, tau=1.)
+        update_target_variables(
+            policy.critic_target.weights, critic_target_weights, tau=1.)
+
     env = env_fn()
 
     global_rb, queues, is_training_done, lock, \
@@ -48,13 +63,15 @@ if __name__ == '__main__':
         env = env_fn()
         tasks.append(Process(
             target=explorer,
-            args=[global_rb, queues[i], trained_steps, n_transition, is_training_done, lock, 
-                  env, policy_fn, noises[i], args.local_buffer_size]))
+            args=[global_rb, queues[i], trained_steps, n_transition,
+                  is_training_done, lock, env, policy_fn, set_weights_fn,
+                  noise, args.local_buffer_size]))
 
     # Add learner
     tasks.append(Process(
         target=learner,
-        args=[global_rb, trained_steps, is_training_done, lock, env_fn(), policy_fn,
+        args=[global_rb, trained_steps, is_training_done, lock, env_fn(),
+              policy_fn, get_weights_fn,
               args.max_batch, args.param_update_freq, *queues]))
 
     for task in tasks:
