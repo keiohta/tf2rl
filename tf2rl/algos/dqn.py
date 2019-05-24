@@ -55,6 +55,7 @@ class DQN(OffPolicyAgent):
             n_warmup=int(1e4),
             target_replace_interval=int(5e3),
             memory_capacity=int(1e6),
+            optimizer=None,
             enable_double_dqn=False,
             enable_dueling_dqn=False,
             enable_noisy_dqn = False,
@@ -65,8 +66,10 @@ class DQN(OffPolicyAgent):
         # Define and initialize Q-function network
         self.q_func = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn, enable_noisy_dqn=enable_noisy_dqn)
         self.q_func_target = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn, enable_noisy_dqn=enable_noisy_dqn)
-        self.q_func_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
-        update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
+        self.q_func_optimizer = optimizer if optimizer is not None else \
+            tf.train.AdamOptimizer(learning_rate=lr)
+        update_target_variables(self.q_func_target.weights,
+                                self.q_func.weights, tau=1.)
 
         self._action_dim = action_dim
 
@@ -125,8 +128,8 @@ class DQN(OffPolicyAgent):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
                 td_errors = self._compute_td_error_body(states, actions, next_states, rewards, done)
-                q_func_loss = tf.reduce_mean(tf.square(td_errors) * weights * 0.5)
-                # q_func_loss = tf.reduce_mean(huber_loss(diff=td_errors) * weights)
+                q_func_loss = tf.reduce_mean(
+                    huber_loss(diff=td_errors) * weights)
 
             q_func_grad = tape.gradient(q_func_loss, self.q_func.trainable_variables)
             self.q_func_optimizer.apply_gradients(zip(q_func_grad, self.q_func.trainable_variables))
