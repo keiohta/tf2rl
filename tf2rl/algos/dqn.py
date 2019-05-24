@@ -81,13 +81,10 @@ class DQN(OffPolicyAgent):
         # DQN variants
         self._enable_double_dqn = enable_double_dqn
         self._enable_noisy_dqn = enable_noisy_dqn
-        self._is_image_inputs = len(state_shape) == 3
 
     def get_action(self, state, test=False):
         if isinstance(state, LazyFrames):
             state = np.array(state)
-        if self._is_image_inputs:
-            state = np.asarray(state / 255., dtype=np.float32)
         assert isinstance(state, np.ndarray)
 
         if not test and np.random.rand() < self.epsilon:
@@ -106,9 +103,6 @@ class DQN(OffPolicyAgent):
     def train(self, states, actions, next_states, rewards, done, weights=None):
         if weights is None:
             weights = np.ones_like(rewards)
-        if self._is_image_inputs:
-            states = np.asarray(states / 255., dtype=np.float32)
-            next_states = np.asarray(next_states / 255., dtype=np.float32)
 
         td_error, q_func_loss = self._train_body(
             states, actions, next_states, rewards, done, weights)

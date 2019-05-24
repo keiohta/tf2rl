@@ -38,7 +38,10 @@ class QFunc(tf.keras.Model):
                                              dtype=np.float32)))
 
     def call(self, inputs):
-        features = self.conv1(inputs)
+        # TODO: This type conversion seems to be bottle neck
+        features = tf.divide(tf.cast(inputs, tf.float32),
+                             tf.constant(255.))
+        features = self.conv1(features)
         features = self.conv2(features)
         features = self.conv3(features)
         features = self.flat(features)
