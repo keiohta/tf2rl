@@ -35,6 +35,7 @@ class OnPolicyAgent(Policy):
             **kwargs):
         if memory_capacity is None:
             memory_capacity = kwargs["batch_size"]
+        kwargs["n_warmup"] = 0
         super().__init__(memory_capacity=memory_capacity, **kwargs)
 
 
