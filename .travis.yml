@@ -1,7 +1,9 @@
 dist: xenial
 language: python
+compiler:
+  - gcc-7.2
 python:
   - "3.7"
 install:
   - pip install gym
-script: python -m unittest discover
+script: python -m unittest discovert
