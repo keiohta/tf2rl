@@ -10,7 +10,9 @@ addons:
 python:
   - "3.7"
 install:
-  - pip install gym, cpprb, tensorflow
+  - pip install gym
+  - pip install cpprb
+  - pip install tensorflow
 script:
   - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
   - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
