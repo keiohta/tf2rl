@@ -2,3 +2,5 @@ tensorflow==1.13.1
 cpprb
 joblib
 gym
+opencv-python
+coveralls
