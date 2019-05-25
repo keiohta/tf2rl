@@ -6,4 +6,6 @@ python:
   - "3.7"
 install:
   - pip install gym
-script: python -m unittest discovert
+script:
+  - gcc --version
+  - python -m unittest discover
