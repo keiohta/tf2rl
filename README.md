@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/keiohta/tf2rl.svg?branch=master)](https://travis-ci.org/keiohta/tf2rl)
+[![Coverage Status](https://coveralls.io/repos/github/keiohta/tf2rl/badge.svg)](https://coveralls.io/github/keiohta/tf2rl)
 
 # TF2RL
 TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using TensorFlow 2.0.
