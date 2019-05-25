@@ -21,4 +21,5 @@ setup(
     license="MIT",
     packages=find_packages("."),
     install_requires=install_requires,
-    extras_require=extras_require)
+    extras_require=extras_require,
+    test_suite='tests')

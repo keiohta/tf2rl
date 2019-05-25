@@ -13,4 +13,6 @@ script:
   - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
   - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
   - pip install -r test_requirements.txt
-  - python -m unittest discover
+  - coverage run --source cookiecutter setup.py test
+after_success:
+  - coveralls
