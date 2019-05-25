@@ -6,7 +6,7 @@ import tensorflow as tf
 from tf2rl.algos.dqn import DQN
 
 
-class DQNTest(unittest.TestCase):
+class TestDQN(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.env = gym.make("CartPole-v0")
