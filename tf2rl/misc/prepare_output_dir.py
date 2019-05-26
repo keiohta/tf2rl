@@ -86,6 +86,8 @@ def prepare_output_dir(args, user_specified_dir=None, argv=None,
     Returns:
         Path of the output directory created by this function (str).
     """
+    if suffix is not "":
+        suffix = "_" + suffix
     time_str = datetime.datetime.now().strftime(time_format) + suffix
     if user_specified_dir is not None:
         if os.path.exists(user_specified_dir):
