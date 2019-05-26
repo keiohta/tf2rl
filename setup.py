@@ -1,7 +1,7 @@
 from setuptools import setup, Extension, find_packages
 
 install_requires = [
-    "cpprb"
+    "cpprb>=7.13.3"
 ]
 
 extras_require = {
