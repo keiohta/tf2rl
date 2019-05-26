@@ -28,7 +28,8 @@ class Trainer:
         self._set_from_args(args)
 
         # prepare log directory
-        self._output_dir = prepare_output_dir(args=args, user_specified_dir="./results")
+        self._output_dir = prepare_output_dir(
+            args=args, user_specified_dir="./results", suffix=args.dir_suffix)
         logging.basicConfig(level=logging.getLevelName(args.logging_level))
         self.logger = logging.getLogger(__name__)
 
@@ -181,6 +182,8 @@ class Trainer:
                             help='Interval to save model')
         parser.add_argument('--model-dir', type=str, default=None,
                             help='Directory to restore model')
+        parser.add_argument('--dir-suffix', type=str, default='',
+                            help='Suffix for directory that contains results')
         # test settings
         parser.add_argument('--test-interval', type=int, default=int(1e4),
                             help='Interval to evaluate trained model')
