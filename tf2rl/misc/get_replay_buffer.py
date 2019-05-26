@@ -28,17 +28,15 @@ def get_replay_buffer(policy, env, use_prioritized_rb, use_nstep_rb, n_step):
     obs_shape = get_space_size(env.observation_space)
     kwargs = {
         "size": policy.update_interval,
+        "default_dtype": np.float32,
         "env_dict": {
             "obs": {
-                "shape": get_space_size(env.observation_space),
-                "dtype": np.float32},
+                "shape": get_space_size(env.observation_space)},
             "next_obs": {
-                "shape": get_space_size(env.observation_space),
-                "dtype": np.float32},
+                "shape": get_space_size(env.observation_space)},
             "act": {
-                "shape": get_space_size(env.action_space),
-                "dtype": np.float32},
-            "rew": {"dtype": np.float32},
+                "shape": get_space_size(env.action_space)},
+            "rew": {},
             "done": {}}}
 
     # on-policy policy
