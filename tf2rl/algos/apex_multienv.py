@@ -259,7 +259,7 @@ def prepare_experiment(env, args):
         size=args.replay_buffer_size)
 
     # queues to share network parameters between a learner and explorers
-    queues = [Queue(), Queue()]
+    queues = [manager.Queue(), manager.Queue()]
 
     # Event object to share training status. if event is set True, all exolorers stop sampling transitions
     is_training_done = Event()
