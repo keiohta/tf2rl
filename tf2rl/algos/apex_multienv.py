@@ -11,6 +11,7 @@ from cpprb import PrioritizedReplayBuffer
 
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
+from tf2rl.envs.env_utils import get_act_dim
 
 config = tf.ConfigProto(allow_soft_placement=True)
 config.gpu_options.allow_growth = True
@@ -56,7 +57,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         envs._sample_env, "Explorer", global_rb.get_buffer_size())
     local_rb = PrioritizedReplayBuffer(
         obs_shape=envs._sample_env.observation_space.shape,
-        act_dim=envs._sample_env.action_space.low.size,
+        act_dim=get_act_dim(envs._sample_env),
         size=buffer_size)
 
     obses = envs.py_reset()
@@ -227,9 +228,10 @@ def prepare_experiment(env, args):
                          PrioritizedReplayBuffer)
     manager = SyncManager()
     manager.start()
+
     global_rb = manager.PrioritizedReplayBuffer(
         obs_shape=env.observation_space.shape,
-        act_dim=env.action_space.low.size,
+        act_dim=get_act_dim(env),
         size=args.replay_buffer_size)
 
     # queues to share network parameters between a learner and explorers
