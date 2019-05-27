@@ -7,7 +7,8 @@ import multiprocessing
 from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
 
-from cpprb import ReplayBuffer, PrioritizedReplayBuffer
+from cpprb import PrioritizedReplayBuffer
+from cpprb.experimental import ReplayBuffer
 
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.envs.env_utils import get_act_dim
@@ -52,10 +53,20 @@ def explorer(global_rb, queue, trained_steps,
         env_fn, n_env, n_thread, episode_max_steps)
     policy = policy_fn(
         envs._sample_env, "Explorer", global_rb.get_buffer_size())
-    local_rb = ReplayBuffer(
-        obs_shape=envs._sample_env.observation_space.shape,
-        act_dim=get_act_dim(envs._sample_env),
-        size=buffer_size)
+    kwargs = {
+        "size": buffer_size,
+        "default_dtype": np.float64,
+        "env_dict": {
+            "obs": {
+                "shape": envs._sample_env.observation_space.shape},
+            "next_obs": {
+                "shape": envs._sample_env.observation_space.shape},
+            "act": {
+                "shape": get_act_dim(envs._sample_env)},
+            "rew": {},
+            "done": {},
+            "priorities": {}}}
+    local_rb = ReplayBuffer(**kwargs)
 
     obses = envs.py_reset()
     start = time.time()
@@ -65,28 +76,32 @@ def explorer(global_rb, queue, trained_steps,
         obses = envs.py_observation()
         actions = policy.get_action(obses, tensor=True)
         next_obses, rewards, dones, _ = envs.step(actions)
+        td_errors = policy.compute_td_error(
+            states=obses, actions=actions, next_states=next_obses,
+            rewards=rewards, dones=dones)
         local_rb.add(obs=obses, act=actions, next_obs=next_obses,
-                     rew=rewards, done=dones)
+                     rew=rewards, done=dones,
+                     priorities=np.abs(td_errors+1e-6))
 
         # Periodically copy weights of explorer
         if not queue.empty():
             set_weights_fn(policy, queue.get())
 
         # Add collected experiences to global replay buffer
-        if local_rb.get_stored_size() > buffer_size:
+        if local_rb.get_stored_size() >= buffer_size:
             samples = local_rb.sample(local_rb.get_stored_size())
             lock.acquire()
             global_rb.add(
                 obs=samples["obs"], act=samples["act"],
                 next_obs=samples["next_obs"], 
-                rew=samples["rew"], done=samples["done"],)
-                # priorities=np.abs(td_errors)+1e-6)
+                rew=samples["rew"], done=samples["done"],
+                priorities=np.squeeze(samples["priorities"]))
             lock.release()
             local_rb.clear()
             msg = "Grad: {0: 6d}\t".format(trained_steps.value)
-            msg += "Samples: {0: 7d}\t".format(n_transition.value)
-            # msg += "TDErr: {0:.5f}\t".format(np.average(np.abs(td_errors).flatten()))
-            msg += "FPS: {0:.2f}".format((n_transition.value - sample_at_start) / (time.time() - start))
+            msg += "Samples: {0: 7d}\t".format(n_sample)
+            msg += "TDErr: {0:.5f}\t".format(np.average(samples["priorities"]))
+            msg += "FPS: {0:.2f}".format((n_sample - n_sample_old) / (time.time() - start))
             print(msg)
             start = time.time()
             n_sample_old = n_sample
@@ -134,18 +149,17 @@ def learner(global_rb, trained_steps, is_training_done,
 
     start_time = time.time()
     while not is_training_done.is_set():
-        with tf.contrib.summary.record_summaries_every_n_global_steps(1000):
+        with tf.contrib.summary.record_summaries_every_n_global_steps(100):
             trained_steps.value += 1
             total_steps.assign(trained_steps.value)
             lock.acquire()
             samples = global_rb.sample(policy.batch_size)
-            with tf.contrib.summary.always_record_summaries():
-                td_errors = policy.train(
-                    samples["obs"], samples["act"], samples["next_obs"],
-                    samples["rew"], np.array(samples["done"], dtype=np.float64),
-                    samples["weights"])
-                writer.flush()
-            global_rb.update_priorities(samples["indexes"], np.abs(td_errors) + 1e-6)
+            td_errors = policy.train(
+                samples["obs"], samples["act"], samples["next_obs"],
+                samples["rew"], np.array(samples["done"], dtype=np.float64),
+                samples["weights"])
+            global_rb.update_priorities(
+                samples["indexes"], np.abs(td_errors)+1e-6)
             lock.release()
 
             # Put updated weights to queue
@@ -159,7 +173,7 @@ def learner(global_rb, trained_steps, is_training_done,
                 start_time = time.time()
             if trained_steps.value % evaluation_freq == 0:
                 queues[1].put(get_weights_fn(policy))
-
+                queues[1].put(int(total_steps))
 
         if trained_steps.value >= n_training:
             is_training_done.set()
