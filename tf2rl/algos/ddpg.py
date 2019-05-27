@@ -137,6 +137,9 @@ class DDPG(OffPolicyAgent):
             return actor_loss, critic_loss, td_errors
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
+        if isinstance(actions, tf.Tensor):
+            rewards = tf.expand_dims(rewards, axis=1)
+            dones = tf.expand_dims(dones, 1)
         td_errors = self._compute_td_error_body(states, actions, next_states, rewards, dones)
         return np.ravel(td_errors.numpy())
 
