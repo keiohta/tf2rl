@@ -18,7 +18,7 @@ config.gpu_options.allow_growth = True
 tf.enable_eager_execution(config=config)
 
 
-def explorer(global_rb, queue, trained_steps, n_transition,
+def explorer(global_rb, queue, trained_steps,
              is_training_done, lock, env_fn, policy_fn,
              set_weights_fn, n_env=64, n_thread=4,
              buffer_size=1024, episode_max_steps=1000):
@@ -34,8 +34,6 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             This is process safe, so you don't need to lock process when use this.
         trained_steps:
             Number of steps to apply gradients.
-        n_transition:
-            Number of collected transitions.
         is_training_done:
             multiprocessing.Event object to share the status of training.
         lock:
@@ -61,11 +59,10 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         size=buffer_size)
 
     obses = envs.py_reset()
-    episode_steps = 0
     start = time.time()
-    sample_at_start = 0
+    n_sample, n_sample_old = 0, 0
     while not is_training_done.is_set():
-        n_transition.value += n_env
+        n_sample += n_env
         obses = envs.py_observation()
         actions = policy.get_action(obses, tensor=True)
         next_obses, rewards, dones, _ = envs.step(actions)
@@ -93,8 +90,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             msg += "FPS: {0:.2f}".format((n_transition.value - sample_at_start) / (time.time() - start))
             print(msg)
             start = time.time()
-            sample_at_start = n_transition.value
-
+            n_sample_old = n_sample
 
 
 def learner(global_rb, trained_steps, is_training_done,
@@ -244,6 +240,5 @@ def prepare_experiment(env, args):
 
     # Shared memory objects to count number of samples and applied gradients
     trained_steps = Value('i', 0)
-    n_transition = Value('i', 0)
 
-    return global_rb, queues, is_training_done, lock, trained_steps, n_transition
+    return global_rb, queues, is_training_done, lock, trained_steps
