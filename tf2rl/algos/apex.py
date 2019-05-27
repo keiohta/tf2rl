@@ -71,7 +71,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         if episode_steps == env._max_episode_steps:
             done_flag = False
         total_reward += r
-        local_rb.add(s, a, r, s_, done_flag)
+        local_rb.add(obs=s, act=a, rew=r, next_obs=s_, done=done_flag)
 
         s = s_
         if done or episode_steps == episode_max_steps:
@@ -99,7 +99,8 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             total_rewards = []
             lock.acquire()
             global_rb.add(
-                samples["obs"], samples["next_obs"], samples["rew"], samples["next_obs"], samples["done"],
+                obs=samples["obs"], act=samples["act"], rew=samples["rew"],
+                next_obs=samples["next_obs"], done=samples["done"],
                 priorities=np.abs(td_errors)+1e-6)
             lock.release()
             local_rb.clear()
