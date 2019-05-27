@@ -18,14 +18,13 @@ if __name__ == '__main__':
     def env_fn():
         return gym.make('HalfCheetah-v2')
 
-    def policy_fn(env, name, memory_capacity=int(1e6),
-                  gpu=-1, sigma=0.3):
+    def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
         return DDPG(
             state_shape=env.observation_space.shape,
             action_dim=env.action_space.high.size,
             gpu=gpu,
             name=name,
-            sigma=sigma,
+            sigma=0.3,
             batch_size=100,
             lr_actor=0.0001,
             lr_critic=0.0001,
@@ -54,14 +53,12 @@ if __name__ == '__main__':
         prepare_experiment(env, args)
 
     tasks = []
-    noise = 0.3
-
     # Add explorers
     tasks.append(Process(
         target=explorer,
         args=[global_rb, queues[0], trained_steps, n_transition,
               is_training_done, lock, env_fn, policy_fn,
-              set_weights_fn, noise, args.n_env, args.n_thread,
+              set_weights_fn, args.n_env, args.n_thread,
               args.local_buffer_size, args.episode_max_steps]))
 
     # Add learner
