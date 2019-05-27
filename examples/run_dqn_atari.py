@@ -66,7 +66,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     env = wrap_dqn(gym.make(args.env_name))
-    test_env = wrap_dqn(gym.make(args.env_name))
+    test_env = wrap_dqn(gym.make(args.env_name), reward_clipping=False)
     # Following parameters are equivalent to DeepMind DQN paper
     # https://www.nature.com/articles/nature14236
     optimizer = tf.train.RMSPropOptimizer(
