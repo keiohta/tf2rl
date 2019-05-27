@@ -62,7 +62,8 @@ class MultiThreadEnv(object):
         assert isinstance(actions, tf.Tensor)
         with tf.variable_scope(name, default_name="MultiStep"):
             obs, reward, done = tf.py_func(
-                self.py_step, [actions], [tf.float64, tf.float64, tf.float64],
+                self.py_step, [actions],
+                [tf.float64, tf.float64, tf.float64],
                 name="py_step")
             obs.set_shape((self.batch_size,) + self.observation_shape)
             reward.set_shape((self.batch_size,))
@@ -97,6 +98,10 @@ class MultiThreadEnv(object):
 
         for t in threads:
             t.join()
+
+        for i in range(self.batch_size):
+            if self.list_steps[i] == self.max_episode_steps:
+                self.list_done[i] = False
 
         obs = np.stack(self.list_obs, axis=0)
         reward = np.stack(self.list_rewards, axis=0).astype(np.float64)
