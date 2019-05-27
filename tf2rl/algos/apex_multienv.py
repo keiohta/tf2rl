@@ -9,7 +9,6 @@ from multiprocessing.managers import SyncManager
 
 from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
-from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.envs.env_utils import get_act_dim
 
@@ -94,7 +93,7 @@ def explorer(global_rb, queue, trained_steps,
 
 
 def learner(global_rb, trained_steps, is_training_done,
-            lock, env, policy_fn, get_weights_fn,
+            lock, env, policy_fn, get_weights_fn, output_dir,
             n_training, update_freq, evaluation_freq, queues):
     """
     Collect transitions and store them to prioritized replay buffer.
@@ -124,7 +123,6 @@ def learner(global_rb, trained_steps, is_training_done,
     """
     policy = policy_fn(env, "Learner", global_rb.get_buffer_size())
 
-    output_dir = prepare_output_dir(args=None, user_specified_dir="./results")
     writer = tf.contrib.summary.create_file_writer(output_dir)
     writer.set_as_default()
     tf.contrib.summary.initialize()
@@ -167,15 +165,22 @@ def learner(global_rb, trained_steps, is_training_done,
             is_training_done.set()
 
 
-def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue,
+def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, output_dir,
               n_evaluation=10, episode_max_steps=1000, show_test_progress=False):
+    writer = tf.contrib.summary.create_file_writer(
+        output_dir, filename_suffix="_evaluation")
+    writer.set_as_default()
+    tf.contrib.summary.initialize()
+
     policy = policy_fn(env, "Learner")
+    total_steps = tf.train.create_global_step()
 
     while not is_training_done.is_set():
         if queue.empty():
             continue
         else:
             set_weights_fn(policy, queue.get())
+            total_steps.assign(queue.get())
             avg_test_return = 0.
             for i in range(n_evaluation):
                 episode_return = 0.
@@ -191,7 +196,12 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue,
                     if done:
                         break
                 avg_test_return += episode_return
-            print("Evaluation: {}".format(avg_test_return / n_evaluation))
+            avg_test_return /= n_evaluation
+            print("Evaluation: {}".format(avg_test_return))
+            with tf.contrib.summary.always_record_summaries():
+                tf.contrib.summary.scalar(name="AverageTestReturn",
+                                          tensor=avg_test_return, family="loss")
+                writer.flush()
 
 
 def apex_argument(parser=None):
