@@ -70,7 +70,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         actions = policy.get_action(obses, tensor=True)
         next_obses, rewards, dones, _ = envs.step(actions)
         td_errors = policy.compute_td_error(
-            obses, actions.numpy(), next_obses, rewards, dones)
+            obses, actions, next_obses, rewards, dones)
 
         local_rb.add(obses, actions, rewards, next_obses, dones,
                      priorities=(np.abs(td_errors)+1e-6))
