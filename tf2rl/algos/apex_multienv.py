@@ -12,6 +12,7 @@ from cpprb.experimental import ReplayBuffer
 
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.envs.env_utils import get_act_dim
+from tf2rl.misc.prepare_output_dir import prepare_output_dir
 
 config = tf.ConfigProto(allow_soft_placement=True)
 config.gpu_options.allow_growth = True
@@ -108,7 +109,7 @@ def explorer(global_rb, queue, trained_steps,
 
 
 def learner(global_rb, trained_steps, is_training_done,
-            lock, env, policy_fn, get_weights_fn, output_dir,
+            lock, env, policy_fn, get_weights_fn,
             n_training, update_freq, evaluation_freq, queues):
     """
     Collect transitions and store them to prioritized replay buffer.
@@ -138,6 +139,8 @@ def learner(global_rb, trained_steps, is_training_done,
     """
     policy = policy_fn(env, "Learner", global_rb.get_buffer_size())
 
+    output_dir = prepare_output_dir(
+        args=None, user_specified_dir="./results", suffix="_learner")
     writer = tf.contrib.summary.create_file_writer(output_dir)
     writer.set_as_default()
     tf.contrib.summary.initialize()
@@ -179,8 +182,10 @@ def learner(global_rb, trained_steps, is_training_done,
             is_training_done.set()
 
 
-def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, output_dir,
+def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue,
               n_evaluation=10, episode_max_steps=1000, show_test_progress=False):
+    output_dir = prepare_output_dir(
+        args=None, user_specified_dir="./results", suffix="_evaluator")
     writer = tf.contrib.summary.create_file_writer(
         output_dir, filename_suffix="_evaluation")
     writer.set_as_default()
@@ -266,3 +271,36 @@ def prepare_experiment(env, args):
     trained_steps = Value('i', 0)
 
     return global_rb, queues, is_training_done, lock, trained_steps
+
+
+def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
+    env = env_fn()
+
+    global_rb, queues, is_training_done, lock, trained_steps = \
+        prepare_experiment(env, args)
+
+    tasks = []
+    # Add explorers
+    tasks.append(Process(
+        target=explorer,
+        args=[global_rb, queues[0], trained_steps,
+              is_training_done, lock, env_fn, policy_fn,
+              set_weights_fn, args.n_env, args.n_thread,
+              args.local_buffer_size, args.episode_max_steps]))
+
+    # Add learner
+    tasks.append(Process(
+        target=learner,
+        args=[global_rb, trained_steps, is_training_done,
+              lock, env_fn(), policy_fn, get_weights_fn,
+              args.max_batch, args.param_update_freq, args.test_freq, queues]))
+
+    # Add evaluator
+    tasks.append(Process(
+        target=evaluator,
+        args=[is_training_done, env_fn(), policy_fn, set_weights_fn, queues[1]]))
+
+    for task in tasks:
+        task.start()
+    for task in tasks:
+        task.join()

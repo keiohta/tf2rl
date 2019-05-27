@@ -2,13 +2,9 @@ import argparse
 import numpy as np
 import gym
 
-import multiprocessing
-from multiprocessing import Process
-
-from tf2rl.algos.apex_multienv import apex_argument, explorer, learner, evaluator, prepare_experiment
+from tf2rl.algos.apex_multienv import apex_argument, run
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.misc.target_update_ops import update_target_variables
-from tf2rl.misc.prepare_output_dir import prepare_output_dir
 
 
 if __name__ == '__main__':
@@ -25,11 +21,11 @@ if __name__ == '__main__':
             action_dim=env.action_space.high.size,
             gpu=gpu,
             name=name,
-            sigma=0.3,
+            sigma=0.1,
             batch_size=100,
-            lr_actor=0.0001,
-            lr_critic=0.0001,
-            actor_units=[300, 200],
+            lr_actor=0.001,
+            lr_critic=0.001,
+            actor_units=[400, 300],
             critic_units=[400, 300],
             memory_capacity=memory_capacity)
 
@@ -47,36 +43,4 @@ if __name__ == '__main__':
         update_target_variables(
             policy.critic_target.weights, critic_target_weights, tau=1.)
 
-    env = env_fn()
-
-    global_rb, queues, is_training_done, lock, trained_steps = \
-        prepare_experiment(env, args)
-
-    output_dir = prepare_output_dir(args=args, user_specified_dir="./results")
-
-    tasks = []
-    # Add explorers
-    tasks.append(Process(
-        target=explorer,
-        args=[global_rb, queues[0], trained_steps,
-              is_training_done, lock, env_fn, policy_fn,
-              set_weights_fn, args.n_env, args.n_thread,
-              args.local_buffer_size, args.episode_max_steps]))
-
-    # Add learner
-    tasks.append(Process(
-        target=learner,
-        args=[global_rb, trained_steps, is_training_done,
-              lock, env_fn(), policy_fn, get_weights_fn, output_dir,
-              args.max_batch, args.param_update_freq, args.test_freq, queues]))
-
-    # Add evaluator
-    tasks.append(Process(
-        target=evaluator,
-        args=[is_training_done, env_fn(), policy_fn, set_weights_fn, queues[1],
-              output_dir]))
-
-    for task in tasks:
-        task.start()
-    for task in tasks:
-        task.join()
+    run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn)
