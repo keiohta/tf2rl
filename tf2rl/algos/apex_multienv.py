@@ -7,7 +7,7 @@ import multiprocessing
 from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
 
-from cpprb import PrioritizedReplayBuffer
+from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
@@ -55,7 +55,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         env_fn, n_env, n_thread, episode_max_steps)
     policy = policy_fn(
         envs._sample_env, "Explorer", global_rb.get_buffer_size())
-    local_rb = PrioritizedReplayBuffer(
+    local_rb = ReplayBuffer(
         obs_shape=envs._sample_env.observation_space.shape,
         act_dim=get_act_dim(envs._sample_env),
         size=buffer_size)
@@ -64,17 +64,13 @@ def explorer(global_rb, queue, trained_steps, n_transition,
     episode_steps = 0
     start = time.time()
     sample_at_start = 0
-
     while not is_training_done.is_set():
         n_transition.value += n_env
+        obses = envs.py_observation()
         actions = policy.get_action(obses, tensor=True)
         next_obses, rewards, dones, _ = envs.step(actions)
-        td_errors = policy.compute_td_error(
-            obses, actions, next_obses, rewards, dones)
-
-        local_rb.add(obses, actions, rewards, next_obses, dones,
-                     priorities=(np.abs(td_errors)+1e-6))
-        obses = next_obses
+        local_rb.add(obs=obses, act=actions, next_obs=next_obses,
+                     rew=rewards, done=dones)
 
         # Periodically copy weights of explorer
         if not queue.empty():
@@ -82,20 +78,23 @@ def explorer(global_rb, queue, trained_steps, n_transition,
 
         # Add collected experiences to global replay buffer
         if local_rb.get_stored_size() > buffer_size:
-            msg = "Grad: {0: 6d}\t".format(trained_steps.value)
-            msg += "Samples: {0: 7d}\t".format(n_transition.value)
-            msg += "TDErr: {0:.5f}\t".format(np.average(np.abs(td_errors).flatten()))
-            msg += "FPS: {0:.2f}".format((n_transition.value - sample_at_start) / (time.time() - start))
-            print(msg)
             samples = local_rb.sample(local_rb.get_stored_size())
             lock.acquire()
             global_rb.add(
-                samples["obs"], samples["next_obs"], samples["rew"], samples["next_obs"], samples["done"],
-                priorities=samples["weights"])
+                obs=samples["obs"], act=samples["act"],
+                next_obs=samples["next_obs"], 
+                rew=samples["rew"], done=samples["done"],)
+                # priorities=np.abs(td_errors)+1e-6)
             lock.release()
             local_rb.clear()
+            msg = "Grad: {0: 6d}\t".format(trained_steps.value)
+            msg += "Samples: {0: 7d}\t".format(n_transition.value)
+            # msg += "TDErr: {0:.5f}\t".format(np.average(np.abs(td_errors).flatten()))
+            msg += "FPS: {0:.2f}".format((n_transition.value - sample_at_start) / (time.time() - start))
+            print(msg)
             start = time.time()
             sample_at_start = n_transition.value
+
 
 
 def learner(global_rb, trained_steps, is_training_done,
