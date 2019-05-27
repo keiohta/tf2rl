@@ -22,7 +22,7 @@ tf.enable_eager_execution(config=config)
 def explorer(global_rb, queue, trained_steps,
              is_training_done, lock, env_fn, policy_fn,
              set_weights_fn, n_env=64, n_thread=4,
-             buffer_size=1024, episode_max_steps=1000):
+             buffer_size=1024, episode_max_steps=1000, gpu=0):
     """
     Collect transitions and store them to prioritized replay buffer.
     Args:
@@ -53,7 +53,7 @@ def explorer(global_rb, queue, trained_steps,
     envs = MultiThreadEnv(
         env_fn, n_env, n_thread, episode_max_steps)
     policy = policy_fn(
-        envs._sample_env, "Explorer", global_rb.get_buffer_size())
+        envs._sample_env, "Explorer", global_rb.get_buffer_size(), gpu=gpu)
     kwargs = {
         "size": buffer_size,
         "default_dtype": np.float64,
@@ -110,7 +110,7 @@ def explorer(global_rb, queue, trained_steps,
 
 def learner(global_rb, trained_steps, is_training_done,
             lock, env, policy_fn, get_weights_fn,
-            n_training, update_freq, evaluation_freq, queues):
+            n_training, update_freq, evaluation_freq, queues, gpu):
     """
     Collect transitions and store them to prioritized replay buffer.
     Args:
@@ -137,7 +137,7 @@ def learner(global_rb, trained_steps, is_training_done,
         queues:
             FIFOs shared with explorers to send latest network parameters.
     """
-    policy = policy_fn(env, "Learner", global_rb.get_buffer_size())
+    policy = policy_fn(env, "Learner", global_rb.get_buffer_size(), gpu=gpu)
 
     output_dir = prepare_output_dir(
         args=None, user_specified_dir="./results", suffix="_learner")
@@ -182,7 +182,7 @@ def learner(global_rb, trained_steps, is_training_done,
             is_training_done.set()
 
 
-def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue,
+def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
               n_evaluation=10, episode_max_steps=1000, show_test_progress=False):
     output_dir = prepare_output_dir(
         args=None, user_specified_dir="./results", suffix="_evaluator")
@@ -191,7 +191,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue,
     writer.set_as_default()
     tf.contrib.summary.initialize()
 
-    policy = policy_fn(env, "Learner")
+    policy = policy_fn(env, "Learner", gpu=gpu)
     total_steps = tf.train.create_global_step()
 
     while not is_training_done.is_set():
@@ -242,7 +242,9 @@ def apex_argument(parser=None):
                         help='Size of replay buffer')
     parser.add_argument('--local-buffer-size', type=int, default=1e4,
                         help='Size of local replay buffer for explorer')
-    parser.add_argument('--gpu', type=int, default=0)
+    parser.add_argument('--gpu-explorer', type=int, default=0)
+    parser.add_argument('--gpu-learner', type=int, default=0)
+    parser.add_argument('--gpu-evaluator', type=int, default=0)
     return parser
 
 
@@ -286,19 +288,19 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
         args=[global_rb, queues[0], trained_steps,
               is_training_done, lock, env_fn, policy_fn,
               set_weights_fn, args.n_env, args.n_thread,
-              args.local_buffer_size, args.episode_max_steps]))
+              args.local_buffer_size, args.episode_max_steps, args.gpu_explorer]))
 
     # Add learner
     tasks.append(Process(
         target=learner,
         args=[global_rb, trained_steps, is_training_done,
               lock, env_fn(), policy_fn, get_weights_fn,
-              args.max_batch, args.param_update_freq, args.test_freq, queues]))
+              args.max_batch, args.param_update_freq, args.test_freq, queues, args.gpu_learner]))
 
     # Add evaluator
     tasks.append(Process(
         target=evaluator,
-        args=[is_training_done, env_fn(), policy_fn, set_weights_fn, queues[1]]))
+        args=[is_training_done, env_fn(), policy_fn, set_weights_fn, queues[1], args.gpu_evaluator]))
 
     for task in tasks:
         task.start()
