@@ -19,7 +19,7 @@ tf.enable_eager_execution(config=config)
 
 def explorer(global_rb, queue, trained_steps, n_transition,
              is_training_done, lock, env_fn, policy_fn,
-             set_weights_fn, noise, n_env=64, n_thread=4,
+             set_weights_fn, n_env=64, n_thread=4,
              buffer_size=1024, episode_max_steps=1000):
     """
     Collect transitions and store them to prioritized replay buffer.
@@ -52,7 +52,8 @@ def explorer(global_rb, queue, trained_steps, n_transition,
     """
     envs = MultiThreadEnv(
         env_fn, n_env, n_thread, episode_max_steps)
-    policy = policy_fn(envs._sample_env, "Explorer", global_rb.get_buffer_size(), sigma=noise)
+    policy = policy_fn(
+        envs._sample_env, "Explorer", global_rb.get_buffer_size())
     local_rb = PrioritizedReplayBuffer(
         obs_shape=envs._sample_env.observation_space.shape,
         act_dim=envs._sample_env.action_space.low.size,
@@ -84,7 +85,6 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             msg += "Samples: {0: 7d}\t".format(n_transition.value)
             msg += "TDErr: {0:.5f}\t".format(np.average(np.abs(td_errors).flatten()))
             msg += "FPS: {0:.2f}".format((n_transition.value - sample_at_start) / (time.time() - start))
-            msg += "GB: {0: 7d}".format(global_rb.get_stored_size())
             print(msg)
             samples = local_rb.sample(local_rb.get_stored_size())
             lock.acquire()
