@@ -70,28 +70,34 @@ class DQN(OffPolicyAgent):
         # DQN variants
         self._enable_double_dqn = enable_double_dqn
 
-    def get_action(self, state, test=False):
+    def get_action(self, state, test=False, tensor=False):
         if isinstance(state, LazyFrames):
             state = np.array(state)
-        assert isinstance(state, np.ndarray)
+        if not tensor:
+            assert isinstance(state, np.ndarray)
 
         if not test and np.random.rand() < self.epsilon:
-            action = np.random.randint(self._action_dim)
+            if tensor:
+                action = [np.random.randint(self._action_dim) for _ in range(state.shape[0])]
+                action = tf.convert_to_tensor(action)
+            else:
+                action = np.random.randint(self._action_dim)
         else:
-            state = np.expand_dims(state, axis=0).astype(np.float64)
+            state = np.expand_dims(state, axis=0).astype(np.float64) if len(state.shape) == 1 else state
             action = self._get_action_body(tf.constant(state))
-            action = np.argmax(action)
-
+            if not tensor:
+                action = action.numpy()[0]
         return action
 
     @tf.contrib.eager.defun
     def _get_action_body(self, state):
-        return self.q_func(state)
+        action = self.q_func(state)
+        return tf.argmax(action, axis=1)
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
         if weights is None:
             weights = np.ones_like(rewards)
-        td_error, q_func_loss = self._train_body(
+        td_errors, q_func_loss = self._train_body(
             states, actions, next_states, rewards, done, weights)
 
         tf.contrib.summary.scalar(name="QFuncLoss", tensor=q_func_loss, family="loss")
@@ -102,7 +108,7 @@ class DQN(OffPolicyAgent):
         if self.n_update % self.target_replace_interval == 0:
             update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
 
-        return td_error
+        return td_errors
 
     @tf.contrib.eager.defun
     def _train_body(self, states, actions, next_states, rewards, done, weights):
@@ -117,14 +123,23 @@ class DQN(OffPolicyAgent):
 
             return td_errors, q_func_loss
 
+    def compute_td_error(self, states, actions, next_states, rewards, dones):
+        # TODO: fix this ugly conversion
+        if isinstance(actions, tf.Tensor):
+            actions = tf.expand_dims(actions, axis=1)
+            rewards = tf.expand_dims(rewards, axis=1)
+            dones = tf.expand_dims(dones, 1)
+        return self._compute_td_error_body(states, actions, next_states, rewards, dones)
+
     @tf.contrib.eager.defun
-    def _compute_td_error_body(self, states, actions, next_states, rewards, done):
+    def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         # TODO: Clean code
-        not_done = 1. - tf.cast(done, dtype=tf.float64)
+        batch_size = states.shape[0]
+        not_dones = 1. - tf.cast(dones, dtype=tf.float64)
         actions = tf.cast(actions, dtype=tf.int32)
         with tf.device(self.device):
             indices = tf.concat(
-                values=[tf.expand_dims(tf.range(self.batch_size), axis=1),
+                values=[tf.expand_dims(tf.range(batch_size), axis=1),
                         actions], axis=1)
             current_Q = tf.expand_dims(
                 tf.gather_nd(self.q_func(states), indices), axis=1)
@@ -134,13 +149,13 @@ class DQN(OffPolicyAgent):
                                           axis=1, output_type=tf.int32)
                 # TODO: Reuse predefined `indices`
                 indices = tf.concat(
-                    values=[tf.expand_dims(tf.range(self.batch_size), axis=1),
+                    values=[tf.expand_dims(tf.range(batch_size), axis=1),
                             tf.expand_dims(max_q_indexes, axis=1)], axis=1)
                 target_Q = tf.expand_dims(
                     tf.gather_nd(self.q_func_target(next_states), indices), axis=1)
-                target_Q = rewards + not_done * self.discount * target_Q
+                target_Q = rewards + not_dones * self.discount * target_Q
             else:
-                target_Q = rewards + not_done * self.discount * tf.reduce_max(
+                target_Q = rewards + not_dones * self.discount * tf.reduce_max(
                     self.q_func_target(next_states), keepdims=True, axis=1)
             target_Q = tf.stop_gradient(target_Q)
             td_errors = current_Q - target_Q
