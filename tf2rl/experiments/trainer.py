@@ -48,7 +48,8 @@ class Trainer:
         tf.contrib.summary.initialize()
 
     def call(self):
-        total_steps = tf.train.create_global_step()
+        tf_total_steps = tf.train.create_global_step()
+        total_steps = 0
         episode_steps = 0
         episode_return = 0
         episode_start_time = time.time()
@@ -72,7 +73,8 @@ class Trainer:
                     self._env.render()
                 episode_steps += 1
                 episode_return += reward
-                total_steps.assign_add(1)
+                tf_total_steps.assign_add(1)
+                total_steps += 1
 
                 done_flag = done
                 if hasattr(self._env, "_max_episode_steps") and \
