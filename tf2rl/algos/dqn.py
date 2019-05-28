@@ -93,9 +93,10 @@ class DQN(OffPolicyAgent):
             self.epsilon = max(epsilon - self.epsilon_decay_rate * self.n_warmup,
                                self.epsilon_min)
         else:
+            epsilon = epsilon if not enable_noisy_dqn else 0.
+            self.epsilon = epsilon
             self.epsilon_min = epsilon
             self.epsilon_decay_rate = 0.
-            self.epsilon = epsilon if not enable_noisy_dqn else 0.
         self.target_replace_interval = target_replace_interval
         self.n_update = 0
 
