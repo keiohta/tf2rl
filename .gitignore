@@ -4,3 +4,10 @@ __pycache__/
 *.egg-info/*
 build/*
 dist/*
+
+*.pkl
+
+.coverage
+
+.vscode/*
+.idea/*
