@@ -8,7 +8,7 @@ from tf2rl.algos.dqn import DQN
 from tf2rl.algos.categorical_dqn import CategoricalDQN
 from tf2rl.networks.noisy_dense import NoisyDense
 from tf2rl.envs.atari_wrapper import wrap_dqn
-from tf2rl.trainer.trainer import Trainer
+from tf2rl.experiments.trainer import Trainer
 
 
 class QFunc(tf.keras.Model):
