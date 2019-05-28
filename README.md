@@ -8,13 +8,13 @@ TF2RL is a deep reinforcement learning library that implements various deep rein
 ## Algorithms
 Following algorithms are supported:
 
-|   Algorithm   | Dicrete action | Continuous action |
-| :-----------: | :------------: | :---------------: |
-| DQN variants  |       ✓        |         X         |
-| DDPG variants |       X        |         ✓         |
-|      SAC      |       X        |         ✓         |
-|     ApeX      |       ✓        |         ✓         |
-|     GAIL      |       ✓        |         ✓         |
+|   Algorithm   | Dicrete action | Continuous action |                           Comments                           |
+| :-----------: | :------------: | :---------------: | :----------------------------------------------------------: |
+| DQN variants  |       ✓        |         X         |  DQN, DDQN, Prior. DQN, Duel. DQN, Distrib. DQN, Noisy DQN   |
+| DDPG variants |       X        |         ✓         |                     DDPG, BiResDDPG, TD3                     |
+|      SAC      |       X        |         ✓         |                              -                               |
+|     ApeX      |       ✓        |         ✓         | with general off-policy algorithms such as DQN, DDPG, and SAC |
+|     GAIL      |       ✓        |         ✓         |                              -                               |
 
 Following papers have been implementd in tf2rl:
 
