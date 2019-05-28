@@ -1,6 +1,6 @@
 import gym
 
-from tf2rl.algos.categorical_dqn import CategoricalDQN
+from tf2rl.algos.categorical_dqn import CategoricalDQN, CategoricalQFunc
 from tf2rl.trainer.trainer import Trainer
 
 
@@ -19,6 +19,7 @@ if __name__ == '__main__':
         enable_dueling_dqn=args.enable_dueling_dqn,
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
+        q_func=CategoricalQFunc,
         n_warmup=500,
         target_replace_interval=300,
         batch_size=32,

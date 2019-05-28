@@ -24,8 +24,8 @@ class CategoricalQFunc(QFunc):
         features = tf.concat(inputs, axis=1)
         features = self.l1(features)
         features = self.l2(features)
+        features = self.l3(features)  # [batch_size, action_dim * n_atoms]
         if self._enable_dueling_dqn:
-            features = self.l3(features)  # [batch_size, action_dim * n_atoms]
             features = tf.reshape(
                 features, (-1, self._action_dim+1, self._n_atoms))  # [batch_size, action_dim, n_atoms]
             v_values = tf.reshape(
@@ -35,7 +35,6 @@ class CategoricalQFunc(QFunc):
             features = v_values + (advantages - tf.expand_dims(
                 tf.reduce_mean(advantages, axis=1), axis=1))
         else:
-            features = self.l3(features)  # [batch_size, action_dim * n_atoms]
             features = tf.reshape(
                 features, (-1, self._action_dim, self._n_atoms))  # [batch_size, action_dim, n_atoms]
         q_dist = tf.keras.activations.softmax(features, axis=2)  # [batch_size, action_dim, n_atoms]
@@ -44,7 +43,6 @@ class CategoricalQFunc(QFunc):
 
 class CategoricalDQN(DQN):
     def __init__(self, *args, **kwargs):
-        kwargs["q_func"] = CategoricalQFunc
         super().__init__(*args, **kwargs)
         self._v_max, self._v_min = 10., -10.
         self._delta_z = (self._v_max - self._v_min) / (self.q_func._n_atoms - 1)

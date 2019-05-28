@@ -12,7 +12,9 @@ from tf2rl.misc.huber_loss import huber_loss
 class QFunc(tf.keras.Model):
     def __init__(self, state_shape, action_dim, units=[32, 32],
                  name="QFunc", enable_dueling_dqn=False,
-                 enable_noisy_dqn=False):
+                 enable_noisy_dqn=False, enable_categorical_dqn=False):
+        if enable_categorical_dqn:
+            raise NotImplementedError
         super().__init__(name=name)
         self._enable_dueling_dqn = enable_dueling_dqn
         self._enable_noisy_dqn = enable_noisy_dqn
@@ -60,14 +62,22 @@ class DQN(OffPolicyAgent):
             optimizer=None,
             enable_double_dqn=False,
             enable_dueling_dqn=False,
-            enable_noisy_dqn = False,
+            enable_noisy_dqn=False,
+            enable_categorical_dqn=False,
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
         q_func = q_func if q_func is not None else QFunc
         # Define and initialize Q-function network
-        self.q_func = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn, enable_noisy_dqn=enable_noisy_dqn)
-        self.q_func_target = q_func(state_shape, action_dim, units=units, enable_dueling_dqn=enable_dueling_dqn, enable_noisy_dqn=enable_noisy_dqn)
+        kwargs_dqn = {
+            "state_shape": state_shape,
+            "action_dim": action_dim,
+            "units": units,
+            "enable_dueling_dqn": enable_dueling_dqn,
+            "enable_noisy_dqn": enable_noisy_dqn,
+            "enable_categorical_dqn": enable_categorical_dqn}
+        self.q_func = q_func(**kwargs_dqn)
+        self.q_func_target = q_func(**kwargs_dqn)
         self.q_func_optimizer = optimizer if optimizer is not None else \
             tf.train.AdamOptimizer(learning_rate=lr)
         update_target_variables(self.q_func_target.weights,
