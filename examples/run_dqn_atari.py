@@ -5,6 +5,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.algos.dqn import DQN
+from tf2rl.algos.categorical_dqn import CategoricalDQN
 from tf2rl.networks.noisy_dense import NoisyDense
 from tf2rl.envs.atari_wrapper import wrap_dqn
 from tf2rl.trainer.trainer import Trainer
@@ -13,10 +14,17 @@ from tf2rl.trainer.trainer import Trainer
 class QFunc(tf.keras.Model):
     def __init__(self, state_shape, action_dim, units=None,
                  name="QFunc", enable_dueling_dqn=False,
-                 enable_noisy_dqn=False):
+                 enable_noisy_dqn=False, enable_categorical_dqn=False,
+                 n_atoms=51):
         super().__init__(name=name)
         self._enable_dueling_dqn = enable_dueling_dqn
         self._enable_noisy_dqn = enable_noisy_dqn
+        self._enable_categorical_dqn = enable_categorical_dqn
+        if enable_categorical_dqn:
+            self._action_dim = action_dim
+            self._n_atoms = n_atoms
+            action_dim = (action_dim + int(enable_dueling_dqn)) * n_atoms
+
         DenseLayer = NoisyDense if enable_noisy_dqn else Dense
 
         self.conv1 = Conv2D(32, kernel_size=(8, 8), strides=(4, 4),
@@ -46,13 +54,30 @@ class QFunc(tf.keras.Model):
         features = self.conv3(features)
         features = self.flat(features)
         features = self.fc1(features)
-        if self._enable_dueling_dqn:
-            advantages = self.fc2(features)
-            v_values = self.fc3(features)
-            q_values = v_values + (advantages - tf.reduce_mean(advantages, axis=1, keepdims=True))
+        if self._enable_categorical_dqn:
+            features = self.fc2(features)
+            if self._enable_dueling_dqn:
+                features = tf.reshape(
+                    features, (-1, self._action_dim+1, self._n_atoms))  # [batch_size, action_dim, n_atoms]
+                v_values = tf.reshape(
+                    features[:, 0], (-1, 1, self._n_atoms))
+                advantages = tf.reshape(
+                    features[:, 1:], [-1, self._action_dim, self._n_atoms])
+                features = v_values + (advantages - tf.expand_dims(
+                    tf.reduce_mean(advantages, axis=1), axis=1))
+            else:
+                features = tf.reshape(
+                    features, (-1, self._action_dim, self._n_atoms))  # [batch_size, action_dim, n_atoms]
+            q_dist = tf.keras.activations.softmax(features, axis=2)  # [batch_size, action_dim, n_atoms]
+            return tf.clip_by_value(q_dist, 1e-8, 1.0-1e-8)
         else:
-            q_values = self.fc2(features)
-        return q_values
+            if self._enable_dueling_dqn:
+                advantages = self.fc2(features)
+                v_values = self.fc3(features)
+                q_values = v_values + (advantages - tf.reduce_mean(advantages, axis=1, keepdims=True))
+            else:
+                q_values = self.fc2(features)
+            return q_values
 
 
 if __name__ == '__main__':
@@ -71,10 +96,12 @@ if __name__ == '__main__':
     # https://www.nature.com/articles/nature14236
     optimizer = tf.train.RMSPropOptimizer(
         learning_rate=0.00025, momentum=0.95, epsilon=0.01)
-    policy = DQN(
+    DQN_class = CategoricalDQN if args.enable_categorical_dqn else DQN
+    policy = DQN_class(
         enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
         enable_noisy_dqn=args.enable_noisy_dqn,
+        enable_categorical_dqn=args.enable_categorical_dqn,
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
         n_warmup=50000,
