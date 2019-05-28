@@ -7,14 +7,32 @@ TF2RL is a deep reinforcement learning library that implements various deep rein
 
 ## Algorithms
 Following algorithms are supported:
-- DQN variants
-    - DQN, Double DQN, Dueling DQN, Categorical DQN
-- DDPG
-    - Bi-Res-DDPG
-- TD3
-- SAC
-- ApeX (DDPG or TD3 or SAC)
-- GAIL
+
+|   Algorithm   | Dicrete action | Continuous action |
+| :-----------: | :------------: | :---------------: |
+| DQN variants  |       ✓        |         X         |
+| DDPG variants |       X        |         ✓         |
+|      SAC      |       X        |         ✓         |
+|     ApeX      |       ✓        |         ✓         |
+|     GAIL      |       ✓        |         ✓         |
+
+Following papers have been implementd in tf2rl:
+
+- [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf)
+- [Human-level control through Deep Reinforcement Learning](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf)
+- [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/abs/1509.06461)
+- [Prioritized Experience Replay](https://arxiv.org/abs/1511.05952)
+- [Dueling Network Architectures for Deep Reinforcement Learning](https://arxiv.org/abs/1511.06581)
+- [Distributed Prioritized Experience Replay](<https://arxiv.org/abs/1803.00933>)
+- [A Distributional Perspective on Reinforcement Learning](<https://arxiv.org/abs/1707.06887>)
+- [Noisy Networks for Exploration](<https://arxiv.org/abs/1706.10295>)
+- [Continuous control with deep reinforcement learning](https://arxiv.org/abs/1509.02971)
+- [Addressing Function Approximation Error in Actor-Critic Methods](<https://arxiv.org/abs/1802.09477>)
+- [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](<https://arxiv.org/abs/1801.01290>)
+- [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>)
+- [Generative Adversarial Imitation Learning](<https://arxiv.org/abs/1606.03476>)
+
+
 
 ## Installation
 ```bash
