@@ -7,6 +7,7 @@ import tensorflow as tf
 
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
+from tf2rl.experiments.utils import save_path
 
 
 config = tf.ConfigProto(allow_soft_placement=True)
@@ -27,7 +28,8 @@ class Trainer:
         self._set_from_args(args)
 
         # prepare log directory
-        self._output_dir = prepare_output_dir(args=args, user_specified_dir="./results")
+        self._output_dir = prepare_output_dir(
+            args=args, user_specified_dir="./results", suffix=args.dir_suffix)
         logging.basicConfig(level=logging.getLevelName(args.logging_level))
         self.logger = logging.getLogger(__name__)
 
@@ -46,8 +48,9 @@ class Trainer:
         self.writer.set_as_default()
         tf.contrib.summary.initialize()
 
-    def __call__(self):
-        total_steps = tf.train.create_global_step()
+    def call(self):
+        tf_total_steps = tf.train.create_global_step()
+        total_steps = 0
         episode_steps = 0
         episode_return = 0
         episode_start_time = time.time()
@@ -71,7 +74,8 @@ class Trainer:
                     self._env.render()
                 episode_steps += 1
                 episode_return += reward
-                total_steps.assign_add(1)
+                tf_total_steps.assign_add(1)
+                total_steps += 1
 
                 done_flag = done
                 if hasattr(self._env, "_max_episode_steps") and \
@@ -102,7 +106,7 @@ class Trainer:
                         replay_buffer.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
                     if int(total_steps) % self._test_interval == 0:
                         with tf.contrib.summary.always_record_summaries():
-                            avg_test_return = self.evaluate_policy()
+                            avg_test_return = self.evaluate_policy(int(total_steps))
                             self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                                 int(total_steps), avg_test_return, self._test_episodes))
                             tf.contrib.summary.scalar(name="AverageTestReturn", tensor=avg_test_return, family="loss")
@@ -115,26 +119,42 @@ class Trainer:
 
             tf.contrib.summary.flush()
 
-    def evaluate_policy(self):
+    def evaluate_policy(self, total_steps):
         avg_test_return = 0.
-        for _ in range(self._test_episodes):
+        if self._save_test_path:
+            replay_buffer = get_replay_buffer(
+                self._policy, self._test_env, size=self._episode_max_steps)
+        for i in range(self._test_episodes):
+            episode_return = 0.
             obs = self._test_env.reset()
             done = False
             for _ in range(self._episode_max_steps):
                 action = self._policy.get_action(obs, test=True)
-                obs, reward, done, _ = self._test_env.step(action)
+                next_obs, reward, done, _ = self._test_env.step(action)
+                if self._save_test_path:
+                    replay_buffer.add(obs=obs, act=action, next_obs=next_obs, rew=reward, done=done)
                 if self._show_test_progress:
                     self._test_env.render()
-                avg_test_return += reward
+                episode_return += reward
+                obs = next_obs
                 if done:
                     break
+            if self._save_test_path:
+                filename = "step_{0:08d}_epi_{1:02d}_return_{2:010.4f}.pkl".format(
+                    total_steps, i, episode_return)
+                save_path(replay_buffer.sample(self._episode_max_steps),
+                          os.path.join(self._output_dir, filename))
+                replay_buffer.clear()
+            avg_test_return += episode_return
 
         return avg_test_return / self._test_episodes
 
     def _set_from_args(self, args):
         # experiment settings
         self._max_steps = args.max_steps
-        self._episode_max_steps = args.episode_max_steps if args.episode_max_steps is not None else args.max_steps
+        self._episode_max_steps = args.episode_max_steps \
+            if args.episode_max_steps is not None \
+            else args.max_steps
         self._show_progress = args.show_progress
         self._model_save_interval = args.save_model_interval
         # replay buffer
@@ -145,27 +165,44 @@ class Trainer:
         self._test_interval = args.test_interval
         self._show_test_progress = args.show_test_progress
         self._test_episodes = args.test_episodes
+        self._save_test_path = args.save_test_path
 
     @staticmethod
     def get_argument(parser=None):
         if parser is None:
             parser = argparse.ArgumentParser(conflict_handler='resolve')
         # experiment settings
-        parser.add_argument('--max-steps', type=int, default=int(1e6))
-        parser.add_argument('--episode-max-steps', type=int, default=int(1e3))
-        parser.add_argument('--show-progress', action='store_true')
-        parser.add_argument('--gpu', type=int, default=0)
-        parser.add_argument('--save-model-interval', type=int, default=int(1e4))
-        parser.add_argument('--model-dir', type=str, default=None)
+        parser.add_argument('--max-steps', type=int, default=int(1e6),
+                            help='Maximum number steps to interact with env.')
+        parser.add_argument('--episode-max-steps', type=int, default=int(1e3),
+                            help='Maximum steps in an episode')
+        parser.add_argument('--show-progress', action='store_true',
+                            help='Call `render` in training process')
+        parser.add_argument('--gpu', type=int, default=0,
+                            help='GPU id')
+        parser.add_argument('--save-model-interval', type=int, default=int(1e4),
+                            help='Interval to save model')
+        parser.add_argument('--model-dir', type=str, default=None,
+                            help='Directory to restore model')
+        parser.add_argument('--dir-suffix', type=str, default='',
+                            help='Suffix for directory that contains results')
         # test settings
-        parser.add_argument('--test-interval', type=int, default=int(1e4))
-        parser.add_argument('--show-test-progress', action='store_true')
-        parser.add_argument('--test-episodes', type=int, default=5)
+        parser.add_argument('--test-interval', type=int, default=int(1e4),
+                            help='Interval to evaluate trained model')
+        parser.add_argument('--show-test-progress', action='store_true',
+                            help='Call `render` in evaluation process')
+        parser.add_argument('--test-episodes', type=int, default=5,
+                            help='Number of episodes to evaluate at once')
+        parser.add_argument('--save-test-path', action='store_true',
+                            help='Save trajectories of evaluation')
         # replay buffer
-        parser.add_argument('--use-prioritized-rb', action='store_true')
-        parser.add_argument('--use-nstep-rb', action='store_true')
-        parser.add_argument('--n-step', type=int, default=4)
+        parser.add_argument('--use-prioritized-rb', action='store_true',
+                            help='Flag to use prioritized experience replay')
+        parser.add_argument('--use-nstep-rb', action='store_true',
+                            help='Flag to use nstep experience replay')
+        parser.add_argument('--n-step', type=int, default=4,
+                            help='Number of steps to look over')
         # others
         parser.add_argument('--logging-level', choices=['DEBUG', 'INFO', 'WARNING'],
-                            default='INFO')
+                            default='INFO', help='Logging level')
         return parser

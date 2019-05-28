@@ -2,6 +2,7 @@ from setuptools import setup, Extension, find_packages
 
 install_requires = [
     "cpprb>=7.13.3"
+    "joblib"
 ]
 
 extras_require = {
@@ -12,7 +13,7 @@ extras_require = {
 
 setup(
     name="tf2rl",
-    version="0.0.2",
+    version="0.0.3",
     description="Deep Reinforcement Learning for TensorFlow2.0",
     url="https://github.com/keiohta/tf2rl",
     author="Kei Ohta",
@@ -20,4 +21,5 @@ setup(
     license="MIT",
     packages=find_packages("."),
     install_requires=install_requires,
-    extras_require=extras_require)
+    extras_require=extras_require,
+    test_suite='tests')

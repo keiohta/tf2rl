@@ -1,7 +1,7 @@
 import gym
 
 from tf2rl.algos.dqn import DQN
-from tf2rl.trainer.trainer import Trainer
+from tf2rl.experiments.trainer import Trainer
 
 
 if __name__ == '__main__':

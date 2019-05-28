@@ -1,0 +1,6 @@
+tensorflow==1.12
+cpprb
+joblib
+gym
+opencv-python
+coveralls

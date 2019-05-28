@@ -9,9 +9,7 @@ from multiprocessing.managers import SyncManager
 
 from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
-from tf2rl.algos.td3 import TD3
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
-from tf2rl.misc.target_update_ops import update_target_variables
 
 config = tf.ConfigProto(allow_soft_placement=True)
 config.gpu_options.allow_growth = True
@@ -19,7 +17,8 @@ tf.enable_eager_execution(config=config)
 
 
 def explorer(global_rb, queue, trained_steps, n_transition,
-             is_training_done, lock, env_fn, policy_fn,
+             is_training_done, lock, env, policy_fn,
+             set_weights_fn, noise,
              buffer_size=1024, max_transition=None,
              episode_max_steps=1000):
     """
@@ -51,8 +50,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         episode_max_steps:
             Maximum number of steps of an episode.
     """
-    env = env_fn()
-    policy = policy_fn(env, "Explorer", global_rb.get_buffer_size())
+    policy = policy_fn(env, "Explorer", global_rb.get_buffer_size(), sigma=noise)
     local_rb = ReplayBuffer(obs_shape=env.observation_space.shape,
                             act_dim=env.action_space.low.size,
                             size=buffer_size)
@@ -65,13 +63,6 @@ def explorer(global_rb, queue, trained_steps, n_transition,
     sample_at_start = 0
 
     while not is_training_done.is_set():
-        # Periodically copy weights of explorer
-        if not queue.empty():
-            actor_weights, critic_weights, critic_target_weights = queue.get()
-            update_target_variables(policy.actor.weights, actor_weights, tau=1.)
-            update_target_variables(policy.critic.weights, critic_weights, tau=1.)
-            update_target_variables(policy.critic_target.weights, critic_target_weights, tau=1.)
-
         n_transition.value += 1
         episode_steps += 1
         a = policy.get_action(s)
@@ -80,7 +71,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         if episode_steps == env._max_episode_steps:
             done_flag = False
         total_reward += r
-        local_rb.add(s, a, r, s_, done_flag)
+        local_rb.add(obs=s, act=a, rew=r, next_obs=s_, done=done_flag)
 
         s = s_
         if done or episode_steps == episode_max_steps:
@@ -89,21 +80,27 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             total_reward = 0
             episode_steps = 0
 
+            # Periodically copy weights of explorer
+            if not queue.empty():
+                set_weights_fn(policy, queue.get())
+
         # Add collected experiences to global replay buffer
-        if local_rb.get_stored_size() == buffer_size - 1:
-            temp_n_transition = n_transition.value
+        if local_rb.get_stored_size() == buffer_size:
             samples = local_rb.sample(local_rb.get_stored_size())
-            states, next_states, actions, rewards, done = samples["obs"], samples["next_obs"], samples["act"], samples["rew"], samples["done"]
-            done = np.array(done, dtype=np.float32)
             td_errors = policy.compute_td_error(
-                states, actions, next_states, rewards, done)
-            print("Grad: {0: 6d}\tSamples: {1: 7d}\tTDErr: {2:.5f}\tAveEpiRew: {3:.3f}\tFPS: {4:.2f}".format(
-                trained_steps.value, n_transition.value, np.average(np.abs(td_errors).flatten()),
-                sum(total_rewards) / len(total_rewards), (temp_n_transition - sample_at_start) / (time.time() - start)))
+                samples["obs"], samples["act"], samples["next_obs"],
+                samples["rew"], np.array(samples["done"], dtype=np.float64))
+            msg = "Grad: {0: 6d}\t".format(trained_steps.value)
+            msg += "Samples: {0: 7d}\t".format(n_transition.value)
+            msg += "TDErr: {0:.5f}\t".format(np.average(np.abs(td_errors).flatten()))
+            msg += "AveEpiRew: {0:.3f}\t".format(sum(total_rewards) / len(total_rewards))
+            msg += "FPS: {0:.2f}".format((n_transition.value - sample_at_start) / (time.time() - start))
+            print(msg)
             total_rewards = []
             lock.acquire()
             global_rb.add(
-                states, actions, rewards, next_states, done,
+                obs=samples["obs"], act=samples["act"], rew=samples["rew"],
+                next_obs=samples["next_obs"], done=samples["done"],
                 priorities=np.abs(td_errors)+1e-6)
             lock.release()
             local_rb.clear()
@@ -115,7 +112,8 @@ def explorer(global_rb, queue, trained_steps, n_transition,
 
 
 def learner(global_rb, trained_steps, is_training_done,
-            lock, env_fn, policy_fn, n_training, update_freq, *queues):
+            lock, env, policy_fn, get_weights_fn,
+            n_training, update_freq, *queues):
     """
     Collect transitions and store them to prioritized replay buffer.
     Args:
@@ -131,7 +129,7 @@ def learner(global_rb, trained_steps, is_training_done,
             multiprocessing.Lock to lock other processes.
             It must be released after process is done.
         env_fn:
-            Method object to generate an environment.
+            Environment.
         policy_fn:
             Method object to generate an explorer.
         n_training:
@@ -142,9 +140,7 @@ def learner(global_rb, trained_steps, is_training_done,
         queues:
             FIFOs shared with explorers to send latest network parameters.
     """
-    env = env_fn()
     policy = policy_fn(env, "Learner", global_rb.get_buffer_size())
-    update_step = update_freq
 
     output_dir = prepare_output_dir(args=None, user_specified_dir="./results")
     writer = tf.contrib.summary.create_file_writer(output_dir)
@@ -164,27 +160,24 @@ def learner(global_rb, trained_steps, is_training_done,
             lock.acquire()
             samples = global_rb.sample(policy.batch_size)
             with tf.contrib.summary.always_record_summaries():
-                td_error = policy.train(
+                td_errors = policy.train(
                     samples["obs"], samples["act"], samples["next_obs"],
                     samples["rew"], np.array(samples["done"], dtype=np.float32),
                     samples["weights"])
                 writer.flush()
-            global_rb.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
+            global_rb.update_priorities(samples["indexes"], np.abs(td_errors) + 1e-6)
             lock.release()
 
             # Put updated weights to queue
-            if trained_steps.value > update_step:
-                weights = []
-                weights.append(policy.actor.weights)
-                weights.append(policy.critic.weights)
-                weights.append(policy.critic_target.weights)
+            if trained_steps.value % update_freq == 0:
+                weights = get_weights_fn(policy)
                 for queue in queues:
                     queue.put(weights)
-                update_step += update_freq
                 with tf.contrib.summary.always_record_summaries():
                     fps = update_freq / (time.time() - start_time)
                     tf.contrib.summary.scalar(name="FPS", tensor=fps, family="loss")
-                    print("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(fps, trained_steps.value))
+                    print("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
+                        fps, trained_steps.value))
                 start_time = time.time()
 
         if trained_steps.value >= n_training:
@@ -196,7 +189,7 @@ def apex_argument(parser=None):
         parser = argparse.ArgumentParser()
     parser.add_argument('--max-batch', type=int, default=1e6,
                         help='number of times to apply batch update')
-    parser.add_argument('--param-update-freq', type=int, default=1e3,
+    parser.add_argument('--param-update-freq', type=int, default=1e2,
                         help='frequency to update parameter')
     parser.add_argument('--n-explorer', type=int, default=None,
                         help='number of explorers to distribute. if None, use maximum number')
@@ -208,39 +201,16 @@ def apex_argument(parser=None):
     return parser
 
 
-# prepare env and policy function
-def env_fn():
-    import gym
-    return gym.make('HalfCheetah-v2')
-
-
-def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
-    return TD3(
-        state_shape=env.observation_space.shape,
-        action_dim=env.action_space.high.size,
-        gpu=gpu,
-        name=name,
-        batch_size=100,
-        memory_capacity=memory_capacity)
-
-
-def main(args_):
-    if args_.n_explorer is None:
-        n_explorer = multiprocessing.cpu_count() - 1
-    else:
-        n_explorer = args_.n_explorer
-    assert n_explorer > 0, "[error] number of explorers must be positive integer"
-
-    env = env_fn()
-
+def prepare_experiment(n_explorer, env, args):
     # Manager to share PER between a learner and explorers
-    SyncManager.register('PrioritizedReplayBuffer', PrioritizedReplayBuffer)
+    SyncManager.register('PrioritizedReplayBuffer',
+                         PrioritizedReplayBuffer)
     manager = SyncManager()
     manager.start()
     global_rb = manager.PrioritizedReplayBuffer(
         obs_shape=env.observation_space.shape,
         act_dim=env.action_space.low.size,
-        size=args_.replay_buffer_size)
+        size=args.replay_buffer_size)
 
     # queues to share network parameters between a learner and explorers
     queues = [Queue() for _ in range(n_explorer)]
@@ -255,27 +225,4 @@ def main(args_):
     trained_steps = Value('i', 0)
     n_transition = Value('i', 0)
 
-    tasks = []
-    # Add explorers
-    for i in range(n_explorer):
-        tasks.append(Process(
-            target=explorer,
-            args=[global_rb, queues[i], trained_steps, n_transition, is_training_done, lock, 
-                  env_fn, policy_fn, args_.local_buffer_size]))
-
-    # Add learner
-    tasks.append(Process(
-        target=learner,
-        args=[global_rb, trained_steps, is_training_done, lock, env_fn, policy_fn,
-              args_.max_batch, args_.param_update_freq, *queues]))
-
-    for task in tasks:
-        task.start()
-    for task in tasks:
-        task.join()
-
-
-if __name__ == '__main__':
-    parser = apex_argument()
-    args_ = parser.parse_args()
-    main(args_)
+    return global_rb, queues, is_training_done, lock, trained_steps, n_transition

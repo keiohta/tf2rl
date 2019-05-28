@@ -1,7 +1,7 @@
 import roboschool, gym
 
 from tf2rl.algos.bi_res_ddpg import BiResDDPG
-from tf2rl.trainer.trainer import Trainer
+from tf2rl.experiments.trainer import Trainer
 
 
 if __name__ == '__main__':
