@@ -48,7 +48,7 @@ class Trainer:
         self.writer.set_as_default()
         tf.contrib.summary.initialize()
 
-    def call(self):
+    def __call__(self):
         tf_total_steps = tf.train.create_global_step()
         total_steps = 0
         episode_steps = 0
