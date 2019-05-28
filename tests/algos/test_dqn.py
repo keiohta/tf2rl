@@ -35,11 +35,12 @@ class TestDQN(unittest.TestCase):
             batch_size=self.batch_size,
             gpu=-1)
 
-        rewards = np.zeros(shape=(self.batch_size,1))
-        dones = np.zeros(shape=(self.batch_size,1))
+        rewards = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
+        dones = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
         obses = np.zeros(
-            shape=(self.batch_size,)+self.env.observation_space.shape)
-        acts = np.zeros(shape=(self.batch_size,1))
+            shape=(self.batch_size,)+self.env.observation_space.shape,
+            dtype=np.float32)
+        acts = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
         agent.train(
             obses, acts, obses, rewards, dones)
 
