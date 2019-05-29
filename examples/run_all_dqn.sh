@@ -1,4 +1,5 @@
-rm -rf results
+#!/bin/sh
+# rm -rf results
 python examples/run_dqn.py --dir-suffix=dqn
 # DDQN
 python examples/run_dqn.py --enable-double-dqn --dir-suffix=ddqn
