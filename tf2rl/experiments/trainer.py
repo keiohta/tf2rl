@@ -90,13 +90,13 @@ class Trainer:
                     n_episode += 1
                     fps = episode_steps / (time.time() - episode_start_time)
                     self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
-                        n_episode, int(total_steps), episode_steps, episode_return, fps))
+                        n_episode, total_steps, episode_steps, episode_return, fps))
 
                     episode_steps = 0
                     episode_return = 0
                     episode_start_time = time.time()
 
-                if int(total_steps) >= self._policy.n_warmup and int(total_steps) % self._policy.update_interval == 0:
+                if total_steps >= self._policy.n_warmup and total_steps % self._policy.update_interval == 0:
                     samples = replay_buffer.sample(self._policy.batch_size)
                     td_error = self._policy.train(
                         samples["obs"], samples["act"], samples["next_obs"],
@@ -104,17 +104,17 @@ class Trainer:
                         None if not self._use_prioritized_rb else samples["weights"])
                     if self._use_prioritized_rb:
                         replay_buffer.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
-                    if int(total_steps) % self._test_interval == 0:
+                    if total_steps % self._test_interval == 0:
                         with tf.contrib.summary.always_record_summaries():
-                            avg_test_return = self.evaluate_policy(int(total_steps))
+                            avg_test_return = self.evaluate_policy(total_steps)
                             self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
-                                int(total_steps), avg_test_return, self._test_episodes))
+                                total_steps, avg_test_return, self._test_episodes))
                             tf.contrib.summary.scalar(name="AverageTestReturn", tensor=avg_test_return, family="loss")
                             tf.contrib.summary.scalar(name="FPS", tensor=fps, family="loss")
 
                         self.writer.flush()
 
-                if int(total_steps) % self._model_save_interval == 0:
+                if total_steps % self._model_save_interval == 0:
                     self.checkpoint_manager.save()
 
             tf.contrib.summary.flush()
