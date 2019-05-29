@@ -9,6 +9,7 @@ if __name__ == '__main__':
     parser = DQN.get_argument(parser)
     parser.set_defaults(test_interval=2000)
     parser.set_defaults(max_steps=int(5e5))
+    parser.set_defaults(max_steps=100000)
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
 
