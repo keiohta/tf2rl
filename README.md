@@ -1,15 +1,38 @@
+[![Build Status](https://travis-ci.org/keiohta/tf2rl.svg?branch=master)](https://travis-ci.org/keiohta/tf2rl)
+[![Coverage Status](https://coveralls.io/repos/github/keiohta/tf2rl/badge.svg)](https://coveralls.io/github/keiohta/tf2rl)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+
 # TF2RL
 TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using TensorFlow 2.0.
 
 ## Algorithms
 Following algorithms are supported:
-- DQN variants
-    - Double DQN, Dueling DQN
-- DDPG
-- Bi-Res-DDPG
-- TD3
-- SAC
-- ApeX (DDPG or TD3 or SAC)
+
+|   Algorithm   | Dicrete action | Continuous action |                           Comments                           |
+| :-----------: | :------------: | :---------------: | :----------------------------------------------------------: |
+| DQN variants  |       ✓        |         X         |  DQN, DDQN, Prior. DQN, Duel. DQN, Distrib. DQN, Noisy DQN   |
+| DDPG variants |       X        |         ✓         |                     DDPG, BiResDDPG, TD3                     |
+|      SAC      |       X        |         ✓         |                              -                               |
+|     ApeX      |       ✓        |         ✓         | with general off-policy algorithms such as DQN, DDPG, and SAC |
+|     GAIL      |       ✓        |         ✓         |                              -                               |
+
+Following papers have been implementd in tf2rl:
+
+- [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf)
+- [Human-level control through Deep Reinforcement Learning](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf)
+- [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/abs/1509.06461)
+- [Prioritized Experience Replay](https://arxiv.org/abs/1511.05952)
+- [Dueling Network Architectures for Deep Reinforcement Learning](https://arxiv.org/abs/1511.06581)
+- [Distributed Prioritized Experience Replay](<https://arxiv.org/abs/1803.00933>)
+- [A Distributional Perspective on Reinforcement Learning](<https://arxiv.org/abs/1707.06887>)
+- [Noisy Networks for Exploration](<https://arxiv.org/abs/1706.10295>)
+- [Continuous control with deep reinforcement learning](https://arxiv.org/abs/1509.02971)
+- [Addressing Function Approximation Error in Actor-Critic Methods](<https://arxiv.org/abs/1802.09477>)
+- [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](<https://arxiv.org/abs/1801.01290>)
+- [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>)
+- [Generative Adversarial Imitation Learning](<https://arxiv.org/abs/1606.03476>)
+
+
 
 ## Installation
 ```bash

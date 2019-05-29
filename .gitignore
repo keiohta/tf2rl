@@ -2,7 +2,13 @@ results/*
 __pycache__/
 
 *.egg-info/*
+*.eggs/
 build/*
 dist/*
 
 *.pkl
+
+.coverage
+
+.vscode/*
+.idea/*

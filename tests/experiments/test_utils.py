@@ -16,7 +16,7 @@ class TestUtils(unittest.TestCase):
         policy = DQN(
             state_shape=cls.env.observation_space.shape,
             action_dim=cls.env.action_space.n,
-            memory_capacity=10)
+            memory_capacity=2**4)
         cls.replay_buffer = get_replay_buffer(
             policy, cls.env)
         cls.output_dir = os.path.join(
@@ -27,7 +27,7 @@ class TestUtils(unittest.TestCase):
 
     def test_save_path(self):
         n_store_episodes = 10
-        obs = np.ones_like(self.env.observation_space.shape)
+        obs = np.ones(shape=self.env.observation_space.shape, dtype=np.float32)
         for epi in range(n_store_episodes):
             for i in range(self.replay_buffer.get_buffer_size()):
                 self.replay_buffer.add(

@@ -28,7 +28,8 @@ class Trainer:
         self._set_from_args(args)
 
         # prepare log directory
-        self._output_dir = prepare_output_dir(args=args, user_specified_dir="./results")
+        self._output_dir = prepare_output_dir(
+            args=args, user_specified_dir="./results", suffix=args.dir_suffix)
         logging.basicConfig(level=logging.getLevelName(args.logging_level))
         self.logger = logging.getLogger(__name__)
 
@@ -48,7 +49,8 @@ class Trainer:
         tf.contrib.summary.initialize()
 
     def __call__(self):
-        total_steps = tf.train.create_global_step()
+        tf_total_steps = tf.train.create_global_step()
+        total_steps = 0
         episode_steps = 0
         episode_return = 0
         episode_start_time = time.time()
@@ -72,7 +74,8 @@ class Trainer:
                     self._env.render()
                 episode_steps += 1
                 episode_return += reward
-                total_steps.assign_add(1)
+                tf_total_steps.assign_add(1)
+                total_steps += 1
 
                 done_flag = done
                 if hasattr(self._env, "_max_episode_steps") and \
@@ -93,11 +96,11 @@ class Trainer:
                     episode_return = 0
                     episode_start_time = time.time()
 
-                if total_steps >= self._policy.n_warmup:
+                if int(total_steps) >= self._policy.n_warmup and int(total_steps) % self._policy.update_interval == 0:
                     samples = replay_buffer.sample(self._policy.batch_size)
                     td_error = self._policy.train(
                         samples["obs"], samples["act"], samples["next_obs"],
-                        samples["rew"], np.array(samples["done"], dtype=np.float64),
+                        samples["rew"], np.array(samples["done"], dtype=np.float32),
                         None if not self._use_prioritized_rb else samples["weights"])
                     if self._use_prioritized_rb:
                         replay_buffer.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
@@ -137,7 +140,7 @@ class Trainer:
                 if done:
                     break
             if self._save_test_path:
-                filename = "step_{0:08d}_epi_{1:02d}_return_{2:05.4f}.pkl".format(
+                filename = "step_{0:08d}_epi_{1:02d}_return_{2:010.4f}.pkl".format(
                     total_steps, i, episode_return)
                 save_path(replay_buffer.sample(self._episode_max_steps),
                           os.path.join(self._output_dir, filename))
@@ -149,7 +152,9 @@ class Trainer:
     def _set_from_args(self, args):
         # experiment settings
         self._max_steps = args.max_steps
-        self._episode_max_steps = args.episode_max_steps if args.episode_max_steps is not None else args.max_steps
+        self._episode_max_steps = args.episode_max_steps \
+            if args.episode_max_steps is not None \
+            else args.max_steps
         self._show_progress = args.show_progress
         self._model_save_interval = args.save_model_interval
         # replay buffer
@@ -179,6 +184,8 @@ class Trainer:
                             help='Interval to save model')
         parser.add_argument('--model-dir', type=str, default=None,
                             help='Directory to restore model')
+        parser.add_argument('--dir-suffix', type=str, default='',
+                            help='Suffix for directory that contains results')
         # test settings
         parser.add_argument('--test-interval', type=int, default=int(1e4),
                             help='Interval to evaluate trained model')

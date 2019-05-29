@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
@@ -9,14 +10,14 @@ class Actor(tf.keras.Model):
     def __init__(self, state_shape, action_dim, max_action, units=[400, 300], name="Actor"):
         super().__init__(name=name)
 
-        self.l1 = tf.keras.layers.Dense(units[0], name="L1")
-        self.l2 = tf.keras.layers.Dense(units[1], name="L2")
-        self.l3 = tf.keras.layers.Dense(action_dim, name="L3")
+        self.l1 = Dense(units[0], name="L1")
+        self.l2 = Dense(units[1], name="L2")
+        self.l3 = Dense(action_dim, name="L3")
 
         self.max_action = max_action
 
         with tf.device("/cpu:0"):
-            self(tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
+            self(tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
     def call(self, inputs):
         features = tf.nn.relu(self.l1(inputs))
@@ -30,12 +31,12 @@ class Critic(tf.keras.Model):
     def __init__(self, state_shape, action_dim, units=[400, 300], name="Critic"):
         super().__init__(name=name)
 
-        self.l1 = tf.keras.layers.Dense(units[0], name="L1")
-        self.l2 = tf.keras.layers.Dense(units[1], name="L2")
-        self.l3 = tf.keras.layers.Dense(1, name="L3")
+        self.l1 = Dense(units[0], name="L1")
+        self.l2 = Dense(units[1], name="L2")
+        self.l3 = Dense(1, name="L3")
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
-        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
         with tf.device("/cpu:0"):
             self([dummy_state, dummy_action])
 
@@ -82,22 +83,23 @@ class DDPG(OffPolicyAgent):
         self.sigma = sigma
         self.tau = tau
 
-    def get_action(self, state, test=False):
-        assert isinstance(state, np.ndarray)
-        assert len(state.shape) == 1
-
-        state = np.expand_dims(state, axis=0).astype(np.float64)
-        action = self._get_action_body(tf.constant(state))
-        action = action.numpy()[0]
-        if not test:
-            action += np.random.normal(0, self.sigma, size=action.shape)
-
-        return action.clip(-self.actor.max_action, self.actor.max_action)
+    def get_action(self, state, test=False, tensor=False):
+        if not tensor:
+            assert isinstance(state, np.ndarray)
+        state = np.expand_dims(state, axis=0).astype(np.float64) if len(state.shape) == 1 else state
+        action = self._get_action_body(
+            tf.constant(state), self.sigma * test, tf.constant(self.actor.max_action, dtype=tf.float64))
+        if tensor:
+            return action
+        else:
+            return action.numpy()[0]
 
     @tf.contrib.eager.defun
-    def _get_action_body(self, state):
+    def _get_action_body(self, state, sigma, max_action):
         with tf.device(self.device):
-            return self.actor(state)
+            action = self.actor(state)
+            action += tf.random.normal(shape=action.shape, mean=0., stddev=sigma, dtype=tf.float64)
+            return tf.clip_by_value(action, -max_action, max_action)
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
         if weights is None:
@@ -135,17 +137,20 @@ class DDPG(OffPolicyAgent):
 
             return actor_loss, critic_loss, td_errors
 
-    def compute_td_error(self, states, actions, next_states, rewards, done):
-        td_errors = self._compute_td_error_body(states, actions, next_states, rewards, done)
+    def compute_td_error(self, states, actions, next_states, rewards, dones):
+        if isinstance(actions, tf.Tensor):
+            rewards = tf.expand_dims(rewards, axis=1)
+            dones = tf.expand_dims(dones, 1)
+        td_errors = self._compute_td_error_body(states, actions, next_states, rewards, dones)
         return np.ravel(td_errors.numpy())
 
     @tf.contrib.eager.defun
-    def _compute_td_error_body(self, states, actions, next_states, rewards, done):
+    def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
-            not_done = 1. - done
+            not_dones = tf.constant(1., dtype=tf.float64) - dones
             target_Q = self.critic_target(
                 [next_states, self.actor_target(next_states)])
-            target_Q = rewards + (not_done * self.discount * target_Q)
+            target_Q = rewards + (not_dones * self.discount * target_Q)
             target_Q = tf.stop_gradient(target_Q)
             current_Q = self.critic([states, actions])
             td_errors = target_Q - current_Q

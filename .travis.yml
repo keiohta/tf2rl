@@ -1,0 +1,18 @@
+dist: xenial
+language: python
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-8
+      - g++-8
+python:
+  - "3.6"
+script:
+  - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
+  - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
+  - pip install -r test_requirements.txt
+  - coverage run --source=tf2rl setup.py test
+after_success:
+  - coveralls

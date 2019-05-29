@@ -1,25 +1,25 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.ddpg import DDPG, Actor
 from tf2rl.misc.target_update_ops import update_target_variables
-
 
 
 class Critic(tf.keras.Model):
     def __init__(self, state_shape, action_dim, units=[400, 300], name="Critic"):
         super().__init__(name=name)
 
-        self.l1 = tf.keras.layers.Dense(units[0], name="L1")
-        self.l2 = tf.keras.layers.Dense(units[1], name="L2")
-        self.l3 = tf.keras.layers.Dense(1, name="L3")
+        self.l1 = Dense(units[0], name="L1")
+        self.l2 = Dense(units[1], name="L2")
+        self.l3 = Dense(1, name="L3")
 
-        self.l4 = tf.keras.layers.Dense(units[0], name="L4")
-        self.l5 = tf.keras.layers.Dense(units[1], name="L5")
-        self.l6 = tf.keras.layers.Dense(1, name="L6")
+        self.l4 = Dense(units[0], name="L4")
+        self.l5 = Dense(units[1], name="L5")
+        self.l6 = Dense(1, name="L6")
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
-        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
         with tf.device("/cpu:0"):
             self([dummy_state, dummy_action])
 
@@ -97,7 +97,8 @@ class TD3(DDPG):
             return actor_loss, critic_loss, np.abs(td_error1) + np.abs(td_error2)
 
     def compute_td_error(self, states, actions, next_states, rewards, done):
-        td_error1, td_error2 = self._compute_td_error_body(states, actions, next_states, rewards, done)
+        td_error1, td_error2 = self._compute_td_error_body(
+            states, actions, next_states, rewards, done)
         return np.ravel(np.abs(td_error1.numpy()) + np.abs(td_error2.numpy()))
 
     @tf.contrib.eager.defun
@@ -109,7 +110,7 @@ class TD3(DDPG):
             next_action = self.actor_target(next_states)
             noise = tf.cast(tf.clip_by_value(
                 tf.random.normal(shape=tf.shape(next_action), stddev=self._policy_noise),
-                -self._noise_clip, self._noise_clip), tf.float64)
+                -self._noise_clip, self._noise_clip), tf.float32)
             next_action = tf.clip_by_value(
                 next_action + noise, -self.actor_target.max_action, self.actor_target.max_action)
 

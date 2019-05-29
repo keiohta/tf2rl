@@ -90,7 +90,7 @@ class EpisodicLifeEnv(gym.Wrapper):
         """
         gym.Wrapper.__init__(self, env)
         self.lives = 0
-        self.was_real_done  = True
+        self.was_real_done = True
 
     def step(self, action):
         obs, reward, done, info = self.env.step(action)
@@ -126,7 +126,7 @@ class MaxAndSkipEnv(gym.Wrapper):
         gym.Wrapper.__init__(self, env)
         # most recent raw observations (for max pooling across time steps)
         self._obs_buffer = np.zeros((2,)+env.observation_space.shape, dtype=np.uint8)
-        self._skip       = skip
+        self._skip = skip
 
     def step(self, action):
         """Repeat action, sum reward, and max over last observations."""
@@ -134,8 +134,10 @@ class MaxAndSkipEnv(gym.Wrapper):
         done = None
         for i in range(self._skip):
             obs, reward, done, info = self.env.step(action)
-            if i == self._skip - 2: self._obs_buffer[0] = obs
-            if i == self._skip - 1: self._obs_buffer[1] = obs
+            if i == self._skip - 2:
+                self._obs_buffer[0] = obs
+            if i == self._skip - 1:
+                self._obs_buffer[1] = obs
             total_reward += reward
             if done:
                 break
@@ -211,6 +213,30 @@ class WarpFrame(gym.ObservationWrapper):
         return obs
 
 
+class ProcessFrame84(gym.ObservationWrapper):
+    def __init__(self, env=None):
+        super(ProcessFrame84, self).__init__(env)
+        self.observation_space = spaces.Box(
+            low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)
+
+    def observation(self, obs):
+        return ProcessFrame84.process(obs)
+
+    @staticmethod
+    def process(frame):
+        if frame.size == 210 * 160 * 3:
+            img = np.reshape(frame, [210, 160, 3]).astype(np.float32)
+        elif frame.size == 250 * 160 * 3:
+            img = np.reshape(frame, [250, 160, 3]).astype(np.float32)
+        else:
+            assert False, "Unknown resolution."
+        img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
+        resized_screen = cv2.resize(img, (84, 110), interpolation=cv2.INTER_AREA)
+        x_t = resized_screen[18:102, :]
+        x_t = np.reshape(x_t, [84, 84, 1])
+        return x_t.astype(np.uint8)
+
+
 class FrameStack(gym.Wrapper):
     def __init__(self, env, k):
         """Stack k last frames.
@@ -223,7 +249,9 @@ class FrameStack(gym.Wrapper):
         self.k = k
         self.frames = deque([], maxlen=k)
         shp = env.observation_space.shape
-        self.observation_space = spaces.Box(low=0, high=255, shape=(shp[:-1] + (shp[-1] * k,)), dtype=env.observation_space.dtype)
+        self.observation_space = spaces.Box(
+            low=0, high=255, shape=(shp[:-1] + (shp[-1] * k,)),
+            dtype=env.observation_space.dtype)
 
     def reset(self):
         ob = self.env.reset()
@@ -303,4 +331,21 @@ def wrap_deepmind(env, episode_life=True, clip_rewards=True, frame_stack=False, 
         env = ClipRewardEnv(env)
     if frame_stack:
         env = FrameStack(env, 4)
+    return env
+
+
+# forked from https://github.com/Shmuma/ptan/blob/master/ptan/common/wrappers.py
+def wrap_dqn(env, stack_frames=4, episodic_life=True, reward_clipping=True):
+    """Apply a common set of wrappers for Atari games."""
+    assert 'NoFrameskip' in env.spec.id
+    if episodic_life:
+        env = EpisodicLifeEnv(env)
+    env = NoopResetEnv(env, noop_max=30)
+    env = MaxAndSkipEnv(env, skip=4)
+    if 'FIRE' in env.unwrapped.get_action_meanings():
+        env = FireResetEnv(env)
+    env = ProcessFrame84(env)
+    env = FrameStack(env, stack_frames)
+    if reward_clipping:
+        env = ClipRewardEnv(env)
     return env
