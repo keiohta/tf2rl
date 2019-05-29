@@ -146,7 +146,11 @@ class Trainer:
                           os.path.join(self._output_dir, filename))
                 replay_buffer.clear()
             avg_test_return += episode_return
-
+        if self._show_test_images:
+            images = tf.cast(
+                tf.expand_dims(np.array(obs).transpose(2,0,1), axis=3),
+                tf.uint8)
+            tf.contrib.summary.image('train/input_img', images,)
         return avg_test_return / self._test_episodes
 
     def _set_from_args(self, args):
@@ -166,6 +170,7 @@ class Trainer:
         self._show_test_progress = args.show_test_progress
         self._test_episodes = args.test_episodes
         self._save_test_path = args.save_test_path
+        self._show_test_images = args.show_test_images
 
     @staticmethod
     def get_argument(parser=None):
@@ -195,6 +200,8 @@ class Trainer:
                             help='Number of episodes to evaluate at once')
         parser.add_argument('--save-test-path', action='store_true',
                             help='Save trajectories of evaluation')
+        parser.add_argument('--show-test-images', action='store_true',
+                            help='Show input images to neural networks when an episode finishes')
         # replay buffer
         parser.add_argument('--use-prioritized-rb', action='store_true',
                             help='Flag to use prioritized experience replay')
