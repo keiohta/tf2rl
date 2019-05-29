@@ -37,8 +37,7 @@ class QFunc(tf.keras.Model):
                                              dtype=np.float32)))
 
     def call(self, inputs):
-        features = tf.concat(inputs, axis=1)
-        features = self.l1(features)
+        features = self.l1(inputs)
         features = self.l2(features)
         if self._enable_categorical_dqn:
             features = self.l3(features)
