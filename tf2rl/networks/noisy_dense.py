@@ -1,10 +1,12 @@
 # This is an implementation of noisy linear layer defined in following paper:
 # Noisy Networks for Exploration, https://arxiv.org/abs/1706.10295
-# Forked from https://github.com/KNakane/tensorflow/blob/master/network/eager_module.py
-# Edited by Kei Ohta
+# Forked from https://github.com/LuEE-C/Noisy-A3C-Keras/blob/master/NoisyDense.py
+# Fixed a bug by Kei Ohta
 
 import numpy as np
 import tensorflow as tf
+
+from tensorflow.keras import backend as K
 
 
 class NoisyDense(tf.keras.layers.Layer):
@@ -42,6 +44,9 @@ class NoisyDense(tf.keras.layers.Layer):
     def build(self, input_shape):
         assert len(input_shape) >= 2
         self.input_dim = input_shape[-1]
+        self.kernel_shape = tf.constant((self.input_dim, self.units))
+        self.bias_shape = tf.constant((self.units,))
+
         self.kernel = self.add_weight(
             shape=[self.input_dim, self.units],
             initializer=tf.initializers.orthogonal(dtype=tf.float32),
@@ -56,11 +61,6 @@ class NoisyDense(tf.keras.layers.Layer):
             initializer=tf.keras.initializers.Constant(value=self.sigma_init),
             name='sigma_kernel',
             trainable=self.trainable)
-
-        self.epsilon_kernel = tf.keras.backend.zeros(
-            shape=(self.input_dim, self.units),
-            name='epsilon_kernel',
-            dtype=tf.float32)
 
         if self.use_bias:
             self.bias = self.add_weight(
@@ -77,11 +77,6 @@ class NoisyDense(tf.keras.layers.Layer):
                 name='sigma_bias',
                 trainable=self.trainable)
 
-            self.epsilon_bias = tf.keras.backend.zeros(
-                shape=(self.units,),
-                name='epsilon_bias',
-                dtype=tf.float32)
-
         else:
             self.bias = None
             self.epsilon_bias = None
@@ -96,24 +91,15 @@ class NoisyDense(tf.keras.layers.Layer):
     def call(self, inputs):
         # Implement Eq.(9)
         perturbed_kernel = self.kernel + \
-            self.sigma_kernel * self.epsilon_kernel
-        outputs = tf.keras.backend.dot(inputs, perturbed_kernel)
+            self.sigma_kernel * K.random_uniform(shape=self.kernel_shape)
+        outputs = K.dot(inputs, perturbed_kernel)
         if self.use_bias:
-            perturbed_bias = self.bias + self.sigma_bias * self.epsilon_bias
-            outputs = tf.keras.backend.bias_add(outputs, perturbed_bias)
+            perturbed_bias = self.bias + \
+                self.sigma_bias * K.random_uniform(shape=self.bias_shape)
+            outputs = K.bias_add(outputs, perturbed_bias)
         if self.activation is not None:
             outputs = self.activation(outputs)
         return outputs
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0], self.units)
-
-    def sample_noise(self):
-        self.epsilon_kernel.assign(np.random.normal(0, 1, (self.input_dim, self.units)))
-        if self.use_bias:
-            self.epsilon_bias.assign(np.random.normal(0, 1, (self.units,)))
-
-    def remove_noise(self):
-        self.epsilon_kernel.assign(np.zeros(shape=(self.input_dim, self.units)))
-        if self.use_bias:
-            self.epsilon_bias.assign(self.epsilon_bias, np.zeros(shape=self.units,))
