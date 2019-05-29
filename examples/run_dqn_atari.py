@@ -5,7 +5,6 @@ import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.algos.dqn import DQN
-from tf2rl.algos.categorical_dqn import CategoricalDQN
 from tf2rl.networks.noisy_dense import NoisyDense
 from tf2rl.envs.atari_wrapper import wrap_dqn
 from tf2rl.experiments.trainer import Trainer
@@ -37,7 +36,7 @@ class QFunc(tf.keras.Model):
         self.fc1 = DenseLayer(512, activation='relu')
         self.fc2 = DenseLayer(action_dim, activation='linear')
 
-        if self._enable_dueling_dqn:
+        if self._enable_dueling_dqn and not enable_categorical_dqn:
             self.fc3 = DenseLayer(1, activation='linear')
 
         input_shape = (1,) + state_shape
@@ -97,10 +96,9 @@ if __name__ == '__main__':
     test_env = wrap_dqn(gym.make(args.env_name), reward_clipping=False)
     # Following parameters are equivalent to DeepMind DQN paper
     # https://www.nature.com/articles/nature14236
-    optimizer = tf.train.RMSPropOptimizer(
-        learning_rate=0.00025, momentum=0.95, epsilon=0.01)
-    DQN_class = CategoricalDQN if args.enable_categorical_dqn else DQN
-    policy = DQN_class(
+    optimizer = tf.train.AdamOptimizer(
+        learning_rate=0.0000625, epsilon=1.5e-4)  # This value is from Rainbow
+    policy = DQN(
         enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
         enable_noisy_dqn=args.enable_noisy_dqn,
