@@ -117,7 +117,7 @@ class DQN(OffPolicyAgent):
             else:
                 action = np.random.randint(self._action_dim)
         else:
-            state = np.expand_dims(state, axis=0).astype(np.float32) if len(state.shape) == 1 else state
+            state = np.expand_dims(state, axis=0).astype(np.float32) if not state.shape[0] == self.batch_size else state
             action = self._get_action_body(tf.constant(state))
             if not tensor:
                 action = action.numpy()[0]
