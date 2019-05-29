@@ -90,6 +90,7 @@ if __name__ == '__main__':
     parser.set_defaults(max_steps=int(1e9))
     parser.set_defaults(save_model_interval=500000)
     parser.set_defaults(gpu=0)
+    parser.set_defaults(show_test_images=True)
     args = parser.parse_args()
 
     env = wrap_dqn(gym.make(args.env_name))
