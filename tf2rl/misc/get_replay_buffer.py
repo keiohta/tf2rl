@@ -56,9 +56,10 @@ def get_replay_buffer(policy, env, use_prioritized_rb=False,
         # return NstepPrioritizedReplayBuffer(**kwargs)
 
     if len(obs_shape) == 3:
-        kwargs["next_of"] = "obs"
+        # kwargs["next_of"] = "obs"
         kwargs["env_dict"]["obs"]["dtype"] = np.ubyte
-        kwargs["env_dict"].pop("next_obs")
+        kwargs["env_dict"]["next_obs"]["dtype"] = np.ubyte
+        # kwargs["env_dict"].pop("next_obs")
 
     # prioritized
     if use_prioritized_rb:
