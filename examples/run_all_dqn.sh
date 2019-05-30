@@ -1,15 +1,13 @@
-#!/bin/sh
-# rm -rf results
-python examples/run_dqn.py --dir-suffix=dqn
-# DDQN
-python examples/run_dqn.py --enable-double-dqn --dir-suffix=ddqn
+#!/bin/bash
+# DQN
+bash run.sh srun -X -c 3 --gres gpu:1 python examples/run_dqn_atari.py --dir-suffix=dqn
+# Prioritized DQN
+bash run.sh srun -X -c 3 --gres gpu:1 python examples/run_dqn_atari.py --use-prioritized-rb --dir-suffix=per_dqn
 # Dueling DDQN
-python examples/run_dqn.py --enable-double-dqn --enable-dueling-dqn --dir-suffix=dueling_ddqn
+bash run.sh srun -X -c 3 --gres gpu:1 python examples/run_dqn_atari.py --enable-double-dqn --enable-dueling-dqn --dir-suffix=dueling-ddqn
+# Distributional DQN
+bash run.sh srun -X -c 3 --gres gpu:1 python examples/run_dqn_atari.py --enable-categorical-dqn --dir-suffix=distributional_dqn
 # Noisy Nets
-python examples/run_dqn.py --enable-noisy-dqn --dir-suffix=noisy
-# Categorical DQN
-python examples/run_dqn.py --enable-categorical-dqn --dir-suffix=categorical_dqn
-# Dueling DDQN Noisy Nets
-python examples/run_dqn.py --enable-double-dqn --enable-dueling-dqn --enable-noisy-dqn --dir-suffix=dueling_ddqn_noisy
-# Dueling DDQN Categorical Noisy Nets
-python examples/run_dqn.py --enable-double-dqn --enable-dueling-dqn --enable-noisy-dqn --enable-categorical-dqn --dir-suffix=dueling_ddqn_categorical_noisy
+bash run.sh srun -X -c 3 --gres gpu:1 python examples/run_dqn_atari.py --enable-noisy-dqn --dir-suffix=noisy
+# Dueling DDQN + Distributional + Noisy
+bash run.sh srun -X -c 3 --gres gpu:1 python examples/run_dqn_atari.py --enable-categorical-dqn --dir-suffix=distributional_dqn --enable-categorical-dqn --enable-noisy-dqn --use-prioritized-rb --dir-suffix=dueling_ddqn_distr_noisy_per
