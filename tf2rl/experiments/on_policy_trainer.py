@@ -52,11 +52,16 @@ class OnPolicyTrainer(Trainer):
                         episode_return = 0
                         episode_start_time = time.time()
 
+                # Train critic
                 samples = replay_buffer.sample(self._policy.batch_size)
-                self._policy.train(
+                self._policy.train_critic(
                     samples["obs"], samples["act"], samples["next_obs"],
-                    samples["rew"], np.array(samples["done"], dtype=np.float32),
-                    None if not self._use_prioritized_rb else samples["weights"])
+                    samples["rew"], samples["done"])
+                # Train actor
+                samples = replay_buffer.sample(self._policy.batch_size)
+                self._policy.train_actor(
+                    samples["obs"], samples["act"], samples["next_obs"],
+                    samples["rew"], samples["done"], samples["log_pi"])
                 if int(total_steps) % self._test_interval == 0:
                     with tf.contrib.summary.always_record_summaries():
                         avg_test_return = self.evaluate_policy(int(total_steps))

@@ -35,7 +35,8 @@ class OnPolicyAgent(Policy):
             **kwargs):
         self.horizon = horizon
         kwargs["n_warmup"] = 0
-        super().__init__(memory_capacity=memory_capacity, **kwargs)
+        kwargs["memory_capacity"] = self.horizon
+        super().__init__(**kwargs)
 
 
 class OffPolicyAgent(Policy):
