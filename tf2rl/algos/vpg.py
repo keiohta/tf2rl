@@ -34,10 +34,10 @@ class VPG(OnPolicyAgent):
         assert isinstance(state, np.ndarray)
         assert len(state.shape) == 1
 
-        action = self._get_action_body(tf.constant(state), test)
         state = np.expand_dims(state, axis=0).astype(np.float32)
+        action, log_pi = self._get_action_body(tf.constant(state), test)
 
-        return action.numpy()
+        return action.numpy(), log_pi.numpy() if not test else log_pi
 
     # @tf.contrib.eager.defun
     def _get_action_body(self, state, test):
@@ -48,33 +48,31 @@ class VPG(OnPolicyAgent):
                 samples = tf.multinomial(tf.log(probs), 1)
                 return elems[tf.cast(samples[0][0], tf.int32)]
             else:
-                return self.actor(state)[0][0]
+                return self.actor(state)
         else:
             if self._is_discrete:
                 return tf.argmax(self.actor(state)) 
             else:
-                return self.actor.mean_action(state)
+                return self.actor.mean_action(state), None
 
-    def train(self, states, actions, next_states, rewards, done):
-        _ = self._train_body(states, actions, next_states, rewards, done)
+    def train(self, states, actions, next_states, rewards, done, log_pis):
+        loss = self._train_body(states, actions, next_states, rewards, done, log_pis)
 
-        # tf.contrib.summary.scalar(name="Loss", tensor=loss, family="loss")
+        tf.contrib.summary.scalar(name="Loss", tensor=loss, family="loss")
         # tf.contrib.summary.scalar(name="Entropy", tensor=entropy, family="loss")
 
-        # return loss
+        return loss
 
     @tf.contrib.eager.defun
-    def _train_body(self, states, actions, next_states, rewards, done):
+    def _train_body(self, states, actions, next_states, rewards, done, log_pis):
         with tf.device(self.device):
             log_probs = self.actor.compute_log_probs(states, actions)
-            print(log_probs)
-            return
-            # loss = - log_likelihood * advantage + lambda * entropy
+            log_likelihood_ratio = log_probs - log_pis  # old log_probs
+            loss = -log_likelihood_ratio  #  * advantage + lambda * entropy
             if self._is_discrete:
                 raise NotImplementedError
             else:
-                raise NotImplementedError
-        # return loss
+                return loss
 
 
 if __name__ == '__main__':

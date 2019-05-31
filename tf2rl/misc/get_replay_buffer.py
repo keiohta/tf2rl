@@ -42,6 +42,7 @@ def get_replay_buffer(policy, env, use_prioritized_rb=False,
 
     # on-policy policy
     if not issubclass(type(policy), OffPolicyAgent):
+        kwargs["env_dict"]["log_pi"] = {}
         return ReplayBuffer(**kwargs)
 
     # off-policy policy

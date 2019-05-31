@@ -31,10 +31,9 @@ class OnPolicyAgent(Policy):
     """
     def __init__(
             self,
-            memory_capacity=None,
+            horizon=2048,
             **kwargs):
-        if memory_capacity is None:
-            memory_capacity = kwargs["batch_size"]
+        self.horizon = horizon
         kwargs["n_warmup"] = 0
         super().__init__(memory_capacity=memory_capacity, **kwargs)
 
