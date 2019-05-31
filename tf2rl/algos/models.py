@@ -22,7 +22,7 @@ class GaussianActor(tf.keras.Model):
         self._max_action = max_action
 
         self(tf.constant(
-            np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
+            np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
     def _compute_dist(self, states):
         """Compute multivariate normal distribution
@@ -77,7 +77,7 @@ class CategoricalActor(tf.keras.Model):
         self.l3 = Dense(action_dim, name="L3", activation='softmax')
 
         self(tf.constant(
-            np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
+            np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
     def call(self, inputs):
         features = self.l1(inputs)

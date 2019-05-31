@@ -34,8 +34,8 @@ class VPG(OnPolicyAgent):
         assert isinstance(state, np.ndarray)
         assert len(state.shape) == 1
 
-        state = np.expand_dims(state, axis=0).astype(np.float64)
         action = self._get_action_body(tf.constant(state), test)
+        state = np.expand_dims(state, axis=0).astype(np.float32)
 
         return action.numpy()
 

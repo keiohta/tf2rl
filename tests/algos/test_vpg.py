@@ -38,8 +38,8 @@ class VPGTest(unittest.TestCase):
 
     def test_train(self):
         batch_size = 32
-        rewards = np.zeros(shape=(batch_size,))
-        dones = np.zeros(shape=(batch_size,))
+        rewards = np.zeros(shape=(batch_size,), dtype=np.float32)
+        dones = np.zeros(shape=(batch_size,), dtype=np.float32)
 
         # discrete_vpg = VPG(
         #     state_shape=self.discrete_env.observation_space.shape,
@@ -56,9 +56,11 @@ class VPGTest(unittest.TestCase):
             action_dim=self.continuous_env.action_space.low.size,
             is_discrete=False, gpu=-1)
         continuous_obses = np.zeros(
-            shape=(batch_size,)+self.continuous_env.observation_space.shape)
+            shape=(batch_size,)+self.continuous_env.observation_space.shape,
+            dtype=np.float32)
         continuous_acts = np.zeros(
-            shape=(batch_size,)+self.continuous_env.action_space.shape)
+            shape=(batch_size,)+self.continuous_env.action_space.shape,
+            dtype=np.float32)
         continuous_vpg.train(
             continuous_obses, continuous_acts, continuous_obses, rewards, dones)
 
