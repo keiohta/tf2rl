@@ -9,11 +9,13 @@ from tf2rl.experiments.utils import restore_latest_n_traj
 
 if __name__ == '__main__':
     parser = IRLTrainer.get_argument()
+    parser = GAIL.get_argument(parser)
     parser.add_argument('--env-name', type=str, default="RoboschoolReacher-v1")
     args = parser.parse_args()
 
     if args.expert_path_dir is None:
         print("Plaese generate demonstrations first")
+        print("python examples/run_sac.py --env-name=RoboschoolReacher-v1 --save-test-path --test-interval=50000")
         exit()
 
     units = [100, 100]
@@ -32,6 +34,7 @@ if __name__ == '__main__':
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.high.size,
         units=units,
+        enable_sn=args.enable_sn,
         gpu=args.gpu)
     expert_trajs = restore_latest_n_traj(
         args.expert_path_dir, n_path=20, max_steps=100)
@@ -39,4 +42,4 @@ if __name__ == '__main__':
                          expert_trajs["acts"], test_env)
     trainer()
 
-# python examples/run_gail_ddpg.py --expert-path-dir results/20190518T112217.808802
+# python examples/run_gail_ddpg.py --expert-path-dir /path/to/expert_dir
