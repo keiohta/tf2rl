@@ -7,7 +7,7 @@ import tensorflow as tf
 
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
-from tf2rl.experiments.utils import save_path
+from tf2rl.experiments.utils import save_path, frames_to_gif
 
 
 config = tf.ConfigProto(allow_soft_placement=True)
@@ -126,6 +126,7 @@ class Trainer:
                 self._policy, self._test_env, size=self._episode_max_steps)
         for i in range(self._test_episodes):
             episode_return = 0.
+            frames = []
             obs = self._test_env.reset()
             done = False
             for _ in range(self._episode_max_steps):
@@ -133,18 +134,23 @@ class Trainer:
                 next_obs, reward, done, _ = self._test_env.step(action)
                 if self._save_test_path:
                     replay_buffer.add(obs=obs, act=action, next_obs=next_obs, rew=reward, done=done)
-                if self._show_test_progress:
+
+                if self._save_test_movie:
+                    frames.append(self._test_env.render(mode='rgb_array'))
+                elif self._show_test_progress:
                     self._test_env.render()
                 episode_return += reward
                 obs = next_obs
                 if done:
                     break
+            prefix = "step_{0:08d}_epi_{1:02d}_return_{2:010.4f}".format(
+                total_steps, i, episode_return)
             if self._save_test_path:
-                filename = "step_{0:08d}_epi_{1:02d}_return_{2:010.4f}.pkl".format(
-                    total_steps, i, episode_return)
                 save_path(replay_buffer.sample(self._episode_max_steps),
-                          os.path.join(self._output_dir, filename))
+                          os.path.join(self._output_dir, prefix + ".pkl"))
                 replay_buffer.clear()
+            if self._save_test_movie:
+                frames_to_gif(frames, prefix, self._output_dir)
             avg_test_return += episode_return
         if self._show_test_images:
             images = tf.cast(
@@ -170,6 +176,7 @@ class Trainer:
         self._show_test_progress = args.show_test_progress
         self._test_episodes = args.test_episodes
         self._save_test_path = args.save_test_path
+        self._save_test_movie = args.save_test_movie
         self._show_test_images = args.show_test_images
 
     @staticmethod
@@ -202,6 +209,8 @@ class Trainer:
                             help='Save trajectories of evaluation')
         parser.add_argument('--show-test-images', action='store_true',
                             help='Show input images to neural networks when an episode finishes')
+        parser.add_argument('--save-test-movie', action='store_true',
+                            help='Save rendering results')
         # replay buffer
         parser.add_argument('--use-prioritized-rb', action='store_true',
                             help='Flag to use prioritized experience replay')

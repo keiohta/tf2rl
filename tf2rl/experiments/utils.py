@@ -2,6 +2,8 @@ import os
 import numpy as np
 import joblib
 import random
+import matplotlib.pyplot as plt
+from matplotlib import animation
 
 import tensorflow as tf
 
@@ -55,3 +57,20 @@ def load_trajectories(filenames, max_steps=None):
             obses = np.vstack((obs, obses))
             acts = np.vstack((act, acts))
     return {'obses': obses, 'acts': acts}
+
+
+def frames_to_gif(frames, prefix, save_dir, interval=50, fps=30):
+    """Convert frames to gif file
+    """
+    assert len(frames) > 0
+    plt.figure(figsize=(frames[0].shape[1] / 72., frames[0].shape[0] / 72.), dpi=72)
+    patch = plt.imshow(frames[0])
+    plt.axis('off')
+
+    def animate(i):
+        patch.set_data(frames[i])
+
+    # TODO: interval should be 1000 / fps ?
+    anim = animation.FuncAnimation(plt.gcf(), animate, frames=len(frames), interval=interval)
+    output_path = "{}/{}.gif".format(save_dir, prefix)
+    anim.save(output_path, writer='imagemagick', fps=fps)
