@@ -12,8 +12,8 @@ class Discriminator(tf.keras.Model):
         self.l2 = tf.keras.layers.Dense(units[1], name="L2", activation="relu")
         self.l3 = tf.keras.layers.Dense(1, name="L3", activation="sigmoid")
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
-        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
         with tf.device("/cpu:0"):
             self([dummy_state, dummy_action])
 
