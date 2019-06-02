@@ -4,9 +4,11 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.dqn import DQN
+from common import CommonAlgos
 
 
-class TestDQN(unittest.TestCase):
+# class TestDQN(unittest.TestCase):
+class TestDQN(CommonAlgos):
     @classmethod
     def setUpClass(cls):
         cls.env = gym.make("CartPole-v0")
