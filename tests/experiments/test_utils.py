@@ -27,7 +27,7 @@ class TestUtils(unittest.TestCase):
 
     def test_save_path(self):
         n_store_episodes = 10
-        obs = np.ones_like(self.env.observation_space.shape)
+        obs = np.ones(shape=self.env.observation_space.shape, dtype=np.float32)
         for epi in range(n_store_episodes):
             for i in range(self.replay_buffer.get_buffer_size()):
                 self.replay_buffer.add(
