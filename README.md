@@ -15,7 +15,7 @@ Following algorithms are supported:
 | DDPG variants |       X        |         ✓         |                     DDPG, BiResDDPG, TD3                     |
 |      SAC      |       X        |         ✓         |                              -                               |
 |     ApeX      |       ✓        |         ✓         | with general off-policy algorithms such as DQN, DDPG, and SAC |
-|     GAIL      |       ✓        |         ✓         |                              -                               |
+|     GAIL      |       ✓        |         ✓         |                        GAIL, GAIL-SN                         |
 
 Following papers have been implementd in tf2rl:
 
