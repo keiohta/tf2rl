@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
@@ -9,14 +10,14 @@ class Actor(tf.keras.Model):
     def __init__(self, state_shape, action_dim, max_action, units=[400, 300], name="Actor"):
         super().__init__(name=name)
 
-        self.l1 = tf.keras.layers.Dense(units[0], name="L1")
-        self.l2 = tf.keras.layers.Dense(units[1], name="L2")
-        self.l3 = tf.keras.layers.Dense(action_dim, name="L3")
+        self.l1 = Dense(units[0], name="L1")
+        self.l2 = Dense(units[1], name="L2")
+        self.l3 = Dense(action_dim, name="L3")
 
         self.max_action = max_action
 
         with tf.device("/cpu:0"):
-            self(tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64)))
+            self(tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
     def call(self, inputs):
         features = tf.nn.relu(self.l1(inputs))
@@ -30,12 +31,12 @@ class Critic(tf.keras.Model):
     def __init__(self, state_shape, action_dim, units=[400, 300], name="Critic"):
         super().__init__(name=name)
 
-        self.l1 = tf.keras.layers.Dense(units[0], name="L1")
-        self.l2 = tf.keras.layers.Dense(units[1], name="L2")
-        self.l3 = tf.keras.layers.Dense(1, name="L3")
+        self.l1 = Dense(units[0], name="L1")
+        self.l2 = Dense(units[1], name="L2")
+        self.l3 = Dense(1, name="L3")
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float64))
-        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float64))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
         with tf.device("/cpu:0"):
             self([dummy_state, dummy_action])
 

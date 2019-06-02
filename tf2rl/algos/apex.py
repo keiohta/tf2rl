@@ -162,7 +162,7 @@ def learner(global_rb, trained_steps, is_training_done,
             with tf.contrib.summary.always_record_summaries():
                 td_errors = policy.train(
                     samples["obs"], samples["act"], samples["next_obs"],
-                    samples["rew"], np.array(samples["done"], dtype=np.float64),
+                    samples["rew"], np.array(samples["done"], dtype=np.float32),
                     samples["weights"])
                 writer.flush()
             global_rb.update_priorities(samples["indexes"], np.abs(td_errors) + 1e-6)

@@ -9,6 +9,7 @@ if __name__ == '__main__':
     parser = DQN.get_argument(parser)
     parser.set_defaults(test_interval=2000)
     parser.set_defaults(max_steps=int(5e5))
+    parser.set_defaults(max_steps=100000)
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
 
@@ -17,6 +18,8 @@ if __name__ == '__main__':
     policy = DQN(
         enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
+        enable_noisy_dqn=args.enable_noisy_dqn,
+        enable_categorical_dqn=args.enable_categorical_dqn,
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
         n_warmup=500,
