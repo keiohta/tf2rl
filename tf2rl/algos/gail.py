@@ -69,8 +69,14 @@ class GAIL(Policy):
                 zip(grads, self.disc.trainable_variables))
         return loss, accuracy
 
-    @tf.contrib.eager.defun
     def inference(self, states, actions):
+        if states.ndim == actions.ndim == 1:
+            states = np.expand_dims(states, axis=0)
+            actions = np.expand_dims(actions, axis=0)
+        return self._inference_body(states, actions)
+
+    @tf.contrib.eager.defun
+    def _inference_body(self, states, actions):
         with tf.device(self.device):
             return tf.log(self.disc([states, actions]) + 1e-8)
 

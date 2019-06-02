@@ -15,27 +15,24 @@ class SNDense(Dense):
             self,
             units,
             trainable=True,
-            class_name="SNDense",
+            u_kernel_initializer=tf.truncated_normal_initializer,
             **kwargs):
         super().__init__(units, **kwargs)
         self.trainable = trainable
+        self.u_kernel_initializer = u_kernel_initializer
 
     def build(self, input_shape):
         assert len(input_shape) >= 2
         super().build(input_shape)
-        self.u = K.zeros(
-            shape=(self.units,),
-            name='u',
-            dtype=tf.float32)
         self.u_kernel = self.add_weight(
-            shape=(1, self.kernel.shape.as_list()[-1]),
-            initializer=tf.truncated_normal_initializer(),
+            # shape=(1, self.kernel.shape.as_list()[-1]),
+            shape=(1, self.units),
+            initializer=self.u_kernel_initializer(),
             name='u_kernel',
             trainable=False)
 
     def compute_spectral_norm(self):
         u_hat = self.u_kernel
-        v_hat = None
 
         def l2_norm(val, eps=1e-12):
             return val / (tf.reduce_sum(val ** 2) ** 0.5 + eps)
@@ -72,6 +69,8 @@ class SNDense(Dense):
         return outputs
 
     def get_config(self):
-        config = {'class_name': "SNDense"}
+        config = {
+            "u_kernel_initializer": self.u_kernel_initializer,
+            "trainable": self.trainable}
         base_config = super(SNDense, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))

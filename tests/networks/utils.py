@@ -295,6 +295,8 @@ def layer_test(layer_cls, kwargs=None, input_shape=None, input_dtype=None,
   if expected_output is not None:
     np.testing.assert_allclose(actual_output, expected_output, rtol=1e-3)
 
+  return None
+
   # test serialization, weight setting at model level
   model_config = model.get_config()
   recovered_model = keras.models.Model.from_config(model_config, custom_objects=custom_objects)
