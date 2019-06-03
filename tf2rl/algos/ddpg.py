@@ -86,9 +86,9 @@ class DDPG(OffPolicyAgent):
     def get_action(self, state, test=False, tensor=False):
         if not tensor:
             assert isinstance(state, np.ndarray)
-        state = np.expand_dims(state, axis=0).astype(np.float64) if len(state.shape) == 1 else state
+        state = np.expand_dims(state, axis=0).astype(np.float32) if len(state.shape) == 1 else state
         action = self._get_action_body(
-            tf.constant(state), self.sigma * test, tf.constant(self.actor.max_action, dtype=tf.float64))
+            tf.constant(state), self.sigma * test, tf.constant(self.actor.max_action, dtype=tf.float32))
         if tensor:
             return action
         else:
@@ -98,7 +98,7 @@ class DDPG(OffPolicyAgent):
     def _get_action_body(self, state, sigma, max_action):
         with tf.device(self.device):
             action = self.actor(state)
-            action += tf.random.normal(shape=action.shape, mean=0., stddev=sigma, dtype=tf.float64)
+            action += tf.random.normal(shape=action.shape, mean=0., stddev=sigma, dtype=tf.float32)
             return tf.clip_by_value(action, -max_action, max_action)
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
@@ -147,7 +147,7 @@ class DDPG(OffPolicyAgent):
     @tf.contrib.eager.defun
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
-            not_dones = tf.constant(1., dtype=tf.float64) - dones
+            not_dones = tf.constant(1., dtype=tf.float32) - dones
             target_Q = self.critic_target(
                 [next_states, self.actor_target(next_states)])
             target_Q = rewards + (not_dones * self.discount * target_Q)

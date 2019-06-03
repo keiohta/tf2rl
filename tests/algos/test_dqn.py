@@ -1,5 +1,4 @@
 import unittest
-import gym
 import numpy as np
 import tensorflow as tf
 
@@ -7,7 +6,6 @@ from tf2rl.algos.dqn import DQN
 from tests.algos.common import CommonAlgos
 
 
-# class TestDQN(unittest.TestCase):
 class TestDQN(CommonAlgos):
     def test__init__(self):
         DQN(state_shape=self.discrete_env.observation_space.shape,
