@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.dqn import DQN
-from common import CommonAlgos
+from tests.algos.common import CommonAlgos
 
 
 # class TestDQN(unittest.TestCase):
