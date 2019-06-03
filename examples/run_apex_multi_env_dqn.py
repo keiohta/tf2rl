@@ -10,11 +10,17 @@ from tf2rl.misc.target_update_ops import update_target_variables
 if __name__ == '__main__':
     parser = apex_argument()
     parser = DQN.get_argument(parser)
+    parser.add_argument('--atari', action='store_true')
+    parser.add_argument('--env-name', type=str,
+                        default="SpaceInvadersNoFrameskip-v4")
     args = parser.parse_args()
 
     # Prepare env and policy function
     def env_fn():
-        return gym.make("CartPole-v0")
+        if args.atari:
+            return gym.make(args.env_name)
+        else:
+            return gym.make("CartPole-v0")
 
     def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
         return DQN(
@@ -28,7 +34,7 @@ if __name__ == '__main__':
             batch_size=32,
             memory_capacity=memory_capacity,
             discount=0.99,
-            gpu=args.gpu)
+            gpu=gpu)
 
     def get_weights_fn(policy):
         return [policy.q_func.weights,
