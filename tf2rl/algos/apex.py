@@ -89,7 +89,7 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             samples = local_rb.sample(local_rb.get_stored_size())
             td_errors = policy.compute_td_error(
                 samples["obs"], samples["act"], samples["next_obs"],
-                samples["rew"], np.array(samples["done"], dtype=np.float64))
+                samples["rew"], np.array(samples["done"], dtype=np.float32))
             msg = "Grad: {0: 6d}\t".format(trained_steps.value)
             msg += "Samples: {0: 7d}\t".format(n_transition.value)
             msg += "TDErr: {0:.5f}\t".format(np.average(np.abs(td_errors).flatten()))

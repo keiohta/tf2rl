@@ -56,7 +56,7 @@ def explorer(global_rb, queue, trained_steps,
         envs._sample_env, "Explorer", global_rb.get_buffer_size(), gpu=gpu)
     kwargs = {
         "size": buffer_size,
-        "default_dtype": np.float64,
+        "default_dtype": np.float32,
         "env_dict": {
             "obs": {
                 "shape": envs._sample_env.observation_space.shape},
@@ -159,7 +159,7 @@ def learner(global_rb, trained_steps, is_training_done,
             samples = global_rb.sample(policy.batch_size)
             td_errors = policy.train(
                 samples["obs"], samples["act"], samples["next_obs"],
-                samples["rew"], np.array(samples["done"], dtype=np.float64),
+                samples["rew"], np.array(samples["done"], dtype=np.float32),
                 samples["weights"])
             global_rb.update_priorities(
                 samples["indexes"], np.abs(td_errors)+1e-6)
