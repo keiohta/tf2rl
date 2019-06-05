@@ -7,6 +7,7 @@ from tensorflow.contrib.layers import xavier_initializer
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
+from tf2rl.misc.huber_loss import huber_loss
 
 
 class GaussianActor(tf.keras.Model):
@@ -179,8 +180,8 @@ class SAC(OffPolicyAgent):
                 target_Q = tf.stop_gradient(
                     self.scale_reward * rewards + not_done * self.discount * vf_next_target)
 
-                td_loss1 = 0.5 * tf.keras.losses.MSE(target_Q, current_Q1)
-                td_loss2 = 0.5 * tf.keras.losses.MSE(target_Q, current_Q2)
+                td_loss1 = huber_loss(target_Q, current_Q1)
+                td_loss2 = huber_loss(target_Q, current_Q2)
 
             q1_grad = tape.gradient(td_loss1, self.qf1.trainable_variables)
             self.qf1_optimizer.apply_gradients(zip(q1_grad, self.qf1.trainable_variables))
@@ -199,7 +200,7 @@ class SAC(OffPolicyAgent):
 
                 target_V = tf.stop_gradient(current_Q - log_pi)
                 td_errors = target_V - current_V
-                vf_loss_t = 0.5 * tf.square(td_errors) * weights
+                vf_loss_t = huber_loss(diff=td_errors) * weights
 
                 # TODO: Add reguralizer
                 policy_loss = tf.reduce_mean(log_pi - current_Q1)
