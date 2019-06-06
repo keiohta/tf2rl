@@ -228,18 +228,20 @@ def apex_argument(parser=None):
                         help='Maximum steps in an episode')
     parser.add_argument('--param-update-freq', type=int, default=1e2,
                         help='frequency to update parameter')
-    parser.add_argument('--test-freq', type=int, default=1e3,
-                        help='Frequency to evaluate policy')
     parser.add_argument('--n-explorer', type=int, default=None,
                         help='number of explorers to distribute. if None, use maximum number')
     parser.add_argument('--replay-buffer-size', type=int, default=1e6,
                         help='size of replay buffer')
     parser.add_argument('--local-buffer-size', type=int, default=1e4,
                         help='size of local replay buffer for explorer')
-    parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--gpu-explorer', type=int, default=0)
     parser.add_argument('--gpu-learner', type=int, default=0)
     parser.add_argument('--gpu-evaluator', type=int, default=0)
+    # Test setting
+    parser.add_argument('--test-freq', type=int, default=1e3,
+                        help='Frequency to evaluate policy')
+    parser.add_argument('--save-model-interval', type=int, default=int(1e4),
+                        help='Interval to save model')
     # Multi Env setting
     parser.add_argument('--n-env', type=int, default=1,
                         help='Number of environments')
@@ -249,9 +251,10 @@ def apex_argument(parser=None):
 
 
 def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
-              n_evaluation=10, episode_max_steps=1000, show_test_progress=False):
+              save_model_interval=int(1e6), n_evaluation=10, episode_max_steps=1000,
+              show_test_progress=False):
     output_dir = prepare_output_dir(
-        args=None, user_specified_dir="./results", suffix="_evaluator")
+        args=None, user_specified_dir="./results", suffix="evaluator")
     writer = tf.contrib.summary.create_file_writer(
         output_dir, filename_suffix="_evaluation")
     writer.set_as_default()
@@ -259,6 +262,11 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
 
     policy = policy_fn(env, "Learner", gpu=gpu)
     total_steps = tf.train.create_global_step()
+    model_save_threshold = save_model_interval
+
+    checkpoint = tf.train.Checkpoint(policy=policy)
+    checkpoint_manager = tf.contrib.checkpoint.CheckpointManager(
+        checkpoint, directory=output_dir, max_to_keep=10)
 
     while not is_training_done.is_set():
         n_evaluated_episode = 0
@@ -294,6 +302,10 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
                 tf.contrib.summary.scalar(name="AverageTestReturn",
                                           tensor=avg_test_return, family="loss")
                 writer.flush()
+            if int(total_steps) > model_save_threshold:
+                model_save_threshold += save_model_interval
+                checkpoint_manager.save()
+    checkpoint_manager.save()
 
 
 def prepare_experiment(env, args):
@@ -367,7 +379,7 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
     tasks.append(Process(
         target=evaluator,
         args=[is_training_done, env_fn(), policy_fn, set_weights_fn,
-              queues[-1], args.gpu_evaluator]))
+              queues[-1], args.gpu_evaluator, args.save_model_interval]))
 
     for task in tasks:
         task.start()
