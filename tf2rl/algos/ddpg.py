@@ -148,7 +148,7 @@ class DDPG(OffPolicyAgent):
     @tf.contrib.eager.defun
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
-            not_dones = tf.constant(1., dtype=tf.float32) - dones
+            not_dones = 1. - dones
             target_Q = self.critic_target(
                 [next_states, self.actor_target(next_states)])
             target_Q = rewards + (not_dones * self.discount * target_Q)

@@ -7,9 +7,10 @@ import multiprocessing
 from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
 
-from cpprb import ReplayBuffer, PrioritizedReplayBuffer
+from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
+from tf2rl.misc.get_replay_buffer import get_default_rb_dict
 
 config = tf.ConfigProto(allow_soft_placement=True)
 config.gpu_options.allow_growth = True
@@ -50,10 +51,10 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         episode_max_steps:
             Maximum number of steps of an episode.
     """
-    policy = policy_fn(env, "Explorer", global_rb.get_buffer_size(), sigma=noise)
-    local_rb = ReplayBuffer(obs_shape=env.observation_space.shape,
-                            act_dim=env.action_space.low.size,
-                            size=buffer_size)
+    policy = policy_fn(
+        env, "Explorer", global_rb.get_buffer_size(), sigma=noise)
+    kwargs = get_default_rb_dict(buffer_size, env)
+    local_rb = ReplayBuffer(**kwargs)
 
     s = env.reset()
     episode_steps = 0
@@ -88,8 +89,9 @@ def explorer(global_rb, queue, trained_steps, n_transition,
         if local_rb.get_stored_size() == buffer_size:
             samples = local_rb.sample(local_rb.get_stored_size())
             td_errors = policy.compute_td_error(
-                samples["obs"], samples["act"], samples["next_obs"],
-                samples["rew"], np.array(samples["done"], dtype=np.float32))
+                states=samples["obs"], actions=samples["act"],
+                next_states=samples["next_obs"], rewards=samples["rew"],
+                dones=samples["done"])
             msg = "Grad: {0: 6d}\t".format(trained_steps.value)
             msg += "Samples: {0: 7d}\t".format(n_transition.value)
             msg += "TDErr: {0:.5f}\t".format(np.average(np.abs(td_errors).flatten()))
@@ -207,10 +209,9 @@ def prepare_experiment(n_explorer, env, args):
                          PrioritizedReplayBuffer)
     manager = SyncManager()
     manager.start()
-    global_rb = manager.PrioritizedReplayBuffer(
-        obs_shape=env.observation_space.shape,
-        act_dim=env.action_space.low.size,
-        size=args.replay_buffer_size)
+
+    kwargs = get_default_rb_dict(args.replay_buffer_size, env)
+    global_rb = manager.PrioritizedReplayBuffer(**kwargs)
 
     # queues to share network parameters between a learner and explorers
     queues = [Queue() for _ in range(n_explorer)]

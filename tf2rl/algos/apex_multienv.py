@@ -7,11 +7,11 @@ import multiprocessing
 from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
 
-from cpprb import PrioritizedReplayBuffer
-from cpprb.experimental import ReplayBuffer
+from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.envs.env_utils import get_act_dim
+from tf2rl.misc.get_replay_buffer import get_default_rb_dict
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 
 config = tf.ConfigProto(allow_soft_placement=True)
@@ -54,19 +54,8 @@ def explorer(global_rb, queue, trained_steps,
         env_fn, n_env, n_thread, episode_max_steps)
     policy = policy_fn(
         envs._sample_env, "Explorer", global_rb.get_buffer_size(), gpu=gpu)
-    kwargs = {
-        "size": buffer_size,
-        "default_dtype": np.float32,
-        "env_dict": {
-            "obs": {
-                "shape": envs._sample_env.observation_space.shape},
-            "next_obs": {
-                "shape": envs._sample_env.observation_space.shape},
-            "act": {
-                "shape": get_act_dim(envs._sample_env)},
-            "rew": {},
-            "done": {},
-            "priorities": {}}}
+    kwargs = get_default_rb_dict(buffer_size, envs._sample_env)
+    kwargs["env_dict"]["priorities"] = {}
     local_rb = ReplayBuffer(**kwargs)
 
     obses = envs.py_reset()
@@ -183,7 +172,7 @@ def learner(global_rb, trained_steps, is_training_done,
 
 
 def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
-              n_evaluation=10, episode_max_steps=1000, show_test_progress=False):
+              n_evaluation=10, episode_max_steps=1000, show_test_progress=True):
     output_dir = prepare_output_dir(
         args=None, user_specified_dir="./results", suffix="_evaluator")
     writer = tf.contrib.summary.create_file_writer(
@@ -195,6 +184,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
     total_steps = tf.train.create_global_step()
 
     while not is_training_done.is_set():
+        # Wait until a new weights comes
         if queue.empty():
             continue
         else:
@@ -255,10 +245,8 @@ def prepare_experiment(env, args):
     manager = SyncManager()
     manager.start()
 
-    global_rb = manager.PrioritizedReplayBuffer(
-        obs_shape=env.observation_space.shape,
-        act_dim=get_act_dim(env),
-        size=args.replay_buffer_size)
+    kwargs = get_default_rb_dict(args.replay_buffer_size, env)
+    global_rb = manager.PrioritizedReplayBuffer(**kwargs)
 
     # queues to share network parameters between a learner and explorers
     queues = [manager.Queue(), manager.Queue()]
