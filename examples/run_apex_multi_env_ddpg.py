@@ -3,7 +3,7 @@ import numpy as np
 import gym
 import roboschool
 
-from tf2rl.algos.apex_multienv import apex_argument, run
+from tf2rl.algos.apex import run, apex_argument
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.misc.target_update_ops import update_target_variables
 
@@ -12,19 +12,20 @@ if __name__ == '__main__':
     parser = apex_argument()
     parser.add_argument('--env-name', type=str,
                         default="RoboschoolAtlasForwardWalk-v1")
+    parser.set_defaults(n_env=64)
     args = parser.parse_args()
 
     # Prepare env and policy function
     def env_fn():
         return gym.make(args.env_name)
 
-    def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
+    def policy_fn(env, name, memory_capacity=int(1e6), noise_level=0.1, gpu=-1):
         return DDPG(
             state_shape=env.observation_space.shape,
             action_dim=env.action_space.high.size,
             gpu=gpu,
             name=name,
-            sigma=0.1,
+            sigma=noise_level,
             batch_size=100,
             lr_actor=0.001,
             lr_critic=0.001,
