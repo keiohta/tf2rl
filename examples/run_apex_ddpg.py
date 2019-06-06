@@ -3,10 +3,7 @@ import numpy as np
 import gym
 import roboschool
 
-import multiprocessing
-from multiprocessing import Process
-
-from tf2rl.algos.apex import apex_argument, explorer, learner, prepare_experiment, run
+from tf2rl.algos.apex import apex_argument, run
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.misc.target_update_ops import update_target_variables
 
@@ -30,9 +27,9 @@ if __name__ == '__main__':
             name=name,
             sigma=noise_level,
             batch_size=100,
-            lr_actor=0.0001,
-            lr_critic=0.0001,
-            actor_units=[300, 200],
+            lr_actor=0.001,
+            lr_critic=0.001,
+            actor_units=[400, 300],
             critic_units=[400, 300],
             memory_capacity=memory_capacity)
 
