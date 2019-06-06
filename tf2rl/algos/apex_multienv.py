@@ -172,7 +172,7 @@ def learner(global_rb, trained_steps, is_training_done,
 
 
 def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
-              n_evaluation=10, episode_max_steps=1000, show_test_progress=True):
+              n_evaluation=10, episode_max_steps=1000, show_test_progress=False):
     output_dir = prepare_output_dir(
         args=None, user_specified_dir="./results", suffix="_evaluator")
     writer = tf.contrib.summary.create_file_writer(
@@ -184,6 +184,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
     total_steps = tf.train.create_global_step()
 
     while not is_training_done.is_set():
+        n_evaluated_episode = 0
         # Wait until a new weights comes
         if queue.empty():
             continue
@@ -192,6 +193,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
             total_steps.assign(queue.get())
             avg_test_return = 0.
             for i in range(n_evaluation):
+                n_evaluated_episode += 1
                 episode_return = 0.
                 obs = env.reset()
                 done = False
@@ -205,8 +207,12 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
                     if done:
                         break
                 avg_test_return += episode_return
-            avg_test_return /= n_evaluation
-            print("Evaluation: {}".format(avg_test_return))
+                # Break if a new weights comes
+                if not queue.empty():
+                    break
+            avg_test_return /= n_evaluated_episode
+            print("Evaluation: {} over {} run".format(
+                avg_test_return, n_evaluated_episode))
             with tf.contrib.summary.always_record_summaries():
                 tf.contrib.summary.scalar(name="AverageTestReturn",
                                           tensor=avg_test_return, family="loss")
