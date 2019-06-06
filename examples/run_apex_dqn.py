@@ -2,7 +2,7 @@ import argparse
 import numpy as np
 import gym
 
-from tf2rl.algos.apex_multienv import apex_argument, run
+from tf2rl.algos.apex import apex_argument, run
 from tf2rl.algos.dqn import DQN
 from tf2rl.misc.target_update_ops import update_target_variables
 
@@ -22,7 +22,8 @@ if __name__ == '__main__':
         else:
             return gym.make("CartPole-v0")
 
-    def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
+    def policy_fn(env, name, memory_capacity=int(1e6),
+                  gpu=-1, noise_level=0.3):
         return DQN(
             name=name,
             enable_double_dqn=args.enable_double_dqn,
