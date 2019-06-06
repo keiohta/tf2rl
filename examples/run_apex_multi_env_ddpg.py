@@ -1,6 +1,7 @@
 import argparse
 import numpy as np
 import gym
+import roboschool
 
 from tf2rl.algos.apex_multienv import apex_argument, run
 from tf2rl.algos.ddpg import DDPG
@@ -9,11 +10,13 @@ from tf2rl.misc.target_update_ops import update_target_variables
 
 if __name__ == '__main__':
     parser = apex_argument()
+    parser.add_argument('--env-name', type=str,
+                        default="RoboschoolAtlasForwardWalk-v1")
     args = parser.parse_args()
 
     # Prepare env and policy function
     def env_fn():
-        return gym.make('HalfCheetah-v2')
+        return gym.make(args.env_name)
 
     def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
         return DDPG(

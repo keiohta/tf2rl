@@ -21,14 +21,9 @@ def get_space_size(space):
         raise NotImplementedError("Assuming to use Box or Discrete")
 
 
-def get_replay_buffer(policy, env, use_prioritized_rb=False,
-                      use_nstep_rb=False, n_step=1, size=None):
-    if policy is None or env is None:
-        return None
-
-    obs_shape = get_space_size(env.observation_space)
-    kwargs = {
-        "size": policy.update_interval,
+def get_default_rb_dict(size, env):
+    return {
+        "size": size,
         "default_dtype": np.float32,
         "env_dict": {
             "obs": {
@@ -39,6 +34,15 @@ def get_replay_buffer(policy, env, use_prioritized_rb=False,
                 "shape": get_space_size(env.action_space)},
             "rew": {},
             "done": {}}}
+
+
+def get_replay_buffer(policy, env, use_prioritized_rb=False,
+                      use_nstep_rb=False, n_step=1, size=None):
+    if policy is None or env is None:
+        return None
+
+    obs_shape = get_space_size(env.observation_space)
+    kwargs = get_default_rb_dict(policy.update_interval, env)
 
     # on-policy policy
     if not issubclass(type(policy), OffPolicyAgent):
