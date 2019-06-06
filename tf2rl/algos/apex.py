@@ -117,7 +117,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
                     states=samples["obs"], actions=samples["act"],
                     next_states=samples["next_obs"], rewards=samples["rew"],
                     dones=samples["done"])
-                priorities = np.abs(td_errors) + 1e-6
+                priorities = np.abs(np.squeeze(td_errors)) + 1e-6
             lock.acquire()
             global_rb.add(
                 obs=samples["obs"], act=samples["act"], rew=samples["rew"],
