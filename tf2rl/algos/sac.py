@@ -7,6 +7,7 @@ from tensorflow.contrib.layers import xavier_initializer
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
+from tf2rl.misc.huber_loss import huber_loss
 
 
 class GaussianActor(tf.keras.Model):
@@ -14,7 +15,7 @@ class GaussianActor(tf.keras.Model):
     LOG_SIG_CAP_MIN = -20
     EPS = 1e-6
 
-    def __init__(self, state_dim, action_dim, max_action, units=[256, 256], name='GaussianPolicy'):
+    def __init__(self, state_shape, action_dim, max_action, units=[256, 256], name='GaussianPolicy'):
         super().__init__(name=name)
 
         self.l1 = Dense(units[0], name="L1", activation='relu')
@@ -24,7 +25,7 @@ class GaussianActor(tf.keras.Model):
 
         self._max_action = max_action
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float32))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
         self(dummy_state)
 
     def _compute_dist(self, states):
@@ -60,14 +61,14 @@ class GaussianActor(tf.keras.Model):
 
 
 class CriticV(tf.keras.Model):
-    def __init__(self, state_dim, name='vf'):
+    def __init__(self, state_shape, name='vf'):
         super().__init__(name=name)
 
         self.l1 = Dense(256, name="L1", activation='relu')
         self.l2 = Dense(256, name="L2", activation='relu')
         self.l3 = Dense(1, name="L3", activation='linear')
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float32))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
         self(dummy_state)
 
     def call(self, states):
@@ -79,14 +80,14 @@ class CriticV(tf.keras.Model):
 
 
 class CriticQ(tf.keras.Model):
-    def __init__(self, state_dim, action_dim, name='qf'):
+    def __init__(self, state_shape, action_dim, name='qf'):
         super().__init__(name=name)
 
         self.l1 = Dense(256, name="L1", activation='relu')
         self.l2 = Dense(256, name="L2", activation='relu')
         self.l3 = Dense(1, name="L2", activation='linear')
 
-        dummy_state = tf.constant(np.zeros(shape=[1, state_dim], dtype=np.float32))
+        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
         dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
         self([dummy_state, dummy_action])
 
@@ -103,7 +104,7 @@ class CriticQ(tf.keras.Model):
 class SAC(OffPolicyAgent):
     def __init__(
             self,
-            state_dim,
+            state_shape,
             action_dim,
             name="SAC",
             max_action=1.,
@@ -116,16 +117,16 @@ class SAC(OffPolicyAgent):
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
-        self.actor = GaussianActor(state_dim, action_dim, max_action)
+        self.actor = GaussianActor(state_shape, action_dim, max_action)
         self.actor_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
 
-        self.vf = CriticV(state_dim)
-        self.vf_target = CriticV(state_dim)
+        self.vf = CriticV(state_shape)
+        self.vf_target = CriticV(state_shape)
         update_target_variables(self.vf_target.weights, self.vf.weights, tau=1.)
         self.vf_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
 
-        self.qf1 = CriticQ(state_dim, action_dim, name="qf1")
-        self.qf2 = CriticQ(state_dim, action_dim, name="qf2")
+        self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
+        self.qf2 = CriticQ(state_shape, action_dim, name="qf2")
         self.qf1_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
         self.qf2_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
 
@@ -179,8 +180,8 @@ class SAC(OffPolicyAgent):
                 target_Q = tf.stop_gradient(
                     self.scale_reward * rewards + not_done * self.discount * vf_next_target)
 
-                td_loss1 = 0.5 * tf.keras.losses.MSE(target_Q, current_Q1)
-                td_loss2 = 0.5 * tf.keras.losses.MSE(target_Q, current_Q2)
+                td_loss1 = huber_loss(target_Q, current_Q1)
+                td_loss2 = huber_loss(target_Q, current_Q2)
 
             q1_grad = tape.gradient(td_loss1, self.qf1.trainable_variables)
             self.qf1_optimizer.apply_gradients(zip(q1_grad, self.qf1.trainable_variables))
@@ -199,7 +200,7 @@ class SAC(OffPolicyAgent):
 
                 target_V = tf.stop_gradient(current_Q - log_pi)
                 td_errors = target_V - current_V
-                vf_loss_t = 0.5 * tf.square(td_errors) * weights
+                vf_loss_t = huber_loss(diff=td_errors) * weights
 
                 # TODO: Add reguralizer
                 policy_loss = tf.reduce_mean(log_pi - current_Q1)

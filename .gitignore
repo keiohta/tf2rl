@@ -12,3 +12,6 @@ dist/*
 
 .vscode/*
 .idea/*
+
+*.out
+.eggs/*

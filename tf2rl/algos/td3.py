@@ -4,6 +4,7 @@ from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.ddpg import DDPG, Actor
 from tf2rl.misc.target_update_ops import update_target_variables
+from tf2rl.misc.huber_loss import huber_loss
 
 
 class Critic(tf.keras.Model):
@@ -73,8 +74,8 @@ class TD3(DDPG):
                 td_error1, td_error2 = self._compute_td_error_body(
                     states, actions, next_states, rewards, done)
                 critic_loss = tf.reduce_mean(
-                    tf.square(td_error1) * weights * 0.5 + \
-                    tf.square(td_error2) * weights * 0.5)
+                    huber_loss(diff=td_error1) * weights + \
+                    huber_loss(diff=td_error2) * weights)
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))

@@ -4,6 +4,7 @@ from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
+from tf2rl.misc.huber_loss import huber_loss
 
 
 class Actor(tf.keras.Model):
@@ -119,7 +120,7 @@ class DDPG(OffPolicyAgent):
             with tf.GradientTape() as tape:
                 td_errors = self._compute_td_error_body(
                     states, actions, next_states, rewards, done)
-                critic_loss = tf.reduce_mean(tf.square(td_errors) * weights * 0.5)
+                critic_loss = tf.reduce_mean(huber_loss(diff=td_errors) * weights)
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
@@ -147,7 +148,7 @@ class DDPG(OffPolicyAgent):
     @tf.contrib.eager.defun
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
-            not_dones = tf.constant(1., dtype=tf.float32) - dones
+            not_dones = 1. - dones
             target_Q = self.critic_target(
                 [next_states, self.actor_target(next_states)])
             target_Q = rewards + (not_dones * self.discount * target_Q)
