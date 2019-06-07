@@ -63,7 +63,7 @@ class MultiThreadEnv(object):
         with tf.variable_scope(name, default_name="MultiStep"):
             obs, reward, done = tf.py_func(
                 self.py_step, [actions],
-                [tf.float64, tf.float64, tf.float64],
+                [tf.float32, tf.float32, tf.float32],
                 name="py_step")
             obs.set_shape((self.batch_size,) + self.observation_shape)
             reward.set_shape((self.batch_size,))
@@ -84,7 +84,6 @@ class MultiThreadEnv(object):
         def _process(offset):
             for idx_env in range(offset, offset+self.batch_thread):
                 new_obs, reward, done, _ = self.envs[idx_env].step(actions[idx_env])
-
                 self.list_obs[idx_env] = new_obs
                 self.list_rewards[idx_env] = reward
                 self.list_done[idx_env] = done
@@ -104,8 +103,8 @@ class MultiThreadEnv(object):
                 self.list_done[i] = False
 
         obs = np.stack(self.list_obs, axis=0)
-        reward = np.stack(self.list_rewards, axis=0).astype(np.float64)
-        done = np.stack(self.list_done, axis=0).astype(np.float64)
+        reward = np.stack(self.list_rewards, axis=0).astype(np.float32)
+        done = np.stack(self.list_done, axis=0).astype(np.float32)
 
         # TODO reset from multiple threads
         for i in range(self.batch_size):
@@ -123,7 +122,7 @@ class MultiThreadEnv(object):
         for idx_env, env in enumerate(self.envs):
             obs = env.reset()
             # TODO: Allow flexible data type
-            self.list_obs[idx_env] = obs.astype(np.float64)
+            self.list_obs[idx_env] = obs.astype(np.float32)
 
         return np.stack(self.list_obs, axis=0)
 

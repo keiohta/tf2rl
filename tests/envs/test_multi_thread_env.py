@@ -34,23 +34,21 @@ class TestMultiThreadEnv(unittest.TestCase):
         self.assertEqual(self.discrete_sample_env.observation_space.low.size, obses.shape[1])
 
     def test_step(self):
-        actions = [self.continuous_sample_env.action_space.sample()
-                   for _ in range(self.batch_size)]
-        actions = tf.convert_to_tensor(actions)
+        # Test with continuous envs
+        actions = tf.convert_to_tensor([
+            self.continuous_sample_env.action_space.sample()
+            for _ in range(self.batch_size)])
+
+        self.continuous_envs.py_reset()
         obses, rewards, dones, _ = self.continuous_envs.step(actions)
         self.assertEqual(self.batch_size, obses.shape[0])
         self.assertEqual(self.batch_size, rewards.shape[0])
         self.assertEqual(self.batch_size, dones.shape[0])
 
-        for _ in range(self.continuous_envs.max_episode_steps - 2):
-            obses, rewards, dones, _ = self.continuous_envs.step(actions)
-        np.testing.assert_array_equal(dones, np.zeros_like(dones))
-        obses, rewards, dones, _ = self.continuous_envs.step(actions)
-        np.testing.assert_array_equal(dones, np.ones_like(dones))
-
-        actions = [self.discrete_sample_env.action_space.sample()
-                   for _ in range(self.batch_size)]
-        actions = tf.convert_to_tensor(actions)
+        # Test with discrete envs
+        actions = tf.convert_to_tensor([
+            self.discrete_sample_env.action_space.sample()
+            for _ in range(self.batch_size)])
         obses, rewards, dones, _ = self.discrete_envs.step(actions)
         self.assertEqual(self.batch_size, obses.shape[0])
         self.assertEqual(self.batch_size, rewards.shape[0])
