@@ -171,7 +171,6 @@ def learner(global_rb, trained_steps, is_training_done,
         args=None, user_specified_dir="./results", suffix="learner")
     writer = tf.summary.create_file_writer(output_dir)
     writer.set_as_default()
-    total_steps = tf.train.create_global_step()
 
     # Wait until explorers collect transitions
     while not is_training_done.is_set() and global_rb.get_stored_size() == 0:
@@ -179,39 +178,36 @@ def learner(global_rb, trained_steps, is_training_done,
 
     start_time = time.time()
     while not is_training_done.is_set():
-        with tf.summary.record_summaries_every_n_global_steps(1000):
-            trained_steps.value += 1
-            total_steps.assign(trained_steps.value)
-            lock.acquire()
-            samples = global_rb.sample(policy.batch_size)
-            with tf.summary.always_record_summaries():
-                td_errors = policy.train(
-                    samples["obs"], samples["act"], samples["next_obs"],
-                    samples["rew"], samples["done"], samples["weights"])
-                writer.flush()
-            global_rb.update_priorities(
-                samples["indexes"], np.abs(td_errors)+1e-6)
-            lock.release()
+        trained_steps.value += 1
+        tf.summary.experimental.set_step(trained_steps.value)
+        lock.acquire()
+        samples = global_rb.sample(policy.batch_size)
+        td_errors = policy.train(
+            samples["obs"], samples["act"], samples["next_obs"],
+            samples["rew"], samples["done"], samples["weights"])
+        writer.flush()
+        global_rb.update_priorities(
+            samples["indexes"], np.abs(td_errors)+1e-6)
+        lock.release()
 
-            # Put updated weights to queue
-            if trained_steps.value % update_freq == 0:
-                weights = get_weights_fn(policy)
-                for i in range(len(queues) - 1):
-                    queues[i].put(weights)
-                with tf.summary.always_record_summaries():
-                    fps = update_freq / (time.time() - start_time)
-                    tf.summary.scalar(name="FPS", data=fps, description="loss")
-                    print("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
-                        fps, trained_steps.value), flush=True)
-                start_time = time.time()
+        # Put updated weights to queue
+        if trained_steps.value % update_freq == 0:
+            weights = get_weights_fn(policy)
+            for i in range(len(queues) - 1):
+                queues[i].put(weights)
+            fps = update_freq / (time.time() - start_time)
+            tf.summary.scalar(name="FPS", data=fps, description="loss")
+            print("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
+                fps, trained_steps.value), flush=True)
+            start_time = time.time()
 
-            # Periodically do evaluation
-            if trained_steps.value % evaluation_freq == 0:
-                queues[-1].put(get_weights_fn(policy))
-                queues[-1].put(int(total_steps))
+        # Periodically do evaluation
+        if trained_steps.value % evaluation_freq == 0:
+            queues[-1].put(get_weights_fn(policy))
+            queues[-1].put(trained_steps.value)
 
-        if trained_steps.value >= n_training:
-            is_training_done.set()
+    if trained_steps.value >= n_training:
+        is_training_done.set()
 
 
 def apex_argument(parser=None):
@@ -255,11 +251,10 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
     writer.set_as_default()
 
     policy = policy_fn(env, "Learner", gpu=gpu)
-    total_steps = tf.train.create_global_step()
     model_save_threshold = save_model_interval
 
     checkpoint = tf.train.Checkpoint(policy=policy)
-    checkpoint_manager = tf.checkpoint.CheckpointManager(
+    checkpoint_manager = tf.train.CheckpointManager(
         checkpoint, directory=output_dir, max_to_keep=10)
 
     while not is_training_done.is_set():
@@ -269,7 +264,8 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
             continue
         else:
             set_weights_fn(policy, queue.get())
-            total_steps.assign(queue.get())
+            trained_steps = queue.get()
+            tf.summary.experimental.set_step(trained_steps)
             avg_test_return = 0.
             for i in range(n_evaluation):
                 n_evaluated_episode += 1
@@ -292,11 +288,10 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
             avg_test_return /= n_evaluated_episode
             print("Evaluation: {} over {} run".format(
                 avg_test_return, n_evaluated_episode), flush=True)
-            with tf.summary.always_record_summaries():
-                tf.summary.scalar(name="AverageTestReturn",
-                                  data=avg_test_return, description="loss")
-                writer.flush()
-            if int(total_steps) > model_save_threshold:
+            tf.summary.scalar(name="AverageTestReturn",
+                                data=avg_test_return, description="loss")
+            writer.flush()
+            if trained_steps > model_save_threshold:
                 model_save_threshold += save_model_interval
                 checkpoint_manager.save()
     checkpoint_manager.save()
