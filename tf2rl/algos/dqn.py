@@ -323,12 +323,9 @@ class DQN(OffPolicyAgent):
 
         return td_errors
 
-
     @staticmethod
     def get_argument(parser=None):
-        import argparse
-        if parser is None:
-            parser = argparse.ArgumentParser(conflict_handler='resolve')
+        parser = OffPolicyAgent.get_argument(parser)
         parser.add_argument('--enable-double-dqn', action='store_true')
         parser.add_argument('--enable-dueling-dqn', action='store_true')
         parser.add_argument('--enable-categorical-dqn', action='store_true')

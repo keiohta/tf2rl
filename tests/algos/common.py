@@ -79,5 +79,58 @@ class CommonDiscreteOutputAlgos(CommonAlgos):
             obses, acts, obses, rewards, dones)
 
 
+class CommonIRLAlgos(CommonAlgos):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.irl_discrete = None
+        cls.irl_continuous = None
+
+    def test_inference_discrete(self):
+        if self.irl_discrete is None:
+            return
+        state = np.zeros(
+            shape=(self.discrete_env.observation_space.low.size,),
+            dtype=np.float32)
+        action = np.zeros(
+            shape=(self.discrete_env.action_space.n,),
+            dtype=np.float32)
+        action[self.discrete_env.action_space.sample()] = 1.
+        self.irl_discrete.inference(state, action)
+
+    def test_inference_continuous(self):
+        if self.irl_continuous is None:
+            return
+        state = np.zeros(
+            shape=(self.continuous_env.observation_space.low.size,),
+            dtype=np.float32)
+        action = np.zeros(
+            shape=(self.continuous_env.action_space.low.size,),
+            dtype=np.float32)
+        self.irl_continuous.inference(state, action)
+
+    def test_train_discrete(self):
+        if self.irl_discrete is None:
+            return
+        states = np.zeros(
+            shape=(self.batch_size, self.discrete_env.observation_space.low.size),
+            dtype=np.float32)
+        actions = np.zeros(
+            shape=(self.batch_size, self.discrete_env.action_space.n),
+            dtype=np.float32)
+        self.irl_discrete.train(states, actions, states, actions)
+
+    def test_train_continuous(self):
+        if self.irl_continuous is None:
+            return
+        states = np.zeros(
+            shape=(self.batch_size, self.continuous_env.observation_space.low.size),
+            dtype=np.float32)
+        actions = np.zeros(
+            shape=(self.batch_size, self.continuous_env.action_space.low.size),
+            dtype=np.float32)
+        self.irl_continuous.train(states, actions, states, actions)
+
+
 if __name__ == '__main__':
     unittest.main()

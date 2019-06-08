@@ -26,6 +26,15 @@ class Policy(tf.keras.Model):
     def get_action(self, observation, test=False):
         raise NotImplementedError
 
+    @staticmethod
+    def get_argument(parser=None):
+        import argparse
+        if parser is None:
+            parser = argparse.ArgumentParser(conflict_handler='resolve')
+        parser.add_argument('--n-warmup', type=int, default=int(1e4))
+        parser.add_argument('--batch-size', type=int, default=32)
+        return parser
+
 
 class OnPolicyAgent(Policy):
     """Base class for on-policy agent
@@ -47,3 +56,9 @@ class OffPolicyAgent(Policy):
             memory_capacity,
             **kwargs):
         super().__init__(memory_capacity=memory_capacity, **kwargs)
+
+    @staticmethod
+    def get_argument(parser=None):
+        parser = Policy.get_argument(parser)
+        parser.add_argument('--memory-capacity', type=int, default=int(1e6))
+        return parser

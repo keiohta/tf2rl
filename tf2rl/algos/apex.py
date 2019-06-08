@@ -1,11 +1,13 @@
 import time
 import numpy as np
-import tensorflow as tf
 import argparse
+import logging
 
 import multiprocessing
 from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
+
+import tensorflow as tf
 
 from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
 
@@ -130,7 +132,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
                 msg += "AveEpiRew: {0:.3f}\t".format(ave_rew)
                 total_rewards = []
             msg += "FPS: {0:.2f}".format((n_sample - n_sample_old) / (time.time() - start))
-            print(msg, flush=True)
+            logging.info(msg)
 
             start = time.time()
             n_sample_old = n_sample
@@ -197,8 +199,8 @@ def learner(global_rb, trained_steps, is_training_done,
                 queues[i].put(weights)
             fps = update_freq / (time.time() - start_time)
             tf.summary.scalar(name="FPS", data=fps, description="loss")
-            print("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
-                fps, trained_steps.value), flush=True)
+            logging.info("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
+                fps, trained_steps.value))
             start_time = time.time()
 
         # Periodically do evaluation
@@ -238,6 +240,9 @@ def apex_argument(parser=None):
                         help='Number of environments')
     parser.add_argument('--n-thread', type=int, default=4,
                         help='Number of thread pool')
+    # Others
+    parser.add_argument('--logging-level', choices=['DEBUG', 'INFO', 'WARNING'],
+                        default='INFO', help='Logging level')
     return parser
 
 
@@ -286,8 +291,8 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
                 if not queue.empty():
                     break
             avg_test_return /= n_evaluated_episode
-            print("Evaluation: {} over {} run".format(
-                avg_test_return, n_evaluated_episode), flush=True)
+            logging.info("Evaluation: {} over {} run".format(
+                avg_test_return, n_evaluated_episode))
             tf.summary.scalar(name="AverageTestReturn",
                                 data=avg_test_return, description="loss")
             writer.flush()
@@ -325,6 +330,11 @@ def prepare_experiment(env, args):
 
 
 def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
+    logging.basicConfig(
+        datefmt="%d/%Y %I:%M:%S",
+        format='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s')
+    logging.getLogger().setLevel(logging.getLevelName(args.logging_level))
+
     if args.n_env > 1:
         args.n_explorer = 1
     elif args.n_explorer is None:
