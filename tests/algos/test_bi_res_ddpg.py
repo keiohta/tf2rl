@@ -5,6 +5,9 @@ import tensorflow as tf
 from tf2rl.algos.bi_res_ddpg import BiResDDPG
 from tests.algos.common import CommonContinuousOutputAlgos
 
+config = tf.ConfigProto(allow_soft_placement=True)
+tf.enable_eager_execution(config=config)
+
 
 class TestBiResDDPG(CommonContinuousOutputAlgos):
     @classmethod
@@ -18,6 +21,4 @@ class TestBiResDDPG(CommonContinuousOutputAlgos):
 
 
 if __name__ == '__main__':
-    config = tf.ConfigProto(allow_soft_placement=True)
-    tf.enable_eager_execution(config=config)
     unittest.main()

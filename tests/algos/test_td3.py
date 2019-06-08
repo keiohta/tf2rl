@@ -5,6 +5,9 @@ import tensorflow as tf
 from tf2rl.algos.td3 import TD3
 from tests.algos.common import CommonContinuousOutputAlgos
 
+config = tf.ConfigProto(allow_soft_placement=True)
+tf.enable_eager_execution(config=config)
+
 
 class TestTD3(CommonContinuousOutputAlgos):
     @classmethod
@@ -18,6 +21,4 @@ class TestTD3(CommonContinuousOutputAlgos):
 
 
 if __name__ == '__main__':
-    config = tf.ConfigProto(allow_soft_placement=True)
-    tf.enable_eager_execution(config=config)
     unittest.main()

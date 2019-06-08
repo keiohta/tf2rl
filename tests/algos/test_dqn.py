@@ -5,6 +5,9 @@ import tensorflow as tf
 from tf2rl.algos.dqn import DQN
 from tests.algos.common import CommonAlgos
 
+config = tf.ConfigProto(allow_soft_placement=True)
+tf.enable_eager_execution(config=config)
+
 
 class TestDQN(CommonAlgos):
     def test__init__(self):
@@ -41,6 +44,4 @@ class TestDQN(CommonAlgos):
 
 
 if __name__ == '__main__':
-    config = tf.ConfigProto(allow_soft_placement=True)
-    tf.enable_eager_execution(config=config)
     unittest.main()
