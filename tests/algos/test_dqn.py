@@ -3,41 +3,55 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.dqn import DQN
-from tests.algos.common import CommonAlgos
+from tests.algos.common import CommonDiscreteOutputAlgos
 
 
-class TestDQN(CommonAlgos):
-    def test__init__(self):
-        DQN(state_shape=self.discrete_env.observation_space.shape,
-            action_dim=self.discrete_env.action_space.n,
-            batch_size=self.batch_size,
+class TestDQN(CommonDiscreteOutputAlgos):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.agent = DQN(
+            state_shape=cls.discrete_env.observation_space.shape,
+            action_dim=cls.discrete_env.action_space.n,
+            batch_size=cls.batch_size,
             gpu=-1)
 
-    def test_get_action(self):
-        agent = DQN(
-            state_shape=self.discrete_env.observation_space.shape,
-            action_dim=self.discrete_env.action_space.n,
-            batch_size=self.batch_size,
-            gpu=-1)
-        state = self.discrete_env.reset()
-        agent.get_action(state, test=False)
-        agent.get_action(state, test=True)
 
-    def test_train(self):
-        agent = DQN(
-            state_shape=self.discrete_env.observation_space.shape,
-            action_dim=self.discrete_env.action_space.n,
-            batch_size=self.batch_size,
+class TestDuelingDoubleDQN(CommonDiscreteOutputAlgos):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.agent = DQN(
+            state_shape=cls.discrete_env.observation_space.shape,
+            action_dim=cls.discrete_env.action_space.n,
+            batch_size=cls.batch_size,
+            enable_double_dqn=True,
+            enable_dueling_dqn=True,
             gpu=-1)
 
-        rewards = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
-        dones = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
-        obses = np.zeros(
-            shape=(self.batch_size,)+self.discrete_env.observation_space.shape,
-            dtype=np.float32)
-        acts = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
-        agent.train(
-            obses, acts, obses, rewards, dones)
+
+class TestNoisyDQN(CommonDiscreteOutputAlgos):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.agent = DQN(
+            state_shape=cls.discrete_env.observation_space.shape,
+            action_dim=cls.discrete_env.action_space.n,
+            batch_size=cls.batch_size,
+            enable_noisy_dqn=True,
+            gpu=-1)
+
+
+class TestCategoricalDQN(CommonDiscreteOutputAlgos):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.agent = DQN(
+            state_shape=cls.discrete_env.observation_space.shape,
+            action_dim=cls.discrete_env.action_space.n,
+            batch_size=cls.batch_size,
+            enable_categorical_dqn=True,
+            gpu=-1)
 
 
 if __name__ == '__main__':
