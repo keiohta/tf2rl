@@ -156,8 +156,6 @@ class SAC(OffPolicyAgent):
         td_errors, actor_loss, vf_loss, qf_loss, log_pi_min, log_pi_max = \
             self._train_body(states, actions, next_states, rewards, done, weights)
 
-        print(td_errors.shape, actor_loss.shape, vf_loss.shape, qf_loss.shape, log_pi_min.shape, log_pi_max.shape)
-
         tf.summary.scalar(name="ActorLoss", data=actor_loss, description="loss")
         tf.summary.scalar(name="CriticVLoss", data=vf_loss, description="loss")
         tf.summary.scalar(name="CriticQLoss", data=qf_loss, description="loss")
@@ -181,8 +179,8 @@ class SAC(OffPolicyAgent):
                 target_Q = tf.stop_gradient(
                     self.scale_reward * rewards + not_done * self.discount * vf_next_target)
 
-                td_loss1 = huber_loss(target_Q, current_Q1)
-                td_loss2 = huber_loss(target_Q, current_Q2)
+                td_loss1 = tf.reduce_mean(huber_loss(target_Q, current_Q1))
+                td_loss2 = tf.reduce_mean(huber_loss(target_Q, current_Q2))
 
             q1_grad = tape.gradient(td_loss1, self.qf1.trainable_variables)
             self.qf1_optimizer.apply_gradients(zip(q1_grad, self.qf1.trainable_variables))
@@ -201,9 +199,7 @@ class SAC(OffPolicyAgent):
 
                 target_V = tf.stop_gradient(current_Q - log_pi)
                 td_errors = target_V - current_V
-                vf_loss_t = huber_loss(diff=td_errors) * tf.squeeze(weights)
-                print("current Q: {}, target V: {}, td_erros: {}, vf_loss_t: {}, weights: {}\r\n".format(
-                    current_Q.shape, target_V.shape, td_errors.shape, vf_loss_t.shape, weights.shape))
+                vf_loss_t = tf.reduce_mean(huber_loss(diff=td_errors) * weights)
 
                 # TODO: Add reguralizer
                 policy_loss = tf.reduce_mean(log_pi - current_Q1)
