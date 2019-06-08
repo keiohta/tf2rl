@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 
-class Policy(tf.contrib.checkpoint.Checkpointable):
+class Policy(tf.keras.Model):
     def __init__(
             self,
             name,
@@ -13,7 +13,8 @@ class Policy(tf.contrib.checkpoint.Checkpointable):
             n_warmup=0,
             max_grad=1.,
             gpu=0):
-        self.name = name
+        super().__init__()
+        self.policy_name = name
         self.update_interval = update_interval
         self.batch_size = batch_size
         self.discount = discount

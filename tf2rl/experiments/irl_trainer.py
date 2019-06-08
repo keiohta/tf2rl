@@ -11,11 +11,6 @@ from tf2rl.experiments.trainer import Trainer
 from tf2rl.experiments.utils import save_path
 
 
-config = tf.ConfigProto(allow_soft_placement=True)
-config.gpu_options.allow_growth = True
-tf.enable_eager_execution(config=config)
-
-
 class IRLTrainer(Trainer):
     def __init__(
             self,
@@ -45,7 +40,7 @@ class IRLTrainer(Trainer):
 
         obs = self._env.reset()
 
-        with tf.contrib.summary.record_summaries_every_n_global_steps(1000):
+        with tf.summary.record_summaries_every_n_global_steps(1000):
             while total_steps < self._max_steps:
                 if total_steps < self._policy.n_warmup:
                     action = self._env.action_space.sample()
@@ -95,19 +90,19 @@ class IRLTrainer(Trainer):
                     if self._use_prioritized_rb:
                         replay_buffer.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
                     if int(total_steps) % self._test_interval == 0:
-                        with tf.contrib.summary.always_record_summaries():
+                        with tf.summary.always_record_summaries():
                             avg_test_return = self.evaluate_policy(int(total_steps))
                             self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                                 int(total_steps), avg_test_return, self._test_episodes))
-                            tf.contrib.summary.scalar(name="AverageTestReturn", tensor=avg_test_return, family="loss")
-                            tf.contrib.summary.scalar(name="FPS", tensor=fps, family="loss")
+                            tf.summary.scalar(name="AverageTestReturn", data=avg_test_return, description="loss")
+                            tf.summary.scalar(name="FPS", data=fps, description="loss")
 
                         self.writer.flush()
 
                 if int(total_steps) % self._model_save_interval == 0:
                     self.checkpoint_manager.save()
 
-            tf.contrib.summary.flush()
+            tf.summary.flush()
 
     @staticmethod
     def get_argument(parser=None):

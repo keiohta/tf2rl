@@ -11,11 +11,12 @@ from tf2rl.misc.target_update_ops import update_target_variables
 
 
 class BiResDDPG(DDPG):
-    def __init__(self, eta=0.05, **kwargs):
+    def __init__(self, eta=0.05, name="BiResDDPG", **kwargs):
+        kwargs["name"] = name
         super().__init__(**kwargs)
         self._eta = eta
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
@@ -41,7 +42,7 @@ class BiResDDPG(DDPG):
 
             return actor_loss, critic_loss, np.abs(td_errors1) + np.abs(td_errors2)
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, done):
         with tf.device(self.device):
             not_done = 1. - done

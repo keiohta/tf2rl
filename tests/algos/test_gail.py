@@ -43,6 +43,4 @@ class TestGAIL(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    config = tf.ConfigProto(allow_soft_placement=True)
-    tf.enable_eager_execution(config=config)
     unittest.main()

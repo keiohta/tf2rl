@@ -10,11 +10,6 @@ from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.experiments.utils import save_path, frames_to_gif
 
 
-config = tf.ConfigProto(allow_soft_placement=True)
-config.gpu_options.allow_growth = True
-tf.enable_eager_execution(config=config)
-
-
 class Trainer:
     def __init__(
             self,
@@ -35,7 +30,7 @@ class Trainer:
 
         # Save and restore model
         checkpoint = tf.train.Checkpoint(policy=self._policy)
-        self.checkpoint_manager = tf.contrib.checkpoint.CheckpointManager(
+        self.checkpoint_manager = tf.train.CheckpointManager(
             checkpoint, directory=self._output_dir, max_to_keep=5)
         if args.model_dir is not None:
             assert os.path.isdir(args.model_dir)
@@ -44,13 +39,12 @@ class Trainer:
             self.logger.info("Restored {}".format(path_ckpt))
 
         # prepare TensorBoard output
-        self.writer = tf.contrib.summary.create_file_writer(self._output_dir)
+        self.writer = tf.summary.create_file_writer(self._output_dir)
         self.writer.set_as_default()
-        tf.contrib.summary.initialize()
 
     def __call__(self):
-        tf_total_steps = tf.train.create_global_step()
         total_steps = 0
+        tf.summary.experimental.set_step(total_steps)
         episode_steps = 0
         episode_return = 0
         episode_start_time = time.time()
@@ -62,62 +56,60 @@ class Trainer:
 
         obs = self._env.reset()
 
-        with tf.contrib.summary.record_summaries_every_n_global_steps(1000):
-            while total_steps < self._max_steps:
-                if total_steps < self._policy.n_warmup:
-                    action = self._env.action_space.sample()
-                else:
-                    action = self._policy.get_action(obs)
+        while total_steps < self._max_steps:
+            if total_steps < self._policy.n_warmup:
+                action = self._env.action_space.sample()
+            else:
+                action = self._policy.get_action(obs)
 
-                next_obs, reward, done, _ = self._env.step(action)
-                if self._show_progress:
-                    self._env.render()
-                episode_steps += 1
-                episode_return += reward
-                tf_total_steps.assign_add(1)
-                total_steps += 1
+            next_obs, reward, done, _ = self._env.step(action)
+            if self._show_progress:
+                self._env.render()
+            episode_steps += 1
+            episode_return += reward
+            total_steps += 1
+            tf.summary.experimental.set_step(total_steps)
 
-                done_flag = done
-                if hasattr(self._env, "_max_episode_steps") and \
-                        episode_steps == self._env._max_episode_steps:
-                    done_flag = False
-                replay_buffer.add(obs=obs, act=action, next_obs=next_obs, rew=reward, done=done_flag)
-                obs = next_obs
+            done_flag = done
+            if hasattr(self._env, "_max_episode_steps") and \
+                    episode_steps == self._env._max_episode_steps:
+                done_flag = False
+            replay_buffer.add(obs=obs, act=action, next_obs=next_obs, rew=reward, done=done_flag)
+            obs = next_obs
 
-                if done or episode_steps == self._episode_max_steps:
-                    obs = self._env.reset()
+            if done or episode_steps == self._episode_max_steps:
+                obs = self._env.reset()
 
-                    n_episode += 1
-                    fps = episode_steps / (time.time() - episode_start_time)
-                    self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
-                        n_episode, total_steps, episode_steps, episode_return, fps))
+                n_episode += 1
+                fps = episode_steps / (time.time() - episode_start_time)
+                self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
+                    n_episode, total_steps, episode_steps, episode_return, fps))
 
-                    episode_steps = 0
-                    episode_return = 0
-                    episode_start_time = time.time()
+                episode_steps = 0
+                episode_return = 0
+                episode_start_time = time.time()
 
-                if total_steps >= self._policy.n_warmup and total_steps % self._policy.update_interval == 0:
-                    samples = replay_buffer.sample(self._policy.batch_size)
-                    td_error = self._policy.train(
-                        samples["obs"], samples["act"], samples["next_obs"],
-                        samples["rew"], np.array(samples["done"], dtype=np.float32),
-                        None if not self._use_prioritized_rb else samples["weights"])
-                    if self._use_prioritized_rb:
-                        replay_buffer.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
-                    if total_steps % self._test_interval == 0:
-                        with tf.contrib.summary.always_record_summaries():
-                            avg_test_return = self.evaluate_policy(total_steps)
-                            self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
-                                total_steps, avg_test_return, self._test_episodes))
-                            tf.contrib.summary.scalar(name="AverageTestReturn", tensor=avg_test_return, family="loss")
-                            tf.contrib.summary.scalar(name="FPS", tensor=fps, family="loss")
+            if total_steps >= self._policy.n_warmup and total_steps % self._policy.update_interval == 0:
+                samples = replay_buffer.sample(self._policy.batch_size)
+                td_error = self._policy.train(
+                    samples["obs"], samples["act"], samples["next_obs"],
+                    samples["rew"], np.array(samples["done"], dtype=np.float32),
+                    None if not self._use_prioritized_rb else samples["weights"])
+                if self._use_prioritized_rb:
+                    replay_buffer.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
+                if total_steps % self._test_interval == 0:
+                    avg_test_return = self.evaluate_policy(total_steps)
+                    self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
+                        total_steps, avg_test_return, self._test_episodes))
+                    tf.summary.scalar(name="AverageTestReturn", data=avg_test_return, description="loss")
+                    tf.summary.scalar(name="FPS", data=fps, description="loss")
 
-                        self.writer.flush()
+                    self.writer.flush()
 
-                if total_steps % self._model_save_interval == 0:
-                    self.checkpoint_manager.save()
+            if total_steps % self._model_save_interval == 0:
+                self.checkpoint_manager.save()
 
-            tf.contrib.summary.flush()
+        tf.summary.flush()
 
     def evaluate_policy(self, total_steps):
         avg_test_return = 0.
@@ -156,7 +148,7 @@ class Trainer:
             images = tf.cast(
                 tf.expand_dims(np.array(obs).transpose(2,0,1), axis=3),
                 tf.uint8)
-            tf.contrib.summary.image('train/input_img', images,)
+            tf.summary.image('train/input_img', images,)
         return avg_test_return / self._test_episodes
 
     def _set_from_args(self, args):

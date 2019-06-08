@@ -13,10 +13,6 @@ from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_default_rb_dict
 
-config = tf.ConfigProto(allow_soft_placement=True)
-config.gpu_options.allow_growth = True
-tf.enable_eager_execution(config=config)
-
 
 def explorer(global_rb, queue, trained_steps, is_training_done,
              lock, env_fn, policy_fn, set_weights_fn, noise_level,
@@ -173,9 +169,8 @@ def learner(global_rb, trained_steps, is_training_done,
 
     output_dir = prepare_output_dir(
         args=None, user_specified_dir="./results", suffix="learner")
-    writer = tf.contrib.summary.create_file_writer(output_dir)
+    writer = tf.summary.create_file_writer(output_dir)
     writer.set_as_default()
-    tf.contrib.summary.initialize()
     total_steps = tf.train.create_global_step()
 
     # Wait until explorers collect transitions
@@ -184,12 +179,12 @@ def learner(global_rb, trained_steps, is_training_done,
 
     start_time = time.time()
     while not is_training_done.is_set():
-        with tf.contrib.summary.record_summaries_every_n_global_steps(1000):
+        with tf.summary.record_summaries_every_n_global_steps(1000):
             trained_steps.value += 1
             total_steps.assign(trained_steps.value)
             lock.acquire()
             samples = global_rb.sample(policy.batch_size)
-            with tf.contrib.summary.always_record_summaries():
+            with tf.summary.always_record_summaries():
                 td_errors = policy.train(
                     samples["obs"], samples["act"], samples["next_obs"],
                     samples["rew"], samples["done"], samples["weights"])
@@ -203,9 +198,9 @@ def learner(global_rb, trained_steps, is_training_done,
                 weights = get_weights_fn(policy)
                 for i in range(len(queues) - 1):
                     queues[i].put(weights)
-                with tf.contrib.summary.always_record_summaries():
+                with tf.summary.always_record_summaries():
                     fps = update_freq / (time.time() - start_time)
-                    tf.contrib.summary.scalar(name="FPS", tensor=fps, family="loss")
+                    tf.summary.scalar(name="FPS", data=fps, description="loss")
                     print("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
                         fps, trained_steps.value), flush=True)
                 start_time = time.time()
@@ -255,17 +250,16 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
               show_test_progress=False):
     output_dir = prepare_output_dir(
         args=None, user_specified_dir="./results", suffix="evaluator")
-    writer = tf.contrib.summary.create_file_writer(
+    writer = tf.summary.create_file_writer(
         output_dir, filename_suffix="_evaluation")
     writer.set_as_default()
-    tf.contrib.summary.initialize()
 
     policy = policy_fn(env, "Learner", gpu=gpu)
     total_steps = tf.train.create_global_step()
     model_save_threshold = save_model_interval
 
     checkpoint = tf.train.Checkpoint(policy=policy)
-    checkpoint_manager = tf.contrib.checkpoint.CheckpointManager(
+    checkpoint_manager = tf.checkpoint.CheckpointManager(
         checkpoint, directory=output_dir, max_to_keep=10)
 
     while not is_training_done.is_set():
@@ -298,9 +292,9 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
             avg_test_return /= n_evaluated_episode
             print("Evaluation: {} over {} run".format(
                 avg_test_return, n_evaluated_episode), flush=True)
-            with tf.contrib.summary.always_record_summaries():
-                tf.contrib.summary.scalar(name="AverageTestReturn",
-                                          tensor=avg_test_return, family="loss")
+            with tf.summary.always_record_summaries():
+                tf.summary.scalar(name="AverageTestReturn",
+                                  data=avg_test_return, description="loss")
                 writer.flush()
             if int(total_steps) > model_save_threshold:
                 model_save_threshold += save_model_interval

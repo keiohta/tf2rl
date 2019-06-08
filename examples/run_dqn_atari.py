@@ -28,7 +28,7 @@ if __name__ == '__main__':
     test_env = wrap_dqn(gym.make(args.env_name), reward_clipping=False)
     # Following parameters are equivalent to DeepMind DQN paper
     # https://www.nature.com/articles/nature14236
-    optimizer = tf.train.AdamOptimizer(
+    optimizer = tf.keras.optimizers.Adam(
         learning_rate=0.0000625, epsilon=1.5e-4)  # This value is from Rainbow
     policy = DQN(
         enable_double_dqn=args.enable_double_dqn,

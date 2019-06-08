@@ -100,7 +100,7 @@ class DQN(OffPolicyAgent):
         self.q_func = q_func(**kwargs_dqn)
         self.q_func_target = q_func(**kwargs_dqn)
         self.q_func_optimizer = optimizer if optimizer is not None else \
-            tf.train.AdamOptimizer(learning_rate=lr)
+            tf.keras.optimizers.Adam(learning_rate=lr)
         update_target_variables(self.q_func_target.weights,
                                 self.q_func.weights, tau=1.)
 
@@ -161,13 +161,13 @@ class DQN(OffPolicyAgent):
         else:
             return action.numpy()[0]
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _get_action_body(self, state):
         action = self.q_func(state)
         # return action
         return tf.argmax(action, axis=1)
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _get_action_body_distributional(self, state):
         action_probs = self.q_func(state)
         return tf.argmax(
@@ -180,7 +180,7 @@ class DQN(OffPolicyAgent):
         td_errors, q_func_loss = self._train_body(
             states, actions, next_states, rewards, done, weights)
 
-        tf.contrib.summary.scalar(name="QFuncLoss", tensor=q_func_loss, family="loss")
+        tf.summary.scalar(name="QFuncLoss", data=q_func_loss, description="loss")
 
         # TODO: Remove following by using tf.global_step
         self.n_update += 1
@@ -191,11 +191,11 @@ class DQN(OffPolicyAgent):
         # Update exploration rate
         self.epsilon = max(self.epsilon - self.epsilon_decay_rate * self.update_interval,
                            self.epsilon_min)
-        tf.contrib.summary.scalar(name="Epsilon", tensor=self.epsilon, family="loss")
+        tf.summary.scalar(name="Epsilon", data=self.epsilon, description="loss")
 
         return td_errors
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
@@ -225,7 +225,7 @@ class DQN(OffPolicyAgent):
             dones = tf.expand_dims(dones, 1)
         return self._compute_td_error_body(states, actions, next_states, rewards, dones)
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         # TODO: Clean code
         batch_size = states.shape[0]
@@ -255,7 +255,7 @@ class DQN(OffPolicyAgent):
             td_errors = current_Q - target_Q
         return td_errors
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _compute_td_error_body_distributional(self, states, actions, next_states, rewards, done):
         actions = tf.cast(actions, dtype=tf.int32)
         with tf.device(self.device):
@@ -315,9 +315,9 @@ class DQN(OffPolicyAgent):
                 self.q_func(states), action_indices)  # [batch_size, n_atoms]
 
             td_errors = tf.reduce_sum(
-                target_Q_next_dist * (u - b) * tf.log(
+                target_Q_next_dist * (u - b) * tf.math.log(
                     tf.gather_nd(current_Q_dist, l_id)) + \
-                target_Q_next_dist * (b - l) * tf.log(
+                target_Q_next_dist * (b - l) * tf.math.log(
                     tf.gather_nd(current_Q_dist, u_id)),
                 axis=1)
 

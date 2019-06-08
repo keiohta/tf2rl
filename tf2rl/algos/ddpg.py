@@ -71,13 +71,13 @@ class DDPG(OffPolicyAgent):
         # Define and initialize Actor network
         self.actor = Actor(state_shape, action_dim, max_action, actor_units)
         self.actor_target = Actor(state_shape, action_dim, max_action, actor_units)
-        self.actor_optimizer = tf.train.AdamOptimizer(learning_rate=lr_actor)
+        self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_actor)
         update_target_variables(self.actor_target.weights, self.actor.weights, tau=1.)
 
         # Define and initialize Critic network
         self.critic = Critic(state_shape, action_dim, critic_units)
         self.critic_target = Critic(state_shape, action_dim, critic_units)
-        self.critic_optimizer = tf.train.AdamOptimizer(learning_rate=lr_critic)
+        self.critic_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_critic)
         update_target_variables(self.critic_target.weights, self.critic.weights, tau=1.)
 
         # Set hyperparameters
@@ -95,7 +95,7 @@ class DDPG(OffPolicyAgent):
         else:
             return action.numpy()[0]
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _get_action_body(self, state, sigma, max_action):
         with tf.device(self.device):
             action = self.actor(state)
@@ -109,12 +109,12 @@ class DDPG(OffPolicyAgent):
             states, actions, next_states, rewards, done, weights)
 
         if actor_loss is not None:
-            tf.contrib.summary.scalar(name="ActorLoss", tensor=actor_loss, family="loss")
-        tf.contrib.summary.scalar(name="CriticLoss", tensor=critic_loss, family="loss")
+            tf.summary.scalar(name="ActorLoss", data=actor_loss, description="loss")
+        tf.summary.scalar(name="CriticLoss", data=critic_loss, description="loss")
 
         return td_errors
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
@@ -145,7 +145,7 @@ class DDPG(OffPolicyAgent):
         td_errors = self._compute_td_error_body(states, actions, next_states, rewards, dones)
         return np.ravel(td_errors.numpy())
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
             not_dones = 1. - dones
