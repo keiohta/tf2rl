@@ -25,8 +25,11 @@ class Trainer:
         # prepare log directory
         self._output_dir = prepare_output_dir(
             args=args, user_specified_dir="./results", suffix=args.dir_suffix)
-        logging.basicConfig(level=logging.getLevelName(args.logging_level))
         self.logger = logging.getLogger(__name__)
+        logging.basicConfig(
+            datefmt="%d/%Y %I:%M:%S",
+            format='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s')
+        logging.getLogger().setLevel(logging.getLevelName(args.logging_level))
 
         # Save and restore model
         checkpoint = tf.train.Checkpoint(policy=self._policy)
