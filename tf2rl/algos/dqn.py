@@ -278,7 +278,7 @@ class DQN(OffPolicyAgent):
                     tf.reshape(tf.range(self.batch_size), [-1, 1]),
                     tf.constant([1, self.q_func._n_atoms])),
                 -1)  # [batch_size, n_atoms, 1]
-            u, l = tf.ceil(b), tf.floor(b)  # [batch_size, n_atoms]
+            u, l = tf.math.ceil(b), tf.math.floor(b)  # [batch_size, n_atoms]
             u_id = tf.concat(
                 [index_help, tf.expand_dims(tf.cast(u, tf.int32), -1)],
                 axis=2)  # [batch_size, n_atoms, 2]

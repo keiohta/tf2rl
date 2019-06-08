@@ -50,7 +50,7 @@ class NoisyDense(tf.keras.layers.Layer):
 
         self.kernel = self.add_weight(
             shape=[self.input_dim, self.units],
-            initializer=tf.initializers.orthogonal(dtype=tf.float32),
+            initializer=tf.keras.initializers.Orthogonal(),
             name='kernel',
             dtype=tf.float32,
             regularizer=self.kernel_regularizer,

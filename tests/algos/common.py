@@ -37,5 +37,33 @@ class CommonContinuousOutputAlgos(CommonAlgos):
             obses, acts, obses, rewards, dones)
 
 
+class CommonDiscreteOutputAlgos(CommonAlgos):
+    def test_get_action(self):
+        if self.agent is None:
+            return
+        state = self.discrete_env.reset()
+        self.agent.get_action(state, test=False)
+        self.agent.get_action(state, test=True)
+
+    def test_train(self):
+        if self.agent is None:
+            return
+
+        rewards = np.zeros(
+            shape=(self.batch_size,1),
+            dtype=np.float32)
+        dones = np.zeros(
+            shape=(self.batch_size,1),
+            dtype=np.float32)
+        obses = np.zeros(
+            shape=(self.batch_size,)+self.discrete_env.observation_space.shape,
+            dtype=np.float32)
+        acts = np.zeros(
+            shape=(self.batch_size,1),
+            dtype=np.float32)
+        self.agent.train(
+            obses, acts, obses, rewards, dones)
+
+
 if __name__ == '__main__':
     unittest.main()
