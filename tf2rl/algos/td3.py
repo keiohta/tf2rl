@@ -97,15 +97,15 @@ class TD3(DDPG):
 
             return actor_loss, critic_loss, np.abs(td_error1) + np.abs(td_error2)
 
-    def compute_td_error(self, states, actions, next_states, rewards, done):
+    def compute_td_error(self, states, actions, next_states, rewards, dones):
         td_error1, td_error2 = self._compute_td_error_body(
-            states, actions, next_states, rewards, done)
-        return np.ravel(np.abs(td_error1.numpy()) + np.abs(td_error2.numpy()))
+            states, actions, next_states, rewards, dones)
+        return np.squeeze(np.abs(td_error1.numpy()) + np.abs(td_error2.numpy()))
 
     @tf.function
-    def _compute_td_error_body(self, states, actions, next_states, rewards, done):
+    def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
-            not_done = 1. - done
+            not_dones = 1. - dones
 
             # Get noisy action
             next_action = self.actor_target(next_states)
@@ -117,7 +117,7 @@ class TD3(DDPG):
 
             target_Q1, target_Q2 = self.critic_target([next_states, next_action])
             target_Q = tf.minimum(target_Q1, target_Q2)
-            target_Q = rewards + (not_done * self.discount * target_Q)
+            target_Q = rewards + (not_dones * self.discount * target_Q)
             target_Q = tf.stop_gradient(target_Q)
             current_Q1, current_Q2 = self.critic([states, actions])
 

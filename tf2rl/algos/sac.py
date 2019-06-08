@@ -214,3 +214,41 @@ class SAC(OffPolicyAgent):
             del tape
 
         return td_errors, policy_loss, vf_loss_t, td_loss1, tf.reduce_min(log_pi), tf.reduce_max(log_pi)
+
+    def compute_td_error(self, states, actions, next_states, rewards, dones):
+        td_erros_Q1, td_errors_Q2, td_errors_V = self._compute_td_error_body(
+            states, actions, next_states, rewards, dones)
+        return np.squeeze(
+            np.abs(td_erros_Q1.numpy()) + \
+            np.abs(td_errors_Q2.numpy()) + \
+            np.abs(td_errors_V.numpy()))
+
+    @tf.function
+    def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
+        with tf.device(self.device):
+            rewards = tf.squeeze(rewards, axis=1)
+            not_dones = 1. - tf.cast(dones, dtype=tf.float32)
+
+            # Compute TD errors for Q-value func
+            current_Q1 = self.qf1([states, actions])
+            current_Q2 = self.qf2([states, actions])
+            vf_next_target = self.vf_target(next_states)
+
+            target_Q = tf.stop_gradient(
+                self.scale_reward * rewards + not_dones * self.discount * vf_next_target)
+    
+            td_errors_Q1 = target_Q - current_Q1
+            td_errors_Q2 = target_Q - current_Q2
+
+            # Compute TD errors for V-value func
+            current_V = self.vf(states)
+            sample_actions, log_pi = self.actor(states)
+
+            current_Q1 = self.qf1([states, sample_actions])
+            current_Q2 = self.qf2([states, sample_actions])
+            current_Q = tf.minimum(current_Q1, current_Q2)
+
+            target_V = tf.stop_gradient(current_Q - log_pi)
+            td_errors_V = target_V - current_V
+
+        return td_errors_Q1, td_errors_Q2, td_errors_V
