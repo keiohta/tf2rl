@@ -35,7 +35,35 @@ class TestContinuousVPG(CommonDiscreteOutputAlgos, CommonActorCritic):
             gpu=-1)
 
     def test_get_action(self):
-        pass
+        if self.agent is None:
+            return
+        # Single input
+        state = self.continuous_env.reset()
+        action, log_pi = self.agent.get_action(state, test=False)
+        self.assertEqual(
+            action.shape[0],
+            self.continuous_env.action_space.low.size)
+        action, log_pi = self.agent.get_action(state, test=True)
+        self.assertEqual(
+            action.shape[0],
+            self.continuous_env.action_space.low.size)
+
+        # Multiple inputs
+        states = np.zeros(shape=(self.batch_size, state.shape[0]))
+        actions, log_pis = self.agent.get_action(states, test=False)
+        self.assertEqual(
+            actions.shape[0],
+            self.batch_size)
+        self.assertEqual(
+            actions.shape[1],
+            self.continuous_env.action_space.low.size)
+        actions, log_pis = self.agent.get_action(states, test=True)
+        self.assertEqual(
+            actions.shape[0],
+            self.batch_size)
+        self.assertEqual(
+            actions.shape[1],
+            self.continuous_env.action_space.low.size)
 
     def test_train(self):
         # TODO: Search how to call only `CommonActorCritic`

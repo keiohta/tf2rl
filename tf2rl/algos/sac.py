@@ -85,11 +85,12 @@ class SAC(OffPolicyAgent):
 
     def get_action(self, state, test=False):
         assert isinstance(state, np.ndarray)
+        is_single_state = len(state.shape) == 1
 
-        state = np.expand_dims(state, axis=0).astype(np.float32) if len(state.shape) == 1 else state
+        state = np.expand_dims(state, axis=0).astype(np.float32) if is_single_state else state
         action = self._get_action_body(tf.constant(state), test)
 
-        return action.numpy()[0] if len(state.shape) == 1 else action
+        return action.numpy()[0] if is_single_state else action
 
     @tf.function
     def _get_action_body(self, state, test):
