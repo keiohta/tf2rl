@@ -35,3 +35,7 @@ class CommonContinuousOutputAlgos(CommonAlgos):
             dtype=np.float32)
         self.agent.train(
             obses, acts, obses, rewards, dones)
+
+
+if __name__ == '__main__':
+    unittest.main()
