@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
 # TODO: Replace following with tensorflow_probability
-from tensorflow.contrib.distributions import MultivariateNormalDiag
+import tensorflow_probability as tfp
 
 
 class GaussianActor(tf.keras.Model):
@@ -39,7 +39,7 @@ class GaussianActor(tf.keras.Model):
         log_sigma = self.out_sigma(features)
         log_sigma = tf.clip_by_value(log_sigma, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
 
-        return MultivariateNormalDiag(loc=mu, scale_diag=tf.exp(log_sigma))
+        return tfp.distributions.MultivariateNormalDiag(loc=mu, scale_diag=tf.exp(log_sigma))
 
     def call(self, states):
         dist = self._compute_dist(states)
@@ -49,7 +49,7 @@ class GaussianActor(tf.keras.Model):
         actions = tf.tanh(raw_actions)
 
         # for variable replacement
-        diff = tf.reduce_sum(tf.log(1. - actions ** 2 + self.EPS), axis=1)
+        diff = tf.reduce_sum(tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
         log_pis -= diff
 
         actions = actions * self._max_action

@@ -2,7 +2,6 @@ import numpy as np
 
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
-import tensorflow_probability as tfp
 
 from tf2rl.algos.models import GaussianActor
 from tf2rl.algos.policy_base import OffPolicyAgent
@@ -86,12 +85,11 @@ class SAC(OffPolicyAgent):
 
     def get_action(self, state, test=False):
         assert isinstance(state, np.ndarray)
-        assert len(state.shape) == 1
 
-        state = np.expand_dims(state, axis=0).astype(np.float32)
+        state = np.expand_dims(state, axis=0).astype(np.float32) if len(state.shape) == 1 else state
         action = self._get_action_body(tf.constant(state), test)
 
-        return action.numpy()[0]
+        return action.numpy()[0] if len(state.shape) == 1 else action
 
     @tf.function
     def _get_action_body(self, state, test):

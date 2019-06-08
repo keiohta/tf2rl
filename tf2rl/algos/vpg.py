@@ -2,7 +2,6 @@ import numpy as np
 
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
-from tensorflow.contrib.distributions import MultivariateNormalDiag
 
 from tf2rl.algos.policy_base import OnPolicyAgent
 from tf2rl.algos.models import CategoricalActor, GaussianActor
@@ -51,8 +50,8 @@ class VPG(OnPolicyAgent):
                 state_shape, action_dim, max_action, actor_units)
         self.critic = CriticV(state_shape, critic_units)
         self._action_dim = action_dim
-        self.actor_optimizer = tf.train.AdamOptimizer(learning_rate=lr_actor)
-        self.critic_optimizer = tf.train.AdamOptimizer(learning_rate=lr_critic)
+        self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_actor)
+        self.critic_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_critic)
 
     def get_action(self, state, test=False):
         assert isinstance(state, np.ndarray)
@@ -95,7 +94,7 @@ class VPG(OnPolicyAgent):
         tf.contrib.summary.scalar(name="Loss", tensor=loss, family="loss")
         return loss
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _train_actor_body(self, states, actions, next_states, rewards, dones, log_pis):
         with tf.device(self.device):
             # Train policy
@@ -110,7 +109,7 @@ class VPG(OnPolicyAgent):
                 else:
                     return actor_loss
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _train_critic_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
             # Train baseline
@@ -126,29 +125,3 @@ class VPG(OnPolicyAgent):
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
 
         return critic_loss
-
-
-if __name__ == '__main__':
-    config = tf.ConfigProto(allow_soft_placement=True)
-    config.gpu_options.allow_growth = True
-    tf.enable_eager_execution(config=config)
-    import gym
-    from tf2rl.envs.utils import is_discrete
-
-    discrete_env = gym.make("CartPole-v0")
-    agent = VPG(
-        discrete_env.observation_space.shape,
-        discrete_env.action_space.n,
-        is_discrete(discrete_env.action_space))
-    obs = discrete_env.reset()
-    for _ in range(10):
-        print(agent.get_action(obs))
-
-    continuous_env = gym.make('Pendulum-v0')
-    agent = VPG(
-        continuous_env.observation_space.shape,
-        continuous_env.action_space.low.size,
-        is_discrete(continuous_env.action_space))
-    obs =continuous_env.reset()
-    for _ in range(10):
-        print(agent.get_action(obs))

@@ -4,17 +4,53 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.vpg import VPG
-from tests.algos.common import CommonDiscreteOutputAlgos, CommonContinuousOutputAlgos
+from tests.algos.common import CommonAlgos, CommonDiscreteOutputAlgos, CommonContinuousOutputAlgos
 
 
-class TestDiscreteVPG(CommonDiscreteOutputAlgos):
+class CommonActorCritic(CommonAlgos):
+    def test_train(self):
+        if self.agent is None:
+            return
+        rewards = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
+        dones = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
+        obses = np.zeros(
+            shape=(self.batch_size,)+self.continuous_env.observation_space.shape,
+            dtype=np.float32)
+        acts = np.zeros(
+            shape=(self.batch_size,self.continuous_env.action_space.low.size,),
+            dtype=np.float32)
+        self.agent.train_actor(
+            obses, acts, obses, rewards, dones)
+        self.agent.train_critic(
+            obses, acts, obses, rewards, dones)
+
+
+class TestContinuousVPG(CommonDiscreteOutputAlgos, CommonActorCritic):
     @classmethod
     def setUpClass(cls):
-        cls.agent(
+        cls.agent = VPG(
             state_shape=cls.continuous_env.observation_space.shape,
-            action_dim=cls.continuous_env.action_space.n,
+            action_dim=cls.continuous_env.action_space.low.size,
             is_discrete=True,
             gpu=-1)
+
+    def test_get_action(self):
+        pass
+
+    def test_train(self):
+        # TODO: Search how to call only `CommonActorCritic`
+        pass
+        # super(self, CommonActorCritic).train()
+
+
+# class TestDiscreteVPG(CommonDiscreteOutputAlgos):
+#     @classmethod
+#     def setUpClass(cls):
+#         cls.agent = VPG(
+#             state_shape=cls.discrete_env.observation_space.shape,
+#             action_dim=cls.discrete_env.action_space.n,
+#             is_discrete=True,
+#             gpu=-1)
 
     # def test_get_action(self):
     #     continuous_vpg = VPG(
