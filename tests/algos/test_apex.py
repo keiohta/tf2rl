@@ -5,11 +5,19 @@ import gym
 import numpy as np
 import tensorflow as tf
 
-from tf2rl.algos.apex_multienv import apex_argument, run
+from tf2rl.algos.apex import apex_argument, run
 from tf2rl.misc.target_update_ops import update_target_variables
 
 
-def test_run(args):
+def test_run():
+    parser = apex_argument()
+    parser.set_defaults(max_batch=10)
+    parser.set_defaults(param_update_freq=1)
+    parser.set_defaults(test_freq=10)
+    parser.set_defaults(n_env=64)
+    parser.set_defaults(local_buffer_size=64)
+    args = parser.parse_args()
+
     _test_run_discrete(args)
     _test_run_continuous(args)
 
@@ -78,9 +86,6 @@ def _test_run_continuous(args):
 
 
 if __name__ == '__main__':
-    config = tf.ConfigProto(allow_soft_placement=True)
-    tf.enable_eager_execution(config=config)
-
     parser = apex_argument()
     parser.set_defaults(max_batch=10)
     parser.set_defaults(param_update_freq=1)

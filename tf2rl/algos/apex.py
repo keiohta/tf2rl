@@ -1,26 +1,24 @@
 import time
 import numpy as np
-import tensorflow as tf
 import argparse
+import logging
 
 import multiprocessing
 from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
 
-from cpprb import ReplayBuffer, PrioritizedReplayBuffer
+import tensorflow as tf
 
+from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
+
+from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
-
-config = tf.ConfigProto(allow_soft_placement=True)
-config.gpu_options.allow_growth = True
-tf.enable_eager_execution(config=config)
+from tf2rl.misc.get_replay_buffer import get_default_rb_dict
 
 
-def explorer(global_rb, queue, trained_steps, n_transition,
-             is_training_done, lock, env, policy_fn,
-             set_weights_fn, noise,
-             buffer_size=1024, max_transition=None,
-             episode_max_steps=1000):
+def explorer(global_rb, queue, trained_steps, is_training_done,
+             lock, env_fn, policy_fn, set_weights_fn, noise_level,
+             n_env=64, n_thread=4, buffer_size=1024, episode_max_steps=1000, gpu=0):
     """
     Collect transitions and store them to prioritized replay buffer.
     Args:
@@ -33,8 +31,6 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             This is process safe, so you don't need to lock process when use this.
         trained_steps:
             Number of steps to apply gradients.
-        n_transition:
-            Number of collected transitions.
         is_training_done:
             multiprocessing.Event object to share the status of training.
         lock:
@@ -45,75 +41,106 @@ def explorer(global_rb, queue, trained_steps, n_transition,
             Method object to generate an explorer.
         buffer_size:
             Size of local buffer. If it is filled with transitions, add them to `global_rb`
-        max_transition:
-            Maximum number of steps to explorer. Default value is None.
         episode_max_steps:
             Maximum number of steps of an episode.
     """
-    policy = policy_fn(env, "Explorer", global_rb.get_buffer_size(), sigma=noise)
-    local_rb = ReplayBuffer(obs_shape=env.observation_space.shape,
-                            act_dim=env.action_space.low.size,
-                            size=buffer_size)
+    if n_env > 1:
+        envs = MultiThreadEnv(
+            env_fn=env_fn, batch_size=n_env, thread_pool=n_thread,
+            max_episode_steps=episode_max_steps)
+        env = envs._sample_env
+    else:
+        env = env_fn()
 
-    s = env.reset()
-    episode_steps = 0
-    total_reward = 0.
-    total_rewards = []
+    policy = policy_fn(
+        env=env, name="Explorer", memory_capacity=global_rb.get_buffer_size(),
+        noise_level=noise_level, gpu=gpu)
+
+    kwargs = get_default_rb_dict(buffer_size, env)
+    if n_env > 1:
+        kwargs["env_dict"]["priorities"] = {}
+    local_rb = ReplayBuffer(**kwargs)
+
+    if n_env == 1:
+        s = env.reset()
+        episode_steps = 0
+        total_reward = 0.
+        total_rewards = []
+    else:
+        obses = envs.py_reset()
     start = time.time()
-    sample_at_start = 0
+    n_sample, n_sample_old = 0, 0
 
     while not is_training_done.is_set():
-        n_transition.value += 1
-        episode_steps += 1
-        a = policy.get_action(s)
-        s_, r, done, _ = env.step(a)
-        done_flag = done
-        if episode_steps == env._max_episode_steps:
-            done_flag = False
-        total_reward += r
-        local_rb.add(obs=s, act=a, rew=r, next_obs=s_, done=done_flag)
+        if n_env == 1:
+            n_sample += 1
+            episode_steps += 1
+            a = policy.get_action(s)
+            s_, r, done, _ = env.step(a)
+            done_flag = done
+            if episode_steps == env._max_episode_steps:
+                done_flag = False
+            total_reward += r
+            local_rb.add(obs=s, act=a, rew=r, next_obs=s_, done=done_flag)
 
-        s = s_
-        if done or episode_steps == episode_max_steps:
-            s = env.reset()
-            total_rewards.append(total_reward)
-            total_reward = 0
-            episode_steps = 0
+            s = s_
+            if done or episode_steps == episode_max_steps:
+                s = env.reset()
+                total_rewards.append(total_reward)
+                total_reward = 0
+                episode_steps = 0
+        else:
+            n_sample += n_env
+            obses = envs.py_observation()
+            actions = policy.get_action(obses, tensor=True)
+            next_obses, rewards, dones, _ = envs.step(actions)
+            td_errors = policy.compute_td_error(
+                states=obses, actions=actions, next_states=next_obses,
+                rewards=rewards, dones=dones)
+            local_rb.add(obs=obses, act=actions, next_obs=next_obses,
+                     rew=rewards, done=dones,
+                     priorities=np.abs(td_errors+1e-6))
 
-            # Periodically copy weights of explorer
-            if not queue.empty():
-                set_weights_fn(policy, queue.get())
+        # Periodically copy weights of explorer
+        if not queue.empty():
+            set_weights_fn(policy, queue.get())
 
         # Add collected experiences to global replay buffer
         if local_rb.get_stored_size() == buffer_size:
             samples = local_rb.sample(local_rb.get_stored_size())
-            td_errors = policy.compute_td_error(
-                samples["obs"], samples["act"], samples["next_obs"],
-                samples["rew"], np.array(samples["done"], dtype=np.float64))
-            msg = "Grad: {0: 6d}\t".format(trained_steps.value)
-            msg += "Samples: {0: 7d}\t".format(n_transition.value)
-            msg += "TDErr: {0:.5f}\t".format(np.average(np.abs(td_errors).flatten()))
-            msg += "AveEpiRew: {0:.3f}\t".format(sum(total_rewards) / len(total_rewards))
-            msg += "FPS: {0:.2f}".format((n_transition.value - sample_at_start) / (time.time() - start))
-            print(msg)
-            total_rewards = []
+            if n_env > 1:
+                priorities=np.squeeze(samples["priorities"])
+            else:
+                td_errors = policy.compute_td_error(
+                    states=samples["obs"], actions=samples["act"],
+                    next_states=samples["next_obs"], rewards=samples["rew"],
+                    dones=samples["done"])
+                priorities = np.abs(np.squeeze(td_errors)) + 1e-6
             lock.acquire()
             global_rb.add(
                 obs=samples["obs"], act=samples["act"], rew=samples["rew"],
                 next_obs=samples["next_obs"], done=samples["done"],
-                priorities=np.abs(td_errors)+1e-6)
+                priorities=priorities)
             lock.release()
             local_rb.clear()
-            start = time.time()
-            sample_at_start = n_transition.value
 
-        if max_transition is not None and n_transition.value >= max_transition:
-            is_training_done.set()
+            msg = "Grad: {0: 6d}\t".format(trained_steps.value)
+            msg += "Samples: {0: 7d}\t".format(n_sample)
+            msg += "TDErr: {0:.5f}\t".format(np.average(priorities))
+            if n_env == 1:
+                ave_rew = 0 if len(total_rewards) == 0 else sum(total_rewards) / len(total_rewards)
+                msg += "AveEpiRew: {0:.3f}\t".format(ave_rew)
+                total_rewards = []
+            msg += "FPS: {0:.2f}".format((n_sample - n_sample_old) / (time.time() - start))
+            logging.info(msg)
+
+            start = time.time()
+            n_sample_old = n_sample
 
 
 def learner(global_rb, trained_steps, is_training_done,
             lock, env, policy_fn, get_weights_fn,
-            n_training, update_freq, *queues):
+            n_training, update_freq, evaluation_freq, gpu, queues):
     """
     Collect transitions and store them to prioritized replay buffer.
     Args:
@@ -140,13 +167,12 @@ def learner(global_rb, trained_steps, is_training_done,
         queues:
             FIFOs shared with explorers to send latest network parameters.
     """
-    policy = policy_fn(env, "Learner", global_rb.get_buffer_size())
+    policy = policy_fn(env, "Learner", global_rb.get_buffer_size(), gpu=gpu)
 
-    output_dir = prepare_output_dir(args=None, user_specified_dir="./results")
-    writer = tf.contrib.summary.create_file_writer(output_dir)
+    output_dir = prepare_output_dir(
+        args=None, user_specified_dir="./results", suffix="learner")
+    writer = tf.summary.create_file_writer(output_dir)
     writer.set_as_default()
-    tf.contrib.summary.initialize()
-    total_steps = tf.train.create_global_step()
 
     # Wait until explorers collect transitions
     while not is_training_done.is_set() and global_rb.get_stored_size() == 0:
@@ -154,41 +180,45 @@ def learner(global_rb, trained_steps, is_training_done,
 
     start_time = time.time()
     while not is_training_done.is_set():
-        with tf.contrib.summary.record_summaries_every_n_global_steps(1000):
-            trained_steps.value += 1
-            total_steps.assign(trained_steps.value)
-            lock.acquire()
-            samples = global_rb.sample(policy.batch_size)
-            with tf.contrib.summary.always_record_summaries():
-                td_errors = policy.train(
-                    samples["obs"], samples["act"], samples["next_obs"],
-                    samples["rew"], np.array(samples["done"], dtype=np.float32),
-                    samples["weights"])
-                writer.flush()
-            global_rb.update_priorities(samples["indexes"], np.abs(td_errors) + 1e-6)
-            lock.release()
+        trained_steps.value += 1
+        tf.summary.experimental.set_step(trained_steps.value)
+        lock.acquire()
+        samples = global_rb.sample(policy.batch_size)
+        td_errors = policy.train(
+            samples["obs"], samples["act"], samples["next_obs"],
+            samples["rew"], samples["done"], samples["weights"])
+        writer.flush()
+        global_rb.update_priorities(
+            samples["indexes"], np.abs(td_errors)+1e-6)
+        lock.release()
 
-            # Put updated weights to queue
-            if trained_steps.value % update_freq == 0:
-                weights = get_weights_fn(policy)
-                for queue in queues:
-                    queue.put(weights)
-                with tf.contrib.summary.always_record_summaries():
-                    fps = update_freq / (time.time() - start_time)
-                    tf.contrib.summary.scalar(name="FPS", tensor=fps, family="loss")
-                    print("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
-                        fps, trained_steps.value))
-                start_time = time.time()
+        # Put updated weights to queue
+        if trained_steps.value % update_freq == 0:
+            weights = get_weights_fn(policy)
+            for i in range(len(queues) - 1):
+                queues[i].put(weights)
+            fps = update_freq / (time.time() - start_time)
+            tf.summary.scalar(name="FPS", data=fps, description="loss")
+            logging.info("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
+                fps, trained_steps.value))
+            start_time = time.time()
 
-        if trained_steps.value >= n_training:
-            is_training_done.set()
+        # Periodically do evaluation
+        if trained_steps.value % evaluation_freq == 0:
+            queues[-1].put(get_weights_fn(policy))
+            queues[-1].put(trained_steps.value)
+
+    if trained_steps.value >= n_training:
+        is_training_done.set()
 
 
 def apex_argument(parser=None):
     if parser is None:
         parser = argparse.ArgumentParser()
-    parser.add_argument('--max-batch', type=int, default=1e6,
+    parser.add_argument('--max-batch', type=int, default=1e7,
                         help='number of times to apply batch update')
+    parser.add_argument('--episode-max-steps', type=int, default=int(1e3),
+                        help='Maximum steps in an episode')
     parser.add_argument('--param-update-freq', type=int, default=1e2,
                         help='frequency to update parameter')
     parser.add_argument('--n-explorer', type=int, default=None,
@@ -197,23 +227,95 @@ def apex_argument(parser=None):
                         help='size of replay buffer')
     parser.add_argument('--local-buffer-size', type=int, default=1e4,
                         help='size of local replay buffer for explorer')
-    parser.add_argument('--gpu', type=int, default=0)
+    parser.add_argument('--gpu-explorer', type=int, default=0)
+    parser.add_argument('--gpu-learner', type=int, default=0)
+    parser.add_argument('--gpu-evaluator', type=int, default=0)
+    # Test setting
+    parser.add_argument('--test-freq', type=int, default=1e3,
+                        help='Frequency to evaluate policy')
+    parser.add_argument('--save-model-interval', type=int, default=int(1e4),
+                        help='Interval to save model')
+    # Multi Env setting
+    parser.add_argument('--n-env', type=int, default=1,
+                        help='Number of environments')
+    parser.add_argument('--n-thread', type=int, default=4,
+                        help='Number of thread pool')
+    # Others
+    parser.add_argument('--logging-level', choices=['DEBUG', 'INFO', 'WARNING'],
+                        default='INFO', help='Logging level')
     return parser
 
 
-def prepare_experiment(n_explorer, env, args):
+def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
+              save_model_interval=int(1e6), n_evaluation=10, episode_max_steps=1000,
+              show_test_progress=False):
+    output_dir = prepare_output_dir(
+        args=None, user_specified_dir="./results", suffix="evaluator")
+    writer = tf.summary.create_file_writer(
+        output_dir, filename_suffix="_evaluation")
+    writer.set_as_default()
+
+    policy = policy_fn(env, "Learner", gpu=gpu)
+    model_save_threshold = save_model_interval
+
+    checkpoint = tf.train.Checkpoint(policy=policy)
+    checkpoint_manager = tf.train.CheckpointManager(
+        checkpoint, directory=output_dir, max_to_keep=10)
+
+    while not is_training_done.is_set():
+        n_evaluated_episode = 0
+        # Wait until a new weights comes
+        if queue.empty():
+            continue
+        else:
+            set_weights_fn(policy, queue.get())
+            trained_steps = queue.get()
+            tf.summary.experimental.set_step(trained_steps)
+            avg_test_return = 0.
+            for i in range(n_evaluation):
+                n_evaluated_episode += 1
+                episode_return = 0.
+                obs = env.reset()
+                done = False
+                for _ in range(episode_max_steps):
+                    action = policy.get_action(obs, test=True)
+                    next_obs, reward, done, _ = env.step(action)
+                    if show_test_progress:
+                        env.render()
+                    episode_return += reward
+                    obs = next_obs
+                    if done:
+                        break
+                avg_test_return += episode_return
+                # Break if a new weights comes
+                if not queue.empty():
+                    break
+            avg_test_return /= n_evaluated_episode
+            logging.info("Evaluation: {} over {} run".format(
+                avg_test_return, n_evaluated_episode))
+            tf.summary.scalar(name="AverageTestReturn",
+                                data=avg_test_return, description="loss")
+            writer.flush()
+            if trained_steps > model_save_threshold:
+                model_save_threshold += save_model_interval
+                checkpoint_manager.save()
+    checkpoint_manager.save()
+
+
+def prepare_experiment(env, args):
     # Manager to share PER between a learner and explorers
     SyncManager.register('PrioritizedReplayBuffer',
                          PrioritizedReplayBuffer)
     manager = SyncManager()
     manager.start()
-    global_rb = manager.PrioritizedReplayBuffer(
-        obs_shape=env.observation_space.shape,
-        act_dim=env.action_space.low.size,
-        size=args.replay_buffer_size)
+
+    kwargs = get_default_rb_dict(args.replay_buffer_size, env)
+    global_rb = manager.PrioritizedReplayBuffer(**kwargs)
 
     # queues to share network parameters between a learner and explorers
-    queues = [Queue() for _ in range(n_explorer)]
+    n_queue = 1 if args.n_env > 1 else args.n_explorer
+    n_queue += 1  # for evaluation
+    queues = [manager.Queue() for _ in range(n_queue)]
 
     # Event object to share training status. if event is set True, all exolorers stop sampling transitions
     is_training_done = Event()
@@ -223,6 +325,62 @@ def prepare_experiment(n_explorer, env, args):
 
     # Shared memory objects to count number of samples and applied gradients
     trained_steps = Value('i', 0)
-    n_transition = Value('i', 0)
 
-    return global_rb, queues, is_training_done, lock, trained_steps, n_transition
+    return global_rb, queues, is_training_done, lock, trained_steps
+
+
+def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
+    logging.basicConfig(
+        datefmt="%d/%Y %I:%M:%S",
+        format='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s')
+    logging.getLogger().setLevel(logging.getLevelName(args.logging_level))
+
+    if args.n_env > 1:
+        args.n_explorer = 1
+    elif args.n_explorer is None:
+        args.n_explorer = multiprocessing.cpu_count() - 1
+    assert args.n_explorer > 0, "[error] number of explorers must be positive integer"
+
+    env = env_fn()
+
+    global_rb, queues, is_training_done, lock, trained_steps = \
+        prepare_experiment(env, args)
+
+    noise = 0.3
+    tasks = []
+
+    # Add explorers
+    if args.n_env > 1:
+        tasks.append(Process(
+            target=explorer,
+            args=[global_rb, queues[0], trained_steps, is_training_done,
+                  lock, env_fn, policy_fn, set_weights_fn, noise,
+                  args.n_env, args.n_thread, args.local_buffer_size,
+                  args.episode_max_steps, args.gpu_explorer]))
+    else:
+        for i in range(args.n_explorer):
+            tasks.append(Process(
+                target=explorer,
+                args=[global_rb, queues[i], trained_steps, is_training_done,
+                      lock, env_fn, policy_fn, set_weights_fn, noise,
+                      args.n_env, args.n_thread, args.local_buffer_size,
+                      args.episode_max_steps, args.gpu_explorer]))
+
+    # Add learner
+    tasks.append(Process(
+        target=learner,
+        args=[global_rb, trained_steps, is_training_done,
+                lock, env_fn(), policy_fn, get_weights_fn,
+                args.max_batch, args.param_update_freq,
+                args.test_freq, args.gpu_learner, queues]))
+
+    # Add evaluator
+    tasks.append(Process(
+        target=evaluator,
+        args=[is_training_done, env_fn(), policy_fn, set_weights_fn,
+              queues[-1], args.gpu_evaluator, args.save_model_interval]))
+
+    for task in tasks:
+        task.start()
+    for task in tasks:
+        task.join()

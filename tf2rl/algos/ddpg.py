@@ -4,6 +4,7 @@ from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
+from tf2rl.misc.huber_loss import huber_loss
 
 
 class Actor(tf.keras.Model):
@@ -70,13 +71,13 @@ class DDPG(OffPolicyAgent):
         # Define and initialize Actor network
         self.actor = Actor(state_shape, action_dim, max_action, actor_units)
         self.actor_target = Actor(state_shape, action_dim, max_action, actor_units)
-        self.actor_optimizer = tf.train.AdamOptimizer(learning_rate=lr_actor)
+        self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_actor)
         update_target_variables(self.actor_target.weights, self.actor.weights, tau=1.)
 
         # Define and initialize Critic network
         self.critic = Critic(state_shape, action_dim, critic_units)
         self.critic_target = Critic(state_shape, action_dim, critic_units)
-        self.critic_optimizer = tf.train.AdamOptimizer(learning_rate=lr_critic)
+        self.critic_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_critic)
         update_target_variables(self.critic_target.weights, self.critic.weights, tau=1.)
 
         # Set hyperparameters
@@ -86,19 +87,19 @@ class DDPG(OffPolicyAgent):
     def get_action(self, state, test=False, tensor=False):
         if not tensor:
             assert isinstance(state, np.ndarray)
-        state = np.expand_dims(state, axis=0).astype(np.float64) if len(state.shape) == 1 else state
+        state = np.expand_dims(state, axis=0).astype(np.float32) if len(state.shape) == 1 else state
         action = self._get_action_body(
-            tf.constant(state), self.sigma * test, tf.constant(self.actor.max_action, dtype=tf.float64))
+            tf.constant(state), self.sigma * test, tf.constant(self.actor.max_action, dtype=tf.float32))
         if tensor:
             return action
         else:
             return action.numpy()[0]
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _get_action_body(self, state, sigma, max_action):
         with tf.device(self.device):
             action = self.actor(state)
-            action += tf.random.normal(shape=action.shape, mean=0., stddev=sigma, dtype=tf.float64)
+            action += tf.random.normal(shape=action.shape, mean=0., stddev=sigma, dtype=tf.float32)
             return tf.clip_by_value(action, -max_action, max_action)
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
@@ -108,18 +109,18 @@ class DDPG(OffPolicyAgent):
             states, actions, next_states, rewards, done, weights)
 
         if actor_loss is not None:
-            tf.contrib.summary.scalar(name="ActorLoss", tensor=actor_loss, family="loss")
-        tf.contrib.summary.scalar(name="CriticLoss", tensor=critic_loss, family="loss")
+            tf.summary.scalar(name="ActorLoss", data=actor_loss, description="loss")
+        tf.summary.scalar(name="CriticLoss", data=critic_loss, description="loss")
 
         return td_errors
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
                 td_errors = self._compute_td_error_body(
                     states, actions, next_states, rewards, done)
-                critic_loss = tf.reduce_mean(tf.square(td_errors) * weights * 0.5)
+                critic_loss = tf.reduce_mean(huber_loss(diff=td_errors) * weights)
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
@@ -144,10 +145,10 @@ class DDPG(OffPolicyAgent):
         td_errors = self._compute_td_error_body(states, actions, next_states, rewards, dones)
         return np.ravel(td_errors.numpy())
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
-            not_dones = tf.constant(1., dtype=tf.float64) - dones
+            not_dones = 1. - dones
             target_Q = self.critic_target(
                 [next_states, self.actor_target(next_states)])
             target_Q = rewards + (not_dones * self.discount * target_Q)

@@ -4,6 +4,7 @@ from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.ddpg import DDPG, Actor
 from tf2rl.misc.target_update_ops import update_target_variables
+from tf2rl.misc.huber_loss import huber_loss
 
 
 class Critic(tf.keras.Model):
@@ -58,7 +59,7 @@ class TD3(DDPG):
         self.critic = Critic(state_shape, action_dim, critic_units)
         self.critic_target = Critic(state_shape, action_dim, critic_units)
         update_target_variables(self.critic_target.weights, self.critic.weights, tau=1.)
-        self.critic_optimizer = tf.train.AdamOptimizer(learning_rate=lr_critic)
+        self.critic_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_critic)
 
         self._policy_noise = policy_noise
         self._noise_clip = noise_clip
@@ -66,15 +67,15 @@ class TD3(DDPG):
         self._actor_update_freq = tf.constant(actor_update_freq)
         self._it = tf.Variable(0)
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
                 td_error1, td_error2 = self._compute_td_error_body(
                     states, actions, next_states, rewards, done)
                 critic_loss = tf.reduce_mean(
-                    tf.square(td_error1) * weights * 0.5 + \
-                    tf.square(td_error2) * weights * 0.5)
+                    huber_loss(diff=td_error1) * weights + \
+                    huber_loss(diff=td_error2) * weights)
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
@@ -96,15 +97,15 @@ class TD3(DDPG):
 
             return actor_loss, critic_loss, np.abs(td_error1) + np.abs(td_error2)
 
-    def compute_td_error(self, states, actions, next_states, rewards, done):
+    def compute_td_error(self, states, actions, next_states, rewards, dones):
         td_error1, td_error2 = self._compute_td_error_body(
-            states, actions, next_states, rewards, done)
-        return np.ravel(np.abs(td_error1.numpy()) + np.abs(td_error2.numpy()))
+            states, actions, next_states, rewards, dones)
+        return np.squeeze(np.abs(td_error1.numpy()) + np.abs(td_error2.numpy()))
 
-    @tf.contrib.eager.defun
-    def _compute_td_error_body(self, states, actions, next_states, rewards, done):
+    @tf.function
+    def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
-            not_done = 1. - done
+            not_dones = 1. - dones
 
             # Get noisy action
             next_action = self.actor_target(next_states)
@@ -116,7 +117,7 @@ class TD3(DDPG):
 
             target_Q1, target_Q2 = self.critic_target([next_states, next_action])
             target_Q = tf.minimum(target_Q1, target_Q2)
-            target_Q = rewards + (not_done * self.discount * target_Q)
+            target_Q = rewards + (not_dones * self.discount * target_Q)
             target_Q = tf.stop_gradient(target_Q)
             current_Q1, current_Q2 = self.critic([states, actions])
 

@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 
-class Policy(tf.contrib.checkpoint.Checkpointable):
+class Policy(tf.keras.Model):
     def __init__(
             self,
             name,
@@ -13,7 +13,8 @@ class Policy(tf.contrib.checkpoint.Checkpointable):
             n_warmup=0,
             max_grad=1.,
             gpu=0):
-        self.name = name
+        super().__init__()
+        self.policy_name = name
         self.update_interval = update_interval
         self.batch_size = batch_size
         self.discount = discount
@@ -24,6 +25,15 @@ class Policy(tf.contrib.checkpoint.Checkpointable):
 
     def get_action(self, observation, test=False):
         raise NotImplementedError
+
+    @staticmethod
+    def get_argument(parser=None):
+        import argparse
+        if parser is None:
+            parser = argparse.ArgumentParser(conflict_handler='resolve')
+        parser.add_argument('--n-warmup', type=int, default=int(1e4))
+        parser.add_argument('--batch-size', type=int, default=32)
+        return parser
 
 
 class OnPolicyAgent(Policy):
@@ -47,3 +57,9 @@ class OffPolicyAgent(Policy):
             memory_capacity,
             **kwargs):
         super().__init__(memory_capacity=memory_capacity, **kwargs)
+
+    @staticmethod
+    def get_argument(parser=None):
+        parser = Policy.get_argument(parser)
+        parser.add_argument('--memory-capacity', type=int, default=int(1e6))
+        return parser

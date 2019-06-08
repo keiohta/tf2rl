@@ -2,12 +2,13 @@ from setuptools import setup, Extension, find_packages
 
 install_requires = [
     "cpprb>=7.13.3"
-    "joblib"
+    "joblib",
+    "tfp-nightly"
 ]
 
 extras_require = {
-    "tf": ["tensorflow==1.12"],
-    "tf_gpu": ["tensorflow-gpu==1.12"],
+    "tf": ["tensorflow==2.0.0b0"],
+    "tf_gpu": ["tensorflow-gpu==2.0.0b0"],
     "examples": ["gym", "gym[atari]", "roboschool", "opencv-python"]
 }
 

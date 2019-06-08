@@ -1,6 +1,8 @@
-tensorflow==1.12
+tensorflow==2.0.0b0
+tfp-nightly
 cpprb
 joblib
 gym
 opencv-python
 coveralls
+matplotlib

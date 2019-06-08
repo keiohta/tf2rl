@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/keiohta/tf2rl.svg?branch=master)](https://travis-ci.org/keiohta/tf2rl)
-[![Coverage Status](https://coveralls.io/repos/github/keiohta/tf2rl/badge.svg)](https://coveralls.io/github/keiohta/tf2rl)
+[![Coverage Status](https://coveralls.io/repos/github/keiohta/tf2rl/badge.svg?branch=master)](https://coveralls.io/github/keiohta/tf2rl?branch=master)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+[![GitHub issues open](https://img.shields.io/github/issues/keiohta/tf2rl.svg)]() 
 
 # TF2RL
 TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using TensorFlow 2.0.
@@ -14,7 +15,7 @@ Following algorithms are supported:
 | DDPG variants |       X        |         ✓         |                     DDPG, BiResDDPG, TD3                     |
 |      SAC      |       X        |         ✓         |                              -                               |
 |     ApeX      |       ✓        |         ✓         | with general off-policy algorithms such as DQN, DDPG, and SAC |
-|     GAIL      |       ✓        |         ✓         |                              -                               |
+|     GAIL      |       ✓        |         ✓         |                        GAIL, GAIL-SN                         |
 
 Following papers have been implementd in tf2rl:
 
