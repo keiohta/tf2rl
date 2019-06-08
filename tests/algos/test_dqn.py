@@ -51,6 +51,19 @@ class TestCategoricalDQN(CommonDiscreteOutputAlgos):
             action_dim=cls.discrete_env.action_space.n,
             batch_size=cls.batch_size,
             enable_categorical_dqn=True,
+            enable_dueling_dqn=True,
+            gpu=-1)
+
+
+class TestCategoricalDuelingDQN(CommonDiscreteOutputAlgos):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.agent = DQN(
+            state_shape=cls.discrete_env.observation_space.shape,
+            action_dim=cls.discrete_env.action_space.n,
+            batch_size=cls.batch_size,
+            enable_categorical_dqn=True,
             gpu=-1)
 
 

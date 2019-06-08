@@ -8,9 +8,11 @@ if __name__ == '__main__':
     parser = Trainer.get_argument()
     parser = DQN.get_argument(parser)
     parser.set_defaults(test_interval=2000)
-    parser.set_defaults(max_steps=int(5e5))
     parser.set_defaults(max_steps=100000)
     parser.set_defaults(gpu=-1)
+    parser.set_defaults(n_warmup=500)
+    parser.set_defaults(batch_size=32)
+    parser.set_defaults(memory_capacity=int(1e4))
     args = parser.parse_args()
 
     env = gym.make("CartPole-v0")
@@ -22,11 +24,11 @@ if __name__ == '__main__':
         enable_categorical_dqn=args.enable_categorical_dqn,
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
-        n_warmup=500,
         target_replace_interval=300,
-        batch_size=32,
-        memory_capacity=10000,
         discount=0.99,
-        gpu=args.gpu)
+        gpu=args.gpu,
+        memory_capacity=args.memory_capacity,
+        batch_size=args.batch_size,
+        n_warmup=args.n_warmup)
     trainer = Trainer(policy, env, args, test_env=test_env)
     trainer()

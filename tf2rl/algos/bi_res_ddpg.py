@@ -65,3 +65,9 @@ class BiResDDPG(DDPG):
             current_Q = tf.stop_gradient(self.critic_target([states, actions]))
             td_errors2 = target_Q - current_Q
         return td_errors1, td_errors2
+
+    @staticmethod
+    def get_argument(parser=None):
+        parser = DDPG.get_argument(parser)
+        parser.add_argument('--eta', type=float, default=0.05)
+        return parser
