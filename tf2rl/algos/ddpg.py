@@ -93,7 +93,7 @@ class DDPG(OffPolicyAgent):
         if tensor:
             return action
         else:
-            return action.numpy()[0]
+            return action.numpy()[0] if len(state.shape) == 1 else action
 
     @tf.function
     def _get_action_body(self, state, sigma, max_action):
