@@ -15,7 +15,7 @@ class SNDense(Dense):
             self,
             units,
             trainable=True,
-            u_kernel_initializer=tf.truncated_normal_initializer,
+            u_kernel_initializer=tf.keras.initializers.TruncatedNormal,
             **kwargs):
         super().__init__(units, **kwargs)
         self.trainable = trainable

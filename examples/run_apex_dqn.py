@@ -22,7 +22,7 @@ if __name__ == '__main__':
         n_warmup = 50000
         target_replace_interval = 10000
         batch_size = 32
-        optimizer = tf.train.AdamOptimizer(
+        optimizer = tf.keras.optimizers.Adam(
             learning_rate=0.0000625, epsilon=1.5e-4)
         epsilon_decay_rate = int(1e6)
         QFunc = AtariQFunc

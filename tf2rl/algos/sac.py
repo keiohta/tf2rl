@@ -2,8 +2,7 @@ import numpy as np
 
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
-from tensorflow.contrib.distributions import MultivariateNormalDiag
-from tensorflow.contrib.layers import xavier_initializer
+import tensorflow_probability as tfp
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
@@ -36,7 +35,7 @@ class GaussianActor(tf.keras.Model):
         log_sigma = self.out_sigma(features)
         log_sigma = tf.clip_by_value(log_sigma, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
 
-        return MultivariateNormalDiag(loc=mu, scale_diag=tf.exp(log_sigma))
+        return tfp.distributions.MultivariateNormalDiag(loc=mu, scale_diag=tf.exp(log_sigma))
 
     def call(self, states):
         dist = self._compute_dist(states)
@@ -46,7 +45,7 @@ class GaussianActor(tf.keras.Model):
         actions = tf.tanh(raw_actions)
 
         # for variable replacement
-        diff = tf.reduce_sum(tf.log(1. - actions ** 2 + self.EPS), axis=1)
+        diff = tf.reduce_sum(tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
         log_pis -= diff
 
         actions = actions * self._max_action
@@ -118,17 +117,17 @@ class SAC(OffPolicyAgent):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
         self.actor = GaussianActor(state_shape, action_dim, max_action)
-        self.actor_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
+        self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
         self.vf = CriticV(state_shape)
         self.vf_target = CriticV(state_shape)
         update_target_variables(self.vf_target.weights, self.vf.weights, tau=1.)
-        self.vf_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
+        self.vf_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
         self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
         self.qf2 = CriticQ(state_shape, action_dim, name="qf2")
-        self.qf1_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
-        self.qf2_optimizer = tf.train.AdamOptimizer(learning_rate=lr)
+        self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
+        self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
         # Set hyper-parameters
         self.tau = tau
@@ -143,7 +142,7 @@ class SAC(OffPolicyAgent):
 
         return action.numpy()[0]
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _get_action_body(self, state, test):
         if not test:
             return self.actor(state)[0]
@@ -157,15 +156,17 @@ class SAC(OffPolicyAgent):
         td_errors, actor_loss, vf_loss, qf_loss, log_pi_min, log_pi_max = \
             self._train_body(states, actions, next_states, rewards, done, weights)
 
-        tf.contrib.summary.scalar(name="ActorLoss", tensor=actor_loss, family="loss")
-        tf.contrib.summary.scalar(name="CriticVLoss", tensor=vf_loss, family="loss")
-        tf.contrib.summary.scalar(name="CriticQLoss", tensor=qf_loss, family="loss")
-        tf.contrib.summary.scalar(name="log_pi_min", tensor=log_pi_min, family="loss")
-        tf.contrib.summary.scalar(name="log_pi_max", tensor=log_pi_max, family="loss")
+        print(td_errors.shape, actor_loss.shape, vf_loss.shape, qf_loss.shape, log_pi_min.shape, log_pi_max.shape)
+
+        tf.summary.scalar(name="ActorLoss", data=actor_loss, description="loss")
+        tf.summary.scalar(name="CriticVLoss", data=vf_loss, description="loss")
+        tf.summary.scalar(name="CriticQLoss", data=qf_loss, description="loss")
+        tf.summary.scalar(name="log_pi_min", data=log_pi_min, description="loss")
+        tf.summary.scalar(name="log_pi_max", data=log_pi_max, description="loss")
 
         return td_errors
 
-    @tf.contrib.eager.defun
+    @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights=None):
         with tf.device(self.device):
             rewards = tf.squeeze(rewards, axis=1)
@@ -200,7 +201,9 @@ class SAC(OffPolicyAgent):
 
                 target_V = tf.stop_gradient(current_Q - log_pi)
                 td_errors = target_V - current_V
-                vf_loss_t = huber_loss(diff=td_errors) * weights
+                vf_loss_t = huber_loss(diff=td_errors) * tf.squeeze(weights)
+                print("current Q: {}, target V: {}, td_erros: {}, vf_loss_t: {}, weights: {}\r\n".format(
+                    current_Q.shape, target_V.shape, td_errors.shape, vf_loss_t.shape, weights.shape))
 
                 # TODO: Add reguralizer
                 policy_loss = tf.reduce_mean(log_pi - current_Q1)

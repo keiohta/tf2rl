@@ -8,9 +8,6 @@ import tensorflow as tf
 from tf2rl.algos.apex import apex_argument, run
 from tf2rl.misc.target_update_ops import update_target_variables
 
-config = tf.ConfigProto(allow_soft_placement=True)
-tf.enable_eager_execution(config=config)
-
 
 def test_run():
     parser = apex_argument()

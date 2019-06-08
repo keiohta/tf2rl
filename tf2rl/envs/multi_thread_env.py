@@ -60,14 +60,14 @@ class MultiThreadEnv(object):
           reach_limit = [batch_size] : whether each environment reached time limit or not.
         """
         assert isinstance(actions, tf.Tensor)
-        with tf.variable_scope(name, default_name="MultiStep"):
-            obs, reward, done = tf.py_func(
-                self.py_step, [actions],
-                [tf.float32, tf.float32, tf.float32],
-                name="py_step")
-            obs.set_shape((self.batch_size,) + self.observation_shape)
-            reward.set_shape((self.batch_size,))
-            done.set_shape((self.batch_size,))
+        # with tf.variable_scope(name, default_name="MultiStep"):
+        obs, reward, done = tf.py_function(
+            self.py_step, [actions],
+            [tf.float32, tf.float32, tf.float32],
+            name="py_step")
+        obs.set_shape((self.batch_size,) + self.observation_shape)
+        reward.set_shape((self.batch_size,))
+        done.set_shape((self.batch_size,))
 
         return obs, reward, done, None
 
