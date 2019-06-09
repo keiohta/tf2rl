@@ -73,9 +73,8 @@ class TD3(DDPG):
             with tf.GradientTape() as tape:
                 td_error1, td_error2 = self._compute_td_error_body(
                     states, actions, next_states, rewards, done)
-                critic_loss = tf.reduce_mean(
-                    huber_loss(diff=td_error1) * weights + \
-                    huber_loss(diff=td_error2) * weights)
+                critic_loss = tf.reduce_mean(huber_loss(diff=td_error1) * weights) + \
+                              tf.reduce_mean(huber_loss(diff=td_error2) * weights)
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
@@ -121,4 +120,4 @@ class TD3(DDPG):
             target_Q = tf.stop_gradient(target_Q)
             current_Q1, current_Q2 = self.critic([states, actions])
 
-        return current_Q1 - target_Q, current_Q2 - target_Q
+        return target_Q- current_Q1, target_Q - current_Q2
