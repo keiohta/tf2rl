@@ -129,8 +129,8 @@ class SAC(OffPolicyAgent):
                 target_Q = tf.stop_gradient(
                     self.scale_reward * rewards + not_done * self.discount * vf_next_target)
 
-                td_loss1 = tf.reduce_mean(huber_loss(target_Q, current_Q1))
-                td_loss2 = tf.reduce_mean(huber_loss(target_Q, current_Q2))
+                td_loss1 = tf.reduce_mean(huber_loss(target_Q, current_Q1, max_grad=self.max_grad))
+                td_loss2 = tf.reduce_mean(huber_loss(target_Q, current_Q2, max_grad=self.max_grad))
 
             q1_grad = tape.gradient(td_loss1, self.qf1.trainable_variables)
             self.qf1_optimizer.apply_gradients(zip(q1_grad, self.qf1.trainable_variables))
@@ -149,7 +149,7 @@ class SAC(OffPolicyAgent):
 
                 target_V = tf.stop_gradient(current_Q - log_pi)
                 td_errors = target_V - current_V
-                vf_loss_t = tf.reduce_mean(huber_loss(diff=td_errors) * weights)
+                vf_loss_t = tf.reduce_mean(huber_loss(diff=td_errors, max_grad=self.max_grad) * weights)
 
                 # TODO: Add reguralizer
                 policy_loss = tf.reduce_mean(log_pi - current_Q1)

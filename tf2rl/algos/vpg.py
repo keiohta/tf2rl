@@ -126,7 +126,7 @@ class VPG(OnPolicyAgent):
                 # target_V = tf.stop_gradient(target_V)
                 current_V = self.critic(states)
                 td_errors = target_V - current_V
-                critic_loss = tf.reduce_mean(huber_loss(diff=td_errors))
+                critic_loss = tf.reduce_mean(huber_loss(diff=td_errors, max_grad=self.max_grad))
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
 

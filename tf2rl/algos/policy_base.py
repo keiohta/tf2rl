@@ -11,7 +11,7 @@ class Policy(tf.keras.Model):
             batch_size=256,
             discount=0.99,
             n_warmup=0,
-            max_grad=1.,
+            max_grad=10.,
             gpu=0):
         super().__init__()
         self.policy_name = name
