@@ -5,6 +5,7 @@ from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OnPolicyAgent
 from tf2rl.algos.models import CategoricalActor, GaussianActor
+from tf2rl.misc.huber_loss import huber_loss
 
 
 class CriticV(tf.keras.Model):
@@ -62,13 +63,13 @@ class VPG(OnPolicyAgent):
         action, log_pi = self._get_action_body(tf.constant(state), test)
 
         action = action.numpy()
-        log_pi = log_pi.numpy()
+        log_pi = log_pi.numpy() if not test else None
         if single_input:
             action = action[0]
             log_pi = log_pi[0] if not test else None
         return action, log_pi if not test else log_pi
 
-    # @tf.contrib.eager.defun
+    @tf.function
     def _get_action_body(self, state, test):
         if not test:
             if self._is_discrete:
@@ -86,12 +87,12 @@ class VPG(OnPolicyAgent):
 
     def train_actor(self, states, actions, next_states, rewards, dones, log_pis):
         loss = self._train_actor_body(states, actions, next_states, rewards, dones, log_pis)
-        tf.contrib.summary.scalar(name="Loss", tensor=loss, family="loss")
+        tf.summary.scalar(name="actor_loss", data=loss, description="actor_loss")
         return loss
 
     def train_critic(self, states, actions, next_states, rewards, dones):
         loss = self._train_critic_body(states, actions, next_states, rewards, dones)
-        tf.contrib.summary.scalar(name="Loss", tensor=loss, family="loss")
+        tf.summary.scalar(name="critic_loss", data=loss, description="critic_loss")
         return loss
 
     @tf.function
@@ -99,28 +100,33 @@ class VPG(OnPolicyAgent):
         with tf.device(self.device):
             # Train policy
             with tf.GradientTape() as tape:
-                not_dones = tf.constant(1., dtype=tf.float32) - dones
+                not_dones = 1. - dones
                 log_probs = self.actor.compute_log_probs(states, actions)
                 log_likelihood_ratio = log_probs - log_pis  # old log_probs
-                advantages = rewards + not_dones * self.critic(next_states) - self.critic(states)
-                actor_loss = -log_likelihood_ratio * advantages  # + lambda * entropy
-                if self._is_discrete:
-                    raise NotImplementedError
-                else:
-                    return actor_loss
+                advantages = rewards + not_dones * self.discount * self.critic(next_states) - self.critic(states)
+                actor_loss = tf.reduce_mean(-log_likelihood_ratio * advantages)  # + lambda * entropy
+
+            actor_grad = tape.gradient(actor_loss, self.actor.trainable_variables)
+            self.actor_optimizer.apply_gradients(
+                zip(actor_grad, self.actor.trainable_variables))
+
+            if self._is_discrete:
+                raise NotImplementedError
+            else:
+                return actor_loss
 
     @tf.function
     def _train_critic_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
             # Train baseline
             with tf.GradientTape() as tape:
-                not_dones = tf.constant(1., dtype=tf.float32) - dones
+                not_dones = 1. - dones
                 target_V = self.critic(next_states)
-                target_V = rewards + not_dones * target_V
-                target_V = tf.stop_gradient(target_V)
+                target_V = rewards + not_dones * self.discount * target_V
+                # target_V = tf.stop_gradient(target_V)
                 current_V = self.critic(states)
                 td_errors = target_V - current_V
-                critic_loss = tf.reduce_mean(tf.square(td_errors) * 0.5)
+                critic_loss = tf.reduce_mean(huber_loss(diff=td_errors))
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
 
