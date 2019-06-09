@@ -106,11 +106,11 @@ class SAC(OffPolicyAgent):
         td_errors, actor_loss, vf_loss, qf_loss, log_pi_min, log_pi_max = \
             self._train_body(states, actions, next_states, rewards, done, weights)
 
-        tf.summary.scalar(name="ActorLoss", data=actor_loss, description="loss")
-        tf.summary.scalar(name="CriticVLoss", data=vf_loss, description="loss")
-        tf.summary.scalar(name="CriticQLoss", data=qf_loss, description="loss")
-        tf.summary.scalar(name="log_pi_min", data=log_pi_min, description="loss")
-        tf.summary.scalar(name="log_pi_max", data=log_pi_max, description="loss")
+        tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
+        tf.summary.scalar(name=self.policy_name+"/critic_V_loss", data=vf_loss)
+        tf.summary.scalar(name=self.policy_name+"/critic_Q_loss", data=qf_loss)
+        tf.summary.scalar(name=self.policy_name+"/log_pi_min", data=log_pi_min)
+        tf.summary.scalar(name=self.policy_name+"/log_pi_max", data=log_pi_max)
 
         return td_errors
 

@@ -87,12 +87,12 @@ class VPG(OnPolicyAgent):
 
     def train_actor(self, states, actions, next_states, rewards, dones, log_pis):
         loss = self._train_actor_body(states, actions, next_states, rewards, dones, log_pis)
-        tf.summary.scalar(name="actor_loss", data=loss, description="actor_loss")
+        tf.summary.scalar(name=self.policy_name+"/actor_loss", data=loss)
         return loss
 
     def train_critic(self, states, actions, next_states, rewards, dones):
         loss = self._train_critic_body(states, actions, next_states, rewards, dones)
-        tf.summary.scalar(name="critic_loss", data=loss, description="critic_loss")
+        tf.summary.scalar(name=self.policy_name+"/critic_loss", data=loss)
         return loss
 
     @tf.function
