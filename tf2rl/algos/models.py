@@ -63,8 +63,11 @@ class GaussianActor(tf.keras.Model):
 
     def compute_log_probs(self, states, actions):
         dist = self._compute_dist(states)
-        log_probs = dist.log_prob(actions)
-        return log_probs
+        log_pis = dist.log_prob(actions)
+        # TODO: This is correct?
+        # diff = tf.reduce_sum(tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
+        # log_pis -= diff
+        return log_pis
 
 
 class CategoricalActor(tf.keras.Model):
