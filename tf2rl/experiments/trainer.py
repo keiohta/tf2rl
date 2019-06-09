@@ -104,8 +104,8 @@ class Trainer:
                     avg_test_return = self.evaluate_policy(total_steps)
                     self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                         total_steps, avg_test_return, self._test_episodes))
-                    tf.summary.scalar(name="AverageTestReturn", data=avg_test_return, description="loss")
-                    tf.summary.scalar(name="FPS", data=fps, description="loss")
+                    tf.summary.scalar(name="Common/average_test_return", data=avg_test_return, description="loss")
+                    tf.summary.scalar(name="Common/fps", data=fps, description="loss")
 
                     self.writer.flush()
 

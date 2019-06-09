@@ -110,8 +110,8 @@ class DDPG(OffPolicyAgent):
             states, actions, next_states, rewards, done, weights)
 
         if actor_loss is not None:
-            tf.summary.scalar(name="ActorLoss", data=actor_loss, description="loss")
-        tf.summary.scalar(name="CriticLoss", data=critic_loss, description="loss")
+            tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss, description="loss")
+        tf.summary.scalar(name=self.policy_name+"/critic_loss", data=critic_loss, description="loss")
 
         return td_errors
 
