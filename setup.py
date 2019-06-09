@@ -1,9 +1,10 @@
 from setuptools import setup, Extension, find_packages
 
 install_requires = [
-    "cpprb>=7.13.3"
+    "setuptools>=41.0.0",
+    "cpprb>=7.13.3",
     "joblib",
-    "tfp-nightly"
+    "tfp-nightly",
 ]
 
 extras_require = {
