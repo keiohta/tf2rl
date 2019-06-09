@@ -54,17 +54,9 @@ class OnPolicyTrainer(Trainer):
             idxes = np.arange(self._policy.horizon)
             samples = replay_buffer.sample(self._policy.horizon)
             np.random.shuffle(idxes)
-            for i in range(int(self._policy.horizon / self._policy.batch_size / 2)):
-                idx = i * 2 * self._policy.batch_size
-                # Train critic
-                self._policy.train_critic(
-                    samples["obs"][idx:idx+self._policy.batch_size],
-                    samples["act"][idx:idx+self._policy.batch_size],
-                    samples["next_obs"][idx:idx+self._policy.batch_size],
-                    samples["rew"][idx:idx+self._policy.batch_size],
-                    samples["done"][idx:idx+self._policy.batch_size])
-                # Train actor
-                idx += self._policy.batch_size
+            for i in range(int(self._policy.horizon / self._policy.batch_size)):
+                idx = i * self._policy.batch_size
+                # Train Actor
                 self._policy.train_actor(
                     samples["obs"][idx:idx+self._policy.batch_size],
                     samples["act"][idx:idx+self._policy.batch_size],
@@ -72,6 +64,14 @@ class OnPolicyTrainer(Trainer):
                     samples["rew"][idx:idx+self._policy.batch_size],
                     samples["done"][idx:idx+self._policy.batch_size],
                     samples["log_pi"][idx:idx+self._policy.batch_size])
+                # Train Critic
+                self._policy.train_critic(
+                    samples["obs"][idx:idx+self._policy.batch_size],
+                    samples["act"][idx:idx+self._policy.batch_size],
+                    samples["next_obs"][idx:idx+self._policy.batch_size],
+                    samples["rew"][idx:idx+self._policy.batch_size],
+                    samples["done"][idx:idx+self._policy.batch_size])
+                idx += self._policy.batch_size
             if total_steps > test_step_threshold == 0:
                 test_step_threshold += self._test_interval
                 avg_test_return = self.evaluate_policy(total_steps)
