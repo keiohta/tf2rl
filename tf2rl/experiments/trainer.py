@@ -24,7 +24,8 @@ class Trainer:
 
         # prepare log directory
         self._output_dir = prepare_output_dir(
-            args=args, user_specified_dir="./results", suffix=args.dir_suffix)
+            args=args, user_specified_dir="./results",
+            suffix="{}_{}".format(self._policy.policy_name, args.dir_suffix))
         self.logger = logging.getLogger(__name__)
         logging.basicConfig(
             datefmt="%d/%Y %I:%M:%S",
@@ -104,8 +105,8 @@ class Trainer:
                     avg_test_return = self.evaluate_policy(total_steps)
                     self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                         total_steps, avg_test_return, self._test_episodes))
-                    tf.summary.scalar(name="Common/average_test_return", data=avg_test_return, description="loss")
-                    tf.summary.scalar(name="Common/fps", data=fps, description="loss")
+                    tf.summary.scalar(name="Common/average_test_return", data=avg_test_return)
+                    tf.summary.scalar(name="Common/fps", data=fps)
 
                     self.writer.flush()
 

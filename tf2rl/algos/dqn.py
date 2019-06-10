@@ -180,7 +180,7 @@ class DQN(OffPolicyAgent):
         td_errors, q_func_loss = self._train_body(
             states, actions, next_states, rewards, done, weights)
 
-        tf.summary.scalar(name="QFuncLoss", data=q_func_loss, description="loss")
+        tf.summary.scalar(name=self.policy_name+"/q_func_Loss", data=q_func_loss)
 
         # TODO: Remove following by using tf.global_step
         self.n_update += 1
@@ -191,7 +191,7 @@ class DQN(OffPolicyAgent):
         # Update exploration rate
         self.epsilon = max(self.epsilon - self.epsilon_decay_rate * self.update_interval,
                            self.epsilon_min)
-        tf.summary.scalar(name="Epsilon", data=self.epsilon, description="loss")
+        tf.summary.scalar(name=self.policy_name+"/epsilon", data=self.epsilon)
 
         return td_errors
 
