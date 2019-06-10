@@ -2,6 +2,7 @@ import numpy as np
 
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
+import tensorflow_probability as tfp
 
 from tf2rl.algos.policy_base import OnPolicyAgent
 from tf2rl.algos.models import CategoricalActor, GaussianActor
@@ -62,28 +63,14 @@ class VPG(OnPolicyAgent):
             state = np.expand_dims(state, axis=0).astype(np.float32)
         action, log_pi = self._get_action_body(tf.constant(state), test)
 
-        action = action.numpy()
-        log_pi = log_pi.numpy() if not test else None
         if single_input:
-            action = action[0]
-            log_pi = log_pi[0] if not test else None
-        return action, log_pi if not test else log_pi
+            return action[0], log_pi[0]
+        else:
+            return action, log_pi
 
     @tf.function
     def _get_action_body(self, state, test):
-        if not test:
-            if self._is_discrete:
-                probs = self.actor(state)
-                elems = tf.range(self._action_dim)
-                samples = tf.multinomial(tf.log(probs), 1)
-                return elems[tf.cast(samples[0][0], tf.int32)]
-            else:
-                return self.actor(state)
-        else:
-            if self._is_discrete:
-                return tf.argmax(self.actor(state)) 
-            else:
-                return self.actor.mean_action(state), None
+        self.actor(state, test)
 
     def train_actor(self, states, actions, next_states, rewards, dones, log_pis):
         loss = self._train_actor_body(states, actions, next_states, rewards, dones, log_pis)

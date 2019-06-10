@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
-# TODO: Replace following with tensorflow_probability
 import tensorflow_probability as tfp
 
 
@@ -26,9 +25,10 @@ class GaussianActor(tf.keras.Model):
 
     def _compute_dist(self, states):
         """Compute multivariate normal distribution
+
         Args:
-            states: Inputs to neural network. NN outputs mu and sigma
-                    to compute the distribution
+            states: Inputs to neural network. NN outputs mean and
+                    standard deviation to compute the distribution
         Return:
             Multivariate normal distribution
         """
@@ -39,14 +39,20 @@ class GaussianActor(tf.keras.Model):
         log_sigma = self.out_sigma(features)
         log_sigma = tf.clip_by_value(log_sigma, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
 
-        return tfp.distributions.MultivariateNormalDiag(loc=mu, scale_diag=tf.exp(log_sigma))
+        return tfp.distributions.MultivariateNormalDiag(
+            loc=mu, scale_diag=tf.exp(log_sigma))
 
-    def call(self, states):
+    def call(self, states, test=False):
+        """Compute actions and log probabilities of the selected action
+        """
         dist = self._compute_dist(states)
-        raw_actions = dist.sample()
+        if test:
+            raw_actions = dist.mean()
+        else:
+            raw_actions = dist.sample()
         log_pis = dist.log_prob(raw_actions)
 
-        actions = tf.tanh(raw_actions)
+        actions = tf.tanh(raw_actions) * self._max_action
 
         # for variable replacement
         diff = tf.reduce_sum(tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
@@ -54,12 +60,6 @@ class GaussianActor(tf.keras.Model):
 
         actions = actions * self._max_action
         return actions, log_pis
-
-    def mean_action(self, states):
-        dist = self._compute_dist(states)
-        raw_actions = dist.mean()
-        actions = tf.tanh(raw_actions) * self._max_action
-        return actions
 
     def compute_log_probs(self, states, actions):
         dist = self._compute_dist(states)
@@ -82,8 +82,34 @@ class CategoricalActor(tf.keras.Model):
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
-    def call(self, inputs):
-        features = self.l1(inputs)
+    def _compute_dist(self, states):
+        """Compute categorical distribution
+
+        Arg:
+            states: Inputs to neural network. NN outputs probabilities
+                    of K classes
+        Return:
+            Categorical distribution
+        """
+        features = self.l1(states)
         features = self.l2(features)
-        features = self.l3(features)
-        return tf.clip_by_value(features, 1e-8, 1.0-1e-8)
+
+        probabilities = self.l3(features)
+        return tfp.distributions.Categorical(
+            probs=probabilities)
+
+    def call(self, states, test=False):
+        """Compute actions and log probability of the selected action
+
+        Return:
+            action: Tensors of action
+            log_probs: Tensors of log probabilities of selected actions
+        """
+        dist = self._compute_dist(states)
+        if test:
+            action = tf.math.argmax(dist.probs, axis=1)
+        else:
+            action = dist.sample()
+        log_prob = dist.log_prob(action)
+
+        return action, log_prob

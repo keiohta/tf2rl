@@ -94,10 +94,7 @@ class SAC(OffPolicyAgent):
 
     @tf.function
     def _get_action_body(self, state, test):
-        if not test:
-            return self.actor(state)[0]
-        else:
-            return self.actor.mean_action(state)
+        return self.actor(state, test)[0]
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
         if weights is None:
