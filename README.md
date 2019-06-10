@@ -16,6 +16,7 @@ Following algorithms are supported:
 |      SAC      |       X        |         ✓         |                              -                               |
 |     ApeX      |       ✓        |         ✓         | with general off-policy algorithms such as DQN, DDPG, and SAC |
 |     GAIL      |       ✓        |         ✓         |                        GAIL, GAIL-SN                         |
+|  PG variants  |       ✓        |         ✓         |                             VPG                              |
 
 Following papers have been implementd in tf2rl:
 
@@ -32,6 +33,8 @@ Following papers have been implementd in tf2rl:
 - [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](<https://arxiv.org/abs/1801.01290>)
 - [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>)
 - [Generative Adversarial Imitation Learning](<https://arxiv.org/abs/1606.03476>)
+- [Policy Gradient Methods for Reinforcement Learning with Function Approximation](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf)
+- [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/abs/1506.02438)
 
 
 
@@ -45,7 +48,6 @@ $ pip install .
 
 TF2RL is built on Google's TensorFlow and requires that either `tensorflow` or `tensorflow-gpu` is installed.
 To include the TensorFlow with the installation of TF2RL, add the flag `tf` for the normal CPU version or `tf_gpu` for the GPU version.
-Note that we DON'T actually use TF2.0 but TF1.12 because it has not been officially released yet.
 ```bash
 # Install TF2RL with TensorFlow CPU version
 $ pip install -e .[tf]
