@@ -68,32 +68,43 @@ class VPG(OnPolicyAgent):
         else:
             return action, log_pi
 
+    def get_action_and_val(self, state, test=False):
+        action, log_pi = self.get_action(state, test)
+        # TODO: clean code
+        single_input = state.ndim == 1
+        if single_input:
+            state = np.expand_dims(state, axis=0).astype(np.float32)
+        val = self.critic(state)
+        if single_input:
+            val = val[0]
+        return action, log_pi, val
+
     @tf.function
     def _get_action_body(self, state, test):
         return self.actor(state, test)
 
-    def train_actor(self, states, actions, next_states, rewards, dones, log_pis):
-        actor_loss = self._train_actor_body(states, actions, next_states, rewards, dones, log_pis)
+    def train_actor(self, states, actions, advantages, log_pis):
+        actor_loss = self._train_actor_body(states, actions, advantages, log_pis)
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
         return actor_loss
 
-    def train_critic(self, states, actions, next_states, rewards, dones):
-        critic_loss = self._train_critic_body(states, actions, next_states, rewards, dones)
+    def train_critic(self, states, returns):
+        critic_loss = self._train_critic_body(states, returns)
         tf.summary.scalar(name=self.policy_name+"/critic_loss", data=critic_loss)
         return critic_loss
 
     @tf.function
-    def _train_actor_body(self, states, actions, next_states, rewards, dones, log_pis):
+    def _train_actor_body(self, states, actions, advantages, log_pis):
         with tf.device(self.device):
             # Train policy
             with tf.GradientTape() as tape:
-                not_dones = 1. - dones
                 log_probs = self.actor.compute_log_probs(states, actions)
-                log_likelihood_ratio = log_probs - log_pis  # old log_probs
-                advantages = rewards + not_dones * self.discount * self.critic(next_states) - self.critic(states)
-                actor_loss = tf.reduce_mean(-log_likelihood_ratio * advantages)  # + lambda * entropy
+                log_likelihood_ratio = log_probs - log_pis
+                actor_loss = tf.reduce_mean(
+                    -log_likelihood_ratio * advantages)  # + lambda * entropy
 
-            actor_grad = tape.gradient(actor_loss, self.actor.trainable_variables)
+            actor_grad = tape.gradient(
+                actor_loss, self.actor.trainable_variables)
             self.actor_optimizer.apply_gradients(
                 zip(actor_grad, self.actor.trainable_variables))
 
@@ -103,18 +114,16 @@ class VPG(OnPolicyAgent):
                 return actor_loss
 
     @tf.function
-    def _train_critic_body(self, states, actions, next_states, rewards, dones):
+    def _train_critic_body(self, states, returns):
         with tf.device(self.device):
             # Train baseline
             with tf.GradientTape() as tape:
-                not_dones = 1. - dones
-                target_V = self.critic(next_states)
-                target_V = rewards + not_dones * self.discount * target_V
-                # target_V = tf.stop_gradient(target_V)
                 current_V = self.critic(states)
-                td_errors = target_V - current_V
-                critic_loss = tf.reduce_mean(huber_loss(diff=td_errors, max_grad=self.max_grad))
+                td_errors = returns - current_V
+                critic_loss = tf.reduce_mean(
+                    huber_loss(diff=td_errors, max_grad=self.max_grad))
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
-            self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
+            self.critic_optimizer.apply_gradients(
+                zip(critic_grad, self.critic.trainable_variables))
 
         return critic_loss

@@ -3,6 +3,7 @@ tfp-nightly
 cpprb
 joblib
 gym
+scipy
 opencv-python
 coveralls
 matplotlib

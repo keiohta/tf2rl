@@ -2,8 +2,11 @@ import time
 import numpy as np
 import tensorflow as tf
 
+from cpprb.experimental import ReplayBuffer
+
 from tf2rl.experiments.trainer import Trainer
-from tf2rl.misc.get_replay_buffer import get_replay_buffer
+from tf2rl.misc.get_replay_buffer import get_replay_buffer, get_default_rb_dict
+from tf2rl.misc.utils import discount_cumsum
 from tf2rl.experiments.utils import save_path, frames_to_gif
 
 
@@ -16,14 +19,19 @@ class OnPolicyTrainer(Trainer):
         n_episode = 0
         test_step_threshold = self._test_interval
 
-        replay_buffer = get_replay_buffer(
-            self._policy, self._env, self._use_prioritized_rb,
-            self._use_nstep_rb, self._n_step)
+        # TODO: clean codes
+        self.replay_buffer = get_replay_buffer(
+            self._policy, self._env)
+        kwargs_local_buf = get_default_rb_dict(
+            size=self._episode_max_steps, env=self._env)
+        kwargs_local_buf["env_dict"]["logp"] = {}
+        kwargs_local_buf["env_dict"]["val"] = {}
+        self.local_buffer = ReplayBuffer(**kwargs_local_buf)
 
         obs = self._env.reset()
         while total_steps < self._max_steps:
             for _ in range(self._policy.horizon):
-                action, log_pi = self._policy.get_action(obs)
+                action, log_pi, val = self._policy.get_action_and_val(obs)
                 next_obs, reward, done, _ = self._env.step(action)
                 if self._show_progress:
                     self._env.render()
@@ -35,11 +43,13 @@ class OnPolicyTrainer(Trainer):
                 if hasattr(self._env, "_max_episode_steps") and \
                         episode_steps == self._env._max_episode_steps:
                     done_flag = False
-                replay_buffer.add(obs=obs, act=action, next_obs=next_obs,
-                                  rew=reward, done=done_flag, log_pi=log_pi)
+                self.local_buffer.add(
+                    obs=obs, act=action, next_obs=next_obs,
+                    rew=reward, done=done_flag, logp=log_pi, val=val)
                 obs = next_obs
 
                 if done or episode_steps == self._episode_max_steps:
+                    self.finite_horizon()
                     obs = self._env.reset()
                     n_episode += 1
                     fps = episode_steps / (time.time() - episode_start_time)
@@ -50,28 +60,39 @@ class OnPolicyTrainer(Trainer):
                     episode_return = 0
                     episode_start_time = time.time()
 
+            self.finite_horizon(last_val=val)
             tf.summary.experimental.set_step(total_steps)
             idxes = np.arange(self._policy.horizon)
-            samples = replay_buffer.sample(self._policy.horizon)
-            np.random.shuffle(idxes)
-            for i in range(int(self._policy.horizon / self._policy.batch_size)):
-                idx = i * self._policy.batch_size
-                # Train Actor
+            samples = self.replay_buffer.sample(self._policy.horizon)
+            # Normalize advantages
+            adv_mean = np.mean(samples["adv"])
+            adv_std = np.std(samples["adv"])
+            adv = (samples["adv"] - adv_mean) / adv_std
+            for _ in range(50):
                 self._policy.train_actor(
-                    samples["obs"][idx:idx+self._policy.batch_size],
-                    samples["act"][idx:idx+self._policy.batch_size],
-                    samples["next_obs"][idx:idx+self._policy.batch_size],
-                    samples["rew"][idx:idx+self._policy.batch_size],
-                    samples["done"][idx:idx+self._policy.batch_size],
-                    samples["log_pi"][idx:idx+self._policy.batch_size])
-                # Train Critic
+                    samples["obs"],
+                    samples["act"],
+                    adv,
+                    samples["logp"])
+            # Train Critic
+            for _ in range(50):
                 self._policy.train_critic(
-                    samples["obs"][idx:idx+self._policy.batch_size],
-                    samples["act"][idx:idx+self._policy.batch_size],
-                    samples["next_obs"][idx:idx+self._policy.batch_size],
-                    samples["rew"][idx:idx+self._policy.batch_size],
-                    samples["done"][idx:idx+self._policy.batch_size])
-                idx += self._policy.batch_size
+                    samples["obs"],
+                    samples["ret"])
+            # np.random.shuffle(idxes)
+            # for i in range(int(self._policy.horizon / self._policy.batch_size)):
+            #     idx = i * self._policy.batch_size
+            #     # Train Actor
+            #     self._policy.train_actor(
+            #         samples["obs"][idx:idx+self._policy.batch_size],
+            #         samples["act"][idx:idx+self._policy.batch_size],
+            #         samples["adv"][idx:idx+self._policy.batch_size],
+            #         samples["logp"][idx:idx+self._policy.batch_size])
+            #     # Train Critic
+            #     self._policy.train_critic(
+            #         samples["obs"][idx:idx+self._policy.batch_size],
+            #         samples["ret"][idx:idx+self._policy.batch_size])
+            #     idx += self._policy.batch_size
             if total_steps > test_step_threshold == 0:
                 test_step_threshold += self._test_interval
                 avg_test_return = self.evaluate_policy(total_steps)
@@ -86,6 +107,26 @@ class OnPolicyTrainer(Trainer):
                 self.checkpoint_manager.save()
 
         tf.summary.flush()
+
+    def finite_horizon(self, last_val=0):
+        """Compute rewards to go and GAE-Lambda advantage
+        """
+        samples = self.local_buffer._encode_sample(
+            np.arange(self.local_buffer.get_stored_size()))
+        rews = np.append(samples["rew"], last_val)
+        vals = np.append(samples["val"], last_val)
+
+        # GAE-Lambda advantage calculation
+        deltas = rews[:-1] + self._policy.discount * vals[1:] - vals[:-1]
+        advs = discount_cumsum(
+            deltas, self._policy.discount * self._policy.lam)
+
+        # Rewards-to-go, to be targets for the value function
+        rets = discount_cumsum(rews, self._policy.discount)[:-1]
+        self.replay_buffer.add(
+            obs=samples["obs"], act=samples["act"], done=samples["done"],
+            ret=rets, adv=advs, logp=np.squeeze(samples["logp"]))
+        self.local_buffer.clear()
 
     def evaluate_policy(self, total_steps):
         avg_test_return = 0.

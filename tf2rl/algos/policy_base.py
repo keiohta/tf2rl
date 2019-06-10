@@ -42,8 +42,10 @@ class OnPolicyAgent(Policy):
     def __init__(
             self,
             horizon=2048,
+            lam=0.95,
             **kwargs):
         self.horizon = horizon
+        self.lam = lam
         kwargs["n_warmup"] = 0
         kwargs["memory_capacity"] = self.horizon
         super().__init__(**kwargs)
