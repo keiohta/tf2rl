@@ -31,7 +31,7 @@ class TestContinuousVPG(CommonDiscreteOutputAlgos, CommonActorCritic):
         cls.agent = VPG(
             state_shape=cls.continuous_env.observation_space.shape,
             action_dim=cls.continuous_env.action_space.low.size,
-            is_discrete=True,
+            is_discrete=False,
             gpu=-1)
 
     def test_get_action(self):

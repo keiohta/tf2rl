@@ -61,26 +61,26 @@ class VPG(OnPolicyAgent):
         single_input = state.ndim == 1
         if single_input:
             state = np.expand_dims(state, axis=0).astype(np.float32)
-        action, log_pi = self._get_action_body(tf.constant(state), test)
+        action, log_pi = self._get_action_body(state, test)
 
         if single_input:
-            return action[0], log_pi[0]
+            return action[0], log_pi
         else:
             return action, log_pi
 
     @tf.function
     def _get_action_body(self, state, test):
-        self.actor(state, test)
+        return self.actor(state, test)
 
     def train_actor(self, states, actions, next_states, rewards, dones, log_pis):
-        loss = self._train_actor_body(states, actions, next_states, rewards, dones, log_pis)
-        tf.summary.scalar(name=self.policy_name+"/actor_loss", data=loss)
-        return loss
+        actor_loss = self._train_actor_body(states, actions, next_states, rewards, dones, log_pis)
+        tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
+        return actor_loss
 
     def train_critic(self, states, actions, next_states, rewards, dones):
-        loss = self._train_critic_body(states, actions, next_states, rewards, dones)
-        tf.summary.scalar(name=self.policy_name+"/critic_loss", data=loss)
-        return loss
+        critic_loss = self._train_critic_body(states, actions, next_states, rewards, dones)
+        tf.summary.scalar(name=self.policy_name+"/critic_loss", data=critic_loss)
+        return critic_loss
 
     @tf.function
     def _train_actor_body(self, states, actions, next_states, rewards, dones, log_pis):
