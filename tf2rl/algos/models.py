@@ -63,10 +63,10 @@ class GaussianActor(tf.keras.Model):
 
     def compute_log_probs(self, states, actions):
         dist = self._compute_dist(states)
-        log_pis = dist.log_prob(actions)
+        log_pis = dist.log_prob(actions / self._max_action)
         # TODO: This is correct?
-        # diff = tf.reduce_sum(tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
-        # log_pis -= diff
+        diff = tf.reduce_sum(tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
+        log_pis -= diff
         return log_pis
 
 
