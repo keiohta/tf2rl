@@ -2,7 +2,7 @@ import gym
 
 from tf2rl.algos.vpg import VPG
 from tf2rl.experiments.on_policy_trainer import OnPolicyTrainer
-from tf2rl.envs.utils import is_discrete
+from tf2rl.envs.utils import is_discrete, get_act_dim
 
 
 if __name__ == '__main__':
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     test_env = gym.make(args.env_name)
     policy = VPG(
         state_shape=env.observation_space.shape,
-        action_dim=env.action_space.low.size,
+        action_dim=get_act_dim(env.action_space),
         is_discrete=is_discrete(env.action_space),
         batch_size=args.batch_size,
         discount=0.9,

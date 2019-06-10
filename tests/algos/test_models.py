@@ -17,6 +17,11 @@ class CommonModel(CommonAlgos):
         self.assertEqual(actions.shape, expected_action_shapes)
         self.assertEqual(log_probs.shape, expected_log_prob_shapes)
 
+    def _test_compute_log_probs(self, states, actions, expected_shapes):
+        log_probs = self.policy(states, actions)
+        print(log_probs.shape)
+        self.assertEqual(log_probs.shape, expected_shapes)
+
 
 class TestGaussianActor(CommonModel):
     @classmethod
@@ -44,6 +49,22 @@ class TestGaussianActor(CommonModel):
             (self.batch_size, self.continuous_env.action_space.low.size),
             (self.batch_size,))
 
+    def test_compute_log_probs(self):
+        # Single input
+        state = np.random.rand(
+            1, self.continuous_env.observation_space.low.size)
+        action = np.random.rand(
+            1, self.continuous_env.action_space.low.size)
+        self._test_compute_log_probs(
+            state, action, (1, self.continuous_env.action_space.low.size))
+        # Multiple inputs
+        states = np.random.rand(
+            self.batch_size, self.continuous_env.observation_space.low.size)
+        action = np.random.rand(
+            self.batch_size, self.continuous_env.action_space.low.size)
+        self._test_compute_log_probs(
+            states, actions, (self.batch_size, self.continuous_env.action_space.low.size))
+
 
 class TestCategoricalActor(CommonModel):
     @classmethod
@@ -62,7 +83,24 @@ class TestCategoricalActor(CommonModel):
         # Multiple inputs
         states = np.random.rand(
             self.batch_size, self.discrete_env.observation_space.low.size)
-        self._test_call(states, (self.batch_size,), (self.batch_size,))
+        self._test_call(
+            states, (self.batch_size,), (self.batch_size,))
+
+    def test_compute_log_probs(self):
+        # Single input
+        state = np.random.rand(
+            1, self.discrete_env.observation_space.low.size)
+        action = np.random.rand(
+            1, self.discrete_env.action_space.n)
+        self._test_compute_log_probs(
+            state, action, (1, self.discrete_env.action_space.n))
+        # Multiple inputs
+        states = np.random.rand(
+            self.batch_size, self.discrete_env.observation_space.low.size)
+        actions = np.random.rand(
+            self.batch_size, self.discrete_env.action_space.n)
+        self._test_compute_log_probs(
+            states, actions, (self.batch_size, self.discrete_env.action_space.n))
 
 
 if __name__ == '__main__':

@@ -77,7 +77,7 @@ class VPG(OnPolicyAgent):
         val = self.critic(state)
         if single_input:
             val = val[0]
-        return action, log_pi, val
+        return action.numpy(), log_pi.numpy(), val.numpy()
 
     @tf.function
     def _get_action_body(self, state, test):
@@ -89,8 +89,11 @@ class VPG(OnPolicyAgent):
         return actor_loss
 
     def train_critic(self, states, returns):
-        critic_loss = self._train_critic_body(states, returns)
+        critic_loss, log_probs = self._train_critic_body(states, returns)
         tf.summary.scalar(name=self.policy_name+"/critic_loss", data=critic_loss)
+        tf.summary.scalar(name=self.policy_name+"/logp_max", data=np.max(log_probs))
+        tf.summary.scalar(name=self.policy_name+"/logp_min", data=np.min(log_probs))
+        tf.summary.scalar(name=self.policy_name+"/logp_ave", data=np.mean(log_probs))
         return critic_loss
 
     @tf.function
@@ -99,7 +102,7 @@ class VPG(OnPolicyAgent):
             # Train policy
             with tf.GradientTape() as tape:
                 log_probs = self.actor.compute_log_probs(states, actions)
-                log_likelihood_ratio = log_probs - log_pis
+                log_likelihood_ratio = log_probs - log_pis if self._is_discrete else log_probs
                 actor_loss = tf.reduce_mean(
                     -log_likelihood_ratio * advantages)  # + lambda * entropy
 
@@ -108,10 +111,7 @@ class VPG(OnPolicyAgent):
             self.actor_optimizer.apply_gradients(
                 zip(actor_grad, self.actor.trainable_variables))
 
-            if self._is_discrete:
-                raise NotImplementedError
-            else:
-                return actor_loss
+            return actor_loss, log_probs
 
     @tf.function
     def _train_critic_body(self, states, returns):

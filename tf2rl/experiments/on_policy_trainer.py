@@ -62,12 +62,9 @@ class OnPolicyTrainer(Trainer):
 
             self.finite_horizon(last_val=val)
             tf.summary.experimental.set_step(total_steps)
-            idxes = np.arange(self._policy.horizon)
             samples = self.replay_buffer.sample(self._policy.horizon)
             # Normalize advantages
-            adv_mean = np.mean(samples["adv"])
-            adv_std = np.std(samples["adv"])
-            adv = (samples["adv"] - adv_mean) / adv_std
+            adv = (samples["adv"] - np.mean(samples["adv"])) / np.std(samples["adv"])
             for _ in range(50):
                 self._policy.train_actor(
                     samples["obs"],
@@ -79,6 +76,7 @@ class OnPolicyTrainer(Trainer):
                 self._policy.train_critic(
                     samples["obs"],
                     samples["ret"])
+            # idxes = np.arange(self._policy.horizon)
             # np.random.shuffle(idxes)
             # for i in range(int(self._policy.horizon / self._policy.batch_size)):
             #     idx = i * self._policy.batch_size

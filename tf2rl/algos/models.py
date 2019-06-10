@@ -37,7 +37,8 @@ class GaussianActor(tf.keras.Model):
 
         mu = self.out_mean(features)
         log_sigma = self.out_sigma(features)
-        log_sigma = tf.clip_by_value(log_sigma, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
+        log_sigma = tf.clip_by_value(
+            log_sigma, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
 
         return tfp.distributions.MultivariateNormalDiag(
             loc=mu, scale_diag=tf.exp(log_sigma))
@@ -113,3 +114,8 @@ class CategoricalActor(tf.keras.Model):
         log_prob = dist.log_prob(action)
 
         return action, log_prob
+
+    def compute_log_probs(self, states, actions):
+        dist = self._compute_dist(states)
+        log_pis = dist.log_prob(actions)
+        return log_pis
