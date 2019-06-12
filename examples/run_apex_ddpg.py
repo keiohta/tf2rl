@@ -34,9 +34,12 @@ if __name__ == '__main__':
             memory_capacity=memory_capacity)
 
     def get_weights_fn(policy):
-        return [policy.actor.weights,
-                policy.critic.weights,
-                policy.critic_target.weights]
+        # TODO: Check if following needed
+        import tensorflow as tf
+        with tf.device(policy.device):
+            return [policy.actor.weights,
+                    policy.critic.weights,
+                    policy.critic_target.weights]
 
     def set_weights_fn(policy, weights):
         actor_weights, critic_weights, critic_target_weights = weights

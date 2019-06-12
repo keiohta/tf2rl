@@ -7,13 +7,28 @@ import multiprocessing
 from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
 
-import tensorflow as tf
 
 from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_default_rb_dict
+
+
+def import_tf():
+    import tensorflow as tf
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            # Currently, memory growth needs to be the same across GPUs
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+            print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+        except RuntimeError as e:
+            # Memory growth must be set before GPUs have been initialized
+            print(e)
+    return tf
 
 
 def explorer(global_rb, queue, trained_steps, is_training_done,
@@ -44,6 +59,8 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
         episode_max_steps:
             Maximum number of steps of an episode.
     """
+    import_tf()
+
     if n_env > 1:
         envs = MultiThreadEnv(
             env_fn=env_fn, batch_size=n_env, thread_pool=n_thread,
@@ -53,7 +70,8 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
         env = env_fn()
 
     policy = policy_fn(
-        env=env, name="Explorer", memory_capacity=global_rb.get_buffer_size(),
+        env=env, name="Explorer",
+        memory_capacity=global_rb.get_buffer_size(),
         noise_level=noise_level, gpu=gpu)
 
     kwargs = get_default_rb_dict(buffer_size, env)
@@ -167,6 +185,8 @@ def learner(global_rb, trained_steps, is_training_done,
         queues:
             FIFOs shared with explorers to send latest network parameters.
     """
+    tf = import_tf()
+
     policy = policy_fn(env, "Learner", global_rb.get_buffer_size(), gpu=gpu)
 
     output_dir = prepare_output_dir(
@@ -175,7 +195,7 @@ def learner(global_rb, trained_steps, is_training_done,
     writer.set_as_default()
 
     # Wait until explorers collect transitions
-    while not is_training_done.is_set() and global_rb.get_stored_size() == 0:
+    while not is_training_done.is_set() and global_rb.get_stored_size() < policy.n_warmup:
         continue
 
     start_time = time.time()
@@ -198,8 +218,8 @@ def learner(global_rb, trained_steps, is_training_done,
             for i in range(len(queues) - 1):
                 queues[i].put(weights)
             fps = update_freq / (time.time() - start_time)
-            tf.summary.scalar(name="FPS", data=fps, description="loss")
-            logging.info("Update weights for explorer. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
+            tf.summary.scalar(name="apex/fps", data=fps)
+            logging.info("Update weights. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
                 fps, trained_steps.value))
             start_time = time.time()
 
@@ -249,6 +269,8 @@ def apex_argument(parser=None):
 def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
               save_model_interval=int(1e6), n_evaluation=10, episode_max_steps=1000,
               show_test_progress=False):
+    tf = import_tf()
+
     output_dir = prepare_output_dir(
         args=None, user_specified_dir="./results", suffix="evaluator")
     writer = tf.summary.create_file_writer(
@@ -272,7 +294,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
             trained_steps = queue.get()
             tf.summary.experimental.set_step(trained_steps)
             avg_test_return = 0.
-            for i in range(n_evaluation):
+            for _ in range(n_evaluation):
                 n_evaluated_episode += 1
                 episode_return = 0.
                 obs = env.reset()
@@ -293,8 +315,8 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
             avg_test_return /= n_evaluated_episode
             logging.info("Evaluation: {} over {} run".format(
                 avg_test_return, n_evaluated_episode))
-            tf.summary.scalar(name="AverageTestReturn",
-                                data=avg_test_return, description="loss")
+            tf.summary.scalar(
+                name="apex/average_test_return", data=avg_test_return)
             writer.flush()
             if trained_steps > model_save_threshold:
                 model_save_threshold += save_model_interval
