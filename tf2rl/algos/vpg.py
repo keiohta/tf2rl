@@ -2,10 +2,10 @@ import numpy as np
 
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
-import tensorflow_probability as tfp
 
 from tf2rl.algos.policy_base import OnPolicyAgent
-from tf2rl.algos.models import CategoricalActor, GaussianActor
+from tf2rl.policies.gaussian_actor import GaussianActor
+from tf2rl.policies.categorical_actor import CategoricalActor
 from tf2rl.misc.huber_loss import huber_loss
 
 

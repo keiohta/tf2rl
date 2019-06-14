@@ -1,5 +1,4 @@
 tensorflow==2.0.0b0
-tfp-nightly
 cpprb
 joblib
 gym
