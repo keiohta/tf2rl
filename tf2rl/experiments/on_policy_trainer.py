@@ -49,7 +49,7 @@ class OnPolicyTrainer(Trainer):
                 obs = next_obs
 
                 if done or episode_steps == self._episode_max_steps:
-                    self.finite_horizon()
+                    self.finish_horizon()
                     obs = self._env.reset()
                     n_episode += 1
                     fps = episode_steps / (time.time() - episode_start_time)
@@ -60,7 +60,7 @@ class OnPolicyTrainer(Trainer):
                     episode_return = 0
                     episode_start_time = time.time()
 
-            self.finite_horizon(last_val=val)
+            self.finish_horizon(last_val=val)
             tf.summary.experimental.set_step(total_steps)
             samples = self.replay_buffer.sample(self._policy.horizon)
             # Normalize advantages
@@ -106,7 +106,7 @@ class OnPolicyTrainer(Trainer):
 
         tf.summary.flush()
 
-    def finite_horizon(self, last_val=0):
+    def finish_horizon(self, last_val=0):
         """Compute rewards to go and GAE-Lambda advantage
         """
         samples = self.local_buffer._encode_sample(
