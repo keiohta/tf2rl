@@ -203,14 +203,14 @@ class DQN(OffPolicyAgent):
                     td_errors = self._compute_td_error_body_distributional(
                         states, actions, next_states, rewards, done)
                     q_func_loss = tf.reduce_mean(
-                        huber_loss(diff=tf.negative(td_errors),
-                                   max_grad=self.max_grad) * weights)
+                        huber_loss(tf.negative(td_errors),
+                                   delta=self.max_grad) * weights)
                 else:
                     td_errors = self._compute_td_error_body(
                         states, actions, next_states, rewards, done)
                     q_func_loss = tf.reduce_mean(
-                        huber_loss(diff=td_errors,
-                                   max_grad=self.max_grad) * weights)
+                        huber_loss(td_errors,
+                                   delta=self.max_grad) * weights)
 
             q_func_grad = tape.gradient(q_func_loss, self.q_func.trainable_variables)
             self.q_func_optimizer.apply_gradients(zip(q_func_grad, self.q_func.trainable_variables))

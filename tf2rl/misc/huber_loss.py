@@ -2,25 +2,25 @@ import numpy as np
 import tensorflow as tf
 
 
-def huber_loss(y_target=None, y_pred=None, diff=None, max_grad=1.):
-    """Calculate the huber loss.
+def huber_loss(x, delta=1.):
+    """Compute the huber loss.
+    https://en.wikipedia.org/wiki/Huber_loss
+
     Args:
-    y_true: np.array, tf.Tensor
-        Target value.
-    y_pred: np.array, tf.Tensor
-        Predicted value.
-    max_grad: float, optional
+    x: np.array or tf.Tensor
+        Values to compute the huber loss.
+    delta: float, optional
         Positive floating point value. Represents the maximum possible
         gradient magnitude.
+
     Returns:
         tf.Tensor
         The huber loss.
     """
-    if diff is None:
-        diff = tf.abs(y_target - y_pred)
-    less_than_max = 0.5 * tf.square(diff)
-    greater_than_max = max_grad * (diff - 0.5 * max_grad)
+    delta = tf.ones_like(x) * delta
+    less_than_max = 0.5 * tf.square(x)
+    greater_than_max = delta * (tf.abs(x) - 0.5 * delta)
     return tf.where(
-        diff <= max_grad,
+        tf.abs(x) <= delta,
         x=less_than_max,
         y=greater_than_max)

@@ -73,8 +73,8 @@ class TD3(DDPG):
             with tf.GradientTape() as tape:
                 td_error1, td_error2 = self._compute_td_error_body(
                     states, actions, next_states, rewards, done)
-                critic_loss = tf.reduce_mean(huber_loss(diff=td_error1, max_grad=self.max_grad) * weights) + \
-                              tf.reduce_mean(huber_loss(diff=td_error2, max_grad=self.max_grad) * weights)
+                critic_loss = tf.reduce_mean(huber_loss(td_error1, delta=self.max_grad) * weights) + \
+                              tf.reduce_mean(huber_loss(td_error2, delta=self.max_grad) * weights)
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))

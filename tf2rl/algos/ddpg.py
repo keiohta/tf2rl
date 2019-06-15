@@ -122,7 +122,7 @@ class DDPG(OffPolicyAgent):
                 td_errors = self._compute_td_error_body(
                     states, actions, next_states, rewards, done)
                 critic_loss = tf.reduce_mean(
-                    huber_loss(diff=td_errors, max_grad=self.max_grad) * weights)
+                    huber_loss(td_errors, delta=self.max_grad) * weights)
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
