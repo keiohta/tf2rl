@@ -10,9 +10,9 @@ if __name__ == '__main__':
     parser = VPG.get_argument(parser)
     parser.add_argument('--env-name', type=str,
                         default="Pendulum-v0")
-    parser.set_defaults(test_interval=2000)
-    parser.set_defaults(max_steps=int(1e6))
-    parser.set_defaults(batch_size=32)
+    parser.set_defaults(test_interval=50000)
+    parser.set_defaults(max_steps=int(1e7))
+    parser.set_defaults(batch_size=64)
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
         batch_size=args.batch_size,
         actor_units=[32, 32],
         critic_units=[32, 32],
-        discount=0.9,
+        discount=0.99,
         gpu=args.gpu)
     trainer = OnPolicyTrainer(policy, env, args, test_env=test_env)
     trainer()

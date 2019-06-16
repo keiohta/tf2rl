@@ -19,16 +19,20 @@ class Categorical(Distribution):
 
     def log_likelihood(self, x, param):
         """Compute log likelihood as:
-            TODO: write equation
+            \log \sum(p_i * x_i)
+
+        Args:
+            x: Values to compute log likelihood
+            param: Dictionary that contains probabilities of outputs
         """
         probs = param["prob"]
-        return tf.math.log(tf.reduce_sum(probs * x) + self._tiny)
+        return tf.math.log(tf.reduce_sum(probs * x, axis=1) + self._tiny)
 
     def sample(self, param):
         probs = param["prob"]
         # NOTE: input to `tf.random.categorical` is log probabilities
         # For more details, see https://www.tensorflow.org/versions/r2.0/api_docs/python/tf/random/categorical
-        return tf.random.categorical(tf.math.log(probs), 1)
+        return tf.random.categorical(tf.math.log(probs), 1)  # [probs.shape[0], 1]
 
     def entropy(self, param):
         probs = param["prob"]

@@ -43,9 +43,9 @@ class CategoricalActor(tf.keras.Model):
         """
         param = self._compute_dist(states)
         if test:
-            action = tf.math.argmax(param["prob"], axis=1)
+            action = tf.math.argmax(param["prob"], axis=1)  # (size,)
         else:
-            action = self.dist.sample(param)
+            action = tf.squeeze(self.dist.sample(param), axis=1)  # (size,)
         log_prob = self.dist.log_likelihood(
             tf.one_hot(indices=action, depth=self.action_dim), param)
 

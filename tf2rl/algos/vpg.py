@@ -84,16 +84,18 @@ class VPG(OnPolicyAgent):
         return self.actor(state, test)
 
     def train_actor(self, states, actions, advantages, log_pis):
-        actor_loss = self._train_actor_body(states, actions, advantages, log_pis)
+        actor_loss, log_probs = self._train_actor_body(states, actions, advantages, log_pis)
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
+        tf.summary.scalar(name=self.policy_name+"/logp_max", data=np.max(log_probs))
+        tf.summary.scalar(name=self.policy_name+"/logp_min", data=np.min(log_probs))
+        tf.summary.scalar(name=self.policy_name+"/logp_mean", data=np.mean(log_probs))
+        tf.summary.scalar(name=self.policy_name+"/adv_max", data=np.max(advantages))
+        tf.summary.scalar(name=self.policy_name+"/adv_min", data=np.min(advantages))
         return actor_loss
 
     def train_critic(self, states, returns):
-        critic_loss, log_probs = self._train_critic_body(states, returns)
+        critic_loss = self._train_critic_body(states, returns)
         tf.summary.scalar(name=self.policy_name+"/critic_loss", data=critic_loss)
-        tf.summary.scalar(name=self.policy_name+"/logp_max", data=np.max(log_probs))
-        tf.summary.scalar(name=self.policy_name+"/logp_min", data=np.min(log_probs))
-        tf.summary.scalar(name=self.policy_name+"/logp_ave", data=np.mean(log_probs))
         return critic_loss
 
     @tf.function
@@ -102,16 +104,14 @@ class VPG(OnPolicyAgent):
             # Train policy
             with tf.GradientTape() as tape:
                 log_probs = self.actor.compute_log_probs(states, actions)
-                log_likelihood_ratio = log_probs - log_pis if self._is_discrete else log_probs
                 actor_loss = tf.reduce_mean(
-                    -log_likelihood_ratio * advantages)  # + lambda * entropy
-
+                    -log_probs * tf.squeeze(advantages))  # + lambda * entropy
             actor_grad = tape.gradient(
                 actor_loss, self.actor.trainable_variables)
             self.actor_optimizer.apply_gradients(
                 zip(actor_grad, self.actor.trainable_variables))
 
-            return actor_loss, log_probs
+        return actor_loss, log_probs
 
     @tf.function
     def _train_critic_body(self, states, returns):
