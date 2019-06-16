@@ -29,8 +29,6 @@ class TestHuberLoss(unittest.TestCase):
             np.array([0.5, 1.5]),
             loss.numpy())
 
-        
-
 
 if __name__ == '__main__':
     unittest.main()

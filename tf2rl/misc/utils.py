@@ -15,7 +15,7 @@ def discount_cumsum(x, discount):
          x2]
     """
     return lfilter(
-        [1],
-        [1, float(-discount)],
-        x[::-1],
+        b=[1],
+        a=[1, float(-discount)],
+        x=x[::-1],
         axis=0)[::-1]
