@@ -6,19 +6,23 @@ from tf2rl.distributions.diagonal_gaussian import DiagonalGaussian
 
 
 class GaussianActor(tf.keras.Model):
-    LOG_SIG_CAP_MAX = 2
-    LOG_SIG_CAP_MIN = -20
+    LOG_SIG_CAP_MAX = 2  # np.e**2 = 7.389
+    LOG_SIG_CAP_MIN = -20  # np.e**-10 = 4.540e-05
     EPS = 1e-6
 
     def __init__(self, state_shape, action_dim, max_action,
-                 units=[256, 256], name='GaussianPolicy'):
+                 units=[256, 256], fix_std=False,
+                 const_std=0.1, name='GaussianPolicy'):
         super().__init__(name=name)
         self.dist = DiagonalGaussian(dim=action_dim)
+        self.fix_std = fix_std
+        self.const_std = const_std
 
         self.l1 = Dense(units[0], name="L1", activation='relu')
         self.l2 = Dense(units[1], name="L2", activation='relu')
         self.out_mean = Dense(action_dim, name="L_mean")
-        self.out_log_sigma = Dense(action_dim, name="L_sigma")
+        if not self.fix_std:
+            self.out_log_std = Dense(action_dim, name="L_sigma")
 
         self._max_action = max_action
 
@@ -38,11 +42,14 @@ class GaussianActor(tf.keras.Model):
         features = self.l2(features)
 
         mean = self.out_mean(features)
-        log_sigma = self.out_log_sigma(features)
-        log_sigma = tf.clip_by_value(
-            log_sigma, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
+        if self.fix_std:
+            log_std = tf.ones_like(mean) * tf.math.log(self.const_std)
+        else:
+            log_std = self.out_log_std(features)
+        log_std = tf.clip_by_value(
+            log_std, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
 
-        return {"mean":mean, "log_std":log_sigma}
+        return {"mean":mean, "log_std":log_std}
 
     def call(self, states, test=False):
         """Compute actions and log probabilities of the selected action
