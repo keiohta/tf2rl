@@ -1,3 +1,4 @@
+import os
 import time
 import numpy as np
 import tensorflow as tf
@@ -139,7 +140,7 @@ class OnPolicyTrainer(Trainer):
             obs = self._test_env.reset()
             done = False
             for _ in range(self._episode_max_steps):
-                action, log_pi = self._policy.get_action(obs, test=True)
+                action, _ = self._policy.get_action(obs, test=True)
                 next_obs, reward, done, _ = self._test_env.step(action)
                 if self._save_test_path:
                     replay_buffer.add(

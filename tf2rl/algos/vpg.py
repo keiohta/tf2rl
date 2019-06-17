@@ -67,20 +67,21 @@ class VPG(OnPolicyAgent):
         action, logp_pi = self._get_action_body(state, test)
 
         if single_input:
-            return action[0], logp_pi
+            return action[0].numpy(), logp_pi.numpy()
         else:
-            return action, logp_pi
+            return action.numpy(), logp_pi.numpy()
 
     def get_action_and_val(self, state, test=False):
-        action, logp_pi = self.get_action(state, test)
-        # TODO: clean code
         single_input = state.ndim == 1
         if single_input:
             state = np.expand_dims(state, axis=0).astype(np.float32)
+        action, logp_pi = self.get_action(state, test)
         val = self.critic(state)
         if single_input:
             val = val[0]
-        return action.numpy(), logp_pi.numpy(), val.numpy()
+            action = action[0]
+            logp_pi = logp_pi
+        return action, logp_pi, val.numpy()
 
     @tf.function
     def _get_action_body(self, state, test):
@@ -125,7 +126,7 @@ class VPG(OnPolicyAgent):
                 current_V = self.critic(states)
                 td_errors = returns - current_V
                 critic_loss = tf.reduce_mean(
-                    huber_loss(diff=td_errors, max_grad=self.max_grad))
+                    huber_loss(td_errors, delta=self.max_grad))
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(
                 zip(critic_grad, self.critic.trainable_variables))
