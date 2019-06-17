@@ -27,6 +27,8 @@ if __name__ == '__main__':
         critic_units=[32, 32],
         discount=0.9,
         fix_std=True,
+        normalize_adv=False,
+        enable_gae=False,
         gpu=args.gpu)
     trainer = OnPolicyTrainer(policy, env, args, test_env=test_env)
     trainer()

@@ -43,9 +43,13 @@ class OnPolicyAgent(Policy):
             self,
             horizon=2048,
             lam=0.95,
+            enable_gae=True,
+            normalize_adv=True,
             **kwargs):
         self.horizon = horizon
         self.lam = lam
+        self.enable_gae = enable_gae
+        self.normalize_adv = normalize_adv
         kwargs["n_warmup"] = 0
         kwargs["memory_capacity"] = self.horizon
         super().__init__(**kwargs)

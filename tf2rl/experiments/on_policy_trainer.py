@@ -64,33 +64,21 @@ class OnPolicyTrainer(Trainer):
             tf.summary.experimental.set_step(total_steps)
             samples = self.replay_buffer.sample(self._policy.horizon)
             # Normalize advantages
-            adv = (samples["adv"] - np.mean(samples["adv"])) / np.std(samples["adv"])
-            for _ in range(50):
+            if self._policy.normalize_adv:
+                adv = (samples["adv"] - np.mean(samples["adv"])) / np.std(samples["adv"])
+            else:
+                adv = samples["adv"]
+            for _ in range(1):
                 self._policy.train_actor(
                     samples["obs"],
                     samples["act"],
                     adv,
                     samples["logp"])
             # Train Critic
-            for _ in range(50):
+            for _ in range(80):
                 self._policy.train_critic(
                     samples["obs"],
                     samples["ret"])
-            # idxes = np.arange(self._policy.horizon)
-            # np.random.shuffle(idxes)
-            # for i in range(int(self._policy.horizon / self._policy.batch_size)):
-            #     idx = i * self._policy.batch_size
-            #     # Train Actor
-            #     self._policy.train_actor(
-            #         samples["obs"][idx:idx+self._policy.batch_size],
-            #         samples["act"][idx:idx+self._policy.batch_size],
-            #         samples["adv"][idx:idx+self._policy.batch_size],
-            #         samples["logp"][idx:idx+self._policy.batch_size])
-            #     # Train Critic
-            #     self._policy.train_critic(
-            #         samples["obs"][idx:idx+self._policy.batch_size],
-            #         samples["ret"][idx:idx+self._policy.batch_size])
-            #     idx += self._policy.batch_size
             if total_steps > test_step_threshold:
                 test_step_threshold += self._test_interval
                 avg_test_return = self.evaluate_policy(total_steps)
@@ -107,7 +95,18 @@ class OnPolicyTrainer(Trainer):
         tf.summary.flush()
 
     def finish_horizon(self, last_val=0):
-        """Compute rewards to go and GAE-Lambda advantage
+        """
+        Call this at the end of a trajectory, or when one gets cut off
+        by an epoch ending. This looks back in the buffer to where the
+        trajectory started, and uses rewards and value estimates from
+        the whole trajectory to compute advantage estimates with GAE-Lambda,
+        as well as compute the rewards-to-go for each state, to use as
+        the targets for the value function.
+        The "last_val" argument should be 0 if the trajectory ended
+        because the agent reached a terminal state (died), and otherwise
+        should be V(s_T), the value function estimated for the last state.
+        This allows us to bootstrap the reward-to-go calculation to account
+        for timesteps beyond the arbitrary episode horizon (or epoch cutoff).
         """
         samples = self.local_buffer._encode_sample(
             np.arange(self.local_buffer.get_stored_size()))
