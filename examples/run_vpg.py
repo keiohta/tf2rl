@@ -25,7 +25,8 @@ if __name__ == '__main__':
         batch_size=args.batch_size,
         actor_units=[32, 32],
         critic_units=[32, 32],
-        discount=0.99,
+        discount=0.9,
+        fix_std=True,
         gpu=args.gpu)
     trainer = OnPolicyTrainer(policy, env, args, test_env=test_env)
     trainer()

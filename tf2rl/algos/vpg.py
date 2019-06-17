@@ -38,8 +38,10 @@ class VPG(OnPolicyAgent):
             max_action=1.,
             actor_units=[256, 256],
             critic_units=[256, 256],
-            lr_actor=3e-4,
+            lr_actor=1e-4,
             lr_critic=3e-4,
+            fix_std=False,
+            const_std=0.1,
             name="VPG",
             **kwargs):
         super().__init__(name=name, **kwargs)
@@ -49,7 +51,8 @@ class VPG(OnPolicyAgent):
                 state_shape, action_dim, actor_units)
         else:
             self.actor = GaussianActor(
-                state_shape, action_dim, max_action, actor_units)
+                state_shape, action_dim, max_action, actor_units,
+                fix_std=fix_std, const_std=const_std)
         self.critic = CriticV(state_shape, critic_units)
         self._action_dim = action_dim
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_actor)
