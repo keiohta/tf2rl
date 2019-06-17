@@ -115,8 +115,11 @@ class OnPolicyTrainer(Trainer):
 
         # GAE-Lambda advantage calculation
         deltas = rews[:-1] + self._policy.discount * vals[1:] - vals[:-1]
-        advs = discount_cumsum(
-            deltas, self._policy.discount * self._policy.lam)
+        if self._policy.enable_gae:
+            advs = discount_cumsum(
+                deltas, self._policy.discount * self._policy.lam)
+        else:
+            advs = deltas
 
         # Rewards-to-go, to be targets for the value function
         rets = discount_cumsum(rews, self._policy.discount)[:-1]

@@ -43,15 +43,15 @@ class DiagonalGaussian(Distribution):
         means = param["mean"]
         log_stds = param["log_std"]
         zs = (x - means) / tf.exp(log_stds)
-        return - tf.reduce_sum(log_stds, axis=-1) - \
-               0.5 * tf.reduce_sum(tf.square(zs), axis=-1) - \
-               0.5 * self.dim * tf.math.log(2 * np.pi)
+        return - tf.reduce_sum(log_stds, axis=-1) \
+               - 0.5 * tf.reduce_sum(tf.square(zs), axis=-1) \
+               - 0.5 * self.dim * tf.math.log(2 * np.pi)
 
     def sample(self, param):
         means = param["mean"]
         log_stds = param["log_std"]
-        rnd = tf.random.normal(shape=means.shape)
-        return means + rnd * tf.math.exp(log_stds)
+        # reparameterization
+        return means + tf.random.normal(shape=means.shape) * tf.math.exp(log_stds)
 
     def entropy(self, param):
         log_stds = param["log_std"]

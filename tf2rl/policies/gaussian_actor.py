@@ -59,22 +59,22 @@ class GaussianActor(tf.keras.Model):
             raw_actions = param["mean"]
         else:
             raw_actions = self.dist.sample(param)
-        log_pis = self.dist.log_likelihood(raw_actions, param)
+        logp_pis = self.dist.log_likelihood(raw_actions, param)
 
         actions = tf.tanh(raw_actions) * self._max_action
 
         # for variable replacement
         diff = tf.reduce_sum(
             tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
-        log_pis -= diff
+        logp_pis -= diff
 
-        return actions, log_pis
+        return actions, logp_pis
 
     def compute_log_probs(self, states, actions):
         param = self._compute_dist(states)
         log_pis = self.dist.log_likelihood(actions, param)
         # TODO: This is correct?
-        diff = tf.reduce_sum(
-            tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
-        log_pis -= diff
+        # diff = tf.reduce_sum(
+        #     tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
+        # log_pis -= diff
         return log_pis

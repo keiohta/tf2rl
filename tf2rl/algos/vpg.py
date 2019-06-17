@@ -64,15 +64,15 @@ class VPG(OnPolicyAgent):
         single_input = state.ndim == 1
         if single_input:
             state = np.expand_dims(state, axis=0).astype(np.float32)
-        action, log_pi = self._get_action_body(state, test)
+        action, logp_pi = self._get_action_body(state, test)
 
         if single_input:
-            return action[0], log_pi
+            return action[0], logp_pi
         else:
-            return action, log_pi
+            return action, logp_pi
 
     def get_action_and_val(self, state, test=False):
-        action, log_pi = self.get_action(state, test)
+        action, logp_pi = self.get_action(state, test)
         # TODO: clean code
         single_input = state.ndim == 1
         if single_input:
@@ -80,20 +80,21 @@ class VPG(OnPolicyAgent):
         val = self.critic(state)
         if single_input:
             val = val[0]
-        return action.numpy(), log_pi.numpy(), val.numpy()
+        return action.numpy(), logp_pi.numpy(), val.numpy()
 
     @tf.function
     def _get_action_body(self, state, test):
         return self.actor(state, test)
 
-    def train_actor(self, states, actions, advantages, log_pis):
-        actor_loss, log_probs = self._train_actor_body(states, actions, advantages, log_pis)
+    def train_actor(self, states, actions, advantages, logp_olds):
+        actor_loss, log_probs = self._train_actor_body(states, actions, advantages)
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
         tf.summary.scalar(name=self.policy_name+"/logp_max", data=np.max(log_probs))
         tf.summary.scalar(name=self.policy_name+"/logp_min", data=np.min(log_probs))
         tf.summary.scalar(name=self.policy_name+"/logp_mean", data=np.mean(log_probs))
         tf.summary.scalar(name=self.policy_name+"/adv_max", data=np.max(advantages))
         tf.summary.scalar(name=self.policy_name+"/adv_min", data=np.min(advantages))
+        # TODO: Compute KL divergence and output it 
         return actor_loss
 
     def train_critic(self, states, returns):
@@ -102,7 +103,7 @@ class VPG(OnPolicyAgent):
         return critic_loss
 
     @tf.function
-    def _train_actor_body(self, states, actions, advantages, log_pis):
+    def _train_actor_body(self, states, actions, advantages):
         with tf.device(self.device):
             # Train policy
             with tf.GradientTape() as tape:
