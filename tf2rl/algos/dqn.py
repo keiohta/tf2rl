@@ -145,27 +145,30 @@ class DQN(OffPolicyAgent):
 
         if not test and np.random.rand() < self.epsilon:
             # TODO: Clean code
+            action = [np.random.randint(self._action_dim) for _ in range(state.shape[0])]
             if tensor:
-                action = [np.random.randint(self._action_dim) for _ in range(state.shape[0])]
                 return tf.convert_to_tensor(action)
             else:
-                return np.random.randint(self._action_dim)
+                return action
+
+        is_single_input = not state.shape[0] == self.batch_size
+        state = np.expand_dims(state, axis=0).astype(np.float32) if is_single_input else state
+        if self._enable_categorical_dqn:
+            action = self._get_action_body_distributional(tf.constant(state))
         else:
-            state = np.expand_dims(state, axis=0).astype(np.float32) if not state.shape[0] == self.batch_size else state
-            if self._enable_categorical_dqn:
-                action = self._get_action_body_distributional(tf.constant(state))
-            else:
-                action = self._get_action_body(tf.constant(state))
+            action = self._get_action_body(tf.constant(state))
         if tensor:
             return action
         else:
-            return action.numpy()[0]
+            if is_single_input:
+                return action.numpy()[0]
+            else:
+                return action.numpy()
 
     @tf.function
     def _get_action_body(self, state):
-        action = self.q_func(state)
-        # return action
-        return tf.argmax(action, axis=1)
+        q_values = self.q_func(state)
+        return tf.argmax(q_values, axis=1)
 
     @tf.function
     def _get_action_body_distributional(self, state):

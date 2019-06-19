@@ -3,10 +3,10 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.dqn import DQN
-from tests.algos.common import CommonDiscreteOutputAlgos
+from tests.algos.common import CommonOffPolDiscreteAlgos
 
 
-class TestDQN(CommonDiscreteOutputAlgos):
+class TestDQN(CommonOffPolDiscreteAlgos):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -17,7 +17,7 @@ class TestDQN(CommonDiscreteOutputAlgos):
             gpu=-1)
 
 
-class TestDuelingDoubleDQN(CommonDiscreteOutputAlgos):
+class TestDuelingDoubleDQN(CommonOffPolDiscreteAlgos):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -30,7 +30,7 @@ class TestDuelingDoubleDQN(CommonDiscreteOutputAlgos):
             gpu=-1)
 
 
-class TestNoisyDQN(CommonDiscreteOutputAlgos):
+class TestNoisyDQN(CommonOffPolDiscreteAlgos):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -42,7 +42,7 @@ class TestNoisyDQN(CommonDiscreteOutputAlgos):
             gpu=-1)
 
 
-class TestCategoricalDQN(CommonDiscreteOutputAlgos):
+class TestCategoricalDQN(CommonOffPolDiscreteAlgos):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -55,7 +55,7 @@ class TestCategoricalDQN(CommonDiscreteOutputAlgos):
             gpu=-1)
 
 
-class TestCategoricalDuelingDQN(CommonDiscreteOutputAlgos):
+class TestCategoricalDuelingDQN(CommonOffPolDiscreteAlgos):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

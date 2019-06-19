@@ -67,7 +67,7 @@ class VPG(OnPolicyAgent):
         action, logp_pi = self._get_action_body(state, test)
 
         if single_input:
-            return action[0].numpy(), logp_pi.numpy()
+            return action.numpy()[0], logp_pi.numpy()
         else:
             return action.numpy(), logp_pi.numpy()
 
@@ -80,7 +80,6 @@ class VPG(OnPolicyAgent):
         if single_input:
             val = val[0]
             action = action[0]
-            logp_pi = logp_pi
         return action, logp_pi, val.numpy()
 
     @tf.function
