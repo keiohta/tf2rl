@@ -6,9 +6,10 @@ import tensorflow as tf
 from cpprb.experimental import ReplayBuffer
 
 from tf2rl.experiments.trainer import Trainer
+from tf2rl.experiments.utils import save_path, frames_to_gif
 from tf2rl.misc.get_replay_buffer import get_replay_buffer, get_default_rb_dict
 from tf2rl.misc.utils import discount_cumsum
-from tf2rl.experiments.utils import save_path, frames_to_gif
+from tf2rl.envs.utils import is_discrete
 
 
 class OnPolicyTrainer(Trainer):
@@ -27,6 +28,8 @@ class OnPolicyTrainer(Trainer):
             size=self._episode_max_steps, env=self._env)
         kwargs_local_buf["env_dict"]["logp"] = {}
         kwargs_local_buf["env_dict"]["val"] = {}
+        if is_discrete(self._env.action_space):
+            kwargs_local_buf["env_dict"]["act"]["dtype"] = np.int32
         self.local_buffer = ReplayBuffer(**kwargs_local_buf)
 
         obs = self._env.reset()
@@ -76,7 +79,7 @@ class OnPolicyTrainer(Trainer):
                     adv,
                     samples["logp"])
             # Train Critic
-            for _ in range(80):
+            for _ in range(10):
                 self._policy.train_critic(
                     samples["obs"],
                     samples["ret"])

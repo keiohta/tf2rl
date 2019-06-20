@@ -38,8 +38,8 @@ class VPG(OnPolicyAgent):
             max_action=1.,
             actor_units=[256, 256],
             critic_units=[256, 256],
-            lr_actor=1e-4,
-            lr_critic=3e-4,
+            lr_actor=1e-3,
+            lr_critic=3e-3,
             fix_std=False,
             const_std=0.1,
             name="VPG",
@@ -108,8 +108,8 @@ class VPG(OnPolicyAgent):
             # Train policy
             with tf.GradientTape() as tape:
                 log_probs = self.actor.compute_log_probs(states, actions)
-                actor_loss = tf.reduce_mean(
-                    -log_probs * tf.squeeze(advantages))  # + lambda * entropy
+                weights = tf.stop_gradient(tf.squeeze(advantages))
+                actor_loss = tf.reduce_mean(-log_probs * weights)  # + lambda * entropy
             actor_grad = tape.gradient(
                 actor_loss, self.actor.trainable_variables)
             self.actor_optimizer.apply_gradients(

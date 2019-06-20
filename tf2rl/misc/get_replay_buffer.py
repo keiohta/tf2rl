@@ -10,6 +10,7 @@ from cpprb.experimental import ReplayBuffer
 from cpprb.experimental import PrioritizedReplayBuffer
 
 from tf2rl.algos.policy_base import OffPolicyAgent
+from tf2rl.envs.utils import is_discrete
 
 
 def get_space_size(space):
@@ -57,6 +58,8 @@ def get_replay_buffer(policy, env, use_prioritized_rb=False,
         kwargs["env_dict"]["logp"] = {}
         kwargs["env_dict"]["ret"] = {}
         kwargs["env_dict"]["adv"] = {}
+        if is_discrete(env.action_space):
+            kwargs["env_dict"]["act"]["dtype"] = np.int32
         return ReplayBuffer(**kwargs)
 
     # N-step prioritized

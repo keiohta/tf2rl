@@ -54,6 +54,12 @@ class OnPolicyAgent(Policy):
         kwargs["memory_capacity"] = self.horizon
         super().__init__(**kwargs)
 
+    @staticmethod
+    def get_argument(parser=None):
+        parser = Policy.get_argument(parser)
+        parser.add_argument('--horizon', type=int, default=2048)
+        return parser
+
 
 class OffPolicyAgent(Policy):
     """Base class for off-policy agent

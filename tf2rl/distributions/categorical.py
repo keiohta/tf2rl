@@ -25,6 +25,8 @@ class Categorical(Distribution):
             param: Dictionary that contains probabilities of outputs
         """
         probs = param["prob"]
+        assert probs.shape == x.shape, \
+            "Different shape inputted. You might have forgotten to convert `x` to one-hot vector."
         return tf.math.log(tf.reduce_sum(probs * x, axis=1) + self._tiny)
 
     def sample(self, param):

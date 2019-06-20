@@ -53,7 +53,6 @@ class CategoricalActor(tf.keras.Model):
 
     def compute_log_probs(self, states, actions):
         param = self._compute_dist(states)
-        # TODO: Should be masked out with actions? See spinning up codes:
-        # https://github.com/openai/spinningup/blob/master/spinup/examples/pg_math/1_simple_pg.py#L35
-        log_prob = self.dist.log_likelihood(actions, param)
+        log_prob = self.dist.log_likelihood(
+            tf.one_hot(indices=tf.squeeze(actions), depth=self.action_dim), param)
         return log_prob
