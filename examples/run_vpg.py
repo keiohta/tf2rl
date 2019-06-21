@@ -24,6 +24,7 @@ if __name__ == '__main__':
         state_shape=env.observation_space.shape,
         action_dim=get_act_dim(env.action_space),
         is_discrete=is_discrete(env.action_space),
+        max_action=env.action_space.high[0],
         batch_size=args.batch_size,
         actor_units=[32, 32],
         critic_units=[32, 32],

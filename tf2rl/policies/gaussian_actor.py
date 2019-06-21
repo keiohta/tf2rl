@@ -17,14 +17,13 @@ class GaussianActor(tf.keras.Model):
         self.dist = DiagonalGaussian(dim=action_dim)
         self.fix_std = fix_std
         self.const_std = const_std
+        self._max_action = max_action
 
         self.l1 = Dense(units[0], name="L1", activation='relu')
         self.l2 = Dense(units[1], name="L2", activation='relu')
         self.out_mean = Dense(action_dim, name="L_mean")
         if not self.fix_std:
             self.out_log_std = Dense(action_dim, name="L_sigma")
-
-        self._max_action = max_action
 
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
@@ -40,7 +39,6 @@ class GaussianActor(tf.keras.Model):
         """
         features = self.l1(states)
         features = self.l2(features)
-
         mean = self.out_mean(features)
         if self.fix_std:
             log_std = tf.ones_like(mean) * tf.math.log(self.const_std)
