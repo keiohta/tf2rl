@@ -11,13 +11,14 @@ class GaussianActor(tf.keras.Model):
     EPS = 1e-6
 
     def __init__(self, state_shape, action_dim, max_action,
-                 units=[256, 256], fix_std=False,
+                 units=[256, 256], fix_std=False, reparameterize=False,
                  const_std=0.1, name='GaussianPolicy'):
         super().__init__(name=name)
         self.dist = DiagonalGaussian(dim=action_dim)
         self.fix_std = fix_std
         self.const_std = const_std
         self._max_action = max_action
+        self._reparameterize = reparameterize
 
         self.l1 = Dense(units[0], name="L1", activation='relu')
         self.l2 = Dense(units[1], name="L2", activation='relu')
@@ -61,18 +62,20 @@ class GaussianActor(tf.keras.Model):
 
         actions = tf.tanh(raw_actions) * self._max_action
 
-        # for variable replacement
-        diff = tf.reduce_sum(
-            tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
-        logp_pis -= diff
+        if self._reparameterize:
+            logp_pis = self._do_reparameterize(logp_pis, actions)
 
         return actions, logp_pis
 
     def compute_log_probs(self, states, actions):
         param = self._compute_dist(states)
-        log_pis = self.dist.log_likelihood(actions, param)
-        # TODO: This is correct?
-        # diff = tf.reduce_sum(
-        #     tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
-        # log_pis -= diff
-        return log_pis
+        logp_pis = self.dist.log_likelihood(actions, param)
+        if self._reparameterize:
+            logp_pis = self._do_reparameterize(logp_pis, actions)
+        return logp_pis
+
+    def _do_reparameterize(self, logp_pis, actions):
+        # To avoid evil machine precision error, strictly clip 1-pi**2 to [0,1] range.
+        diff = tf.reduce_sum(
+            tf.math.log(self._max_action ** 2 - actions ** 2 + self.EPS), axis=1)
+        return logp_pis - diff

@@ -52,7 +52,25 @@ class CategoricalActor(tf.keras.Model):
         return action, log_prob
 
     def compute_log_probs(self, states, actions):
+        """Compute log probabilities of inputted actions
+
+        Args:
+            states: Tensors of inputs to NN
+            actions: Tensors of NOT one-hot vector. They will be converted
+                     to one-hot vector inside this function.
+        """
         param = self._compute_dist(states)
+        actions = tf.one_hot(
+            indices=tf.squeeze(actions),
+            depth=self.action_dim)
+        param["prob"] = tf.cond(
+            tf.math.greater(tf.rank(actions), tf.rank(param["prob"])),
+            lambda: tf.expand_dims(param["prob"], axis=0),
+            lambda: param["prob"])
+        actions = tf.cond(
+            tf.math.greater(tf.rank(param["prob"]), tf.rank(actions)),
+            lambda: tf.expand_dims(actions, axis=0),
+            lambda: actions)
         log_prob = self.dist.log_likelihood(
-            tf.one_hot(indices=tf.squeeze(actions), depth=self.action_dim), param)
+            actions, param)
         return log_prob

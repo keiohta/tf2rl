@@ -42,6 +42,7 @@ class DiagonalGaussian(Distribution):
         """
         means = param["mean"]
         log_stds = param["log_std"]
+        assert means.shape == log_stds.shape
         zs = (x - means) / tf.exp(log_stds)
         return - tf.reduce_sum(log_stds, axis=-1) \
                - 0.5 * tf.reduce_sum(tf.square(zs), axis=-1) \

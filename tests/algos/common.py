@@ -147,7 +147,7 @@ class CommonOnPolActorCritic(CommonAlgos):
             dtype=np.float32)
         acts = np.zeros(
             shape=(self.batch_size,self.action_dim),
-            dtype=np.float32)
+            dtype=np.int32 if self.is_discrete else np.float32)
         advs = np.ones(
             shape=(self.batch_size,1),
             dtype=np.float32)

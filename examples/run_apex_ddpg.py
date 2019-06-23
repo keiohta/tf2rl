@@ -23,6 +23,7 @@ if __name__ == '__main__':
         return DDPG(
             state_shape=env.observation_space.shape,
             action_dim=env.action_space.high.size,
+            max_action=env.action_space.high[0],
             gpu=gpu,
             name=name,
             sigma=noise_level,

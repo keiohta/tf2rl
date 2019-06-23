@@ -35,21 +35,21 @@ class TestCategoricalActor(CommonModel):
         # Single input
         state = np.random.rand(
             1, self.discrete_env.observation_space.low.size)
-        action = np.random.rand(
-            1, self.discrete_env.action_space.n)
+        action = np.random.randint(
+            self.discrete_env.action_space.n, size=1)
         self._test_compute_log_probs(
-            state,
-            action,
-            (1,))
+            states=state,
+            actions=action,
+            expected_shapes=(1,))
         # Multiple inputs
         states = np.random.rand(
             self.batch_size, self.discrete_env.observation_space.low.size)
-        actions = np.random.rand(
-            self.batch_size, self.discrete_env.action_space.n)
+        actions = np.random.randint(
+            self.discrete_env.action_space.n, size=self.batch_size)
         self._test_compute_log_probs(
-            states,
-            actions,
-            (self.batch_size,))
+            states=states,
+            actions=actions,
+            expected_shapes=(self.batch_size,))
 
 
 if __name__ == '__main__':
