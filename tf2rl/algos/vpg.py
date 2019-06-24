@@ -6,7 +6,6 @@ from tensorflow.keras.layers import Dense
 from tf2rl.algos.policy_base import OnPolicyAgent
 from tf2rl.policies.gaussian_actor import GaussianActor
 from tf2rl.policies.categorical_actor import CategoricalActor
-from tf2rl.misc.huber_loss import huber_loss
 
 
 class CriticV(tf.keras.Model):
@@ -41,7 +40,8 @@ class VPG(OnPolicyAgent):
             lr_actor=1e-3,
             lr_critic=3e-3,
             fix_std=False,
-            const_std=0.1,
+            tanh_std=False,
+            const_std=0.3,
             name="VPG",
             **kwargs):
         super().__init__(name=name, **kwargs)
@@ -52,7 +52,7 @@ class VPG(OnPolicyAgent):
         else:
             self.actor = GaussianActor(
                 state_shape, action_dim, max_action, actor_units,
-                fix_std=fix_std, const_std=const_std)
+                fix_std=fix_std, tanh_std=tanh_std, const_std=const_std)
         self.critic = CriticV(state_shape, critic_units)
         self._action_dim = action_dim
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_actor)
@@ -123,9 +123,8 @@ class VPG(OnPolicyAgent):
             # Train baseline
             with tf.GradientTape() as tape:
                 current_V = self.critic(states)
-                td_errors = returns - current_V
-                critic_loss = tf.reduce_mean(
-                    huber_loss(td_errors, delta=self.max_grad))
+                td_errors = tf.squeeze(returns) - current_V
+                critic_loss = tf.reduce_mean(0.5 * tf.square(td_errors))
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(
                 zip(critic_grad, self.critic.trainable_variables))

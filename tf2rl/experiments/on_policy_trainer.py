@@ -79,7 +79,7 @@ class OnPolicyTrainer(Trainer):
                     adv,
                     samples["logp"])
             # Train Critic
-            for _ in range(10):
+            for _ in range(5):
                 self._policy.train_critic(
                     samples["obs"],
                     samples["ret"])
