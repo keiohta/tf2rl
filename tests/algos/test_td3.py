@@ -3,10 +3,10 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.td3 import TD3
-from tests.algos.common import CommonContinuousOutputAlgos
+from tests.algos.common import CommonOffPolContinuousAlgos
 
 
-class TestTD3(CommonContinuousOutputAlgos):
+class TestTD3(CommonOffPolContinuousAlgos):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

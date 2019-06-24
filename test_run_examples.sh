@@ -29,4 +29,7 @@ ${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-categorical-
 # ${prefix} examples/run_apex_ddpg.py ${common_arg} --n-env 64
 
 # GAIL
+# TODO
 
+# On-policy agents
+# ${prefix} examples/run_vpg.py ${common_arg}

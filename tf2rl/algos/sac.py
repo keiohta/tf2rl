@@ -2,61 +2,11 @@ import numpy as np
 
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
-import tensorflow_probability as tfp
 
+from tf2rl.policies.gaussian_actor import GaussianActor
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.misc.huber_loss import huber_loss
-
-
-class GaussianActor(tf.keras.Model):
-    LOG_SIG_CAP_MAX = 2
-    LOG_SIG_CAP_MIN = -20
-    EPS = 1e-6
-
-    def __init__(self, state_shape, action_dim, max_action, units=[256, 256], name='GaussianPolicy'):
-        super().__init__(name=name)
-
-        self.l1 = Dense(units[0], name="L1", activation='relu')
-        self.l2 = Dense(units[1], name="L2", activation='relu')
-        self.out_mean = Dense(action_dim, name="L_mean")
-        self.out_sigma = Dense(action_dim, name="L_sigma")
-
-        self._max_action = max_action
-
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
-        self(dummy_state)
-
-    def _compute_dist(self, states):
-        features = self.l1(states)
-        features = self.l2(features)
-
-        mu = self.out_mean(features)
-        log_sigma = self.out_sigma(features)
-        log_sigma = tf.clip_by_value(log_sigma, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
-
-        return tfp.distributions.MultivariateNormalDiag(loc=mu, scale_diag=tf.exp(log_sigma))
-
-    def call(self, states):
-        dist = self._compute_dist(states)
-        raw_actions = dist.sample()
-        log_pis = dist.log_prob(raw_actions)
-
-        actions = tf.tanh(raw_actions)
-
-        # for variable replacement
-        diff = tf.reduce_sum(tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
-        log_pis -= diff
-
-        actions = actions * self._max_action
-        return actions, log_pis
-
-    def mean_action(self, states):
-        dist = self._compute_dist(states)
-        raw_actions = dist.mean()
-        actions = tf.tanh(raw_actions) * self._max_action
-
-        return actions
 
 
 class CriticV(tf.keras.Model):
@@ -116,7 +66,7 @@ class SAC(OffPolicyAgent):
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
-        self.actor = GaussianActor(state_shape, action_dim, max_action)
+        self.actor = GaussianActor(state_shape, action_dim, max_action, squash=True)
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
         self.vf = CriticV(state_shape)
@@ -135,19 +85,16 @@ class SAC(OffPolicyAgent):
 
     def get_action(self, state, test=False):
         assert isinstance(state, np.ndarray)
-        assert len(state.shape) == 1
+        is_single_state = len(state.shape) == 1
 
-        state = np.expand_dims(state, axis=0).astype(np.float32)
+        state = np.expand_dims(state, axis=0).astype(np.float32) if is_single_state else state
         action = self._get_action_body(tf.constant(state), test)
 
-        return action.numpy()[0]
+        return action.numpy()[0] if is_single_state else action
 
     @tf.function
     def _get_action_body(self, state, test):
-        if not test:
-            return self.actor(state)[0]
-        else:
-            return self.actor.mean_action(state)
+        return self.actor(state, test)[0]
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
         if weights is None:
@@ -156,11 +103,11 @@ class SAC(OffPolicyAgent):
         td_errors, actor_loss, vf_loss, qf_loss, log_pi_min, log_pi_max = \
             self._train_body(states, actions, next_states, rewards, done, weights)
 
-        tf.summary.scalar(name="ActorLoss", data=actor_loss, description="loss")
-        tf.summary.scalar(name="CriticVLoss", data=vf_loss, description="loss")
-        tf.summary.scalar(name="CriticQLoss", data=qf_loss, description="loss")
-        tf.summary.scalar(name="log_pi_min", data=log_pi_min, description="loss")
-        tf.summary.scalar(name="log_pi_max", data=log_pi_max, description="loss")
+        tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
+        tf.summary.scalar(name=self.policy_name+"/critic_V_loss", data=vf_loss)
+        tf.summary.scalar(name=self.policy_name+"/critic_Q_loss", data=qf_loss)
+        tf.summary.scalar(name=self.policy_name+"/log_pi_min", data=log_pi_min)
+        tf.summary.scalar(name=self.policy_name+"/log_pi_max", data=log_pi_max)
 
         return td_errors
 
@@ -179,8 +126,8 @@ class SAC(OffPolicyAgent):
                 target_Q = tf.stop_gradient(
                     self.scale_reward * rewards + not_done * self.discount * vf_next_target)
 
-                td_loss1 = tf.reduce_mean(huber_loss(target_Q, current_Q1))
-                td_loss2 = tf.reduce_mean(huber_loss(target_Q, current_Q2))
+                td_loss1 = tf.reduce_mean(huber_loss(target_Q - current_Q1, delta=self.max_grad))
+                td_loss2 = tf.reduce_mean(huber_loss(target_Q - current_Q2, delta=self.max_grad))
 
             q1_grad = tape.gradient(td_loss1, self.qf1.trainable_variables)
             self.qf1_optimizer.apply_gradients(zip(q1_grad, self.qf1.trainable_variables))
@@ -199,7 +146,8 @@ class SAC(OffPolicyAgent):
 
                 target_V = tf.stop_gradient(current_Q - log_pi)
                 td_errors = target_V - current_V
-                vf_loss_t = tf.reduce_mean(huber_loss(diff=td_errors) * weights)
+                vf_loss_t = tf.reduce_mean(
+                    huber_loss(td_errors, delta=self.max_grad) * weights)
 
                 # TODO: Add reguralizer
                 policy_loss = tf.reduce_mean(log_pi - current_Q1)

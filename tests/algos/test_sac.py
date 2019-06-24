@@ -3,10 +3,10 @@ import numpy as np
 import tensorflow as tf
 
 from tf2rl.algos.sac import SAC
-from tests.algos.common import CommonContinuousOutputAlgos
+from tests.algos.common import CommonOffPolContinuousAlgos
 
 
-class TestSAC(CommonContinuousOutputAlgos):
+class TestSAC(CommonOffPolContinuousAlgos):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()

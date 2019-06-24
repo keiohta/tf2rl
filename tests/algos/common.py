@@ -13,13 +13,42 @@ class CommonAlgos(unittest.TestCase):
         cls.agent = None
 
 
-class CommonContinuousOutputAlgos(CommonAlgos):
+class CommonOffPolAlgos(CommonAlgos):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env = None
+        cls.action_dim = None
+        cls.is_discrete = True
+
     def test_get_action(self):
         if self.agent is None:
             return
-        state = self.continuous_env.reset()
-        self.agent.get_action(state, test=False)
-        self.agent.get_action(state, test=True)
+        # Single input
+        state = self.env.reset().astype(np.float32)
+        action_train = self.agent.get_action(state, test=False)
+        action_test = self.agent.get_action(state, test=True)
+        if self.is_discrete:
+            self.assertTrue(type(action_train) == np.int64 or type(action_train) == int)
+            self.assertTrue(type(action_test) == np.int64 or type(action_test) == int)
+        else:
+            self.assertEqual(action_train.shape[0], self.action_dim)
+            self.assertEqual(action_test.shape[0], self.action_dim)
+
+        # Multiple inputs
+        states = np.zeros(shape=(self.batch_size, state.shape[0]), dtype=np.float32)
+        actions_train = self.agent.get_action(states, test=False)
+        actions_test = self.agent.get_action(states, test=True)
+        if self.is_discrete:
+            self.assertEqual(
+                actions_train.shape, (self.batch_size,))
+            self.assertEqual(
+                actions_test.shape, (self.batch_size,))
+        else:
+            self.assertEqual(
+                actions_train.shape, (self.batch_size, self.action_dim))
+            self.assertEqual(
+                actions_test.shape, (self.batch_size, self.action_dim))
 
     def test_train(self):
         if self.agent is None:
@@ -27,10 +56,10 @@ class CommonContinuousOutputAlgos(CommonAlgos):
         rewards = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
         dones = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
         obses = np.zeros(
-            shape=(self.batch_size,)+self.continuous_env.observation_space.shape,
+            shape=(self.batch_size,)+self.env.observation_space.shape,
             dtype=np.float32)
         acts = np.zeros(
-            shape=(self.batch_size,self.continuous_env.action_space.low.size,),
+            shape=(self.batch_size,self.action_dim,),
             dtype=np.float32)
         self.agent.train(
             obses, acts, obses, rewards, dones)
@@ -41,7 +70,7 @@ class CommonContinuousOutputAlgos(CommonAlgos):
         rewards = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
         dones = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
         obses = np.zeros(
-            shape=(self.batch_size,)+self.continuous_env.observation_space.shape,
+            shape=(self.batch_size,)+self.env.observation_space.shape,
             dtype=np.float32)
         acts = np.zeros(
             shape=(self.batch_size,self.continuous_env.action_space.low.size,),
@@ -51,32 +80,110 @@ class CommonContinuousOutputAlgos(CommonAlgos):
             rewards=rewards, dones=dones)
 
 
-class CommonDiscreteOutputAlgos(CommonAlgos):
+class CommonOffPolContinuousAlgos(CommonOffPolAlgos):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env = cls.continuous_env
+        cls.action_dim = cls.continuous_env.action_space.low.size
+        cls.is_discrete = False
+
+
+class CommonOffPolDiscreteAlgos(CommonOffPolAlgos):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env = cls.discrete_env
+        cls.action_dim = 1
+        cls.is_discrete = True
+
+
+class CommonOnPolActorCritic(CommonAlgos):
     def test_get_action(self):
         if self.agent is None:
             return
-        state = self.discrete_env.reset()
-        self.agent.get_action(state, test=False)
-        self.agent.get_action(state, test=True)
+        # Single input
+        state = self.env.reset().astype(np.float32)
+        action_train, logp_train = self.agent.get_action(state, test=False)
+        action_test, logp_test = self.agent.get_action(state, test=True)
+        if self.is_discrete:
+            self.assertTrue(type(action_train) == np.int64 or type(action_train) == int)
+            self.assertTrue(type(action_test) == np.int64 or type(action_test) == int)
+        else:
+            self.assertEqual(action_train.shape[0], self.action_dim)
+            self.assertEqual(action_test.shape[0], self.action_dim)
+        self.assertEqual(logp_train.shape[0], 1)
+        self.assertEqual(logp_test.shape[0], 1)
+
+        # Multiple inputs
+        states = np.zeros(shape=(self.batch_size, state.shape[0]), dtype=np.float32)
+        actions_train, logps_train = self.agent.get_action(states, test=False)
+        actions_test, logps_test = self.agent.get_action(states, test=True)
+        if self.is_discrete:
+            self.assertEqual(
+                actions_train.shape, (self.batch_size,))
+            self.assertEqual(
+                actions_test.shape, (self.batch_size,))
+        else:
+            self.assertEqual(
+                actions_train.shape, (self.batch_size, self.action_dim))
+            self.assertEqual(
+                actions_test.shape, (self.batch_size, self.action_dim))
+        self.assertEqual(logps_train.shape, (self.batch_size,))
+        self.assertEqual(logps_test.shape, (self.batch_size,))
 
     def test_train(self):
+        """In actor critic, train method is divided into
+        `train_actor` and `train_critic` methods
+        """
+        pass
+
+    def test_train_actor(self):
         if self.agent is None:
             return
-
-        rewards = np.zeros(
-            shape=(self.batch_size,1),
-            dtype=np.float32)
-        dones = np.zeros(
-            shape=(self.batch_size,1),
-            dtype=np.float32)
+        state = self.env.reset().astype(np.float32)
         obses = np.zeros(
-            shape=(self.batch_size,)+self.discrete_env.observation_space.shape,
+            shape=(self.batch_size,)+state.shape,
             dtype=np.float32)
         acts = np.zeros(
+            shape=(self.batch_size,self.action_dim),
+            dtype=np.int32 if self.is_discrete else np.float32)
+        advs = np.ones(
             shape=(self.batch_size,1),
             dtype=np.float32)
-        self.agent.train(
-            obses, acts, obses, rewards, dones)
+        logps = np.ones_like(advs)
+        self.agent.train_actor(obses, acts, advs, logps)
+
+    def test_train_critic(self):
+        if self.agent is None:
+            return
+        state = self.env.reset().astype(np.float32)
+        obses = np.zeros(
+            shape=(self.batch_size,)+state.shape,
+            dtype=np.float32)
+        returns = np.zeros(
+            shape=(self.batch_size,1),
+            dtype=np.float32)
+
+        self.agent.train_critic(obses, returns)
+
+
+class CommonOnPolActorCriticContinuousAlgos(CommonOnPolActorCritic):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env = cls.continuous_env
+        cls.action_dim = cls.continuous_env.action_space.low.size
+        cls.is_discrete = False
+
+
+class CommonOnPolActorCriticDiscreteAlgos(CommonOnPolActorCritic):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.env = cls.discrete_env
+        cls.action_dim = 1
+        cls.is_discrete = True
 
 
 class CommonIRLAlgos(CommonAlgos):

@@ -25,6 +25,7 @@ if __name__ == '__main__':
     policy = DDPG(
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.high.size,
+        max_action=env.action_space.high[0],
         gpu=args.gpu,
         actor_units=units,
         critic_units=units,

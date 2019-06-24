@@ -85,15 +85,16 @@ class DDPG(OffPolicyAgent):
         self.tau = tau
 
     def get_action(self, state, test=False, tensor=False):
+        is_single_state = len(state.shape) == 1
         if not tensor:
             assert isinstance(state, np.ndarray)
-        state = np.expand_dims(state, axis=0).astype(np.float32) if len(state.shape) == 1 else state
+        state = np.expand_dims(state, axis=0).astype(np.float32) if is_single_state else state
         action = self._get_action_body(
             tf.constant(state), self.sigma * test, tf.constant(self.actor.max_action, dtype=tf.float32))
         if tensor:
             return action
         else:
-            return action.numpy()[0]
+            return action.numpy()[0] if is_single_state else action.numpy()
 
     @tf.function
     def _get_action_body(self, state, sigma, max_action):
@@ -109,8 +110,8 @@ class DDPG(OffPolicyAgent):
             states, actions, next_states, rewards, done, weights)
 
         if actor_loss is not None:
-            tf.summary.scalar(name="ActorLoss", data=actor_loss, description="loss")
-        tf.summary.scalar(name="CriticLoss", data=critic_loss, description="loss")
+            tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss, description="loss")
+        tf.summary.scalar(name=self.policy_name+"/critic_loss", data=critic_loss, description="loss")
 
         return td_errors
 
@@ -120,7 +121,8 @@ class DDPG(OffPolicyAgent):
             with tf.GradientTape() as tape:
                 td_errors = self._compute_td_error_body(
                     states, actions, next_states, rewards, done)
-                critic_loss = tf.reduce_mean(huber_loss(diff=td_errors) * weights)
+                critic_loss = tf.reduce_mean(
+                    huber_loss(td_errors, delta=self.max_grad) * weights)
 
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))

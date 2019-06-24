@@ -19,6 +19,7 @@ if __name__ == '__main__':
         action_dim=env.action_space.high.size,
         gpu=args.gpu,
         memory_capacity=args.memory_capacity,
+        max_action=env.action_space.high[0],
         batch_size=args.batch_size,
         n_warmup=args.n_warmup)
     trainer = Trainer(policy, env, args, test_env=test_env)

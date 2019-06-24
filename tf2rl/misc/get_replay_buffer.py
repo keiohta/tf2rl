@@ -10,6 +10,7 @@ from cpprb.experimental import ReplayBuffer
 from cpprb.experimental import PrioritizedReplayBuffer
 
 from tf2rl.algos.policy_base import OffPolicyAgent
+from tf2rl.envs.utils import is_discrete
 
 
 def get_space_size(space):
@@ -42,15 +43,24 @@ def get_replay_buffer(policy, env, use_prioritized_rb=False,
         return None
 
     obs_shape = get_space_size(env.observation_space)
-    kwargs = get_default_rb_dict(policy.update_interval, env)
+    kwargs = get_default_rb_dict(policy.memory_capacity, env)
+
+    if size is not None:
+        kwargs["size"] = size
 
     # on-policy policy
     if not issubclass(type(policy), OffPolicyAgent):
+        kwargs["size"] = policy.horizon
+        kwargs["env_dict"].pop("next_obs")
+        kwargs["env_dict"].pop("rew")
+        # TODO: Remove done. Currently cannot remove because of cpprb implementation
+        # kwargs["env_dict"].pop("done")
+        kwargs["env_dict"]["logp"] = {}
+        kwargs["env_dict"]["ret"] = {}
+        kwargs["env_dict"]["adv"] = {}
+        if is_discrete(env.action_space):
+            kwargs["env_dict"]["act"]["dtype"] = np.int32
         return ReplayBuffer(**kwargs)
-
-    # off-policy policy
-    kwargs["size"] = policy.memory_capacity \
-        if size is None else size
 
     # N-step prioritized
     if use_prioritized_rb and use_nstep_rb:

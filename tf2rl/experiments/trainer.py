@@ -5,6 +5,18 @@ import logging
 import argparse
 import tensorflow as tf
 
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
+
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.experiments.utils import save_path, frames_to_gif
@@ -24,7 +36,8 @@ class Trainer:
 
         # prepare log directory
         self._output_dir = prepare_output_dir(
-            args=args, user_specified_dir="./results", suffix=args.dir_suffix)
+            args=args, user_specified_dir="./results",
+            suffix="{}_{}".format(self._policy.policy_name, args.dir_suffix))
         self.logger = logging.getLogger(__name__)
         logging.basicConfig(
             datefmt="%d/%Y %I:%M:%S",
@@ -104,8 +117,8 @@ class Trainer:
                     avg_test_return = self.evaluate_policy(total_steps)
                     self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                         total_steps, avg_test_return, self._test_episodes))
-                    tf.summary.scalar(name="AverageTestReturn", data=avg_test_return, description="loss")
-                    tf.summary.scalar(name="FPS", data=fps, description="loss")
+                    tf.summary.scalar(name="Common/average_test_return", data=avg_test_return)
+                    tf.summary.scalar(name="Common/fps", data=fps)
 
                     self.writer.flush()
 

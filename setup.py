@@ -1,10 +1,9 @@
 from setuptools import setup, Extension, find_packages
 
 install_requires = [
-    "setuptools>=41.0.0",
-    "cpprb>=7.13.3",
+    "cpprb>=7.13.3"
     "joblib",
-    "tfp-nightly",
+    "scipy"
 ]
 
 extras_require = {

@@ -142,30 +142,35 @@ class DQN(OffPolicyAgent):
             state = np.array(state)
         if not tensor:
             assert isinstance(state, np.ndarray)
+        is_single_input = not state.shape[0] == self.batch_size
 
         if not test and np.random.rand() < self.epsilon:
-            # TODO: Clean code
+            if is_single_input:
+                action = np.random.randint(self._action_dim)
+            else:
+                action = np.array([np.random.randint(self._action_dim) for _ in range(state.shape[0])], dtype=np.int64)
             if tensor:
-                action = [np.random.randint(self._action_dim) for _ in range(state.shape[0])]
                 return tf.convert_to_tensor(action)
             else:
-                return np.random.randint(self._action_dim)
+                return action
+
+        state = np.expand_dims(state, axis=0).astype(np.float32) if is_single_input else state
+        if self._enable_categorical_dqn:
+            action = self._get_action_body_distributional(tf.constant(state))
         else:
-            state = np.expand_dims(state, axis=0).astype(np.float32) if not state.shape[0] == self.batch_size else state
-            if self._enable_categorical_dqn:
-                action = self._get_action_body_distributional(tf.constant(state))
-            else:
-                action = self._get_action_body(tf.constant(state))
+            action = self._get_action_body(tf.constant(state))
         if tensor:
             return action
         else:
-            return action.numpy()[0]
+            if is_single_input:
+                return action.numpy()[0]
+            else:
+                return action.numpy()
 
     @tf.function
     def _get_action_body(self, state):
-        action = self.q_func(state)
-        # return action
-        return tf.argmax(action, axis=1)
+        q_values = self.q_func(state)
+        return tf.argmax(q_values, axis=1)
 
     @tf.function
     def _get_action_body_distributional(self, state):
@@ -180,7 +185,7 @@ class DQN(OffPolicyAgent):
         td_errors, q_func_loss = self._train_body(
             states, actions, next_states, rewards, done, weights)
 
-        tf.summary.scalar(name="QFuncLoss", data=q_func_loss, description="loss")
+        tf.summary.scalar(name=self.policy_name+"/q_func_Loss", data=q_func_loss)
 
         # TODO: Remove following by using tf.global_step
         self.n_update += 1
@@ -191,7 +196,7 @@ class DQN(OffPolicyAgent):
         # Update exploration rate
         self.epsilon = max(self.epsilon - self.epsilon_decay_rate * self.update_interval,
                            self.epsilon_min)
-        tf.summary.scalar(name="Epsilon", data=self.epsilon, description="loss")
+        tf.summary.scalar(name=self.policy_name+"/epsilon", data=self.epsilon)
 
         return td_errors
 
@@ -203,14 +208,14 @@ class DQN(OffPolicyAgent):
                     td_errors = self._compute_td_error_body_distributional(
                         states, actions, next_states, rewards, done)
                     q_func_loss = tf.reduce_mean(
-                        huber_loss(diff=tf.negative(td_errors),
-                                   max_grad=self.max_grad) * weights)
+                        huber_loss(tf.negative(td_errors),
+                                   delta=self.max_grad) * weights)
                 else:
                     td_errors = self._compute_td_error_body(
                         states, actions, next_states, rewards, done)
                     q_func_loss = tf.reduce_mean(
-                        huber_loss(diff=td_errors,
-                                   max_grad=self.max_grad) * weights)
+                        huber_loss(td_errors,
+                                   delta=self.max_grad) * weights)
 
             q_func_grad = tape.gradient(q_func_loss, self.q_func.trainable_variables)
             self.q_func_optimizer.apply_gradients(zip(q_func_grad, self.q_func.trainable_variables))

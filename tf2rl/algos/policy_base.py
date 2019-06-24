@@ -11,7 +11,7 @@ class Policy(tf.keras.Model):
             batch_size=256,
             discount=0.99,
             n_warmup=0,
-            max_grad=1.,
+            max_grad=10.,
             gpu=0):
         super().__init__()
         self.policy_name = name
@@ -41,11 +41,24 @@ class OnPolicyAgent(Policy):
     """
     def __init__(
             self,
-            memory_capacity=None,
+            horizon=2048,
+            lam=0.95,
+            enable_gae=True,
+            normalize_adv=True,
             **kwargs):
-        if memory_capacity is None:
-            memory_capacity = kwargs["batch_size"]
-        super().__init__(memory_capacity=memory_capacity, **kwargs)
+        self.horizon = horizon
+        self.lam = lam
+        self.enable_gae = enable_gae
+        self.normalize_adv = normalize_adv
+        kwargs["n_warmup"] = 0
+        kwargs["memory_capacity"] = self.horizon
+        super().__init__(**kwargs)
+
+    @staticmethod
+    def get_argument(parser=None):
+        parser = Policy.get_argument(parser)
+        parser.add_argument('--horizon', type=int, default=2048)
+        return parser
 
 
 class OffPolicyAgent(Policy):
