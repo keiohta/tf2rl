@@ -17,11 +17,11 @@ ${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-noisy-dqn
 ${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn
 ${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn --enable-dueling-dqn
 
-# ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg}
-# ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-double-dqn --enable-dueling-dqn
-# ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-noisy-dqn
-# ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn
-# ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn --enable-dueling-dqn
+${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg}
+${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-double-dqn --enable-dueling-dqn
+${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-noisy-dqn
+${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn
+${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn --enable-dueling-dqn
 
 # ApeX
 # common_arg="--gpu-explorer -1 --gpu-learner -1 --gpu-evaluator -1 --logging-level WARNING --max-batch 256 --batch-size 32 --param-update-freq 32 --local-buffer-size 64 --test-freq 64"
