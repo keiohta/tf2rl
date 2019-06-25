@@ -1,7 +1,6 @@
 #!/bin/bash
-
 prefix="python -u"
-common_arg="--gpu -1 --logging-level WARNING --max-steps 256 --batch-size 32"
+common_arg="--gpu -1 --logging-level WARNING --max-steps 256 --batch-size 32 --dir-suffix TEST"
 off_pol_arg="--n-warmup 64 --memory-capacity 256"
 
 # DDPG variants
@@ -32,4 +31,8 @@ ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-catego
 # TODO
 
 # On-policy agents
-# ${prefix} examples/run_vpg.py ${common_arg}
+on_pol_arg="--horizon 64"
+${prefix} examples/run_vpg.py ${common_arg} ${on_pol_arg}
+
+# Clean generated files
+rm -rf results/*TEST*
