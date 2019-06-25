@@ -12,6 +12,7 @@ if __name__ == '__main__':
     parser = apex_argument()
     parser.add_argument('--env-name', type=str,
                         default="RoboschoolAtlasForwardWalk-v1")
+    parser = DDPG.get_argument(parser)
     args = parser.parse_args()
 
     # Prepare env and policy function

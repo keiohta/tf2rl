@@ -7,7 +7,6 @@ import multiprocessing
 from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
 
-
 from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
@@ -34,30 +33,42 @@ def import_tf():
 def explorer(global_rb, queue, trained_steps, is_training_done,
              lock, env_fn, policy_fn, set_weights_fn, noise_level,
              n_env=64, n_thread=4, buffer_size=1024, episode_max_steps=1000, gpu=0):
-    """
-    Collect transitions and store them to prioritized replay buffer.
+    """Collect transitions and store them to prioritized replay buffer.
+
     Args:
         global_rb:
             Prioritized replay buffer sharing with multiple explorers and only one learner.
             This object is shared over processes, so it must be locked when trying to
             operate something with `lock` object.
         queue:
-            A FIFO shared with the learner to get latest network parameters.
+            A FIFO shared with the `learner` and `evaluator` to get the latest network weights.
             This is process safe, so you don't need to lock process when use this.
         trained_steps:
             Number of steps to apply gradients.
         is_training_done:
             multiprocessing.Event object to share the status of training.
         lock:
-            multiprocessing.Lock to lock other processes. You must release after process is done.
+            multiprocessing.Lock to lock other processes.
         env_fn:
             Method object to generate an environment.
         policy_fn:
             Method object to generate an explorer.
+        set_weights_fn:
+            Method object to set network weights gotten from queue.
+        noise_level:
+            Noise level for exploration. For epsilon-greedy policy like DQN variants,
+            this will be epsilon, and if DDPG variants this will be variance for Normal distribution.
+        n_env:
+            Number of environments to distribute. If this is set to be more than 1,
+            `MultiThreadEnv` will be used.
+        n_thread:
+            Number of thread used in `MultiThreadEnv`.
         buffer_size:
-            Size of local buffer. If it is filled with transitions, add them to `global_rb`
+            Size of local buffer. If this is filled with transitions, add them to `global_rb`
         episode_max_steps:
             Maximum number of steps of an episode.
+        gpu:
+            GPU id. If this is set to -1, then this process uses only CPU.
     """
     import_tf()
 
@@ -159,8 +170,8 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
 def learner(global_rb, trained_steps, is_training_done,
             lock, env, policy_fn, get_weights_fn,
             n_training, update_freq, evaluation_freq, gpu, queues):
-    """
-    Collect transitions and store them to prioritized replay buffer.
+    """Update network weights using samples collected by explorers.
+
     Args:
         global_rb:
             Prioritized replay buffer sharing with multiple explorers and only one learner.
@@ -172,16 +183,21 @@ def learner(global_rb, trained_steps, is_training_done,
             multiprocessing.Event object to share if training is done or not.
         lock:
             multiprocessing.Lock to lock other processes.
-            It must be released after process is done.
-        env_fn:
-            Environment.
+        env:
+            Environment object.
         policy_fn:
             Method object to generate an explorer.
+        get_weights_fn:
+            Method object to get network weights and put them to queue.
         n_training:
             Maximum number of times to apply gradients. If number of applying gradients
             is over this value, training will be done by setting `is_training_done` to `True`
         update_freq:
             Frequency to update parameters, i.e., put network parameters to `queues`
+        evaluation_freq:
+            Frequency to call `evaluator`.
+        gpu:
+            GPU id. If this is set to -1, then this process uses only CPU.
         queues:
             FIFOs shared with explorers to send latest network parameters.
     """
@@ -228,47 +244,38 @@ def learner(global_rb, trained_steps, is_training_done,
             queues[-1].put(get_weights_fn(policy))
             queues[-1].put(trained_steps.value)
 
-    if trained_steps.value >= n_training:
-        is_training_done.set()
-
-
-def apex_argument(parser=None):
-    if parser is None:
-        parser = argparse.ArgumentParser()
-    parser.add_argument('--max-batch', type=int, default=1e7,
-                        help='number of times to apply batch update')
-    parser.add_argument('--episode-max-steps', type=int, default=int(1e3),
-                        help='Maximum steps in an episode')
-    parser.add_argument('--param-update-freq', type=int, default=1e2,
-                        help='frequency to update parameter')
-    parser.add_argument('--n-explorer', type=int, default=None,
-                        help='number of explorers to distribute. if None, use maximum number')
-    parser.add_argument('--replay-buffer-size', type=int, default=1e6,
-                        help='size of replay buffer')
-    parser.add_argument('--local-buffer-size', type=int, default=1e4,
-                        help='size of local replay buffer for explorer')
-    parser.add_argument('--gpu-explorer', type=int, default=0)
-    parser.add_argument('--gpu-learner', type=int, default=0)
-    parser.add_argument('--gpu-evaluator', type=int, default=0)
-    # Test setting
-    parser.add_argument('--test-freq', type=int, default=1e3,
-                        help='Frequency to evaluate policy')
-    parser.add_argument('--save-model-interval', type=int, default=int(1e4),
-                        help='Interval to save model')
-    # Multi Env setting
-    parser.add_argument('--n-env', type=int, default=1,
-                        help='Number of environments')
-    parser.add_argument('--n-thread', type=int, default=4,
-                        help='Number of thread pool')
-    # Others
-    parser.add_argument('--logging-level', choices=['DEBUG', 'INFO', 'WARNING'],
-                        default='INFO', help='Logging level')
-    return parser
+        if trained_steps.value >= n_training:
+            is_training_done.set()
 
 
 def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
               save_model_interval=int(1e6), n_evaluation=10, episode_max_steps=1000,
               show_test_progress=False):
+    """Evaluate trained network weights periodically.
+
+    Args:
+        is_training_done:
+            multiprocessing.Event object to share if training is done or not.
+        env:
+            Environment object.
+        policy_fn:
+            Method object to generate an explorer.
+        set_weights_fn:
+            Method object to set network weights gotten from queue.
+        queue:
+            A FIFO shared with the learner to get the latest network weights.
+            This is process safe, so you don't need to lock process when use this.
+        gpu:
+            GPU id. If this is set to -1, then this process uses only CPU.
+        save_model_interval:
+            Interval to save model.
+        n_evaluation:
+            Number of episodes to evaluate.
+        episode_max_steps:
+            Maximum number of steps of an episode.
+        show_test_progress:
+            If true, `render` will be called to visualize evaluation process.
+    """
     tf = import_tf()
 
     output_dir = prepare_output_dir(
@@ -322,6 +329,40 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
                 model_save_threshold += save_model_interval
                 checkpoint_manager.save()
     checkpoint_manager.save()
+
+
+def apex_argument(parser=None):
+    if parser is None:
+        parser = argparse.ArgumentParser()
+    parser.add_argument('--max-batch', type=int, default=1e7,
+                        help='number of times to apply batch update')
+    parser.add_argument('--episode-max-steps', type=int, default=int(1e3),
+                        help='Maximum steps in an episode')
+    parser.add_argument('--param-update-freq', type=int, default=1e2,
+                        help='frequency to update parameter')
+    parser.add_argument('--n-explorer', type=int, default=None,
+                        help='number of explorers to distribute. if None, use maximum number')
+    parser.add_argument('--replay-buffer-size', type=int, default=1e6,
+                        help='size of replay buffer')
+    parser.add_argument('--local-buffer-size', type=int, default=1e4,
+                        help='size of local replay buffer for explorer')
+    parser.add_argument('--gpu-explorer', type=int, default=0)
+    parser.add_argument('--gpu-learner', type=int, default=0)
+    parser.add_argument('--gpu-evaluator', type=int, default=0)
+    # Test setting
+    parser.add_argument('--test-freq', type=int, default=1e3,
+                        help='Frequency to evaluate policy')
+    parser.add_argument('--save-model-interval', type=int, default=int(1e4),
+                        help='Interval to save model')
+    # Multi Env setting
+    parser.add_argument('--n-env', type=int, default=1,
+                        help='Number of environments')
+    parser.add_argument('--n-thread', type=int, default=4,
+                        help='Number of thread pool')
+    # Others
+    parser.add_argument('--logging-level', choices=['DEBUG', 'INFO', 'WARNING'],
+                        default='INFO', help='Logging level')
+    return parser
 
 
 def prepare_experiment(env, args):

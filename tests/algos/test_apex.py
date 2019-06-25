@@ -9,21 +9,22 @@ from tf2rl.algos.apex import apex_argument, run
 from tf2rl.misc.target_update_ops import update_target_variables
 
 
-def test_run(args):
+def test_run(parser):
     parser = apex_argument()
     parser.set_defaults(max_batch=10)
     parser.set_defaults(param_update_freq=1)
     parser.set_defaults(test_freq=10)
     parser.set_defaults(n_env=64)
     parser.set_defaults(local_buffer_size=64)
-    args = parser.parse_args()
 
-    _test_run_discrete(args)
-    _test_run_continuous(args)
+    _test_run_discrete(parser)
+    _test_run_continuous(parser)
 
 
-def _test_run_discrete(args):
+def _test_run_discrete(parser):
     from tf2rl.algos.dqn import DQN
+    parser = DQN.get_argument(parser)
+    args = parser.parse_args()
 
     def env_fn():
         return gym.make("CartPole-v0")
@@ -54,8 +55,10 @@ def _test_run_discrete(args):
     run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn)
 
 
-def _test_run_continuous(args):
+def _test_run_continuous(parser):
     from tf2rl.algos.ddpg import DDPG
+    parser = DDPG.get_argument(parser)
+    args = parser.parse_args()
 
     def env_fn():
         return gym.make('Pendulum-v0')
@@ -86,12 +89,4 @@ def _test_run_continuous(args):
 
 
 if __name__ == '__main__':
-    parser = apex_argument()
-    parser.set_defaults(max_batch=10)
-    parser.set_defaults(param_update_freq=1)
-    parser.set_defaults(test_freq=10)
-    parser.set_defaults(n_env=64)
-    parser.set_defaults(local_buffer_size=64)
-    args = parser.parse_args()
-
-    test_run(args)
+    test_run()

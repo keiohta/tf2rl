@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/bash -eu
+
 prefix="python -u"
 common_arg="--gpu -1 --logging-level WARNING --max-steps 256 --batch-size 32 --dir-suffix TEST"
 off_pol_arg="--n-warmup 64 --memory-capacity 256"
@@ -23,9 +24,9 @@ ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-catego
 ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn --enable-dueling-dqn
 
 # ApeX
-# common_arg="--gpu-explorer -1 --gpu-learner -1 --gpu-evaluator -1 --logging-level WARNING --max-batch 256 --batch-size 32 --param-update-freq 32 --local-buffer-size 64 --test-freq 64"
-# ${prefix} examples/run_apex_ddpg.py ${common_arg} --n-env 1
-# ${prefix} examples/run_apex_ddpg.py ${common_arg} --n-env 64
+apex_arg="--gpu-explorer -1 --gpu-learner -1 --gpu-evaluator -1 --logging-level WARNING --max-batch 256 --batch-size 32 --param-update-freq 32 --local-buffer-size 64 --test-freq 64"
+${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 1
+# ${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 64
 
 # GAIL
 # TODO
