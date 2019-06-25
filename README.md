@@ -68,7 +68,8 @@ $ pip install -e .[tf-gpu, examples]
   - If you want to train with only CPU, set `--gpu -1`
 
 ```bash
-$ cd examples # You must change directory to avoid importing local files.
+# You must change directory to avoid importing local files.
+$ cd examples
 $ python run_ddpg.py
 ```
 
