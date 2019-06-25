@@ -84,7 +84,7 @@ class MultiThreadEnv(object):
         """
         def _process(offset):
             for idx_env in range(offset, offset+self.batch_thread):
-                new_obs, reward, done, _ = self.envs[idx_env].step(actions[idx_env])
+                new_obs, reward, done, _ = self.envs[idx_env].step(actions[idx_env].numpy())
                 self.list_obs[idx_env] = new_obs
                 self.list_rewards[idx_env] = reward
                 self.list_done[idx_env] = done
