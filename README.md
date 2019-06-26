@@ -40,39 +40,40 @@ Following papers have been implementd in tf2rl:
   - [Spectral Normalization for Generative Adversarial Networks](<https://arxiv.org/abs/1802.05957>)
 
 ## Installation
+- Install from PyPI:
+```bash
+$ pip install tf2rl
+```
+
+- Install from source:
 ```bash
 $ git clone https://github.com/keiohta/tf2rl.git tf2rl
 $ cd tf2rl
-$ pip install -U numpy pip
 $ pip install .
 ```
 
-TF2RL is built on Google's TensorFlow and requires either `tensorflow` or `tensorflow-gpu`.
-To include the TensorFlow with the installation of TF2RL, add the flag `tf` for the normal CPU version, or `tf_gpu` for the GPU version.
+- TF2RL is built on Google's TensorFlow and requires either `tensorflow` or `tensorflow-gpu`.
+  To include the TensorFlow with the installation of TF2RL, add the flag `tf` for the CPU version, or `tf_gpu` for the GPU version.
 
 ```bash
 # Install TF2RL with TensorFlow CPU version
-$ pip install -e .[tf]
+$ pip install . [tf]
 ```
 
-Also, if you want to run example codes, add the flag `examples` that install additional dependencies.
-If you are developer, set `-e` option, then local modification affects your installation.
+- Also, if you want to run example codes, add the flag `examples` that install additional dependencies.
+  If you are developer, set `-e` option, then local modification affects your installation.
 
 ```bash
 # Install developer mode TF2RL plus TensorFlow GPU version and additional dependencies to run examples
 $ pip install -e .[tf-gpu, examples]
 ```
 
-## Example
-- Train DDPG agent
-  - If you want to train with only CPU, set `--gpu -1`
+## Getting started
+You can check implemented algorithms in [examples](https://github.com/keiohta/tf2rl/tree/master/examples).
+For example if you want to train DDPG agent:
 
 ```bash
 # You must change directory to avoid importing local files.
 $ cd examples
 $ python run_ddpg.py
 ```
-
-## Usage
-- You can see options defined in `Trainer.get_argument`
-
