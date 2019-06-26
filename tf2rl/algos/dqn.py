@@ -105,6 +105,8 @@ class DQN(OffPolicyAgent):
                                 self.q_func.weights, tau=1.)
 
         self._action_dim = action_dim
+        # This is used to check if input state to `get_action` is multiple (batch) or single
+        self._state_ndim = np.array(state_shape).shape[0]
 
         # Distributional DQN
         if enable_categorical_dqn:
@@ -142,7 +144,7 @@ class DQN(OffPolicyAgent):
             state = np.array(state)
         if not tensor:
             assert isinstance(state, np.ndarray)
-        is_single_input = not state.shape[0] == self.batch_size
+        is_single_input = state.ndim == self._state_ndim
 
         if not test and np.random.rand() < self.epsilon:
             if is_single_input:

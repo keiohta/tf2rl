@@ -16,7 +16,7 @@ ${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-double-dqn -
 ${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-noisy-dqn
 ${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn
 ${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn --enable-dueling-dqn
-
+# DQN variants for Atari
 ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg}
 ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-double-dqn --enable-dueling-dqn
 ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-noisy-dqn
@@ -24,12 +24,14 @@ ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-catego
 ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn --enable-dueling-dqn
 
 # ApeX
-apex_arg="--gpu-explorer -1 --gpu-learner -1 --gpu-evaluator -1 --logging-level WARNING --max-batch 256 --batch-size 32 --param-update-freq 32 --local-buffer-size 64 --test-freq 64"
+apex_arg="--gpu-explorer -1 --gpu-learner -1 --gpu-evaluator -1 --logging-level WARNING --max-batch 4 --batch-size 32 --param-update-freq 1 --local-buffer-size 64 --test-freq 1"
 ${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 1
-# ${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 64
+${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 64
+${prefix} examples/run_apex_dqn.py ${apex_arg} --n-env 1
+${prefix} examples/run_apex_dqn.py ${apex_arg} --n-env 64
 
 # GAIL
-# TODO
+# TODO: test run_gail_ddpg
 
 # On-policy agents
 on_pol_arg="--horizon 64"
