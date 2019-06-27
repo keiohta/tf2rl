@@ -17,6 +17,9 @@ if gpus:
         # Memory growth must be set before GPUs have been initialized
         print(e)
 
+logging.root.handlers[0].setFormatter(logging.Formatter(
+    fmt='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s'))
+
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.experiments.utils import save_path, frames_to_gif
@@ -39,9 +42,6 @@ class Trainer:
             args=args, user_specified_dir="./results",
             suffix="{}_{}".format(self._policy.policy_name, args.dir_suffix))
         self.logger = logging.getLogger(__name__)
-        logging.basicConfig(
-            datefmt="%d/%Y %I:%M:%S",
-            format='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s')
         logging.getLogger().setLevel(logging.getLevelName(args.logging_level))
 
         # Save and restore model
