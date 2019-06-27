@@ -10,6 +10,7 @@ class MultiThreadEnv(object):
 
     This serve tensorflow operators to manipulate multiple environments.
     """
+
     def __init__(self, env_fn, batch_size, thread_pool=4, max_episode_steps=1000):
         """
         :param env_fn: function to make environments.
@@ -84,7 +85,8 @@ class MultiThreadEnv(object):
         """
         def _process(offset):
             for idx_env in range(offset, offset+self.batch_thread):
-                new_obs, reward, done, _ = self.envs[idx_env].step(actions[idx_env].numpy())
+                new_obs, reward, done, _ = self.envs[idx_env].step(
+                    actions[idx_env].numpy())
                 self.list_obs[idx_env] = new_obs
                 self.list_rewards[idx_env] = reward
                 self.list_done[idx_env] = done
@@ -92,7 +94,8 @@ class MultiThreadEnv(object):
 
         threads = []
         for i in range(self.thread_pool):
-            thread = threading.Thread(target=_process, args=[i*self.batch_thread])
+            thread = threading.Thread(
+                target=_process, args=[i*self.batch_thread])
             thread.start()
             threads.append(thread)
 

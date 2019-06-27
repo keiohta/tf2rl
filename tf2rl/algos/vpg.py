@@ -16,7 +16,8 @@ class CriticV(tf.keras.Model):
         self.l2 = Dense(units[1], name="L2", activation='relu')
         self.l3 = Dense(1, name="L2", activation='linear')
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_state = tf.constant(
+            np.zeros(shape=(1,)+state_shape, dtype=np.float32))
         with tf.device('/cpu:0'):
             self(dummy_state)
 
@@ -56,7 +57,8 @@ class VPG(OnPolicyAgent):
         self.critic = CriticV(state_shape, critic_units)
         self._action_dim = action_dim
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_actor)
-        self.critic_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_critic)
+        self.critic_optimizer = tf.keras.optimizers.Adam(
+            learning_rate=lr_critic)
 
     def get_action(self, state, test=False):
         assert isinstance(state, np.ndarray)
@@ -87,19 +89,26 @@ class VPG(OnPolicyAgent):
         return self.actor(state, test)
 
     def train_actor(self, states, actions, advantages, logp_olds):
-        actor_loss, log_probs = self._train_actor_body(states, actions, advantages)
+        actor_loss, log_probs = self._train_actor_body(
+            states, actions, advantages)
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
-        tf.summary.scalar(name=self.policy_name+"/logp_max", data=np.max(log_probs))
-        tf.summary.scalar(name=self.policy_name+"/logp_min", data=np.min(log_probs))
-        tf.summary.scalar(name=self.policy_name+"/logp_mean", data=np.mean(log_probs))
-        tf.summary.scalar(name=self.policy_name+"/adv_max", data=np.max(advantages))
-        tf.summary.scalar(name=self.policy_name+"/adv_min", data=np.min(advantages))
-        # TODO: Compute KL divergence and output it 
+        tf.summary.scalar(name=self.policy_name+"/logp_max",
+                          data=np.max(log_probs))
+        tf.summary.scalar(name=self.policy_name+"/logp_min",
+                          data=np.min(log_probs))
+        tf.summary.scalar(name=self.policy_name+"/logp_mean",
+                          data=np.mean(log_probs))
+        tf.summary.scalar(name=self.policy_name+"/adv_max",
+                          data=np.max(advantages))
+        tf.summary.scalar(name=self.policy_name+"/adv_min",
+                          data=np.min(advantages))
+        # TODO: Compute KL divergence and output it
         return actor_loss
 
     def train_critic(self, states, returns):
         critic_loss = self._train_critic_body(states, returns)
-        tf.summary.scalar(name=self.policy_name+"/critic_loss", data=critic_loss)
+        tf.summary.scalar(name=self.policy_name +
+                          "/critic_loss", data=critic_loss)
         return critic_loss
 
     @tf.function
@@ -109,7 +118,8 @@ class VPG(OnPolicyAgent):
             with tf.GradientTape() as tape:
                 log_probs = self.actor.compute_log_probs(states, actions)
                 weights = tf.stop_gradient(tf.squeeze(advantages))
-                actor_loss = tf.reduce_mean(-log_probs * weights)  # + lambda * entropy
+                # + lambda * entropy
+                actor_loss = tf.reduce_mean(-log_probs * weights)
             actor_grad = tape.gradient(
                 actor_loss, self.actor.trainable_variables)
             self.actor_optimizer.apply_gradients(
@@ -125,7 +135,8 @@ class VPG(OnPolicyAgent):
                 current_V = self.critic(states)
                 td_errors = tf.squeeze(returns) - current_V
                 critic_loss = tf.reduce_mean(0.5 * tf.square(td_errors))
-            critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
+            critic_grad = tape.gradient(
+                critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(
                 zip(critic_grad, self.critic.trainable_variables))
 

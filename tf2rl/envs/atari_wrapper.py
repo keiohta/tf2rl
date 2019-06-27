@@ -22,13 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
+import cv2
+from gym import spaces
+import gym
+from collections import deque
 import numpy as np
 import os
 os.environ.setdefault('PATH', '')
-from collections import deque
-import gym
-from gym import spaces
-import cv2
 cv2.ocl.setUseOpenCL(False)
 
 
@@ -49,7 +49,8 @@ class NoopResetEnv(gym.Wrapper):
         if self.override_num_noops is not None:
             noops = self.override_num_noops
         else:
-            noops = self.unwrapped.np_random.randint(1, self.noop_max + 1) #pylint: disable=E1101
+            noops = self.unwrapped.np_random.randint(
+                1, self.noop_max + 1)  # pylint: disable=E1101
         assert noops > 0
         obs = None
         for _ in range(noops):
@@ -125,7 +126,8 @@ class MaxAndSkipEnv(gym.Wrapper):
         """Return only every `skip`-th frame"""
         gym.Wrapper.__init__(self, env)
         # most recent raw observations (for max pooling across time steps)
-        self._obs_buffer = np.zeros((2,)+env.observation_space.shape, dtype=np.uint8)
+        self._obs_buffer = np.zeros(
+            (2,)+env.observation_space.shape, dtype=np.uint8)
         self._skip = skip
 
     def step(self, action):
@@ -189,7 +191,8 @@ class WarpFrame(gym.ObservationWrapper):
         else:
             original_space = self.observation_space.spaces[self._key]
             self.observation_space.spaces[self._key] = new_space
-        assert original_space.dtype == np.uint8 and len(original_space.shape) == 3
+        assert original_space.dtype == np.uint8 and len(
+            original_space.shape) == 3
 
     def observation(self, obs):
         if self._key is None:
@@ -230,8 +233,10 @@ class ProcessFrame84(gym.ObservationWrapper):
             img = np.reshape(frame, [250, 160, 3]).astype(np.float32)
         else:
             assert False, "Unknown resolution."
-        img = img[:, :, 0] * 0.299 + img[:, :, 1] * 0.587 + img[:, :, 2] * 0.114
-        resized_screen = cv2.resize(img, (84, 110), interpolation=cv2.INTER_AREA)
+        img = img[:, :, 0] * 0.299 + img[:, :, 1] * \
+            0.587 + img[:, :, 2] * 0.114
+        resized_screen = cv2.resize(
+            img, (84, 110), interpolation=cv2.INTER_AREA)
         x_t = resized_screen[18:102, :]
         x_t = np.reshape(x_t, [84, 84, 1])
         return x_t.astype(np.uint8)
@@ -272,7 +277,8 @@ class FrameStack(gym.Wrapper):
 class ScaledFloatFrame(gym.ObservationWrapper):
     def __init__(self, env):
         gym.ObservationWrapper.__init__(self, env)
-        self.observation_space = gym.spaces.Box(low=0, high=1, shape=env.observation_space.shape, dtype=np.float32)
+        self.observation_space = gym.spaces.Box(
+            low=0, high=1, shape=env.observation_space.shape, dtype=np.float32)
 
     def observation(self, observation):
         # careful! This undoes the memory optimization, use

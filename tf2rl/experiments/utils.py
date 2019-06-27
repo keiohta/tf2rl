@@ -20,7 +20,8 @@ def restore_latest_n_traj(dirname, n_path=10, max_steps=None):
 
 def get_filenames(dirname, n_path=None):
     import re
-    itr_reg = re.compile(r"step_(?P<step>[0-9]+)_epi_(?P<episodes>[0-9]+)_return_(-?)(?P<return_u>[0-9]+).(?P<return_l>[0-9]+).pkl")
+    itr_reg = re.compile(
+        r"step_(?P<step>[0-9]+)_epi_(?P<episodes>[0-9]+)_return_(-?)(?P<return_u>[0-9]+).(?P<return_l>[0-9]+).pkl")
 
     itr_files = []
     for _, filename in enumerate(os.listdir(dirname)):
@@ -30,7 +31,8 @@ def get_filenames(dirname, n_path=None):
             itr_files.append((itr_count, filename))
 
     n_path = n_path if n_path is not None else len(itr_files)
-    itr_files = sorted(itr_files, key=lambda x: int(x[0]), reverse=True)[:n_path]
+    itr_files = sorted(itr_files, key=lambda x: int(
+        x[0]), reverse=True)[:n_path]
     filenames = []
     for itr_file_and_count in itr_files:
         filenames.append(os.path.join(dirname, itr_file_and_count[1]))
@@ -63,7 +65,8 @@ def frames_to_gif(frames, prefix, save_dir, interval=50, fps=30):
     """Convert frames to gif file
     """
     assert len(frames) > 0
-    plt.figure(figsize=(frames[0].shape[1] / 72., frames[0].shape[0] / 72.), dpi=72)
+    plt.figure(figsize=(frames[0].shape[1] / 72.,
+                        frames[0].shape[0] / 72.), dpi=72)
     patch = plt.imshow(frames[0])
     plt.axis('off')
 
@@ -71,6 +74,7 @@ def frames_to_gif(frames, prefix, save_dir, interval=50, fps=30):
         patch.set_data(frames[i])
 
     # TODO: interval should be 1000 / fps ?
-    anim = animation.FuncAnimation(plt.gcf(), animate, frames=len(frames), interval=interval)
+    anim = animation.FuncAnimation(
+        plt.gcf(), animate, frames=len(frames), interval=interval)
     output_path = "{}/{}.gif".format(save_dir, prefix)
     anim.save(output_path, writer='imagemagick', fps=fps)

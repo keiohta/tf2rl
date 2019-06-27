@@ -53,13 +53,15 @@ class QFunc(tf.keras.Model):
             else:
                 features = tf.reshape(
                     features, (-1, self._action_dim, self._n_atoms))  # [batch_size, action_dim, n_atoms]
-            q_dist = tf.keras.activations.softmax(features, axis=2)  # [batch_size, action_dim, n_atoms]
+            # [batch_size, action_dim, n_atoms]
+            q_dist = tf.keras.activations.softmax(features, axis=2)
             return tf.clip_by_value(q_dist, 1e-8, 1.0-1e-8)
         else:
             if self._enable_dueling_dqn:
                 advantages = self.l3(features)
                 v_values = self.l4(features)
-                q_values = v_values + (advantages - tf.reduce_mean(advantages, axis=1, keepdims=True))
+                q_values = v_values + \
+                    (advantages - tf.reduce_mean(advantages, axis=1, keepdims=True))
             else:
                 q_values = self.l3(features)
             return q_values
@@ -111,9 +113,11 @@ class DQN(OffPolicyAgent):
         # Distributional DQN
         if enable_categorical_dqn:
             self._v_max, self._v_min = 10., -10.
-            self._delta_z = (self._v_max - self._v_min) / (self.q_func._n_atoms - 1)
+            self._delta_z = (self._v_max - self._v_min) / \
+                (self.q_func._n_atoms - 1)
             self._z_list = tf.constant(
-                [self._v_min + i * self._delta_z for i in range(self.q_func._n_atoms)],
+                [self._v_min + i *
+                    self._delta_z for i in range(self.q_func._n_atoms)],
                 dtype=tf.float32)
             self._z_list_broadcasted = tf.tile(
                 tf.reshape(self._z_list, [1, self.q_func._n_atoms]),
@@ -123,7 +127,8 @@ class DQN(OffPolicyAgent):
         if epsilon_min is not None and not enable_noisy_dqn:
             assert epsilon > epsilon_min
             self.epsilon_min = epsilon_min
-            self.epsilon_decay_rate = (epsilon - epsilon_min) / epsilon_decay_step
+            self.epsilon_decay_rate = (
+                epsilon - epsilon_min) / epsilon_decay_step
             self.epsilon = max(epsilon - self.epsilon_decay_rate * self.n_warmup,
                                self.epsilon_min)
         else:
@@ -150,13 +155,15 @@ class DQN(OffPolicyAgent):
             if is_single_input:
                 action = np.random.randint(self._action_dim)
             else:
-                action = np.array([np.random.randint(self._action_dim) for _ in range(state.shape[0])], dtype=np.int64)
+                action = np.array([np.random.randint(self._action_dim)
+                                   for _ in range(state.shape[0])], dtype=np.int64)
             if tensor:
                 return tf.convert_to_tensor(action)
             else:
                 return action
 
-        state = np.expand_dims(state, axis=0).astype(np.float32) if is_single_input else state
+        state = np.expand_dims(state, axis=0).astype(
+            np.float32) if is_single_input else state
         if self._enable_categorical_dqn:
             action = self._get_action_body_distributional(tf.constant(state))
         else:
@@ -187,13 +194,15 @@ class DQN(OffPolicyAgent):
         td_errors, q_func_loss = self._train_body(
             states, actions, next_states, rewards, done, weights)
 
-        tf.summary.scalar(name=self.policy_name+"/q_func_Loss", data=q_func_loss)
+        tf.summary.scalar(name=self.policy_name +
+                          "/q_func_Loss", data=q_func_loss)
 
         # TODO: Remove following by using tf.global_step
         self.n_update += 1
         # Update target networks
         if self.n_update % self.target_replace_interval == 0:
-            update_target_variables(self.q_func_target.weights, self.q_func.weights, tau=1.)
+            update_target_variables(
+                self.q_func_target.weights, self.q_func.weights, tau=1.)
 
         # Update exploration rate
         self.epsilon = max(self.epsilon - self.epsilon_decay_rate * self.update_interval,
@@ -219,8 +228,10 @@ class DQN(OffPolicyAgent):
                         huber_loss(td_errors,
                                    delta=self.max_grad) * weights)
 
-            q_func_grad = tape.gradient(q_func_loss, self.q_func.trainable_variables)
-            self.q_func_optimizer.apply_gradients(zip(q_func_grad, self.q_func.trainable_variables))
+            q_func_grad = tape.gradient(
+                q_func_loss, self.q_func.trainable_variables)
+            self.q_func_optimizer.apply_gradients(
+                zip(q_func_grad, self.q_func.trainable_variables))
 
             return td_errors, q_func_loss
 
@@ -270,14 +281,15 @@ class DQN(OffPolicyAgent):
                 tf.reshape(rewards, [-1, 1]),
                 tf.constant([1, self.q_func._n_atoms]))  # [batch_size, n_atoms]
             not_done = 1.0 - tf.tile(
-                tf.reshape(done ,[-1, 1]),
+                tf.reshape(done, [-1, 1]),
                 tf.constant([1, self.q_func._n_atoms]))  # [batch_size, n_atoms]
             discounts = tf.cast(
                 tf.reshape(self.discount, [-1, 1]), tf.float32)
             z = tf.reshape(
                 self._z_list, [1, self.q_func._n_atoms])  # [1, n_atoms]
             z = rewards + not_done * discounts * z  # [batch_size, n_atoms]
-            z = tf.clip_by_value(z, self._v_min, self._v_max)  # [batch_size, n_atoms]
+            # [batch_size, n_atoms]
+            z = tf.clip_by_value(z, self._v_min, self._v_max)
             b = (z - self._v_min) / self._delta_z  # [batch_size, n_atoms]
 
             index_help = tf.expand_dims(
@@ -293,7 +305,8 @@ class DQN(OffPolicyAgent):
                 [index_help, tf.expand_dims(tf.cast(l, tf.int32), -1)],
                 axis=2)  # [batch_size, n_atoms, 2]
 
-            target_Q_next_dist = self.q_func_target(next_states)  # [batch_size, n_action, n_atoms]
+            target_Q_next_dist = self.q_func_target(
+                next_states)  # [batch_size, n_action, n_atoms]
             if self._enable_double_dqn:
                 # TODO: Check this implementation is correct
                 target_Q_next_dist = tf.gather_nd(
@@ -323,7 +336,7 @@ class DQN(OffPolicyAgent):
 
             td_errors = tf.reduce_sum(
                 target_Q_next_dist * (u - b) * tf.math.log(
-                    tf.gather_nd(current_Q_dist, l_id)) + \
+                    tf.gather_nd(current_Q_dist, l_id)) +
                 target_Q_next_dist * (b - l) * tf.math.log(
                     tf.gather_nd(current_Q_dist, u_id)),
                 axis=1)

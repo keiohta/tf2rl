@@ -33,7 +33,8 @@ class Categorical(Distribution):
         probs = param["prob"]
         # NOTE: input to `tf.random.categorical` is log probabilities
         # For more details, see https://www.tensorflow.org/versions/r2.0/api_docs/python/tf/random/categorical
-        return tf.random.categorical(tf.math.log(probs), 1)  # [probs.shape[0], 1]
+        # [probs.shape[0], 1]
+        return tf.random.categorical(tf.math.log(probs), 1)
 
     def entropy(self, param):
         probs = param["prob"]

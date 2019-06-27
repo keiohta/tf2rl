@@ -17,7 +17,7 @@ def get_space_size(space):
     if isinstance(space, Box):
         return space.shape
     elif isinstance(space, Discrete):
-        return [1,]  # space.n
+        return [1, ]  # space.n
     else:
         raise NotImplementedError("Assuming to use Box or Discrete")
 

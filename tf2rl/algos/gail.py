@@ -15,8 +15,10 @@ class Discriminator(tf.keras.Model):
         self.l2 = DenseClass(units[1], name="L2", activation="relu")
         self.l3 = DenseClass(1, name="L3", activation="sigmoid")
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
-        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
+        dummy_state = tf.constant(
+            np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_action = tf.constant(
+            np.zeros(shape=[1, action_dim], dtype=np.float32))
         with tf.device("/cpu:0"):
             self([dummy_state, dummy_action])
 
@@ -45,11 +47,9 @@ class GAIL(Policy):
 
     def train(self, agent_states, agent_acts, expert_states, expert_acts):
         loss, accuracy = self._train_body(agent_states, agent_acts,
-                                expert_states, expert_acts)
-        tf.summary.scalar(
-            name="DiscriminatorLoss", data=loss, description="loss")
-        tf.summary.scalar(
-            name="Accuracy", data=accuracy, description="loss")
+                                          expert_states, expert_acts)
+        tf.summary.scalar(name="DiscriminatorLoss", data=loss)
+        tf.summary.scalar(name="Accuracy", data=accuracy)
         # TODO: Summarize kl-divergence and classification accuracy
 
     @tf.function
@@ -59,7 +59,7 @@ class GAIL(Policy):
             with tf.GradientTape() as tape:
                 real_logit = self.disc([expert_states, expert_acts])
                 fake_logit = self.disc([agent_states, expert_acts])
-                loss = -(tf.reduce_mean(tf.math.log(real_logit + epsilon)) + \
+                loss = -(tf.reduce_mean(tf.math.log(real_logit + epsilon)) +
                          tf.reduce_mean(tf.math.log(1. - fake_logit + epsilon)))
                 accuracy = \
                     tf.reduce_mean(tf.cast(real_logit > 0.5, tf.float32)) / 2. + \

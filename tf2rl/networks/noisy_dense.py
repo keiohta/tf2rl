@@ -11,7 +11,7 @@ from tensorflow.keras import backend as K
 
 class NoisyDense(tf.keras.layers.Layer):
     def __init__(
-            self, 
+            self,
             units,
             sigma_init=0.017,
             activation=None,
@@ -36,7 +36,8 @@ class NoisyDense(tf.keras.layers.Layer):
         self.bias_initializer = tf.keras.initializers.get(bias_initializer)
         self.kernel_regularizer = tf.keras.regularizers.get(kernel_regularizer)
         self.bias_regularizer = tf.keras.regularizers.get(bias_regularizer)
-        self.activity_regularizer = tf.keras.regularizers.get(activity_regularizer)
+        self.activity_regularizer = tf.keras.regularizers.get(
+            activity_regularizer)
         self.kernel_constraint = tf.keras.constraints.get(kernel_constraint)
         self.bias_constraint = tf.keras.constraints.get(bias_constraint)
         self.trainable = trainable
@@ -74,7 +75,8 @@ class NoisyDense(tf.keras.layers.Layer):
 
             self.sigma_bias = self.add_weight(
                 shape=(self.units,),
-                initializer=tf.keras.initializers.Constant(value=self.sigma_init),
+                initializer=tf.keras.initializers.Constant(
+                    value=self.sigma_init),
                 name='sigma_bias',
                 trainable=self.trainable)
 

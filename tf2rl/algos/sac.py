@@ -17,7 +17,8 @@ class CriticV(tf.keras.Model):
         self.l2 = Dense(256, name="L2", activation='relu')
         self.l3 = Dense(1, name="L3", activation='linear')
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_state = tf.constant(
+            np.zeros(shape=(1,)+state_shape, dtype=np.float32))
         self(dummy_state)
 
     def call(self, states):
@@ -36,8 +37,10 @@ class CriticQ(tf.keras.Model):
         self.l2 = Dense(256, name="L2", activation='relu')
         self.l3 = Dense(1, name="L2", activation='linear')
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
-        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
+        dummy_state = tf.constant(
+            np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_action = tf.constant(
+            np.zeros(shape=[1, action_dim], dtype=np.float32))
         self([dummy_state, dummy_action])
 
     def call(self, inputs):
@@ -72,7 +75,8 @@ class SAC(OffPolicyAgent):
 
         self.vf = CriticV(state_shape)
         self.vf_target = CriticV(state_shape)
-        update_target_variables(self.vf_target.weights, self.vf.weights, tau=1.)
+        update_target_variables(self.vf_target.weights,
+                                self.vf.weights, tau=1.)
         self.vf_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
         self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
@@ -88,7 +92,8 @@ class SAC(OffPolicyAgent):
         assert isinstance(state, np.ndarray)
         is_single_state = len(state.shape) == 1
 
-        state = np.expand_dims(state, axis=0).astype(np.float32) if is_single_state else state
+        state = np.expand_dims(state, axis=0).astype(
+            np.float32) if is_single_state else state
         action = self._get_action_body(tf.constant(state), test)
 
         return action.numpy()[0] if is_single_state else action
@@ -102,7 +107,8 @@ class SAC(OffPolicyAgent):
             weights = np.ones_like(rewards)
 
         td_errors, actor_loss, vf_loss, qf_loss, log_pi_min, log_pi_max = \
-            self._train_body(states, actions, next_states, rewards, done, weights)
+            self._train_body(states, actions, next_states,
+                             rewards, done, weights)
 
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
         tf.summary.scalar(name=self.policy_name+"/critic_V_loss", data=vf_loss)
@@ -127,13 +133,17 @@ class SAC(OffPolicyAgent):
                 target_Q = tf.stop_gradient(
                     self.scale_reward * rewards + not_done * self.discount * vf_next_target)
 
-                td_loss1 = tf.reduce_mean(huber_loss(target_Q - current_Q1, delta=self.max_grad))
-                td_loss2 = tf.reduce_mean(huber_loss(target_Q - current_Q2, delta=self.max_grad))
+                td_loss1 = tf.reduce_mean(huber_loss(
+                    target_Q - current_Q1, delta=self.max_grad))
+                td_loss2 = tf.reduce_mean(huber_loss(
+                    target_Q - current_Q2, delta=self.max_grad))
 
             q1_grad = tape.gradient(td_loss1, self.qf1.trainable_variables)
-            self.qf1_optimizer.apply_gradients(zip(q1_grad, self.qf1.trainable_variables))
+            self.qf1_optimizer.apply_gradients(
+                zip(q1_grad, self.qf1.trainable_variables))
             q2_grad = tape.gradient(td_loss2, self.qf2.trainable_variables)
-            self.qf2_optimizer.apply_gradients(zip(q2_grad, self.qf2.trainable_variables))
+            self.qf2_optimizer.apply_gradients(
+                zip(q2_grad, self.qf2.trainable_variables))
 
             del tape
 
@@ -154,11 +164,15 @@ class SAC(OffPolicyAgent):
                 policy_loss = tf.reduce_mean(log_pi - current_Q1)
 
             vf_grad = tape.gradient(vf_loss_t, self.vf.trainable_variables)
-            self.vf_optimizer.apply_gradients(zip(vf_grad, self.vf.trainable_variables))
-            update_target_variables(self.vf_target.weights, self.vf.weights, self.tau)
+            self.vf_optimizer.apply_gradients(
+                zip(vf_grad, self.vf.trainable_variables))
+            update_target_variables(
+                self.vf_target.weights, self.vf.weights, self.tau)
 
-            actor_grad = tape.gradient(policy_loss, self.actor.trainable_variables)
-            self.actor_optimizer.apply_gradients(zip(actor_grad, self.actor.trainable_variables))
+            actor_grad = tape.gradient(
+                policy_loss, self.actor.trainable_variables)
+            self.actor_optimizer.apply_gradients(
+                zip(actor_grad, self.actor.trainable_variables))
 
             del tape
 
@@ -168,8 +182,8 @@ class SAC(OffPolicyAgent):
         td_erros_Q1, td_errors_Q2, td_errors_V = self._compute_td_error_body(
             states, actions, next_states, rewards, dones)
         return np.squeeze(
-            np.abs(td_erros_Q1.numpy()) + \
-            np.abs(td_errors_Q2.numpy()) + \
+            np.abs(td_erros_Q1.numpy()) +
+            np.abs(td_errors_Q2.numpy()) +
             np.abs(td_errors_V.numpy()))
 
     @tf.function
@@ -185,7 +199,7 @@ class SAC(OffPolicyAgent):
 
             target_Q = tf.stop_gradient(
                 self.scale_reward * rewards + not_dones * self.discount * vf_next_target)
-    
+
             td_errors_Q1 = target_Q - current_Q1
             td_errors_Q2 = target_Q - current_Q2
 

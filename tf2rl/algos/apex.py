@@ -14,6 +14,10 @@ from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_default_rb_dict
 
 
+logging.root.handlers[0].setFormatter(logging.Formatter(
+    fmt='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s'))
+
+
 def import_tf():
     import tensorflow as tf
     gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -23,14 +27,13 @@ def import_tf():
             for gpu in gpus:
                 tf.config.experimental.set_memory_growth(gpu, True)
             logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-            print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+            logging.info(
+                len(gpus), "Physical GPUs,",
+                len(logical_gpus), "Logical GPUs")
         except RuntimeError as e:
             # Memory growth must be set before GPUs have been initialized
-            print(e)
+            logging.error(e)
     return tf
-
-logging.root.handlers[0].setFormatter(logging.Formatter(
-    fmt='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s'))
 
 
 def explorer(global_rb, queue, trained_steps, is_training_done,
@@ -130,8 +133,8 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
                 states=obses, actions=actions, next_states=next_obses,
                 rewards=rewards, dones=dones)
             local_rb.add(obs=obses, act=actions, next_obs=next_obses,
-                     rew=rewards, done=dones,
-                     priorities=np.abs(td_errors+1e-6))
+                         rew=rewards, done=dones,
+                         priorities=np.abs(td_errors+1e-6))
 
         # Periodically copy weights of explorer
         if not queue.empty():
@@ -141,7 +144,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
         if local_rb.get_stored_size() == buffer_size:
             samples = local_rb.sample(local_rb.get_stored_size())
             if n_env > 1:
-                priorities=np.squeeze(samples["priorities"])
+                priorities = np.squeeze(samples["priorities"])
             else:
                 td_errors = policy.compute_td_error(
                     states=samples["obs"], actions=samples["act"],
@@ -160,10 +163,12 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
             msg += "Samples: {0: 7d}\t".format(n_sample)
             msg += "TDErr: {0:.5f}\t".format(np.average(priorities))
             if n_env == 1:
-                ave_rew = 0 if len(total_rewards) == 0 else sum(total_rewards) / len(total_rewards)
+                ave_rew = 0 if len(total_rewards) == 0 else \
+                    sum(total_rewards) / len(total_rewards)
                 msg += "AveEpiRew: {0:.3f}\t".format(ave_rew)
                 total_rewards = []
-            msg += "FPS: {0:.2f}".format((n_sample - n_sample_old) / (time.time() - start))
+            msg += "FPS: {0:.2f}".format(
+                (n_sample - n_sample_old) / (time.time() - start))
             logging.info(msg)
 
             start = time.time()
@@ -433,9 +438,9 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
     tasks.append(Process(
         target=learner,
         args=[global_rb, trained_steps, is_training_done,
-                lock, env_fn(), policy_fn, get_weights_fn,
-                args.max_batch, args.param_update_freq,
-                args.test_freq, args.gpu_learner, queues]))
+              lock, env_fn(), policy_fn, get_weights_fn,
+              args.max_batch, args.param_update_freq,
+              args.test_freq, args.gpu_learner, queues]))
 
     # Add evaluator
     tasks.append(Process(

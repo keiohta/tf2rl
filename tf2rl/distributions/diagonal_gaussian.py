@@ -27,7 +27,7 @@ class DiagonalGaussian(Distribution):
         new_std = tf.math.exp(new_log_stds)
 
         numerator = tf.math.square(old_means - new_means) \
-                    + tf.math.square(old_std) - tf.math.square(new_std)
+            + tf.math.square(old_std) - tf.math.square(new_std)
         denominator = 2 * tf.math.square(new_std) + 1e-8
         return tf.math.reduce_sum(numerator / denominator + new_log_stds - old_log_stds)
 

@@ -58,7 +58,8 @@ class IRLTrainer(Trainer):
                 if hasattr(self._env, "_max_episode_steps") and \
                         episode_steps == self._env._max_episode_steps:
                     done_flag = False
-                replay_buffer.add(obs=obs, act=action, next_obs=next_obs, rew=reward, done=done_flag)
+                replay_buffer.add(obs=obs, act=action,
+                                  next_obs=next_obs, rew=reward, done=done_flag)
                 obs = next_obs
 
                 if done or episode_steps == self._episode_max_steps:
@@ -79,7 +80,8 @@ class IRLTrainer(Trainer):
                                                 size=self._policy.batch_size)
                     expert_obs, expert_act = self._expert_obs[indices], self._expert_act[indices]
                     # Train IRL
-                    self._irl.train(samples["obs"], samples["act"], expert_obs, expert_act)
+                    self._irl.train(
+                        samples["obs"], samples["act"], expert_obs, expert_act)
 
                     # Train policy
                     rew = self._irl.inference(samples["obs"], samples["act"])
@@ -88,14 +90,18 @@ class IRLTrainer(Trainer):
                         rew, np.array(samples["done"], dtype=np.float32),
                         None if not self._use_prioritized_rb else samples["weights"])
                     if self._use_prioritized_rb:
-                        replay_buffer.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
+                        replay_buffer.update_priorities(
+                            samples["indexes"], np.abs(td_error) + 1e-6)
                     if int(total_steps) % self._test_interval == 0:
                         with tf.summary.always_record_summaries():
-                            avg_test_return = self.evaluate_policy(int(total_steps))
+                            avg_test_return = self.evaluate_policy(
+                                int(total_steps))
                             self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                                 int(total_steps), avg_test_return, self._test_episodes))
-                            tf.summary.scalar(name="AverageTestReturn", data=avg_test_return, description="loss")
-                            tf.summary.scalar(name="FPS", data=fps, description="loss")
+                            tf.summary.scalar(
+                                name="AverageTestReturn", data=avg_test_return)
+                            tf.summary.scalar(
+                                name="FPS", data=fps)
 
                         self.writer.flush()
 

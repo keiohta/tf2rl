@@ -1,3 +1,6 @@
+from tf2rl.experiments.utils import save_path, frames_to_gif
+from tf2rl.misc.get_replay_buffer import get_replay_buffer
+from tf2rl.misc.prepare_output_dir import prepare_output_dir
 import os
 import time
 import numpy as np
@@ -19,10 +22,6 @@ if gpus:
 
 logging.root.handlers[0].setFormatter(logging.Formatter(
     fmt='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s'))
-
-from tf2rl.misc.prepare_output_dir import prepare_output_dir
-from tf2rl.misc.get_replay_buffer import get_replay_buffer
-from tf2rl.experiments.utils import save_path, frames_to_gif
 
 
 class Trainer:
@@ -90,7 +89,8 @@ class Trainer:
             if hasattr(self._env, "_max_episode_steps") and \
                     episode_steps == self._env._max_episode_steps:
                 done_flag = False
-            replay_buffer.add(obs=obs, act=action, next_obs=next_obs, rew=reward, done=done_flag)
+            replay_buffer.add(obs=obs, act=action,
+                              next_obs=next_obs, rew=reward, done=done_flag)
             obs = next_obs
 
             if done or episode_steps == self._episode_max_steps:
@@ -112,12 +112,14 @@ class Trainer:
                     samples["rew"], np.array(samples["done"], dtype=np.float32),
                     None if not self._use_prioritized_rb else samples["weights"])
                 if self._use_prioritized_rb:
-                    replay_buffer.update_priorities(samples["indexes"], np.abs(td_error) + 1e-6)
+                    replay_buffer.update_priorities(
+                        samples["indexes"], np.abs(td_error) + 1e-6)
                 if total_steps % self._test_interval == 0:
                     avg_test_return = self.evaluate_policy(total_steps)
                     self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                         total_steps, avg_test_return, self._test_episodes))
-                    tf.summary.scalar(name="Common/average_test_return", data=avg_test_return)
+                    tf.summary.scalar(
+                        name="Common/average_test_return", data=avg_test_return)
                     tf.summary.scalar(name="Common/fps", data=fps)
 
                     self.writer.flush()
@@ -141,7 +143,8 @@ class Trainer:
                 action = self._policy.get_action(obs, test=True)
                 next_obs, reward, done, _ = self._test_env.step(action)
                 if self._save_test_path:
-                    replay_buffer.add(obs=obs, act=action, next_obs=next_obs, rew=reward, done=done)
+                    replay_buffer.add(obs=obs, act=action,
+                                      next_obs=next_obs, rew=reward, done=done)
 
                 if self._save_test_movie:
                     frames.append(self._test_env.render(mode='rgb_array'))
@@ -162,7 +165,7 @@ class Trainer:
             avg_test_return += episode_return
         if self._show_test_images:
             images = tf.cast(
-                tf.expand_dims(np.array(obs).transpose(2,0,1), axis=3),
+                tf.expand_dims(np.array(obs).transpose(2, 0, 1), axis=3),
                 tf.uint8)
             tf.summary.image('train/input_img', images,)
         return avg_test_return / self._test_episodes

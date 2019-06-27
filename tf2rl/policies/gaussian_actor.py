@@ -24,10 +24,12 @@ class GaussianActor(tf.keras.Model):
 
         self.l1 = Dense(units[0], name="L1", activation='relu')
         self.l2 = Dense(units[1], name="L2", activation='relu')
-        self.out_mean = Dense(action_dim, name="L_mean", activation='tanh' if tanh_mean else None)
+        self.out_mean = Dense(action_dim, name="L_mean",
+                              activation='tanh' if tanh_mean else None)
         if not self.fix_std:
             activation = 'tanh' if tanh_std else None
-            self.out_log_std = Dense(action_dim, name="L_sigma", activation=activation)
+            self.out_log_std = Dense(
+                action_dim, name="L_sigma", activation=activation)
 
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
@@ -49,12 +51,13 @@ class GaussianActor(tf.keras.Model):
         else:
             log_std = self.out_log_std(features)
             if self._tanh_std:
-                log_std = self.LOG_SIG_CAP_MIN + 0.5 * (self.LOG_SIG_CAP_MAX - self.LOG_SIG_CAP_MIN) * (log_std + 1)
+                log_std = self.LOG_SIG_CAP_MIN + 0.5 * \
+                    (self.LOG_SIG_CAP_MAX - self.LOG_SIG_CAP_MIN) * (log_std + 1)
             else:
                 log_std = tf.clip_by_value(
                     log_std, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
 
-        return {"mean":mean, "log_std":log_std}
+        return {"mean": mean, "log_std": log_std}
 
     def call(self, states, test=False):
         """Compute actions and log probabilities of the selected action

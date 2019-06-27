@@ -69,7 +69,8 @@ class OnPolicyTrainer(Trainer):
             samples = self.replay_buffer.sample(self._policy.horizon)
             # Normalize advantages
             if self._policy.normalize_adv:
-                adv = (samples["adv"] - np.mean(samples["adv"])) / np.std(samples["adv"])
+                adv = (samples["adv"] - np.mean(samples["adv"])
+                       ) / np.std(samples["adv"])
             else:
                 adv = samples["adv"]
             for _ in range(1):
@@ -88,7 +89,8 @@ class OnPolicyTrainer(Trainer):
                 avg_test_return = self.evaluate_policy(total_steps)
                 self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                     total_steps, avg_test_return, self._test_episodes))
-                tf.summary.scalar(name="Common/average_test_return", data=avg_test_return)
+                tf.summary.scalar(
+                    name="Common/average_test_return", data=avg_test_return)
                 tf.summary.scalar(name="Common/fps", data=fps)
 
                 self.writer.flush()
@@ -169,7 +171,7 @@ class OnPolicyTrainer(Trainer):
             avg_test_return += episode_return
         if self._show_test_images:
             images = tf.cast(
-                tf.expand_dims(np.array(obs).transpose(2,0,1), axis=3),
+                tf.expand_dims(np.array(obs).transpose(2, 0, 1), axis=3),
                 tf.uint8)
             tf.summary.image('train/input_img', images,)
         return avg_test_return / self._test_episodes

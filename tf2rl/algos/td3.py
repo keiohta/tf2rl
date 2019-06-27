@@ -19,8 +19,10 @@ class Critic(tf.keras.Model):
         self.l5 = Dense(units[1], name="L5")
         self.l6 = Dense(1, name="L6")
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
-        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
+        dummy_state = tf.constant(
+            np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_action = tf.constant(
+            np.zeros(shape=[1, action_dim], dtype=np.float32))
         with tf.device("/cpu:0"):
             self([dummy_state, dummy_action])
 
@@ -58,8 +60,10 @@ class TD3(DDPG):
 
         self.critic = Critic(state_shape, action_dim, critic_units)
         self.critic_target = Critic(state_shape, action_dim, critic_units)
-        update_target_variables(self.critic_target.weights, self.critic.weights, tau=1.)
-        self.critic_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_critic)
+        update_target_variables(
+            self.critic_target.weights, self.critic.weights, tau=1.)
+        self.critic_optimizer = tf.keras.optimizers.Adam(
+            learning_rate=lr_critic)
 
         self._policy_noise = policy_noise
         self._noise_clip = noise_clip
@@ -76,8 +80,10 @@ class TD3(DDPG):
                 critic_loss = tf.reduce_mean(huber_loss(td_error1, delta=self.max_grad) * weights) + \
                               tf.reduce_mean(huber_loss(td_error2, delta=self.max_grad) * weights)
 
-            critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
-            self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
+            critic_grad = tape.gradient(
+                critic_loss, self.critic.trainable_variables)
+            self.critic_optimizer.apply_gradients(
+                zip(critic_grad, self.critic.trainable_variables))
 
             self._it.assign_add(1)
             with tf.GradientTape() as tape:
@@ -92,8 +98,10 @@ class TD3(DDPG):
                     zip(actor_grad, self.actor.trainable_variables))
 
             # Update target networks
-            update_target_variables(self.critic_target.weights, self.critic.weights, self.tau)
-            update_target_variables(self.actor_target.weights, self.actor.weights, self.tau)
+            update_target_variables(
+                self.critic_target.weights, self.critic.weights, self.tau)
+            update_target_variables(
+                self.actor_target.weights, self.actor.weights, self.tau)
 
             return actor_loss, critic_loss, np.abs(td_error1) + np.abs(td_error2)
 
@@ -110,12 +118,14 @@ class TD3(DDPG):
             # Get noisy action
             next_action = self.actor_target(next_states)
             noise = tf.cast(tf.clip_by_value(
-                tf.random.normal(shape=tf.shape(next_action), stddev=self._policy_noise),
+                tf.random.normal(shape=tf.shape(next_action),
+                                 stddev=self._policy_noise),
                 -self._noise_clip, self._noise_clip), tf.float32)
             next_action = tf.clip_by_value(
                 next_action + noise, -self.actor_target.max_action, self.actor_target.max_action)
 
-            target_Q1, target_Q2 = self.critic_target([next_states, next_action])
+            target_Q1, target_Q2 = self.critic_target(
+                [next_states, next_action])
             target_Q = tf.minimum(target_Q1, target_Q2)
             target_Q = rewards + (not_dones * self.discount * target_Q)
             target_Q = tf.stop_gradient(target_Q)

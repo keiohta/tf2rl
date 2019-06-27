@@ -69,11 +69,11 @@ def periodically(body, period, name="periodically"):
 
     with tf.variable_scope(None, default_name=name):
         counter = tf.get_variable(
-                "counter",
-                shape=[],
-                dtype=tf.int64,
-                trainable=False,
-                initializer=tf.constant_initializer(period, dtype=tf.int64))
+            "counter",
+            shape=[],
+            dtype=tf.int64,
+            trainable=False,
+            initializer=tf.constant_initializer(period, dtype=tf.int64))
 
         def _wrapped_body():
             with tf.control_dependencies([body()]):
@@ -81,6 +81,6 @@ def periodically(body, period, name="periodically"):
                 return counter.assign(1)
 
         update = tf.cond(
-                tf.equal(counter, period), _wrapped_body, lambda: counter.assign_add(1))
+            tf.equal(counter, period), _wrapped_body, lambda: counter.assign_add(1))
 
     return update

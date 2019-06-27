@@ -62,13 +62,15 @@ class AtariQFunc(tf.keras.Model):
             else:
                 features = tf.reshape(
                     features, (-1, self._action_dim, self._n_atoms))  # [batch_size, action_dim, n_atoms]
-            q_dist = tf.keras.activations.softmax(features, axis=2)  # [batch_size, action_dim, n_atoms]
+            # [batch_size, action_dim, n_atoms]
+            q_dist = tf.keras.activations.softmax(features, axis=2)
             return tf.clip_by_value(q_dist, 1e-8, 1.0-1e-8)
         else:
             if self._enable_dueling_dqn:
                 advantages = self.fc2(features)
                 v_values = self.fc3(features)
-                q_values = v_values + (advantages - tf.reduce_mean(advantages, axis=1, keepdims=True))
+                q_values = v_values + \
+                    (advantages - tf.reduce_mean(advantages, axis=1, keepdims=True))
             else:
                 q_values = self.fc2(features)
             return q_values
