@@ -29,6 +29,9 @@ def import_tf():
             print(e)
     return tf
 
+logging.root.handlers[0].setFormatter(logging.Formatter(
+    fmt='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s'))
+
 
 def explorer(global_rb, queue, trained_steps, is_training_done,
              lock, env_fn, policy_fn, set_weights_fn, noise_level,
@@ -393,9 +396,6 @@ def prepare_experiment(env, args):
 
 
 def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
-    logging.basicConfig(
-        datefmt="%d/%Y %I:%M:%S",
-        format='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s')
     logging.getLogger().setLevel(logging.getLevelName(args.logging_level))
 
     if args.n_env > 1:
