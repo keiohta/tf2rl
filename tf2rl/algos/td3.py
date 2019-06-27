@@ -64,8 +64,8 @@ class TD3(DDPG):
         self._policy_noise = policy_noise
         self._noise_clip = noise_clip
 
-        self._actor_update_freq = tf.constant(actor_update_freq)
-        self._it = tf.Variable(0)
+        self._actor_update_freq = actor_update_freq
+        self._it = tf.Variable(0, dtype=tf.int32)
 
     @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights):
@@ -79,16 +79,17 @@ class TD3(DDPG):
             critic_grad = tape.gradient(critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(zip(critic_grad, self.critic.trainable_variables))
 
-            actor_loss = None
-            # TODO: Update actor and target networks at specified frequency
-            # tf.assign(self._it, self._it+1)
-            # if tf.mod(self._it, self._actor_update_freq) == 0:
+            self._it.assign_add(1)
             with tf.GradientTape() as tape:
                 next_actions = self.actor(states)
-                actor_loss = -tf.reduce_mean(self.critic([states, next_actions]))
+                actor_loss = - \
+                    tf.reduce_mean(self.critic([states, next_actions]))
 
-            actor_grad = tape.gradient(actor_loss, self.actor.trainable_variables)
-            self.actor_optimizer.apply_gradients(zip(actor_grad, self.actor.trainable_variables))
+            if tf.math.equal(self._it % self._actor_update_freq, 0):
+                actor_grad = tape.gradient(
+                    actor_loss, self.actor.trainable_variables)
+                self.actor_optimizer.apply_gradients(
+                    zip(actor_grad, self.actor.trainable_variables))
 
             # Update target networks
             update_target_variables(self.critic_target.weights, self.critic.weights, self.tau)
