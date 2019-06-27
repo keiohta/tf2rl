@@ -13,7 +13,7 @@ class TestCategoricalActor(CommonModel):
         cls.policy = CategoricalActor(
             state_shape=cls.discrete_env.observation_space.shape,
             action_dim=cls.discrete_env.action_space.n,
-            units=[4,4])
+            units=[4, 4])
 
     def test_call(self):
         # Single input

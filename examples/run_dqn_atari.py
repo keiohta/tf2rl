@@ -15,7 +15,8 @@ if __name__ == '__main__':
     parser = Trainer.get_argument()
     parser = DQN.get_argument(parser)
     parser.add_argument("--replay-buffer-size", type=int, default=int(1e6))
-    parser.add_argument('--env-name', type=str, default="SpaceInvadersNoFrameskip-v4")
+    parser.add_argument('--env-name', type=str,
+                        default="SpaceInvadersNoFrameskip-v4")
     parser.set_defaults(episode_max_steps=108000)
     parser.set_defaults(test_interval=10000)
     parser.set_defaults(max_steps=int(1e9))

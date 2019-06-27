@@ -14,13 +14,13 @@ class TestGaussianActor(CommonModel):
             state_shape=cls.continuous_env.observation_space.shape,
             action_dim=cls.continuous_env.action_space.low.size,
             max_action=1.,
-            units=[4,4])
+            units=[4, 4])
         cls.const_std = 0.1
         cls.policy_fixed_sigma = GaussianActor(
             state_shape=cls.continuous_env.observation_space.shape,
             action_dim=cls.continuous_env.action_space.low.size,
             max_action=1.,
-            units=[4,4],
+            units=[4, 4],
             fix_std=True,
             const_std=cls.const_std)
 

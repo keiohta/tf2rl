@@ -33,7 +33,8 @@ class TestUtils(unittest.TestCase):
                 self.replay_buffer.add(
                     obs=obs*i, act=i, rew=0., next_obs=obs*(i+1), done=False)
             save_path(
-                self.replay_buffer.sample(self.replay_buffer.get_buffer_size()),
+                self.replay_buffer.sample(
+                    self.replay_buffer.get_buffer_size()),
                 os.path.join(self.output_dir,
                              "step_0_epi_{}_return_0.0.pkl").format(epi))
         data = restore_latest_n_traj(self.output_dir)

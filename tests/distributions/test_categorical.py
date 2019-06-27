@@ -13,9 +13,9 @@ class TestCategorical(CommonDist):
         prob = np.zeros(shape=(cls.dim), dtype=np.float32)
         prob[0] = 1.
         cls.param = {
-            "prob": np.tile(prob, (1,1))}  # [1, dim]
+            "prob": np.tile(prob, (1, 1))}  # [1, dim]
         cls.params = {
-            "prob": np.tile(prob, (cls.batch_size,1))}  # [batch_size, dim]
+            "prob": np.tile(prob, (cls.batch_size, 1))}  # [batch_size, dim]
 
     def test_kl(self):
         # KL of same distribution should be zero

@@ -29,14 +29,17 @@ class CommonOffPolAlgos(CommonAlgos):
         action_train = self.agent.get_action(state, test=False)
         action_test = self.agent.get_action(state, test=True)
         if self.is_discrete:
-            self.assertTrue(type(action_train) == np.int64 or type(action_train) == int)
-            self.assertTrue(type(action_test) == np.int64 or type(action_test) == int)
+            self.assertTrue(type(action_train) ==
+                            np.int64 or type(action_train) == int)
+            self.assertTrue(type(action_test) ==
+                            np.int64 or type(action_test) == int)
         else:
             self.assertEqual(action_train.shape[0], self.action_dim)
             self.assertEqual(action_test.shape[0], self.action_dim)
 
         # Multiple inputs
-        states = np.zeros(shape=(self.batch_size, state.shape[0]), dtype=np.float32)
+        states = np.zeros(
+            shape=(self.batch_size, state.shape[0]), dtype=np.float32)
         actions_train = self.agent.get_action(states, test=False)
         actions_test = self.agent.get_action(states, test=True)
         if self.is_discrete:
@@ -53,13 +56,13 @@ class CommonOffPolAlgos(CommonAlgos):
     def test_train(self):
         if self.agent is None:
             return
-        rewards = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
-        dones = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
+        rewards = np.zeros(shape=(self.batch_size, 1), dtype=np.float32)
+        dones = np.zeros(shape=(self.batch_size, 1), dtype=np.float32)
         obses = np.zeros(
             shape=(self.batch_size,)+self.env.observation_space.shape,
             dtype=np.float32)
         acts = np.zeros(
-            shape=(self.batch_size,self.action_dim,),
+            shape=(self.batch_size, self.action_dim,),
             dtype=np.float32)
         self.agent.train(
             obses, acts, obses, rewards, dones)
@@ -67,13 +70,13 @@ class CommonOffPolAlgos(CommonAlgos):
     def test_compute_td_error(self):
         if self.agent is None:
             return
-        rewards = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
-        dones = np.zeros(shape=(self.batch_size,1), dtype=np.float32)
+        rewards = np.zeros(shape=(self.batch_size, 1), dtype=np.float32)
+        dones = np.zeros(shape=(self.batch_size, 1), dtype=np.float32)
         obses = np.zeros(
             shape=(self.batch_size,)+self.env.observation_space.shape,
             dtype=np.float32)
         acts = np.zeros(
-            shape=(self.batch_size,self.continuous_env.action_space.low.size,),
+            shape=(self.batch_size, self.continuous_env.action_space.low.size,),
             dtype=np.float32)
         self.agent.compute_td_error(
             states=obses, actions=acts, next_states=obses,
@@ -107,8 +110,10 @@ class CommonOnPolActorCritic(CommonAlgos):
         action_train, logp_train = self.agent.get_action(state, test=False)
         action_test, logp_test = self.agent.get_action(state, test=True)
         if self.is_discrete:
-            self.assertTrue(type(action_train) == np.int64 or type(action_train) == int)
-            self.assertTrue(type(action_test) == np.int64 or type(action_test) == int)
+            self.assertTrue(type(action_train) ==
+                            np.int64 or type(action_train) == int)
+            self.assertTrue(type(action_test) ==
+                            np.int64 or type(action_test) == int)
         else:
             self.assertEqual(action_train.shape[0], self.action_dim)
             self.assertEqual(action_test.shape[0], self.action_dim)
@@ -116,7 +121,8 @@ class CommonOnPolActorCritic(CommonAlgos):
         self.assertEqual(logp_test.shape[0], 1)
 
         # Multiple inputs
-        states = np.zeros(shape=(self.batch_size, state.shape[0]), dtype=np.float32)
+        states = np.zeros(
+            shape=(self.batch_size, state.shape[0]), dtype=np.float32)
         actions_train, logps_train = self.agent.get_action(states, test=False)
         actions_test, logps_test = self.agent.get_action(states, test=True)
         if self.is_discrete:
@@ -146,10 +152,10 @@ class CommonOnPolActorCritic(CommonAlgos):
             shape=(self.batch_size,)+state.shape,
             dtype=np.float32)
         acts = np.zeros(
-            shape=(self.batch_size,self.action_dim),
+            shape=(self.batch_size, self.action_dim),
             dtype=np.int32 if self.is_discrete else np.float32)
         advs = np.ones(
-            shape=(self.batch_size,1),
+            shape=(self.batch_size, 1),
             dtype=np.float32)
         logps = np.ones_like(advs)
         self.agent.train_actor(obses, acts, advs, logps)
@@ -162,7 +168,7 @@ class CommonOnPolActorCritic(CommonAlgos):
             shape=(self.batch_size,)+state.shape,
             dtype=np.float32)
         returns = np.zeros(
-            shape=(self.batch_size,1),
+            shape=(self.batch_size, 1),
             dtype=np.float32)
 
         self.agent.train_critic(obses, returns)

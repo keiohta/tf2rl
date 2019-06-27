@@ -12,13 +12,14 @@ class TestMultiThreadEnv(unittest.TestCase):
         cls.batch_size = 64
         cls.thread_pool = 4
         cls.max_episode_steps = 1000
-        env_fn = lambda: gym.make("Pendulum-v0")
+        def env_fn(): return gym.make("Pendulum-v0")
         cls.continuous_sample_env = env_fn()
         cls.continuous_envs = MultiThreadEnv(
             env_fn=env_fn,
             batch_size=cls.batch_size,
             max_episode_steps=cls.max_episode_steps)
-        env_fn = lambda: gym.make("CartPole-v0")
+
+        def env_fn(): return gym.make("CartPole-v0")
         cls.discrete_sample_env = env_fn()
         cls.discrete_envs = MultiThreadEnv(
             env_fn=env_fn,
@@ -28,10 +29,12 @@ class TestMultiThreadEnv(unittest.TestCase):
     def test_py_reset(self):
         obses = self.continuous_envs.py_reset()
         self.assertEqual(self.batch_size, obses.shape[0])
-        self.assertEqual(self.continuous_sample_env.observation_space.low.size, obses.shape[1])
+        self.assertEqual(
+            self.continuous_sample_env.observation_space.low.size, obses.shape[1])
         obses = self.discrete_envs.py_reset()
         self.assertEqual(self.batch_size, obses.shape[0])
-        self.assertEqual(self.discrete_sample_env.observation_space.low.size, obses.shape[1])
+        self.assertEqual(
+            self.discrete_sample_env.observation_space.low.size, obses.shape[1])
 
     def test_step(self):
         # Test with continuous envs
