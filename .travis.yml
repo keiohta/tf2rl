@@ -8,11 +8,12 @@ addons:
       - gcc-8
       - g++-8
 python:
-  - "3.6"
+  - "3.7"
 script:
   - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
   - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
   - pip install -r test_requirements.txt
   - coverage run --source=tf2rl setup.py test
+  - bash test_run_examples.sh
 after_success:
   - coveralls
