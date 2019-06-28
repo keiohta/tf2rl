@@ -4,12 +4,10 @@ from scipy.signal import lfilter
 def discount_cumsum(x, discount):
     """
     Forked from rllab for computing discounted cumulative sums of vectors.
-    input: 
-        vector x, 
-        [x0, 
-         x1, 
-         x2]
-    output:
+
+    :param x (np.ndarray or tf.Tensor)
+        vector of [x0, x1, x2]
+    :return output:
         [x0 + discount * x1 + discount^2 * x2,  
          x1 + discount * x2,
          x2]

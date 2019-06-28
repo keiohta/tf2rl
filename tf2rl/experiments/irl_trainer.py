@@ -1,7 +1,8 @@
 import os
 import time
-import numpy as np
 import logging
+
+import numpy as np
 import argparse
 import tensorflow as tf
 

@@ -1,10 +1,10 @@
 import os
+import random
+
 import numpy as np
 import joblib
-import random
 import matplotlib.pyplot as plt
 from matplotlib import animation
-
 import tensorflow as tf
 
 
@@ -62,7 +62,8 @@ def load_trajectories(filenames, max_steps=None):
 
 
 def frames_to_gif(frames, prefix, save_dir, interval=50, fps=30):
-    """Convert frames to gif file
+    """
+    Convert frames to gif file
     """
     assert len(frames) > 0
     plt.figure(figsize=(frames[0].shape[1] / 72.,

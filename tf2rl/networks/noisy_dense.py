@@ -1,7 +1,7 @@
 # This is an implementation of noisy linear layer defined in following paper:
 # Noisy Networks for Exploration, https://arxiv.org/abs/1706.10295
 # Forked from https://github.com/LuEE-C/Noisy-A3C-Keras/blob/master/NoisyDense.py
-# Fixed a bug by Kei Ohta
+# Fixed bug by Kei Ohta
 
 import numpy as np
 import tensorflow as tf

@@ -1,11 +1,13 @@
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+
 from tf2rl.distributions.base import Distribution
 
 
 class Categorical(Distribution):
     def kl(self, old_param, new_param):
-        """Compute the KL divergence of two Categorical distribution as:
+        """
+        Compute the KL divergence of two Categorical distribution as:
             p_1 * (\log p_1  - \log p_2)
         """
         old_prob, new_prob = old_param["prob"], new_param["prob"]
@@ -17,12 +19,13 @@ class Categorical(Distribution):
         return (tf.reduce_sum(new_prob * x) + self._tiny) / (tf.reduce_sum(old_prob * x) + self._tiny)
 
     def log_likelihood(self, x, param):
-        """Compute log likelihood as:
+        """
+        Compute log likelihood as:
             \log \sum(p_i * x_i)
 
-        Args:
-            x: Values to compute log likelihood
-            param: Dictionary that contains probabilities of outputs
+        :param x (tf.Tensor or np.ndarray): Values to compute log likelihood
+        :param param (Dict): Dictionary that contains probabilities of outputs
+        :return (tf.Tensor): Log probabilities
         """
         probs = param["prob"]
         assert probs.shape == x.shape, \

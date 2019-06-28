@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Periodic execution ops.
+"""
+Periodic execution ops.
 
 It is very common in Reinforcement Learning for certain ops to only need to be
 executed periodically, for example: once every N agent steps. The ops below
@@ -25,12 +26,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-# Dependency imports
 import tensorflow as tf
 
 
 def periodically(body, period, name="periodically"):
-    """Periodically performs a tensorflow op.
+    """
+    Periodically performs a tensorflow op.
 
     The body tensorflow op will be executed every `period` times the periodically
     op is executed. More specifically, with `n` the number of times the op has
@@ -41,19 +42,14 @@ def periodically(body, period, name="periodically"):
     If `period` is 0 or `None`, it would not perform any op and would return a
     `tf.no_op()`.
 
-    Args:
-        body: callable that returns the tensorflow op to be performed every time
-            an internal counter is divisible by the period. The op must have no
-            output (for example, a tf.group()).
-        period: inverse frequency with which to perform the op.
-        name: name of the variable_scope.
-
-    Raises:
-        TypeError: if body is not a callable.
-        ValueError: if period is negative.
-
-    Returns:
-        An op that periodically performs the specified op.
+    :param body (callable): callable that returns the tensorflow op to be performed every time
+        an internal counter is divisible by the period. The op must have no
+        output (for example, a tf.group()).
+    :param period (int): inverse frequency with which to perform the op.
+    :param name (str): name of the variable_scope.
+    :raise TypeError: if body is not a callable.
+    :raise ValueError: if period is negative.
+    :return: An op that periodically performs the specified op.
     """
     if not callable(body):
         raise TypeError("body must be callable.")

@@ -11,7 +11,7 @@ from tf2rl.misc.target_update_ops import update_target_variables
 
 def test_run(parser):
     parser = apex_argument()
-    parser.set_defaults(max_batch=10)
+    parser.set_defaults(n_training=10)
     parser.set_defaults(param_update_freq=1)
     parser.set_defaults(test_freq=10)
     parser.set_defaults(n_env=64)

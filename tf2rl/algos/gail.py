@@ -1,13 +1,14 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import Policy
 from tf2rl.networks.spectral_norm_dense import SNDense
-from tensorflow.keras.layers import Dense
 
 
 class Discriminator(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=[32, 32], enable_sn=False, name="Discriminator"):
+    def __init__(self, state_shape, action_dim, units=[32, 32],
+                 enable_sn=False, name="Discriminator"):
         super().__init__(name=name)
 
         DenseClass = SNDense if enable_sn else Dense
@@ -87,8 +88,3 @@ class GAIL(Policy):
             parser = argparse.ArgumentParser(conflict_handler='resolve')
         parser.add_argument('--enable-sn', action='store_true')
         return parser
-
-
-if __name__ == '__main__':
-    # TODO: Solve binary classification problem using GAIL
-    pass

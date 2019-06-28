@@ -4,10 +4,8 @@ from gym.spaces.box import Box
 from gym.spaces.discrete import Discrete
 from gym.spaces.dict import Dict
 
-# from cpprb import NstepReplayBuffer
-# from cpprb import NstepPrioritizedReplayBuffer
-from cpprb.experimental import ReplayBuffer
-from cpprb.experimental import PrioritizedReplayBuffer
+# from cpprb import NstepReplayBuffer, NstepPrioritizedReplayBuffer
+from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.envs.utils import is_discrete
@@ -70,10 +68,8 @@ def get_replay_buffer(policy, env, use_prioritized_rb=False,
         # return NstepPrioritizedReplayBuffer(**kwargs)
 
     if len(obs_shape) == 3:
-        # kwargs["next_of"] = "obs"
         kwargs["env_dict"]["obs"]["dtype"] = np.ubyte
         kwargs["env_dict"]["next_obs"]["dtype"] = np.ubyte
-        # kwargs["env_dict"].pop("next_obs")
 
     # prioritized
     if use_prioritized_rb:
@@ -85,8 +81,5 @@ def get_replay_buffer(policy, env, use_prioritized_rb=False,
         kwargs["discount"] = policy.discount
         raise NotImplementedError
         # return NstepReplayBuffer(**kwargs)
-
-    # if isinstance(kwargs["act_dim"], tuple):
-    #     kwargs["act_dim"] = kwargs["act_dim"][0]
 
     return ReplayBuffer(**kwargs)

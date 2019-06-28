@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Tensorflow ops for updating target networks.
+"""
+Tensorflow ops for updating target networks.
 
 Tensorflow ops that are used to update a target network from a source network.
 This is used in agents such as DQN or DPG, which use a target network that
@@ -23,7 +24,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-# Dependency imports
 import tensorflow as tf
 from tf2rl.misc import periodic_ops
 
@@ -33,28 +33,24 @@ def update_target_variables(target_variables,
                             tau=1.0,
                             use_locking=False,
                             name="update_target_variables"):
-    """Returns an op to update a list of target variables from source variables.
+    """
+    Returns an op to update a list of target variables from source variables.
 
     The update rule is:
     `target_variable = (1 - tau) * target_variable + tau * source_variable`.
 
-    Args:
-        target_variables: a list of the variables to be updated.
-        source_variables: a list of the variables used for the update.
-        tau: weight used to gate the update. The permitted range is 0 < tau <= 1,
-            with small tau representing an incremental update, and tau == 1
-            representing a full update (that is, a straight copy).
-        use_locking: use `tf.Variable.assign`'s locking option when assigning
-            source variable values to target variables.
-        name: sets the `name_scope` for this op.
-
-    Raises:
-        TypeError: when tau is not a Python float
-        ValueError: when tau is out of range, or the source and target variables
-            have different numbers or shapes.
-
-    Returns:
-        An op that executes all the variable updates.
+    :param target_variables: a list of the variables to be updated.
+    :param source_variables: a list of the variables used for the update.
+    :param tau: weight used to gate the update. The permitted range is 0 < tau <= 1,
+        with small tau representing an incremental update, and tau == 1
+        representing a full update (that is, a straight copy).
+    :param use_locking: use `tf.Variable.assign`'s locking option when assigning
+        source variable values to target variables.
+    :param name: sets the `name_scope` for this op.
+    :raise TypeError: when tau is not a Python float
+    :raise ValueError: when tau is out of range, or the source and target variables
+        have different numbers or shapes.
+    :return: An op that executes all the variable updates.
     """
     if not isinstance(tau, float):
         raise TypeError("Tau has wrong type (should be float) {}".format(tau))
@@ -91,7 +87,8 @@ def periodic_target_update(target_variables,
                            tau=1.0,
                            use_locking=False,
                            name="periodic_target_update"):
-    """Returns an op to periodically update a list of target variables.
+    """
+    Returns an op to periodically update a list of target variables.
 
     The `update_target_variables` op is executed every `update_period`
     executions of the `periodic_target_update` op.
@@ -99,19 +96,16 @@ def periodic_target_update(target_variables,
     The update rule is:
     `target_variable = (1 - tau) * target_variable + tau * source_variable`.
 
-    Args:
-        target_variables: a list of the variables to be updated.
-        source_variables: a list of the variables used for the update.
-        update_period: inverse frequency with which to apply the update.
-        tau: weight used to gate the update. The permitted range is 0 < tau <= 1,
-            with small tau representing an incremental update, and tau == 1
-            representing a full update (that is, a straight copy).
-        use_locking: use `tf.variable.Assign`'s locking option when assigning
-            source variable values to target variables.
-        name: sets the `name_scope` for this op.
-
-    Returns:
-        An op that periodically updates `target_variables` with `source_variables`.
+    :param target_variables: a list of the variables to be updated.
+    :param source_variables: a list of the variables used for the update.
+    :param update_period: inverse frequency with which to apply the update.
+    :param tau: weight used to gate the update. The permitted range is 0 < tau <= 1,
+        with small tau representing an incremental update, and tau == 1
+        representing a full update (that is, a straight copy).
+    :param use_locking: use `tf.variable.Assign`'s locking option when assigning
+        source variable values to target variables.
+    :param name: sets the `name_scope` for this op.
+    :return: An op that periodically updates `target_variables` with `source_variables`.
     """
 
     def update_op():

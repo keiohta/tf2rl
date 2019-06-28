@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
 from tensorflow.python.eager import context
@@ -25,7 +24,6 @@ class SNDense(Dense):
         assert len(input_shape) >= 2
         super().build(input_shape)
         self.u_kernel = self.add_weight(
-            # shape=(1, self.kernel.shape.as_list()[-1]),
             shape=(1, self.units),
             initializer=self.u_kernel_initializer(),
             name='u_kernel',

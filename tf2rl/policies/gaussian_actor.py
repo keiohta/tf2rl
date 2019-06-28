@@ -35,13 +35,12 @@ class GaussianActor(tf.keras.Model):
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
     def _compute_dist(self, states):
-        """Compute multivariate normal distribution
+        """
+        Compute multivariate normal distribution
 
-        Args:
-            states: Inputs to neural network. NN outputs mean and
-                    standard deviation to compute the distribution
-        Return:
-            Multivariate normal distribution
+        :param states (np.ndarray or tf.Tensor): Inputs to neural network.
+            NN outputs mean and standard deviation to compute the distribution
+        :return (Dict): Multivariate normal distribution
         """
         features = self.l1(states)
         features = self.l2(features)
@@ -60,7 +59,8 @@ class GaussianActor(tf.keras.Model):
         return {"mean": mean, "log_std": log_std}
 
     def call(self, states, test=False):
-        """Compute actions and log probabilities of the selected action
+        """
+        Compute actions and log probabilities of the selected action
         """
         param = self._compute_dist(states)
         if test:

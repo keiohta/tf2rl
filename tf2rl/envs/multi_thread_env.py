@@ -1,4 +1,5 @@
 import threading
+
 import numpy as np
 import tensorflow as tf
 
@@ -13,9 +14,9 @@ class MultiThreadEnv(object):
 
     def __init__(self, env_fn, batch_size, thread_pool=4, max_episode_steps=1000):
         """
-        :param env_fn: function to make environments.
-        :param batch_size: batch_size
-        ;param thread_pool thread pool size
+        :param env_fn (function): function to make environments.
+        :param batch_size (int): batch_size
+        ;param thread_pool (int): thread pool size
         """
         assert batch_size % thread_pool == 0
 

@@ -1,12 +1,19 @@
+import os
+import time
+import logging
+import argparse
+
+import numpy as np
+import tensorflow as tf
+
 from tf2rl.experiments.utils import save_path, frames_to_gif
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
-import os
-import time
-import numpy as np
-import logging
-import argparse
-import tensorflow as tf
+
+
+logging.root.handlers[0].setFormatter(logging.Formatter(
+    fmt='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s'))
+
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
@@ -19,9 +26,6 @@ if gpus:
     except RuntimeError as e:
         # Memory growth must be set before GPUs have been initialized
         print(e)
-
-logging.root.handlers[0].setFormatter(logging.Formatter(
-    fmt='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s'))
 
 
 class Trainer:

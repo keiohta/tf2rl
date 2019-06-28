@@ -37,7 +37,8 @@ class Policy(tf.keras.Model):
 
 
 class OnPolicyAgent(Policy):
-    """Base class for on-policy agent
+    """
+    Base class for on-policy agents
     """
 
     def __init__(
@@ -63,7 +64,8 @@ class OnPolicyAgent(Policy):
 
 
 class OffPolicyAgent(Policy):
-    """Base class for off-policy agent
+    """
+    Base class for off-policy agents
     """
 
     def __init__(

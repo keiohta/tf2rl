@@ -1,5 +1,6 @@
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+
 from tf2rl.distributions.base import Distribution
 
 
@@ -12,14 +13,15 @@ class DiagonalGaussian(Distribution):
         return self._dim
 
     def kl(self, old_param, new_param):
-        """Compute KL divergence of two distributions as:
-        (\mu_1 - \mu_2)^2 + \sigma_1^2 - \sigma_2^2 } / (2 * \sigma_2^2) + ln(\sigma_2 / \sigma_1)
+        """
+        Compute KL divergence of two distributions as:
+            (\mu_1 - \mu_2)^2 + \sigma_1^2 - \sigma_2^2 } / (2 * \sigma_2^2) + ln(\sigma_2 / \sigma_1)
 
-        Args:
-            old_param: Gaussian distribution to compare with that contains
-                means: (batch_size * output_dim)
-                std: (batch_size * output_dim)
-            new_param: Same contents with old_param
+        :param old_param (Dict):
+            Gaussian distribution to compare with that contains
+            means: (batch_size * output_dim)
+            std: (batch_size * output_dim)
+        :param new_param (Dict): Same contents with old_param
         """
         old_means, old_log_stds = old_param["mean"], old_param["log_std"]
         new_means, new_log_stds = new_param["mean"], new_param["log_std"]
@@ -37,7 +39,8 @@ class DiagonalGaussian(Distribution):
         return tf.math.exp(llh_new - llh_old)
 
     def log_likelihood(self, x, param):
-        """Compute log likelihood as:
+        """
+        Compute log likelihood as:
             TODO: write equation
         """
         means = param["mean"]
