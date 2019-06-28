@@ -24,7 +24,7 @@ ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-catego
 ${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn --enable-dueling-dqn
 
 # ApeX
-apex_arg="--gpu-explorer -1 --gpu-learner -1 --gpu-evaluator -1 --logging-level WARNING --max-batch 4 --batch-size 32 --param-update-freq 1 --local-buffer-size 64 --test-freq 1"
+apex_arg="--gpu-explorer -1 --gpu-learner -1 --gpu-evaluator -1 --logging-level WARNING --n-training 4 --batch-size 32 --param-update-freq 1 --local-buffer-size 64 --test-freq 1"
 ${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 1
 ${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 64
 ${prefix} examples/run_apex_dqn.py ${apex_arg} --n-env 1
