@@ -20,24 +20,24 @@ Following algorithms are supported:
 Following papers have been implementd in tf2rl:
 
 - Model-free On-policy
-  - [Policy Gradient Methods for Reinforcement Learning with Function Approximation](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf)
-  - [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/abs/1506.02438)
+  - [Policy Gradient Methods for Reinforcement Learning with Function Approximation](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/vpg.py>)
+  - [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/abs/1506.02438), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/misc/discount_cumsum.py>)
 - Model-free Off-policy
-  - [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf)
-  - [Human-level control through Deep Reinforcement Learning](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf)
-  - [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/abs/1509.06461)
-  - [Prioritized Experience Replay](https://arxiv.org/abs/1511.05952)
-  - [Dueling Network Architectures for Deep Reinforcement Learning](https://arxiv.org/abs/1511.06581)
-  - [A Distributional Perspective on Reinforcement Learning](<https://arxiv.org/abs/1707.06887>)
-  - [Noisy Networks for Exploration](<https://arxiv.org/abs/1706.10295>)
-  - [Distributed Prioritized Experience Replay](<https://arxiv.org/abs/1803.00933>)
-  - [Continuous control with deep reinforcement learning](https://arxiv.org/abs/1509.02971)
-  - [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](<https://arxiv.org/abs/1801.01290>)
-  - [Addressing Function Approximation Error in Actor-Critic Methods](<https://arxiv.org/abs/1802.09477>)
-  - [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>)
+  - [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
+  - [Human-level control through Deep Reinforcement Learning](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
+  - [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/abs/1509.06461), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
+  - [Prioritized Experience Replay](https://arxiv.org/abs/1511.05952), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
+  - [Dueling Network Architectures for Deep Reinforcement Learning](https://arxiv.org/abs/1511.06581), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
+  - [A Distributional Perspective on Reinforcement Learning](<https://arxiv.org/abs/1707.06887>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
+  - [Noisy Networks for Exploration](<https://arxiv.org/abs/1706.10295>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/networks/noisy_dense.py>)
+  - [Distributed Prioritized Experience Replay](<https://arxiv.org/abs/1803.00933>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/apex.py>)
+  - [Continuous control with deep reinforcement learning](https://arxiv.org/abs/1509.02971), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/ddpg.py>)
+  - [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](<https://arxiv.org/abs/1801.01290>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac.py>)
+  - [Addressing Function Approximation Error in Actor-Critic Methods](<https://arxiv.org/abs/1802.09477>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/td3.py>)
+  - [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/bi_res_ddpg.py>)
 - Imitation Learning
-  - [Generative Adversarial Imitation Learning](<https://arxiv.org/abs/1606.03476>)
-  - [Spectral Normalization for Generative Adversarial Networks](<https://arxiv.org/abs/1802.05957>)
+  - [Generative Adversarial Imitation Learning](<https://arxiv.org/abs/1606.03476>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/gail.py>)
+  - [Spectral Normalization for Generative Adversarial Networks](<https://arxiv.org/abs/1802.05957>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/networks/spectral_norm_dense.py>)
 
 ## Installation
 - Install from PyPI:
