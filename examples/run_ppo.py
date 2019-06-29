@@ -12,9 +12,10 @@ if __name__ == '__main__':
                         default="Pendulum-v0")
     parser.add_argument('--normalize-adv', action='store_true')
     parser.add_argument('--enable-gae', action='store_true')
-    parser.set_defaults(test_interval=5000)
+    parser.set_defaults(test_interval=10240)
     parser.set_defaults(max_steps=int(1e7))
-    parser.set_defaults(horizon=1000)
+    parser.set_defaults(horizon=512)
+    parser.set_defaults(batch_size=32)
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
 

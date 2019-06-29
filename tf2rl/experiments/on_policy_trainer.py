@@ -14,15 +14,17 @@ from tf2rl.envs.utils import is_discrete
 
 
 class OnPolicyTrainer(Trainer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        assert self._test_interval % self._policy.horizon == 0, \
+            "Test interval should be divisible by policy horizon"
+
     def __call__(self):
         total_steps = 0
-        episode_steps = 0
-        episode_return = 0
-        episode_start_time = time.time()
         n_episode = 0
-        test_step_threshold = self._test_interval
 
         # TODO: clean codes
+        # Prepare buffer
         self.replay_buffer = get_replay_buffer(
             self._policy, self._env)
         kwargs_local_buf = get_default_rb_dict(
@@ -33,66 +35,37 @@ class OnPolicyTrainer(Trainer):
             kwargs_local_buf["env_dict"]["act"]["dtype"] = np.int32
         self.local_buffer = ReplayBuffer(**kwargs_local_buf)
 
-        obs = self._env.reset()
+        tf.summary.experimental.set_step(total_steps)
         while total_steps < self._max_steps:
-            for _ in range(self._policy.horizon):
-                action, log_pi, val = self._policy.get_action_and_val(obs)
-                next_obs, reward, done, _ = self._env.step(action)
-                if self._show_progress:
-                    self._env.render()
-                episode_steps += 1
-                episode_return += reward
-                total_steps += 1
+            # Collect samples
+            self._collect_sample(n_episode, total_steps)
+            total_steps += self._policy.horizon
 
-                done_flag = done
-                if hasattr(self._env, "_max_episode_steps") and \
-                        episode_steps == self._env._max_episode_steps:
-                    done_flag = False
-                self.local_buffer.add(
-                    obs=obs, act=action, next_obs=next_obs,
-                    rew=reward, done=done_flag, logp=log_pi, val=val)
-                obs = next_obs
-
-                if done or episode_steps == self._episode_max_steps:
-                    self.finish_horizon()
-                    obs = self._env.reset()
-                    n_episode += 1
-                    fps = episode_steps / (time.time() - episode_start_time)
-                    self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
-                        n_episode, int(total_steps), episode_steps, episode_return, fps))
-
-                    episode_steps = 0
-                    episode_return = 0
-                    episode_start_time = time.time()
-
-            self.finish_horizon(last_val=val)
             tf.summary.experimental.set_step(total_steps)
             samples = self.replay_buffer.sample(self._policy.horizon)
-            # Normalize advantages
-            if self._policy.normalize_adv:
-                adv = (samples["adv"] - np.mean(samples["adv"])
-                       ) / np.std(samples["adv"])
-            else:
-                adv = samples["adv"]
-            for _ in range(1):
-                self._policy.train_actor(
-                    samples["obs"],
-                    samples["act"],
-                    adv,
-                    samples["logp"])
-            # Train Critic
-            for _ in range(5):
-                self._policy.train_critic(
-                    samples["obs"],
-                    samples["ret"])
-            if total_steps > test_step_threshold:
-                test_step_threshold += self._test_interval
+
+            indices = np.random.permutation(np.arange(self._policy.horizon))
+            for idx in range(int(self._policy.horizon / self._policy.batch_size)):
+                target = slice(idx*self._policy.batch_size, (idx+1)*self._policy.batch_size)
+                # Train actor
+                for _ in range(1):
+                    self._policy.train_actor(
+                        samples["obs"][target],
+                        samples["act"][target],
+                        samples["adv"][target],
+                        samples["logp"][target])
+                # Train Critic
+                for _ in range(5):
+                    self._policy.train_critic(
+                        samples["obs"][target],
+                        samples["ret"][target])
+
+            if total_steps % self._test_interval == 0:
                 avg_test_return = self.evaluate_policy(total_steps)
                 self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                     total_steps, avg_test_return, self._test_episodes))
                 tf.summary.scalar(
                     name="Common/average_test_return", data=avg_test_return)
-                tf.summary.scalar(name="Common/fps", data=fps)
 
                 self.writer.flush()
 
@@ -100,6 +73,44 @@ class OnPolicyTrainer(Trainer):
                 self.checkpoint_manager.save()
 
         tf.summary.flush()
+
+    def _collect_sample(self, n_episode, total_steps):
+        episode_steps = 0
+        episode_return = 0
+        episode_start_time = time.time()
+        obs = self._env.reset()
+        for _ in range(self._policy.horizon):
+            action, log_pi, val = self._policy.get_action_and_val(obs)
+            next_obs, reward, done, _ = self._env.step(action)
+            if self._show_progress:
+                self._env.render()
+            episode_steps += 1
+            episode_return += reward
+
+            done_flag = done
+            if hasattr(self._env, "_max_episode_steps") and \
+                    episode_steps == self._env._max_episode_steps:
+                done_flag = False
+            self.local_buffer.add(
+                obs=obs, act=action, next_obs=next_obs,
+                rew=reward, done=done_flag, logp=log_pi, val=val)
+            obs = next_obs
+
+            if done or episode_steps == self._episode_max_steps:
+                total_steps += episode_steps
+                self.finish_horizon()
+                obs = self._env.reset()
+                n_episode += 1
+                fps = episode_steps / (time.time() - episode_start_time)
+                self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
+                    n_episode, int(total_steps), episode_steps, episode_return, fps))
+
+                tf.summary.scalar(name="Common/fps", data=fps)
+                episode_steps = 0
+                episode_return = 0
+                episode_start_time = time.time()
+        self.finish_horizon(last_val=val)
+        return n_episode
 
     def finish_horizon(self, last_val=0):
         """

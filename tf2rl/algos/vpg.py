@@ -15,10 +15,9 @@ class CriticV(tf.keras.Model):
         self.l2 = Dense(units[1], name="L2", activation='relu')
         self.l3 = Dense(1, name="L2", activation='linear')
 
-        dummy_state = tf.constant(
-            np.zeros(shape=(1,)+state_shape, dtype=np.float32))
         with tf.device('/cpu:0'):
-            self(dummy_state)
+            self(tf.constant(
+                np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
     def call(self, inputs):
         features = self.l1(inputs)
@@ -88,6 +87,10 @@ class VPG(OnPolicyAgent):
         return self.actor(state, test)
 
     def train_actor(self, states, actions, advantages, logp_olds):
+        # Normalize advantages
+        if self.normalize_adv:
+            advantages = (advantages - np.mean(advantages)) / np.std(advantages)
+
         actor_loss, log_probs = self._train_actor_body(
             states, actions, advantages)
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
