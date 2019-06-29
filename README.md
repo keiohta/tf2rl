@@ -40,32 +40,18 @@ Following papers have been implementd in tf2rl:
   - [Spectral Normalization for Generative Adversarial Networks](<https://arxiv.org/abs/1802.05957>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/networks/spectral_norm_dense.py>)
 
 ## Installation
-- Install from PyPI:
+You can install `tf2rl` from PyPI:
+
 ```bash
 $ pip install tf2rl
 ```
 
-- Install from source:
+or, you can also install from source:
+
 ```bash
 $ git clone https://github.com/keiohta/tf2rl.git tf2rl
 $ cd tf2rl
 $ pip install .
-```
-
-- TF2RL is built on Google's TensorFlow and requires either `tensorflow` or `tensorflow-gpu`.
-  To include the TensorFlow with the installation of TF2RL, add the flag `tf` for the CPU version, or `tf_gpu` for the GPU version.
-
-```bash
-# Install TF2RL with TensorFlow CPU version
-$ pip install . [tf]
-```
-
-- Also, if you want to run example codes, add the flag `examples` that install additional dependencies.
-  If you are developer, set `-e` option, then local modification affects your installation.
-
-```bash
-# Install developer mode TF2RL plus TensorFlow GPU version and additional dependencies to run examples
-$ pip install -e .[tf-gpu, examples]
 ```
 
 ## Getting started

@@ -31,6 +31,14 @@ cd tf2rl
 pip install -e .[examples]
 ```
 
+3. TF2RL is built on Google's TensorFlow and requires either `tensorflow` or `tensorflow-gpu`.
+   To include the TensorFlow with the installation of TF2RL, add the flag `tf` for the CPU version, or `tf_gpu` for the GPU version:
+
+```bash
+# Install TF2RL with TensorFlow CPU version
+$ pip install -e .[examples,tf-gpu]
+```
+
 ## Codestyle
 
 We follow the [PEP8 codestyle](https://www.python.org/dev/peps/pep-0008/), and suggest the order of the imports as:
