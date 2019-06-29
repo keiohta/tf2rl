@@ -9,7 +9,7 @@ from cpprb.experimental import ReplayBuffer
 from tf2rl.experiments.trainer import Trainer
 from tf2rl.experiments.utils import save_path, frames_to_gif
 from tf2rl.misc.get_replay_buffer import get_replay_buffer, get_default_rb_dict
-from tf2rl.misc.utils import discount_cumsum
+from tf2rl.misc.discount_cumsum import discount_cumsum
 from tf2rl.envs.utils import is_discrete
 
 

@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from tf2rl.misc.utils import discount_cumsum
+from tf2rl.misc.discount_cumsum import discount_cumsum
 
 
 class TestUtils(unittest.TestCase):
