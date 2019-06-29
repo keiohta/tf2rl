@@ -38,7 +38,7 @@ class OnPolicyTrainer(Trainer):
         tf.summary.experimental.set_step(total_steps)
         while total_steps < self._max_steps:
             # Collect samples
-            self._collect_sample(n_episode, total_steps)
+            n_episode = self._collect_sample(n_episode, total_steps)
             total_steps += self._policy.horizon
 
             tf.summary.experimental.set_step(total_steps)
