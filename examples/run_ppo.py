@@ -12,10 +12,10 @@ if __name__ == '__main__':
                         default="Pendulum-v0")
     parser.add_argument('--normalize-adv', action='store_true')
     parser.add_argument('--enable-gae', action='store_true')
-    parser.set_defaults(test_interval=10240)
+    parser.set_defaults(test_interval=20480)
     parser.set_defaults(max_steps=int(1e7))
-    parser.set_defaults(horizon=512)
-    parser.set_defaults(batch_size=32)
+    parser.set_defaults(horizon=2048)
+    parser.set_defaults(batch_size=64)
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
 
@@ -28,11 +28,13 @@ if __name__ == '__main__':
         max_action=None if is_discrete(
             env.action_space) else env.action_space.high[0],
         batch_size=args.batch_size,
-        actor_units=[32, 32],
-        critic_units=[32, 32],
-        discount=0.9,
+        actor_units=[64, 64],
+        critic_units=[64, 64],
+        lr_actor=3e-4,
+        lr_critic=3e-4,
+        discount=0.99,
         horizon=args.horizon,
-        fix_std=True,
+        # fix_std=True,
         normalize_adv=args.normalize_adv,
         enable_gae=args.enable_gae,
         gpu=args.gpu)
