@@ -1,7 +1,7 @@
 from setuptools import setup, Extension, find_packages
 
 install_requires = [
-    "cpprb>=7.13.3"
+    "cpprb>=7.13.3,<8.0.0"
     "joblib",
     "scipy"
 ]
