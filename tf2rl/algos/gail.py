@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
-from tf2rl.algos.policy_base import Policy
+from tf2rl.algos.policy_base import IRLPolicy
 from tf2rl.networks.spectral_norm_dense import SNDense
 
 
@@ -30,7 +30,7 @@ class Discriminator(tf.keras.Model):
         return self.l3(features)
 
 
-class GAIL(Policy):
+class GAIL(IRLPolicy):
     def __init__(
             self,
             state_shape,
@@ -49,8 +49,8 @@ class GAIL(Policy):
     def train(self, agent_states, agent_acts, expert_states, expert_acts):
         loss, accuracy = self._train_body(agent_states, agent_acts,
                                           expert_states, expert_acts)
-        tf.summary.scalar(name="DiscriminatorLoss", data=loss)
-        tf.summary.scalar(name="Accuracy", data=accuracy)
+        tf.summary.scalar(name=self.policy_name+"/DiscriminatorLoss", data=loss)
+        tf.summary.scalar(name=self.policy_name+"/Accuracy", data=accuracy)
         # TODO: Summarize kl-divergence and classification accuracy
 
     @tf.function
@@ -62,12 +62,13 @@ class GAIL(Policy):
                 fake_logit = self.disc([agent_states, expert_acts])
                 loss = -(tf.reduce_mean(tf.math.log(real_logit + epsilon)) +
                          tf.reduce_mean(tf.math.log(1. - fake_logit + epsilon)))
-                accuracy = \
-                    tf.reduce_mean(tf.cast(real_logit > 0.5, tf.float32)) / 2. + \
-                    tf.reduce_mean(tf.cast(fake_logit < 0.5, tf.float32)) / 2.
             grads = tape.gradient(loss, self.disc.trainable_variables)
             self.optimizer.apply_gradients(
                 zip(grads, self.disc.trainable_variables))
+
+        accuracy = \
+            tf.reduce_mean(tf.cast(real_logit > 0.5, tf.float32)) / 2. + \
+            tf.reduce_mean(tf.cast(fake_logit < 0.5, tf.float32)) / 2.
         return loss, accuracy
 
     def inference(self, states, actions):

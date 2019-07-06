@@ -29,7 +29,8 @@ class IRLTrainer(Trainer):
         self._expert_act = expert_act
 
     def __call__(self):
-        total_steps = tf.train.create_global_step()
+        total_steps = 0
+        tf.summary.experimental.set_step(total_steps)
         episode_steps = 0
         episode_return = 0
         episode_start_time = time.time()
@@ -41,7 +42,7 @@ class IRLTrainer(Trainer):
 
         obs = self._env.reset()
 
-        with tf.summary.record_summaries_every_n_global_steps(1000):
+        while total_steps < self._max_steps:
             while total_steps < self._max_steps:
                 if total_steps < self._policy.n_warmup:
                     action = self._env.action_space.sample()
@@ -53,7 +54,8 @@ class IRLTrainer(Trainer):
                     self._env.render()
                 episode_steps += 1
                 episode_return += reward
-                total_steps.assign_add(1)
+                total_steps += 1
+                tf.summary.experimental.set_step(total_steps)
 
                 done_flag = done
                 if hasattr(self._env, "_max_episode_steps") and \
@@ -77,36 +79,37 @@ class IRLTrainer(Trainer):
 
                 if total_steps >= self._policy.n_warmup:
                     samples = replay_buffer.sample(self._policy.batch_size)
-                    indices = np.random.randint(self._expert_obs.shape[0],
-                                                size=self._policy.batch_size)
-                    expert_obs, expert_act = self._expert_obs[indices], self._expert_act[indices]
-                    # Train IRL
-                    self._irl.train(
-                        samples["obs"], samples["act"], expert_obs, expert_act)
-
                     # Train policy
                     rew = self._irl.inference(samples["obs"], samples["act"])
                     td_error = self._policy.train(
                         samples["obs"], samples["act"], samples["next_obs"],
-                        rew, np.array(samples["done"], dtype=np.float32),
+                        rew, samples["done"],
                         None if not self._use_prioritized_rb else samples["weights"])
                     if self._use_prioritized_rb:
                         replay_buffer.update_priorities(
                             samples["indexes"], np.abs(td_error) + 1e-6)
-                    if int(total_steps) % self._test_interval == 0:
-                        with tf.summary.always_record_summaries():
-                            avg_test_return = self.evaluate_policy(
-                                int(total_steps))
-                            self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
-                                int(total_steps), avg_test_return, self._test_episodes))
-                            tf.summary.scalar(
-                                name="AverageTestReturn", data=avg_test_return)
-                            tf.summary.scalar(
-                                name="FPS", data=fps)
+
+                    # Train IRL
+                    for _ in range(self._irl.n_training):
+                        samples = replay_buffer.sample(self._irl.batch_size)
+                        indices = np.random.randint(self._expert_obs.shape[0],
+                                                    size=self._irl.batch_size)
+                        self._irl.train(
+                            samples["obs"], samples["act"],
+                            self._expert_obs[indices], self._expert_act[indices])
+
+                    if total_steps % self._test_interval == 0:
+                        avg_test_return = self.evaluate_policy(total_steps)
+                        self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
+                            total_steps, avg_test_return, self._test_episodes))
+                        tf.summary.scalar(
+                            name="Common/average_test_return", data=avg_test_return)
+                        tf.summary.scalar(
+                            name="Common/fps", data=fps)
 
                         self.writer.flush()
 
-                if int(total_steps) % self._model_save_interval == 0:
+                if total_steps % self._model_save_interval == 0:
                     self.checkpoint_manager.save()
 
             tf.summary.flush()

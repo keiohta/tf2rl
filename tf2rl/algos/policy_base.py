@@ -79,3 +79,13 @@ class OffPolicyAgent(Policy):
         parser = Policy.get_argument(parser)
         parser.add_argument('--memory-capacity', type=int, default=int(1e6))
         return parser
+
+
+class IRLPolicy(Policy):
+    def __init__(
+            self,
+            n_training=1,
+            memory_capacity=0,
+            **kwargs):
+        self.n_training = n_training
+        super().__init__(memory_capacity=memory_capacity, **kwargs)
