@@ -72,11 +72,13 @@ class VAIL(IRLPolicy):
         self._step_reg_param = tf.constant(1e-5, dtype=tf.float32)
 
     def train(self, agent_states, agent_acts, expert_states, expert_acts):
-        loss, accuracy = self._train_body(agent_states, agent_acts,
-                                          expert_states, expert_acts)
+        loss, accuracy, real_kl, fake_kl = self._train_body(
+            agent_states, agent_acts, expert_states, expert_acts)
         tf.summary.scalar(name=self.policy_name+"/DiscriminatorLoss", data=loss)
         tf.summary.scalar(name=self.policy_name+"/Accuracy", data=accuracy)
         tf.summary.scalar(name=self.policy_name+"/RegParam", data=self._reg_param)
+        tf.summary.scalar(name=self.policy_name+"/RealKL", data=real_kl)
+        tf.summary.scalar(name=self.policy_name+"/FakeKL", data=fake_kl)
 
     @tf.function
     def _compute_kl(self, means, log_stds):
@@ -90,7 +92,7 @@ class VAIL(IRLPolicy):
         """
         return tf.reduce_sum(
             -log_stds + (tf.square(means) + tf.square(tf.exp(log_stds)) - 1.) / 2.,
-            axis=-1)
+                axis=-1)
 
     @tf.function
     def _train_body(self, agent_states, agent_acts, expert_states, expert_acts):
@@ -120,7 +122,7 @@ class VAIL(IRLPolicy):
         accuracy = \
             tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. + \
             tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.
-        return loss, accuracy
+        return loss, accuracy, tf.reduce_mean(real_kl), tf.reduce_mean(fake_kl)
 
     def inference(self, states, actions):
         if states.ndim == actions.ndim == 1:

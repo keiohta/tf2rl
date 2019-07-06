@@ -22,8 +22,9 @@ class IRLTrainer(Trainer):
             expert_obs,
             expert_act,
             test_env=None):
-        super().__init__(policy, env, args, test_env)
         self._irl = irl
+        args.dir_suffix = self._irl.policy_name + args.dir_suffix
+        super().__init__(policy, env, args, test_env)
         # TODO: Add assertion to check dimention of expert demos and current policy, env is the same
         self._expert_obs = expert_obs
         self._expert_act = expert_act

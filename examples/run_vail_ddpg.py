@@ -36,6 +36,7 @@ if __name__ == '__main__':
         action_dim=env.action_space.high.size,
         units=units,
         enable_sn=args.enable_sn,
+        batch_size=32,
         gpu=args.gpu)
     expert_trajs = restore_latest_n_traj(
         args.expert_path_dir, n_path=20, max_steps=100)
