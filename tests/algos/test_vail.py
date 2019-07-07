@@ -20,11 +20,11 @@ class TestVAIL(CommonIRLAlgos):
             action_dim=cls.continuous_env.action_space.low.size,
             gpu=-1)
 
-    def test_compute_kl(self):
+    def test__compute_kl_latent(self):
         means = np.zeros(
             shape=(self.batch_size, self.continuous_env.action_space.high.size))
         log_stds = np.zeros_like(means)
-        results = self.irl_continuous._compute_kl(
+        results = self.irl_continuous._compute_kl_latent(
             means=means, log_stds=log_stds)
         np.testing.assert_array_equal(results, np.zeros_like(results))
 
@@ -32,7 +32,7 @@ class TestVAIL(CommonIRLAlgos):
             self.batch_size, self.continuous_env.action_space.high.size)
         log_stds = np.random.rand(
             self.batch_size, self.continuous_env.action_space.high.size)
-        results = self.irl_continuous._compute_kl(
+        results = self.irl_continuous._compute_kl_latent(
             means=means, log_stds=log_stds)
         np.testing.assert_equal(np.any(np.not_equal(
             results, np.zeros_like(results))), True)
