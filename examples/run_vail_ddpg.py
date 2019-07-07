@@ -1,8 +1,7 @@
-import roboschool
 import gym
 
 from tf2rl.algos.ddpg import DDPG
-from tf2rl.algos.gail import GAIL
+from tf2rl.algos.vail import VAIL
 from tf2rl.experiments.trainer import Trainer
 from tf2rl.experiments.irl_trainer import IRLTrainer
 from tf2rl.experiments.utils import restore_latest_n_traj
@@ -10,7 +9,7 @@ from tf2rl.experiments.utils import restore_latest_n_traj
 
 if __name__ == '__main__':
     parser = IRLTrainer.get_argument()
-    parser = GAIL.get_argument(parser)
+    parser = VAIL.get_argument(parser)
     parser.add_argument('--env-name', type=str, default="RoboschoolReacher-v1")
     args = parser.parse_args()
 
@@ -32,7 +31,7 @@ if __name__ == '__main__':
         critic_units=units,
         n_warmup=10000,
         batch_size=100)
-    irl = GAIL(
+    irl = VAIL(
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.high.size,
         units=units,

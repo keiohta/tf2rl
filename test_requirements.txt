@@ -2,6 +2,7 @@ tensorflow==2.0.0b0
 cpprb
 joblib
 gym
+gym[atari]
 scipy
 opencv-python
 coveralls
