@@ -56,7 +56,7 @@ class VAIL(IRLPolicy):
             action_dim,
             units=[32, 32],
             n_latent_units=32,
-            lr=5e-3,
+            lr=5e-5,
             kl_target=0.5,
             reg_param=0.,
             enable_sn=False,
