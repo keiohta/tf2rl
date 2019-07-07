@@ -18,7 +18,7 @@ if __name__ == '__main__':
         print("python examples/run_sac.py --env-name=RoboschoolReacher-v1 --save-test-path --test-interval=50000")
         exit()
 
-    units = [100, 100]
+    units = [400, 300]
 
     env = gym.make(args.env_name)
     test_env = gym.make(args.env_name)
@@ -29,8 +29,8 @@ if __name__ == '__main__':
         gpu=args.gpu,
         actor_units=units,
         critic_units=units,
-        n_warmup=1000,
-        batch_size=32)
+        n_warmup=10000,
+        batch_size=100)
     irl = VAIL(
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.high.size,
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         batch_size=32,
         gpu=args.gpu)
     expert_trajs = restore_latest_n_traj(
-        args.expert_path_dir, n_path=20, max_steps=100)
+        args.expert_path_dir, n_path=20, max_steps=1000)
     trainer = IRLTrainer(policy, env, args, irl, expert_trajs["obses"],
                          expert_trajs["acts"], test_env)
     trainer()
