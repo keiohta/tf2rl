@@ -100,4 +100,10 @@ class NoisyDense(tf.keras.layers.Layer):
         return outputs
 
     def compute_output_shape(self, input_shape):
-        return (input_shape[0], self.units)
+        input_shape = tensor_shape.TensorShape(input_shape)
+        input_shape = input_shape.with_rank_at_least(2)
+        if tensor_shape.dimension_value(input_shape[-1]) is None:
+            raise ValueError(
+                'The innermost dimension of input_shape must be defined, but saw: %s'
+                % input_shape)
+        return input_shape[:-1].concatenate(self.units)
