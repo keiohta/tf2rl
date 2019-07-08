@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow as tf
 
 from tensorflow.keras import backend as K
+from tensorflow.python.framework import tensor_shape
 
 
 class NoisyDense(tf.keras.layers.Layer):
