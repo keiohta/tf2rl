@@ -11,6 +11,7 @@ class PPO(VPG):
             clip_ratio=0.2,
             name="PPO",
             **kwargs):
+        kwargs["hidden_activation"] = "tanh"
         super().__init__(name=name, **kwargs)
         self.clip = clip
         self.clip_ratio = clip_ratio
@@ -38,6 +39,8 @@ class PPO(VPG):
                           data=tf.reduce_mean(logp_olds - logp_news))
         tf.summary.scalar(name=self.policy_name+"/ent",
                           data=tf.reduce_mean(-logp_news))
+        tf.summary.scalar(name=self.policy_name+"/ratio",
+                          data=tf.reduce_mean(ratio))
         return actor_loss
 
     @tf.function
@@ -52,11 +55,11 @@ class PPO(VPG):
                         advantages > 0,
                         (1. + self.clip_ratio) * advantages,
                         (1. - self.clip_ratio) * advantages))
-                    surr_loss = - \
-                        tf.minimum(ratio * tf.squeeze(advantages), min_adv)
+                    surr_loss = -tf.reduce_mean(tf.minimum(
+                        ratio * tf.squeeze(advantages), min_adv))
                 else:
                     raise NotImplementedError
-                actor_loss = tf.reduce_mean(surr_loss)  # + lambda * entropy
+                actor_loss = surr_loss  # + lambda * entropy
             actor_grad = tape.gradient(
                 actor_loss, self.actor.trainable_variables)
             self.actor_optimizer.apply_gradients(

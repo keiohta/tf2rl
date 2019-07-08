@@ -11,7 +11,7 @@ class GaussianActor(tf.keras.Model):
     EPS = 1e-6
 
     def __init__(self, state_shape, action_dim, max_action,
-                 units=[256, 256], fix_std=False,
+                 units=[256, 256], hidden_activation="relu", fix_std=False,
                  tanh_mean=True, tanh_std=True, squash=False,
                  const_std=0.1, name='GaussianPolicy'):
         super().__init__(name=name)
@@ -22,8 +22,8 @@ class GaussianActor(tf.keras.Model):
         self._max_action = max_action
         self._squash = squash
 
-        self.l1 = Dense(units[0], name="L1", activation='relu')
-        self.l2 = Dense(units[1], name="L2", activation='relu')
+        self.l1 = Dense(units[0], name="L1", activation=hidden_activation)
+        self.l2 = Dense(units[1], name="L2", activation=hidden_activation)
         self.out_mean = Dense(action_dim, name="L_mean",
                               activation='tanh' if tanh_mean else None)
         if not self.fix_std:

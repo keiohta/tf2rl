@@ -41,6 +41,7 @@ class VPG(OnPolicyAgent):
             fix_std=False,
             tanh_std=False,
             const_std=0.3,
+            hidden_activation="relu",
             name="VPG",
             **kwargs):
         super().__init__(name=name, **kwargs)
@@ -51,6 +52,7 @@ class VPG(OnPolicyAgent):
         else:
             self.actor = GaussianActor(
                 state_shape, action_dim, max_action, actor_units,
+                hidden_activation=hidden_activation,
                 fix_std=fix_std, tanh_std=tanh_std, const_std=const_std)
         self.critic = CriticV(state_shape, critic_units)
         self._action_dim = action_dim

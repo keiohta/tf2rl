@@ -48,14 +48,14 @@ class OnPolicyTrainer(Trainer):
             for idx in range(int(self._policy.horizon / self._policy.batch_size)):
                 target = slice(idx*self._policy.batch_size, (idx+1)*self._policy.batch_size)
                 # Train actor
-                for _ in range(1):
+                for _ in range(self._policy.n_epoch):
                     self._policy.train_actor(
                         samples["obs"][target],
                         samples["act"][target],
                         samples["adv"][target],
                         samples["logp"][target])
                 # Train Critic
-                for _ in range(5):
+                for _ in range(self._policy.n_epoch_critic):
                     self._policy.train_critic(
                         samples["obs"][target],
                         samples["ret"][target])

@@ -69,6 +69,5 @@ class CategoricalActor(tf.keras.Model):
             tf.math.greater(tf.rank(param["prob"]), tf.rank(actions)),
             lambda: tf.expand_dims(actions, axis=0),
             lambda: actions)
-        log_prob = self.dist.log_likelihood(
-            actions, param)
+        log_prob = self.dist.log_likelihood(actions, param)
         return log_prob

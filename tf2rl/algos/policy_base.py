@@ -12,6 +12,7 @@ class Policy(tf.keras.Model):
             discount=0.99,
             n_warmup=0,
             max_grad=10.,
+            n_epoch=1,
             gpu=0):
         super().__init__()
         self.policy_name = name
@@ -19,6 +20,7 @@ class Policy(tf.keras.Model):
         self.batch_size = batch_size
         self.discount = discount
         self.n_warmup = n_warmup
+        self.n_epoch = n_epoch
         self.max_grad = max_grad
         self.memory_capacity = memory_capacity
         self.device = "/gpu:{}".format(gpu) if gpu >= 0 else "/cpu:0"
@@ -47,11 +49,13 @@ class OnPolicyAgent(Policy):
             lam=0.95,
             enable_gae=True,
             normalize_adv=True,
+            n_epoch_critic=1,
             **kwargs):
         self.horizon = horizon
         self.lam = lam
         self.enable_gae = enable_gae
         self.normalize_adv = normalize_adv
+        self.n_epoch_critic = n_epoch_critic
         kwargs["n_warmup"] = 0
         kwargs["memory_capacity"] = self.horizon
         super().__init__(**kwargs)
