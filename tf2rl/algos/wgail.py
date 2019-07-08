@@ -7,33 +7,6 @@ from tf2rl.algos.gail import GAIL, Discriminator
 from tf2rl.networks.spectral_norm_dense import SNDense
 
 
-class Normalizer():
-    """
-    Normalize input data online. This is based on following:
-    https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
-    """
-
-    def __init__(self):
-        self.n = tf.Variable(0)
-        self.mean = tf.Variable(0)
-        self.mean_diff = tf.Variable(0)
-        self.var = tf.Variable(0)
-
-    @tf.function
-    def observe(self, x):
-        self.n.assign_add(1)
-        numerator = x - self.mean
-        self.mean += (x - self.mean) / self.n
-        self.mean_diff += numerator * (x - self.mean)
-        self.var = tf.clip_by_value(
-            self.mean_diff / self.n, 1e-2, 1e+2)
-
-    @tf.function
-    def normalize(self, x):
-        std = tf.math.sqrt(self.var)
-        return (x - self.mean) / std
-
-
 class DiscriminatorWGAIL(Discriminator):
     def compute_reward(self, inputs):
         cur_rewards = -self.call(inputs)
