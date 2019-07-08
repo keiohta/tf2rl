@@ -40,22 +40,25 @@ class OnPolicyTrainer(Trainer):
             # Collect samples
             n_episode = self._collect_sample(n_episode, total_steps)
             total_steps += self._policy.horizon
-
             tf.summary.experimental.set_step(total_steps)
-            samples = self.replay_buffer.sample(self._policy.horizon)
 
-            indices = np.random.permutation(np.arange(self._policy.horizon))
-            for idx in range(int(self._policy.horizon / self._policy.batch_size)):
-                target = slice(idx*self._policy.batch_size, (idx+1)*self._policy.batch_size)
-                # Train actor
-                for _ in range(self._policy.n_epoch):
+            # Train actor
+            for _ in range(self._policy.n_epoch):
+                samples = self.replay_buffer.sample(self._policy.horizon)
+                for idx in range(int(self._policy.horizon / self._policy.batch_size)):
+                    target = slice(idx*self._policy.batch_size,
+                                   (idx+1)*self._policy.batch_size)
                     self._policy.train_actor(
                         samples["obs"][target],
                         samples["act"][target],
                         samples["adv"][target],
                         samples["logp"][target])
-                # Train Critic
-                for _ in range(self._policy.n_epoch_critic):
+            # Train Critic
+            for _ in range(self._policy.n_epoch_critic):
+                samples = self.replay_buffer.sample(self._policy.horizon)
+                for idx in range(int(self._policy.horizon / self._policy.batch_size)):
+                    target = slice(idx*self._policy.batch_size,
+                                   (idx+1)*self._policy.batch_size)
                     self._policy.train_critic(
                         samples["obs"][target],
                         samples["ret"][target])
@@ -66,7 +69,6 @@ class OnPolicyTrainer(Trainer):
                     total_steps, avg_test_return, self._test_episodes))
                 tf.summary.scalar(
                     name="Common/average_test_return", data=avg_test_return)
-
                 self.writer.flush()
 
             if total_steps % self._model_save_interval == 0:
