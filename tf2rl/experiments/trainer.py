@@ -47,15 +47,16 @@ class Trainer:
         self.logger = logging.getLogger(__name__)
         logging.getLogger().setLevel(logging.getLevelName(args.logging_level))
 
-        # Save and restore model
-        checkpoint = tf.train.Checkpoint(policy=self._policy)
-        self.checkpoint_manager = tf.train.CheckpointManager(
-            checkpoint, directory=self._output_dir, max_to_keep=5)
-        if args.model_dir is not None:
-            assert os.path.isdir(args.model_dir)
-            path_ckpt = tf.train.latest_checkpoint(args.model_dir)
-            checkpoint.restore(path_ckpt)
-            self.logger.info("Restored {}".format(path_ckpt))
+        # Save and restore model if parent class of policy is `tf.keras.model`
+        if isinstance(self._policy, tf.keras.Model):
+            checkpoint = tf.train.Checkpoint(policy=self._policy)
+            self.checkpoint_manager = tf.train.CheckpointManager(
+                checkpoint, directory=self._output_dir, max_to_keep=5)
+            if args.model_dir is not None:
+                assert os.path.isdir(args.model_dir)
+                path_ckpt = tf.train.latest_checkpoint(args.model_dir)
+                checkpoint.restore(path_ckpt)
+                self.logger.info("Restored {}".format(path_ckpt))
 
         # prepare TensorBoard output
         self.writer = tf.summary.create_file_writer(self._output_dir)
@@ -205,8 +206,6 @@ class Trainer:
                             help='Maximum steps in an episode')
         parser.add_argument('--show-progress', action='store_true',
                             help='Call `render` in training process')
-        parser.add_argument('--gpu', type=int, default=0,
-                            help='GPU id')
         parser.add_argument('--save-model-interval', type=int, default=int(1e4),
                             help='Interval to save model')
         parser.add_argument('--model-dir', type=str, default=None,
