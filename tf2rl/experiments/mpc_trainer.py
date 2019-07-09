@@ -131,7 +131,7 @@ class MPCTrainer(Trainer):
     def _mpc(self, obs):
         init_actions = self._policy.get_actions(
             batch_size=self._n_sample)
-        rewards = np.zeros(shape=(self._n_sample,))
+        total_rewards = np.zeros(shape=(self._n_sample,))
         obses = np.tile(obs, (self._n_sample, 1))
 
         for i in range(self._horizon):
@@ -140,15 +140,16 @@ class MPCTrainer(Trainer):
             else:
                 acts = self._policy.get_actions(
                     batch_size=self._n_sample)
-            assert obses.shape[0] == acts.shape[0], "{} {}".format(
-                obses.shape[0], acts.shape[0])
+            assert obses.shape[0] == acts.shape[0]
             obs_diffs = self._dynamics_model.predict(
                 np.concatenate([obses, acts], axis=1))
-            assert obses.shape[0] == obs_diffs.shape[0]
+            assert obses.shape == obs_diffs.shape
             next_obses = obses + obs_diffs
-            rewards += self._reward_fn(obses, next_obses, acts)
+            rewards = self._reward_fn(obses, next_obses, acts)
+            assert rewards.shape == total_rewards.shape
+            total_rewards += rewards
             obses = next_obses
-        idx = np.argmin(rewards)
+        idx = np.argmax(total_rewards)
         return init_actions[idx]
 
     def _set_from_args(self, args):
