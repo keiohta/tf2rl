@@ -125,7 +125,7 @@ class MPCTrainer(Trainer):
                 obs = next_obs
             tf.summary.experimental.set_step(total_steps)
             tf.summary.scalar("mpc/total_rew", total_rew)
-            self.logger.info("iter: {: 3d} total_rew: {:4.4f}".format(
+            self.logger.info("iter={0: 3d} total_rew: {1:4.4f}".format(
                 i, total_rew))
 
     def _mpc(self, obs):
@@ -196,7 +196,7 @@ class MPCTrainer(Trainer):
             loss = self._fit_dynamics_body(x, y)
             self.logger.debug("batch: {} loss: {:2.6f}".format(batch, loss))
         tf.summary.scalar("mpc/model_loss", loss)
-        self.logger.info("iter={0: 3d} loss: {1:2.6f}".format(
+        self.logger.info("iter={0: 3d} loss: {1:2.8f}".format(
             n_iter, loss))
 
     @staticmethod

@@ -15,13 +15,14 @@ if __name__ == "__main__":
         assert obses.ndim == next_obses.ndim == acts.ndim == 2
         assert obses.shape[0] == next_obses.shape[0] == acts.shape[0]
         acts = np.squeeze(acts)
-        thetas = obses[:, 0]
-        theta_dots = obses[:, 1]
+        thetas = np.arctan2(obses[:, 1], obses[:, 0])
+        theta_dots = obses[:, 2]
 
         def angle_normalize(x):
             return (((x+np.pi) % (2*np.pi)) - np.pi)
 
         acts = np.clip(acts, -2, 2)
+        assert thetas.shape == theta_dots.shape == acts.shape
         costs = angle_normalize(thetas)**2 + .1*theta_dots**2 + .001*(acts**2)
         return -costs
 
