@@ -2,17 +2,19 @@ import numpy as np
 import tensorflow as tf
 
 
-class Normalizer():
+class Normalizer:
     """
     Normalize input data online. This is based on following:
     https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm
     """
 
-    def __init__(self):
-        self.n = tf.Variable(0, dtype=tf.float32)
-        self.mean = tf.Variable(0, dtype=tf.float32)
-        self.mean_diff = tf.Variable(0, dtype=tf.float32)
-        self.var = tf.Variable(0, dtype=tf.float32)
+    def __init__(self, mean_only=False):
+        self._mean_only = mean_only
+        self._n = tf.Variable(0, dtype=tf.float32)
+        self._mean = tf.Variable(0, dtype=tf.float32)
+        self._mean_diff = tf.Variable(0, dtype=tf.float32)
+        if not self._mean_only:
+            self._var = tf.Variable(0, dtype=tf.float32)
 
     @tf.function
     def observe(self, x):
@@ -21,34 +23,35 @@ class Normalizer():
 
         :param x (float): Input data
         """
-        self.n.assign_add(1)
-        numerator = x - self.mean
-        self.mean.assign_add((x - self.mean) / self.n)
-        self.mean_diff.assign_add(numerator * (x - self.mean))
-        self.var = tf.clip_by_value(
-            self.mean_diff / self.n, 1e-2, 1e+2)
+        self._n.assign_add(1)
+        numerator = x - self._mean
+        self._mean.assign_add((x - self._mean) / self._n)
+        self._mean_diff.assign_add(numerator * (x - self._mean))
+        if not self._mean_only:
+            self._var = tf.clip_by_value(
+                tf.math.divide_no_nan(self._mean_diff, self._n), 1e-2, 1e+2)
 
     @tf.function
     def normalize(self, x):
-        std = tf.math.sqrt(self.var)
-        return tf.math.divide_no_nan(x - self.mean, std)
+        std = tf.math.sqrt(self._var)
+        return tf.math.divide_no_nan(x - self._mean, std)
 
 
 class NormalizerNumpy:
     def __init__(self):
-        self.n = 0
-        self.mean = 0
-        self.mean_diff = 0
-        self.var = 0
+        self._n = 0
+        self._mean = 0
+        self._mean_diff = 0
+        self._var = 0
 
     def observe(self, x):
-        self.n += 1
-        numerator = x - self.mean
-        self.mean += (x - self.mean) / self.n
-        self.mean_diff += numerator * (x - self.mean)
-        self.var = self.mean_diff / self.n
+        self._n += 1
+        numerator = x - self._mean
+        self._mean += (x - self._mean) / self._n
+        self._mean_diff += numerator * (x - self._mean)
+        self._var = self._mean_diff / self._n
 
     def normalize(self, x):
-        std = np.sqrt(self.var)
-        return (x - self.mean) / std
+        std = np.sqrt(self._var)
+        return (x - self._mean) / std
 
