@@ -77,6 +77,7 @@ class GaussianActor(tf.keras.Model):
         return actions * self._max_action, logp_pis
 
     def compute_log_probs(self, states, actions):
+        actions /= self._max_action
         param = self._compute_dist(states)
         logp_pis = self.dist.log_likelihood(actions, param)
         if self._squash:
@@ -84,6 +85,7 @@ class GaussianActor(tf.keras.Model):
         return logp_pis
 
     def _squash_correction(self, logp_pis, actions):
+        assert np.max(np.abs(actions)) <= 1.
         # To avoid evil machine precision error, strictly clip 1-pi**2 to [0,1] range.
         diff = tf.reduce_sum(
             tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
