@@ -17,10 +17,6 @@ class PPO(VPG):
         self.clip_ratio = clip_ratio
 
     def train_actor(self, states, actions, advantages, logp_olds):
-        # Normalize advantages
-        if self.normalize_adv:
-            advantages = (advantages - np.mean(advantages)) / np.std(advantages)
-
         actor_loss, logp_news, ratio = self._train_actor_body(
             states, actions, advantages, logp_olds)
         tf.summary.scalar(name=self.policy_name+"/actor_loss",

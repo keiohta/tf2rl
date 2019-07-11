@@ -89,10 +89,6 @@ class VPG(OnPolicyAgent):
         return self.actor(state, test)
 
     def train_actor(self, states, actions, advantages, logp_olds):
-        # Normalize advantages
-        if self.normalize_adv:
-            advantages = (advantages - np.mean(advantages)) / np.std(advantages)
-
         actor_loss, log_probs = self._train_actor_body(
             states, actions, advantages)
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)

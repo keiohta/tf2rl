@@ -45,13 +45,17 @@ class OnPolicyTrainer(Trainer):
             # Train actor
             for _ in range(self._policy.n_epoch):
                 samples = self.replay_buffer.sample(self._policy.horizon)
+                if self._policy.normalize_adv:
+                    adv = (samples["adv"] - np.mean(samples["adv"])) / np.std(samples["adv"])
+                else:
+                    adv = samples["adv"]
                 for idx in range(int(self._policy.horizon / self._policy.batch_size)):
                     target = slice(idx*self._policy.batch_size,
                                    (idx+1)*self._policy.batch_size)
                     self._policy.train_actor(
                         samples["obs"][target],
                         samples["act"][target],
-                        samples["adv"][target],
+                        adv[target],
                         samples["logp"][target])
             # Train Critic
             for _ in range(self._policy.n_epoch_critic):
