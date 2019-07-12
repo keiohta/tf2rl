@@ -33,6 +33,8 @@ class VPG(OnPolicyAgent):
             state_shape,
             action_dim,
             is_discrete,
+            actor=None,
+            actor_args={},
             max_action=1.,
             actor_units=[256, 256],
             critic_units=[256, 256],
@@ -46,14 +48,17 @@ class VPG(OnPolicyAgent):
             **kwargs):
         super().__init__(name=name, **kwargs)
         self._is_discrete = is_discrete
-        if is_discrete:
-            self.actor = CategoricalActor(
-                state_shape, action_dim, actor_units)
+        if actor is None:
+            if is_discrete:
+                self.actor = CategoricalActor(
+                    state_shape, action_dim, actor_units)
+            else:
+                self.actor = GaussianActor(
+                    state_shape, action_dim, max_action, actor_units,
+                    hidden_activation=hidden_activation,
+                    fix_std=fix_std, tanh_std=tanh_std, const_std=const_std)
         else:
-            self.actor = GaussianActor(
-                state_shape, action_dim, max_action, actor_units,
-                hidden_activation=hidden_activation,
-                fix_std=fix_std, tanh_std=tanh_std, const_std=const_std)
+            self.actor = actor(**actor_args)
         self.critic = CriticV(state_shape, critic_units)
         self._action_dim = action_dim
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_actor)

@@ -29,7 +29,6 @@ class CategoricalActor(tf.keras.Model):
         """
         features = self.l1(states)
         features = self.l2(features)
-
         probs = self.l3(features)
         return {"prob": probs}
 
