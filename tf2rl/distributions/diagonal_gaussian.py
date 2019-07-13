@@ -59,4 +59,4 @@ class DiagonalGaussian(Distribution):
 
     def entropy(self, param):
         log_stds = param["log_std"]
-        return tf.math.sum(log_stds + tf.math.log(tf.math.sqrt(2 * tf.math.pi * np.e)), axis=-1)
+        return tf.reduce_sum(log_stds + tf.math.log(tf.math.sqrt(2 * np.pi * np.e)), axis=-1)
