@@ -5,6 +5,7 @@ from tensorflow.keras.layers import Dense
 from tf2rl.algos.policy_base import OnPolicyAgent
 from tf2rl.policies.gaussian_actor import GaussianActor
 from tf2rl.policies.categorical_actor import CategoricalActor
+from tf2rl.envs.atari_wrapper import LazyFrames
 
 
 class CriticV(tf.keras.Model):
@@ -34,7 +35,8 @@ class VPG(OnPolicyAgent):
             action_dim,
             is_discrete,
             actor=None,
-            actor_args={},
+            critic=None,
+            actor_critic=None,
             max_action=1.,
             actor_units=[256, 256],
             critic_units=[256, 256],
@@ -48,66 +50,101 @@ class VPG(OnPolicyAgent):
             **kwargs):
         super().__init__(name=name, **kwargs)
         self._is_discrete = is_discrete
-        if actor is None:
-            if is_discrete:
-                self.actor = CategoricalActor(
-                    state_shape, action_dim, actor_units)
-            else:
-                self.actor = GaussianActor(
-                    state_shape, action_dim, max_action, actor_units,
-                    hidden_activation=hidden_activation,
-                    fix_std=fix_std, tanh_std=tanh_std, const_std=const_std)
+
+        if actor_critic is not None:
+            self.actor_critic = actor_critic
+            self.actor_critic_optimizer = tf.keras.optimizers.Adam(
+                learning_rate=lr_actor)
         else:
-            self.actor = actor(**actor_args)
-        self.critic = CriticV(state_shape, critic_units)
-        self._action_dim = action_dim
-        self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_actor)
-        self.critic_optimizer = tf.keras.optimizers.Adam(
-            learning_rate=lr_critic)
+            self.actor_critic = None
+            if actor is None:
+                if is_discrete:
+                    self.actor = CategoricalActor(
+                        state_shape, action_dim, actor_units)
+                else:
+                    self.actor = GaussianActor(
+                        state_shape, action_dim, max_action, actor_units,
+                        hidden_activation=hidden_activation,
+                        fix_std=fix_std, tanh_std=tanh_std, const_std=const_std)
+            else:
+                self.actor = actor
+            if critic is None:
+                self.critic = CriticV(state_shape, critic_units)
+            else:
+                self.critic = critic
+            self.actor_optimizer = tf.keras.optimizers.Adam(
+                learning_rate=lr_actor)
+            self.critic_optimizer = tf.keras.optimizers.Adam(
+                learning_rate=lr_critic)
+
+        # This is used to check if input state to `get_action` is multiple (batch) or single
+        self._state_ndim = np.array(state_shape).shape[0]
 
     def get_action(self, state, test=False):
-        assert isinstance(state, np.ndarray)
+        if isinstance(state, LazyFrames):
+            state = np.array(state)
+        assert isinstance(state, np.ndarray), \
+            "Input instance should be np.ndarray, not {}".format(type(state))
 
-        single_input = state.ndim == 1
-        if single_input:
+        is_single_input = state.ndim == self._state_ndim
+        if is_single_input:
             state = np.expand_dims(state, axis=0).astype(np.float32)
-        action, logp_pi = self._get_action_body(state, test)
+        action, logp = self._get_action_body(state, test)
 
-        if single_input:
-            return action.numpy()[0], logp_pi.numpy()
+        if is_single_input:
+            return action.numpy()[0], logp.numpy()
         else:
-            return action.numpy(), logp_pi.numpy()
+            return action.numpy(), logp.numpy()
 
     def get_action_and_val(self, state, test=False):
-        single_input = state.ndim == 1
-        if single_input:
+        if isinstance(state, LazyFrames):
+            state = np.array(state)
+        is_single_input = state.ndim == self._state_ndim
+        if is_single_input:
             state = np.expand_dims(state, axis=0).astype(np.float32)
-        action, logp_pi = self.get_action(state, test)
-        val = self.critic(state)
-        if single_input:
-            val = val[0]
+
+        action, logp, v = self._get_action_logp_v_body(state, test)
+
+        if is_single_input:
+            v = v[0]
             action = action[0]
-        return action, logp_pi, val.numpy()
+
+        return action.numpy(), logp.numpy(), v.numpy()
+
+    @tf.function
+    def _get_action_logp_v_body(self, state, test):
+        if self.actor_critic:
+            return self.actor_critic(state, test)
+        else:
+            action, logp = self.actor(state, test)
+            v = self.critic(state)
+            return action, logp, v
 
     @tf.function
     def _get_action_body(self, state, test):
-        return self.actor(state, test)
+        if self.actor_critic is not None:
+            action, logp, _ = self.actor_critic(state, test)
+            return action, logp
+        else:
+            return self.actor(state, test)
 
     def train_actor(self, states, actions, advantages, logp_olds):
-        actor_loss, log_probs = self._train_actor_body(
+        actor_loss, logp_news = self._train_actor_body(
             states, actions, advantages)
-        tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
+        tf.summary.scalar(name=self.policy_name+"/actor_loss",
+                          data=actor_loss)
         tf.summary.scalar(name=self.policy_name+"/logp_max",
-                          data=np.max(log_probs))
+                          data=np.max(logp_news))
         tf.summary.scalar(name=self.policy_name+"/logp_min",
-                          data=np.min(log_probs))
+                          data=np.min(logp_news))
         tf.summary.scalar(name=self.policy_name+"/logp_mean",
-                          data=np.mean(log_probs))
+                          data=np.mean(logp_news))
         tf.summary.scalar(name=self.policy_name+"/adv_max",
                           data=np.max(advantages))
         tf.summary.scalar(name=self.policy_name+"/adv_min",
                           data=np.min(advantages))
-        # TODO: Compute KL divergence and output it
+        tf.summary.scalar(name=self.policy_name+"/kl",
+                          data=tf.reduce_mean(logp_olds - logp_news))
         return actor_loss
 
     def train_critic(self, states, returns):

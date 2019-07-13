@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.networks.noisy_dense import NoisyDense
-from tf2rl.policies.categorical_actor import CategoricalActor
+from tf2rl.policies.categorical_actor import CategoricalActorCritic
 from tf2rl.distributions.categorical import Categorical
 
 
@@ -78,10 +78,10 @@ class AtariQFunc(tf.keras.Model):
             return q_values
 
 
-class AtariCategoricalPolicy(CategoricalActor):
+class AtariCategoricalActorCritic(CategoricalActorCritic):
     def __init__(self, state_shape, action_dim,
-                 name="CategoricalActor"):
-        super().__init__(name=name)
+                 name="AtariCategoricalActorCritic"):
+        tf.keras.Model.__init__(self, name=name)
         self.dist = Categorical(dim=action_dim)
         self.action_dim = action_dim
 
@@ -93,26 +93,18 @@ class AtariCategoricalPolicy(CategoricalActor):
                             padding='valid', activation='relu')
         self.flat = Flatten()
         self.fc1 = Dense(512, activation='relu')
-        self.fc2 = Dense(action_dim, name="L3", activation='softmax')
+        self.prob = Dense(action_dim, activation='softmax')
+        self.v = Dense(1, activation="linear")
 
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
-    def _compute_dist(self, states):
-        """
-        Compute categorical distribution
-
-        :param states (np.ndarray or tf.Tensor): Inputs to neural network.
-            NN outputs probabilities of K classes
-        :return: Categorical distribution
-        """
-        # TODO: This type conversion seems to be bottle neck
-        features = tf.divide(tf.cast(inputs, tf.float32),
+    def _compute_feature(self, states):
+        features = tf.divide(tf.cast(states, tf.float32),
                              tf.constant(255.))
         features = self.conv1(features)
         features = self.conv2(features)
         features = self.conv3(features)
         features = self.flat(features)
         features = self.fc1(features)
-        probs = self.fc2(features)
-        return {"prob": probs}
+        return features

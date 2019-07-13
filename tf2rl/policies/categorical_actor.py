@@ -77,3 +77,25 @@ class CategoricalActor(tf.keras.Model):
             lambda: actions)
         log_prob = self.dist.log_likelihood(actions, param)
         return log_prob
+
+
+class CategoricalActorCritic(CategoricalActor):
+    def __init__(self, *args, **kwargs):
+        tf.keras.Model.__init__(self)
+        self.v = Dense(1, activation="linear")
+        super().__init__(*args, **kwargs)
+
+    def call(self, states, test=False):
+        features = self._compute_feature(states)
+        probs = self.prob(features)
+        param = {"prob": probs}
+        if test:
+            action = tf.math.argmax(param["prob"], axis=1)  # (size,)
+        else:
+            action = tf.squeeze(self.dist.sample(param), axis=1)  # (size,)
+
+        log_prob = self.dist.log_likelihood(
+            tf.one_hot(indices=action, depth=self.action_dim), param)
+        v = self.v(features)
+
+        return action, log_prob, v

@@ -69,7 +69,8 @@ class SAC(OffPolicyAgent):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
         self.actor = GaussianActor(
-            state_shape, action_dim, max_action, squash=True, tanh_mean=False, tanh_std=False)
+            state_shape, action_dim, max_action, squash=True,
+            tanh_mean=False, tanh_std=False)
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
         self.vf = CriticV(state_shape)

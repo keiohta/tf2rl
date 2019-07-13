@@ -16,8 +16,72 @@ class PPO(VPG):
         self.clip = clip
         self.clip_ratio = clip_ratio
 
+    def train_actor_critic(self, states, actions, advantages, logp_olds, returns):
+        actor_loss, critic_loss, logp_news, ratio, ent = self._train_actor_critic_body(
+            states, actions, advantages, logp_olds, returns)
+        tf.summary.scalar(name=self.policy_name+"/actor_loss",
+                          data=actor_loss)
+        tf.summary.scalar(name=self.policy_name+"/logp_max",
+                          data=np.max(logp_news))
+        tf.summary.scalar(name=self.policy_name+"/logp_min",
+                          data=np.min(logp_news))
+        tf.summary.scalar(name=self.policy_name+"/logp_mean",
+                          data=np.mean(logp_news))
+        tf.summary.scalar(name=self.policy_name+"/adv_max",
+                          data=np.max(advantages))
+        tf.summary.scalar(name=self.policy_name+"/adv_min",
+                          data=np.min(advantages))
+        tf.summary.scalar(name=self.policy_name+"/kl",
+                          data=tf.reduce_mean(logp_olds - logp_news))
+        tf.summary.scalar(name=self.policy_name+"/ent",
+                          data=ent)
+        tf.summary.scalar(name=self.policy_name+"/ratio",
+                          data=tf.reduce_mean(ratio))
+        tf.summary.scalar(name=self.policy_name +
+                          "/critic_loss", data=critic_loss)
+
+    @tf.function
+    def _train_actor_critic_body(
+            self, states, actions, advantages, logp_olds, returns):
+        with tf.device(self.device):
+            with tf.GradientTape() as tape:
+                _, _, current_V = self.actor_critic(states)
+                ent = tf.reduce_mean(
+                    self.actor_critic.compute_entropy(states))
+                # Actor
+                if self.clip:
+                    logp_news = self.actor_critic.compute_log_probs(
+                        states, actions)
+                    ratio = tf.math.exp(
+                        logp_news - tf.squeeze(logp_olds))
+                    min_adv = tf.clip_by_value(
+                        ratio,
+                        1.0 - self.clip_ratio,
+                        1.0 + self.clip_ratio) * tf.squeeze(advantages)
+                    # min_adv = tf.squeeze(tf.where(
+                    #     advantages > 0,
+                    #     (1. + self.clip_ratio) * advantages,
+                    #     (1. - self.clip_ratio) * advantages))
+                    actor_loss = -tf.reduce_mean(tf.minimum(
+                        ratio * tf.squeeze(advantages),
+                        min_adv))
+                    actor_loss -= self.entropy_coef * ent
+                else:
+                    raise NotImplementedError
+                # Critic
+                td_errors = tf.squeeze(returns) - current_V
+                critic_loss = tf.reduce_mean(0.5 * tf.square(td_errors))
+                total_loss = actor_loss + self.vfunc_coef * critic_loss
+
+            grads = tape.gradient(
+                total_loss, self.actor_critic.trainable_variables)
+            self.actor_critic_optimizer.apply_gradients(
+                zip(grads, self.actor_critic.trainable_variables))
+
+        return actor_loss, critic_loss, logp_news, ratio, ent
+
     def train_actor(self, states, actions, advantages, logp_olds):
-        actor_loss, logp_news, ratio = self._train_actor_body(
+        actor_loss, logp_news, ratio, ent = self._train_actor_body(
             states, actions, advantages, logp_olds)
         tf.summary.scalar(name=self.policy_name+"/actor_loss",
                           data=actor_loss)
@@ -34,7 +98,7 @@ class PPO(VPG):
         tf.summary.scalar(name=self.policy_name+"/kl",
                           data=tf.reduce_mean(logp_olds - logp_news))
         tf.summary.scalar(name=self.policy_name+"/ent",
-                          data=tf.reduce_mean(-logp_news))
+                          data=ent)
         tf.summary.scalar(name=self.policy_name+"/ratio",
                           data=tf.reduce_mean(ratio))
         return actor_loss
@@ -44,11 +108,11 @@ class PPO(VPG):
         with tf.device(self.device):
             # Update actor
             with tf.GradientTape() as tape:
+                ent = tf.reduce_mean(
+                    self.actor.compute_entropy(states))
                 if self.clip:
                     logp_news = self.actor.compute_log_probs(states, actions)
                     ratio = tf.math.exp(logp_news - tf.squeeze(logp_olds))
-                    surr_loss = -tf.reduce_mean(tf.minimum(
-                        ratio * tf.squeeze(advantages), min_adv))
                     # min_adv = tf.squeeze(tf.where(
                     #     advantages > 0,
                     #     (1. + self.clip_ratio) * advantages,
@@ -57,12 +121,15 @@ class PPO(VPG):
                         ratio,
                         1.0 - self.clip_ratio,
                         1.0 + self.clip_ratio) * tf.squeeze(advantages)
+                    actor_loss = -tf.reduce_mean(tf.minimum(
+                        ratio * tf.squeeze(advantages),
+                        min_adv))
+                    actor_loss -= self.entropy_coef * ent
                 else:
                     raise NotImplementedError
-                actor_loss = surr_loss  # + lambda * entropy
             actor_grad = tape.gradient(
                 actor_loss, self.actor.trainable_variables)
             self.actor_optimizer.apply_gradients(
                 zip(actor_grad, self.actor.trainable_variables))
 
-        return actor_loss, logp_news, ratio
+        return actor_loss, logp_news, ratio, ent
