@@ -47,12 +47,16 @@ class PPO(VPG):
                 if self.clip:
                     logp_news = self.actor.compute_log_probs(states, actions)
                     ratio = tf.math.exp(logp_news - tf.squeeze(logp_olds))
-                    min_adv = tf.squeeze(tf.where(
-                        advantages > 0,
-                        (1. + self.clip_ratio) * advantages,
-                        (1. - self.clip_ratio) * advantages))
                     surr_loss = -tf.reduce_mean(tf.minimum(
                         ratio * tf.squeeze(advantages), min_adv))
+                    # min_adv = tf.squeeze(tf.where(
+                    #     advantages > 0,
+                    #     (1. + self.clip_ratio) * advantages,
+                    #     (1. - self.clip_ratio) * advantages))
+                    min_adv = tf.clip_by_value(
+                        ratio,
+                        1.0 - self.clip_ratio,
+                        1.0 + self.clip_ratio) * tf.squeeze(advantages)
                 else:
                     raise NotImplementedError
                 actor_loss = surr_loss  # + lambda * entropy
