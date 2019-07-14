@@ -28,8 +28,10 @@ class GaussianActor(tf.keras.Model):
                               activation='tanh' if tanh_mean else None)
         if not self.fix_std:
             activation = 'tanh' if tanh_std else None
-            self.out_log_std = Dense(
-                action_dim, name="L_sigma", activation=activation)
+            # self.out_log_std = Dense(
+            #     action_dim, name="L_sigma", activation=activation)
+            self.out_log_std = tf.Variable(
+                initial_value=np.zeros(action_dim), dtype=tf.float32, name="logstd")
 
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
@@ -48,7 +50,10 @@ class GaussianActor(tf.keras.Model):
         if self.fix_std:
             log_std = tf.ones_like(mean) * tf.math.log(self.const_std)
         else:
-            log_std = self.out_log_std(features)
+            # log_std = self.out_log_std(features)
+            log_std = tf.tile(
+                input=tf.expand_dims(self.out_log_std, axis=0),
+                multiples=[mean.shape[0], 1])
             if self._tanh_std:
                 log_std = self.LOG_SIG_CAP_MIN + 0.5 * \
                     (self.LOG_SIG_CAP_MAX - self.LOG_SIG_CAP_MIN) * (log_std + 1)
