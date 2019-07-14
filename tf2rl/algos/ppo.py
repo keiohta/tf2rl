@@ -85,6 +85,10 @@ class PPO(VPG):
             states, actions, advantages, logp_olds)
         tf.summary.scalar(name=self.policy_name+"/actor_loss",
                           data=actor_loss)
+        # DEBUG START
+        tf.summary.scalar(name=self.policy_name+"/lop_std_mean",
+                          data=tf.reduce_mean(self.actor.out_log_std))
+        # DEBUG END
         tf.summary.scalar(name=self.policy_name+"/logp_max",
                           data=np.max(logp_news))
         tf.summary.scalar(name=self.policy_name+"/logp_min",
