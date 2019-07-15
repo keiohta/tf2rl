@@ -6,7 +6,7 @@ from tf2rl.distributions.diagonal_gaussian import DiagonalGaussian
 
 
 class GaussianActor(tf.keras.Model):
-    LOG_SIG_CAP_MAX = 10  # np.e**2 = 7.389
+    LOG_SIG_CAP_MAX = 2  # np.e**2 = 7.389
     LOG_SIG_CAP_MIN = -20  # np.e**-10 = 4.540e-05
     EPS = 1e-6
 
