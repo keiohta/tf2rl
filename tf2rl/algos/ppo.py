@@ -86,8 +86,11 @@ class PPO(VPG):
         tf.summary.scalar(name=self.policy_name+"/actor_loss",
                           data=actor_loss)
         # DEBUG START
-        tf.summary.scalar(name=self.policy_name+"/lop_std_mean",
-                          data=tf.reduce_mean(self.actor.out_log_std))
+        from tf2rl.policies.gaussian_actor import GaussianActor
+        if isinstance(self.actor, GaussianActor):
+            if self.actor._state_independent_std:
+                tf.summary.scalar(name=self.policy_name+"/lop_std_mean",
+                                data=tf.reduce_mean(self.actor.out_log_std))
         # DEBUG END
         tf.summary.scalar(name=self.policy_name+"/logp_max",
                           data=np.max(logp_news))
