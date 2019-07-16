@@ -58,10 +58,6 @@ class PPO(VPG):
                         ratio,
                         1.0 - self.clip_ratio,
                         1.0 + self.clip_ratio) * tf.squeeze(advantages)
-                    # min_adv = tf.squeeze(tf.where(
-                    #     advantages > 0,
-                    #     (1. + self.clip_ratio) * advantages,
-                    #     (1. - self.clip_ratio) * advantages))
                     actor_loss = -tf.reduce_mean(tf.minimum(
                         ratio * tf.squeeze(advantages),
                         min_adv))
@@ -90,7 +86,9 @@ class PPO(VPG):
         if isinstance(self.actor, GaussianActor):
             if self.actor._state_independent_std:
                 tf.summary.scalar(name=self.policy_name+"/lop_std_mean",
-                                data=tf.reduce_mean(self.actor.out_log_std))
+                                  data=tf.reduce_mean(self.actor.out_log_std))
+        tf.summary.scalar(name=self.policy_name+"/actions",
+                          data=tf.reduce_mean(actions))
         # DEBUG END
         tf.summary.scalar(name=self.policy_name+"/logp_max",
                           data=np.max(logp_news))
@@ -118,12 +116,9 @@ class PPO(VPG):
                 ent = tf.reduce_mean(
                     self.actor.compute_entropy(states))
                 if self.clip:
-                    logp_news = self.actor.compute_log_probs(states, actions)
+                    logp_news = self.actor.compute_log_probs(
+                        states, actions)
                     ratio = tf.math.exp(logp_news - tf.squeeze(logp_olds))
-                    # min_adv = tf.squeeze(tf.where(
-                    #     advantages > 0,
-                    #     (1. + self.clip_ratio) * advantages,
-                    #     (1. - self.clip_ratio) * advantages))
                     min_adv = tf.clip_by_value(
                         ratio,
                         1.0 - self.clip_ratio,

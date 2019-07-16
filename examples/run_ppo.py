@@ -11,7 +11,6 @@ if __name__ == '__main__':
     parser = PPO.get_argument(parser)
     parser.add_argument('--env-name', type=str,
                         default="Pendulum-v0")
-    parser.add_argument("--actor-critic", action="store_true")
     parser.set_defaults(test_interval=20480)
     parser.set_defaults(max_steps=int(1e7))
     parser.set_defaults(horizon=2048)
@@ -22,11 +21,6 @@ if __name__ == '__main__':
     env = gym.make(args.env_name)
     test_env = gym.make(args.env_name)
 
-    actor_critic = CategoricalActorCritic(
-        state_shape=env.observation_space.shape,
-        action_dim=get_act_dim(env.action_space),
-        units=[64, 64]) if args.actor_critic else None
-
     policy = PPO(
         state_shape=env.observation_space.shape,
         action_dim=get_act_dim(env.action_space),
@@ -34,7 +28,6 @@ if __name__ == '__main__':
         max_action=None if is_discrete(
             env.action_space) else env.action_space.high[0],
         batch_size=args.batch_size,
-        actor_critic=actor_critic,
         actor_units=[64, 64],
         critic_units=[64, 64],
         n_epoch=10,
@@ -44,7 +37,6 @@ if __name__ == '__main__':
         discount=0.99,
         lam=0.95,
         horizon=args.horizon,
-        # fix_std=True,
         normalize_adv=args.normalize_adv,
         enable_gae=args.enable_gae,
         gpu=args.gpu)

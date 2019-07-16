@@ -30,8 +30,6 @@ if __name__ == '__main__':
         critic_units=[32, 32],
         discount=0.9,
         horizon=args.horizon,
-        entropy_coef=0.,
-        # fix_std=True,
         normalize_adv=args.normalize_adv,
         enable_gae=args.enable_gae,
         gpu=args.gpu)
