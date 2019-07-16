@@ -86,7 +86,16 @@ You can check implemented algorithms in [examples](https://github.com/keiohta/tf
 For example if you want to train DDPG agent:
 
 ```bash
-# You must change directory to avoid importing local files.
+# You must change directory to avoid importing local files
 $ cd examples
-$ python run_ddpg.py
+# For options, please specify --help or read code for options
+$ python run_ddpg.py [options]
 ```
+
+You can see the training progress/results from TensorBoard as follows:
+
+```bash
+# When executing `run_**.py`, its logs are automatically generated under `./results`
+$ tensorboard --logdir results
+```
+
