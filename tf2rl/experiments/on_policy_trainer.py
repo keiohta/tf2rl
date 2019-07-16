@@ -110,8 +110,11 @@ class OnPolicyTrainer(Trainer):
         episode_start_time = time.time()
         obs = self._env.reset()
         for _ in range(self._policy.horizon):
-            action, log_pi, val = self._policy.get_action_and_val(obs)
-            next_obs, reward, done, _ = self._env.step(action)
+            act, logp, val = self._policy.get_action_and_val(obs)
+            # TODO: Clean code
+            clipped_act = act if not hasattr(self._env.action_space, "high") else \
+                np.clip(act, self._env.action_space.low, self._env.action_space.high)
+            next_obs, reward, done, _ = self._env.step(clipped_act)
             if self._show_progress:
                 self._env.render()
             episode_steps += 1
@@ -122,8 +125,8 @@ class OnPolicyTrainer(Trainer):
                     episode_steps == self._env._max_episode_steps:
                 done_flag = False
             self.local_buffer.add(
-                obs=obs, act=action, next_obs=next_obs,
-                rew=reward, done=done_flag, logp=log_pi, val=val)
+                obs=obs, act=act, next_obs=next_obs,
+                rew=reward, done=done_flag, logp=logp, val=val)
             obs = next_obs
 
             if done or episode_steps == self._episode_max_steps:
@@ -188,11 +191,13 @@ class OnPolicyTrainer(Trainer):
             obs = self._test_env.reset()
             done = False
             for _ in range(self._episode_max_steps):
-                action, _ = self._policy.get_action(obs, test=True)
-                next_obs, reward, done, _ = self._test_env.step(action)
+                act, _ = self._policy.get_action(obs, test=True)
+                act = act if not hasattr(self._env.action_space, "high") else \
+                    np.clip(act, self._env.action_space.low, self._env.action_space.high)
+                next_obs, reward, done, _ = self._test_env.step(act)
                 if self._save_test_path:
                     replay_buffer.add(
-                        obs=obs, act=action, next_obs=next_obs,
+                        obs=obs, act=act, next_obs=next_obs,
                         rew=reward, done=done)
 
                 if self._save_test_movie:

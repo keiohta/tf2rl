@@ -12,15 +12,15 @@ class GaussianActor(tf.keras.Model):
 
     def __init__(self, state_shape, action_dim, max_action,
                  units=[256, 256], hidden_activation="relu",
-                 tanh_mean=True, tanh_std=True,
+                 tanh_mean=False, tanh_std=False,
                  fix_std=False, const_std=0.1,
                  state_independent_std=False,
                  squash=False, name='GaussianPolicy'):
         super().__init__(name=name)
         self.dist = DiagonalGaussian(dim=action_dim)
-        self.fix_std = fix_std
+        self._fix_std = fix_std
         self._tanh_std = tanh_std
-        self.const_std = const_std
+        self._const_std = const_std
         self._max_action = max_action
         self._squash = squash
         self._state_independent_std = state_independent_std
@@ -29,10 +29,10 @@ class GaussianActor(tf.keras.Model):
         self.l2 = Dense(units[1], name="L2", activation=hidden_activation)
         self.out_mean = Dense(action_dim, name="L_mean",
                               activation='tanh' if tanh_mean else None)
-        if not self.fix_std:
+        if not self._fix_std:
             if self._state_independent_std:
                 self.out_log_std = tf.Variable(
-                    initial_value=np.zeros(action_dim),
+                    initial_value=-0.5*np.ones(action_dim, dtype=np.float32),
                     dtype=tf.float32, name="logstd")
             else:
                 activation = 'tanh' if tanh_std else None
@@ -53,8 +53,8 @@ class GaussianActor(tf.keras.Model):
         features = self.l1(states)
         features = self.l2(features)
         mean = self.out_mean(features)
-        if self.fix_std:
-            log_std = tf.ones_like(mean) * tf.math.log(self.const_std)
+        if self._fix_std:
+            log_std = tf.ones_like(mean) * tf.math.log(self._const_std)
         else:
             if self._state_independent_std:
                 log_std = tf.tile(
@@ -82,7 +82,8 @@ class GaussianActor(tf.keras.Model):
             raw_actions = self.dist.sample(param)
         logp_pis = self.dist.log_likelihood(raw_actions, param)
 
-        actions = tf.tanh(raw_actions)
+        actions = raw_actions
+        # actions = tf.tanh(raw_actions)
 
         if self._squash:
             logp_pis = self._squash_correction(logp_pis, actions)
