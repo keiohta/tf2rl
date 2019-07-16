@@ -38,9 +38,14 @@ class OnPolicyTrainer(Trainer):
         tf.summary.experimental.set_step(total_steps)
         while total_steps < self._max_steps:
             # Collect samples
-            n_episode = self._collect_sample(n_episode, total_steps)
+            n_episode, total_rewards = self._collect_sample(n_episode, total_steps)
             total_steps += self._policy.horizon
             tf.summary.experimental.set_step(total_steps)
+
+            if len(total_rewards) > 0:
+                avg_training_return = sum(total_rewards) / len(total_rewards)
+                tf.summary.scalar(
+                    name="Common/training_return", data=avg_training_return)
 
             # Train actor critic
             if self._policy.actor_critic is not None:
@@ -101,6 +106,7 @@ class OnPolicyTrainer(Trainer):
     def _collect_sample(self, n_episode, total_steps):
         episode_steps = 0
         episode_return = 0
+        episode_returns = []
         episode_start_time = time.time()
         obs = self._env.reset()
         for _ in range(self._policy.horizon):
@@ -130,11 +136,12 @@ class OnPolicyTrainer(Trainer):
                     n_episode, int(total_steps), episode_steps, episode_return, fps))
 
                 tf.summary.scalar(name="Common/fps", data=fps)
+                episode_returns.append(episode_return)
                 episode_steps = 0
                 episode_return = 0
                 episode_start_time = time.time()
         self.finish_horizon(last_val=val)
-        return n_episode
+        return n_episode, episode_returns
 
     def finish_horizon(self, last_val=0):
         """
