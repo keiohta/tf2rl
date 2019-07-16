@@ -66,7 +66,9 @@ class SAC(OffPolicyAgent):
             n_warmup=int(1e4),
             memory_capacity=int(1e6),
             **kwargs):
-        super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
+        super().__init__(
+            name=name, memory_capacity=memory_capacity,
+            n_warmup=n_warmup, **kwargs)
 
         self.actor = GaussianActor(
             state_shape, action_dim, max_action, squash=True,

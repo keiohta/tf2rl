@@ -83,9 +83,9 @@ class GaussianActor(tf.keras.Model):
         logp_pis = self.dist.log_likelihood(raw_actions, param)
 
         actions = raw_actions
-        # actions = tf.tanh(raw_actions)
 
         if self._squash:
+            actions = tf.tanh(raw_actions)
             logp_pis = self._squash_correction(logp_pis, actions)
 
         return actions * self._max_action, logp_pis
