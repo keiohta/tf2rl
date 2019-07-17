@@ -66,10 +66,13 @@ class SAC(OffPolicyAgent):
             n_warmup=int(1e4),
             memory_capacity=int(1e6),
             **kwargs):
-        super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
+        super().__init__(
+            name=name, memory_capacity=memory_capacity,
+            n_warmup=n_warmup, **kwargs)
 
         self.actor = GaussianActor(
-            state_shape, action_dim, max_action, squash=True, tanh_mean=False, tanh_std=False)
+            state_shape, action_dim, max_action, squash=True,
+            tanh_mean=False, tanh_std=False)
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
         self.vf = CriticV(state_shape)
@@ -105,15 +108,15 @@ class SAC(OffPolicyAgent):
         if weights is None:
             weights = np.ones_like(rewards)
 
-        td_errors, actor_loss, vf_loss, qf_loss, log_pi_min, log_pi_max = \
+        td_errors, actor_loss, vf_loss, qf_loss, logp_min, logp_max = \
             self._train_body(states, actions, next_states,
                              rewards, done, weights)
 
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
         tf.summary.scalar(name=self.policy_name+"/critic_V_loss", data=vf_loss)
         tf.summary.scalar(name=self.policy_name+"/critic_Q_loss", data=qf_loss)
-        tf.summary.scalar(name=self.policy_name+"/log_pi_min", data=log_pi_min)
-        tf.summary.scalar(name=self.policy_name+"/log_pi_max", data=log_pi_max)
+        tf.summary.scalar(name=self.policy_name+"/logp_min", data=logp_min)
+        tf.summary.scalar(name=self.policy_name+"/logp_max", data=logp_max)
 
         return td_errors
 
@@ -148,19 +151,19 @@ class SAC(OffPolicyAgent):
 
             with tf.GradientTape(persistent=True) as tape:
                 current_V = self.vf(states)
-                sample_actions, log_pi = self.actor(states)
+                sample_actions, logp = self.actor(states)
 
                 current_Q1 = self.qf1([states, sample_actions])
                 current_Q2 = self.qf2([states, sample_actions])
                 current_Q = tf.minimum(current_Q1, current_Q2)
 
-                target_V = tf.stop_gradient(current_Q - log_pi)
+                target_V = tf.stop_gradient(current_Q - logp)
                 td_errors = target_V - current_V
                 vf_loss_t = tf.reduce_mean(
                     huber_loss(td_errors, delta=self.max_grad) * weights)
 
                 # TODO: Add reguralizer
-                policy_loss = tf.reduce_mean(log_pi - current_Q1)
+                policy_loss = tf.reduce_mean(logp - current_Q1)
 
             vf_grad = tape.gradient(vf_loss_t, self.vf.trainable_variables)
             self.vf_optimizer.apply_gradients(
@@ -175,7 +178,7 @@ class SAC(OffPolicyAgent):
 
             del tape
 
-        return td_errors, policy_loss, vf_loss_t, td_loss1, tf.reduce_min(log_pi), tf.reduce_max(log_pi)
+        return td_errors, policy_loss, vf_loss_t, td_loss1, tf.reduce_min(logp), tf.reduce_max(logp)
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
         td_erros_Q1, td_errors_Q2, td_errors_V = self._compute_td_error_body(
@@ -204,13 +207,13 @@ class SAC(OffPolicyAgent):
 
             # Compute TD errors for V-value func
             current_V = self.vf(states)
-            sample_actions, log_pi = self.actor(states)
+            sample_actions, logp = self.actor(states)
 
             current_Q1 = self.qf1([states, sample_actions])
             current_Q2 = self.qf2([states, sample_actions])
             current_Q = tf.minimum(current_Q1, current_Q2)
 
-            target_V = tf.stop_gradient(current_Q - log_pi)
+            target_V = tf.stop_gradient(current_Q - logp)
             td_errors_V = target_V - current_V
 
         return td_errors_Q1, td_errors_Q2, td_errors_V

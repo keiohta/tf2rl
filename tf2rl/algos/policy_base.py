@@ -12,6 +12,7 @@ class Policy(tf.keras.Model):
             discount=0.99,
             n_warmup=0,
             max_grad=10.,
+            n_epoch=1,
             gpu=0):
         super().__init__()
         self.policy_name = name
@@ -19,6 +20,7 @@ class Policy(tf.keras.Model):
         self.batch_size = batch_size
         self.discount = discount
         self.n_warmup = n_warmup
+        self.n_epoch = n_epoch
         self.max_grad = max_grad
         self.memory_capacity = memory_capacity
         self.device = "/gpu:{}".format(gpu) if gpu >= 0 else "/cpu:0"
@@ -47,19 +49,29 @@ class OnPolicyAgent(Policy):
             lam=0.95,
             enable_gae=True,
             normalize_adv=True,
+            n_epoch_critic=1,
+            entropy_coef=0.01,
+            vfunc_coef=1.,
             **kwargs):
         self.horizon = horizon
         self.lam = lam
         self.enable_gae = enable_gae
         self.normalize_adv = normalize_adv
+        self.n_epoch_critic = n_epoch_critic
+        self.entropy_coef = entropy_coef
+        self.vfunc_coef = vfunc_coef
         kwargs["n_warmup"] = 0
         kwargs["memory_capacity"] = self.horizon
         super().__init__(**kwargs)
+        assert self.horizon % self.batch_size == 0, \
+            "Horizon should be divisible by batch size"
 
     @staticmethod
     def get_argument(parser=None):
         parser = Policy.get_argument(parser)
         parser.add_argument('--horizon', type=int, default=2048)
+        parser.add_argument('--normalize-adv', action='store_true')
+        parser.add_argument('--enable-gae', action='store_true')
         return parser
 
 

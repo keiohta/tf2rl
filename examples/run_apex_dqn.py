@@ -6,7 +6,7 @@ import tensorflow as tf
 from tf2rl.algos.apex import apex_argument, run
 from tf2rl.algos.dqn import DQN
 from tf2rl.misc.target_update_ops import update_target_variables
-from tf2rl.networks.dqn_model import AtariQFunc
+from tf2rl.networks.atari_model import AtariQFunc
 
 
 if __name__ == '__main__':

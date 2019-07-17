@@ -12,7 +12,7 @@ Following algorithms are supported:
 
 |                          Algorithm                           | Dicrete action | Continuous action |                  Support                   | Category                 |
 | :----------------------------------------------------------: | :------------: | :---------------: | :----------------------------------------: | ------------------------ |
-| [VPG](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf) |       ✓        |         ✓         |  [GAE](https://arxiv.org/abs/1506.02438)   | Model-free On-policy RL  |
+| [VPG](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [PPO](<https://arxiv.org/abs/1707.06347>) |       ✓        |         ✓         |  [GAE](https://arxiv.org/abs/1506.02438)   | Model-free On-policy RL  |
 | [DQN](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf) (including [DDQN](https://arxiv.org/abs/1509.06461), [Prior. DQN](https://arxiv.org/abs/1511.05952), [Duel. DQN](https://arxiv.org/abs/1511.06581), [Distrib. DQN](<https://arxiv.org/abs/1707.06887>), [Noisy DQN](<https://arxiv.org/abs/1706.10295>)) |       ✓        |         -         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
 | [DDPG](https://arxiv.org/abs/1509.02971) (including [TD3](<https://arxiv.org/abs/1802.09477>), [BiResDDPG](<https://arxiv.org/abs/1905.01072>)) |       -        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
 |          [SAC](<https://arxiv.org/abs/1801.01290>)           |       -        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
@@ -20,10 +20,11 @@ Following algorithms are supported:
 
 Following papers have been implementd in tf2rl:
 
-- Model-free On-policy
+- Model-free On-policy RL
   - [Policy Gradient Methods for Reinforcement Learning with Function Approximation](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/vpg.py>)
   - [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/abs/1506.02438), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/misc/discount_cumsum.py>)
-- Model-free Off-policy
+  - [Proximal Policy Optimization Algorithms](<https://arxiv.org/abs/1707.06347>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/ppo.py>)
+- Model-free Off-policy RL
   - [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
   - [Human-level control through Deep Reinforcement Learning](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
   - [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/abs/1509.06461), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
@@ -87,7 +88,16 @@ You can check implemented algorithms in [examples](https://github.com/keiohta/tf
 For example if you want to train DDPG agent:
 
 ```bash
-# You must change directory to avoid importing local files.
+# You must change directory to avoid importing local files
 $ cd examples
-$ python run_ddpg.py
+# For options, please specify --help or read code for options
+$ python run_ddpg.py [options]
 ```
+
+You can see the training progress/results from TensorBoard as follows:
+
+```bash
+# When executing `run_**.py`, its logs are automatically generated under `./results`
+$ tensorboard --logdir results
+```
+
