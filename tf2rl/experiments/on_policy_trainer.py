@@ -48,47 +48,21 @@ class OnPolicyTrainer(Trainer):
                     name="Common/training_return", data=avg_training_return)
 
             # Train actor critic
-            if self._policy.actor_critic is not None:
-                for _ in range(self._policy.n_epoch):
-                    samples = self.replay_buffer.sample(self._policy.horizon)
-                    if self._policy.normalize_adv:
-                        adv = (samples["adv"] - np.mean(samples["adv"])) / np.std(samples["adv"])
-                    else:
-                        adv = samples["adv"]
-                    for idx in range(int(self._policy.horizon / self._policy.batch_size)):
-                        target = slice(idx*self._policy.batch_size,
-                                    (idx+1)*self._policy.batch_size)
-                        self._policy.train_actor_critic(
-                            states=samples["obs"][target],
-                            actions=samples["act"][target],
-                            advantages=adv[target],
-                            logp_olds=samples["logp"][target],
-                            returns=samples["ret"][target])
-            else:
-                # Train actor
-                for _ in range(self._policy.n_epoch):
-                    samples = self.replay_buffer.sample(self._policy.horizon)
-                    if self._policy.normalize_adv:
-                        adv = (samples["adv"] - np.mean(samples["adv"])) / np.std(samples["adv"])
-                    else:
-                        adv = samples["adv"]
-                    for idx in range(int(self._policy.horizon / self._policy.batch_size)):
-                        target = slice(idx*self._policy.batch_size,
-                                    (idx+1)*self._policy.batch_size)
-                        self._policy.train_actor(
-                            samples["obs"][target],
-                            samples["act"][target],
-                            adv[target],
-                            samples["logp"][target])
-                # Train critic
-                for _ in range(self._policy.n_epoch_critic):
-                    samples = self.replay_buffer.sample(self._policy.horizon)
-                    for idx in range(int(self._policy.horizon / self._policy.batch_size)):
-                        target = slice(idx*self._policy.batch_size,
-                                    (idx+1)*self._policy.batch_size)
-                        self._policy.train_critic(
-                            samples["obs"][target],
-                            samples["ret"][target])
+            for _ in range(self._policy.n_epoch):
+                samples = self.replay_buffer.sample(self._policy.horizon)
+                if self._policy.normalize_adv:
+                    adv = (samples["adv"] - np.mean(samples["adv"])) / np.std(samples["adv"])
+                else:
+                    adv = samples["adv"]
+                for idx in range(int(self._policy.horizon / self._policy.batch_size)):
+                    target = slice(idx*self._policy.batch_size,
+                                (idx+1)*self._policy.batch_size)
+                    self._policy.train(
+                        states=samples["obs"][target],
+                        actions=samples["act"][target],
+                        advantages=adv[target],
+                        logp_olds=samples["logp"][target],
+                        returns=samples["ret"][target])
 
             if total_steps % self._test_interval == 0:
                 avg_test_return = self.evaluate_policy(total_steps)

@@ -103,9 +103,9 @@ class GaussianActor(tf.keras.Model):
         return self.dist.entropy(param)
 
     def _squash_correction(self, logp_pis, actions):
-        assert_op = tf.Assert(tf.less_equal(tf.reduce_max(actions), 1.), [actions])
+        # assert_op = tf.Assert(tf.less_equal(tf.reduce_max(actions), 1.), [actions])
         # To avoid evil machine precision error, strictly clip 1-pi**2 to [0,1] range.
-        with tf.control_dependencies([assert_op]):
-            diff = tf.reduce_sum(
-                tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
+        # with tf.control_dependencies([assert_op]):
+        diff = tf.reduce_sum(
+            tf.math.log(1. - actions ** 2 + self.EPS), axis=1)
         return logp_pis - diff

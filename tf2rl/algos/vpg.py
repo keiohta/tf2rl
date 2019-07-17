@@ -129,9 +129,12 @@ class VPG(OnPolicyAgent):
         else:
             return self.actor(state, test)
 
-    def train_actor(self, states, actions, advantages, logp_olds):
+    def train(self, states, actions, advantages, logp_olds, returns):
+        # Train actor and critic
         actor_loss, logp_news = self._train_actor_body(
-            states, actions, advantages)
+            states, actions, advantages, logp_olds)
+        critic_loss = self._train_critic_body(states, returns)
+        # Visualize results in TensorBoard
         tf.summary.scalar(name=self.policy_name+"/actor_loss",
                           data=actor_loss)
         tf.summary.scalar(name=self.policy_name+"/logp_max",
@@ -146,16 +149,12 @@ class VPG(OnPolicyAgent):
                           data=np.min(advantages))
         tf.summary.scalar(name=self.policy_name+"/kl",
                           data=tf.reduce_mean(logp_olds - logp_news))
-        return actor_loss
-
-    def train_critic(self, states, returns):
-        critic_loss = self._train_critic_body(states, returns)
         tf.summary.scalar(name=self.policy_name +
                           "/critic_loss", data=critic_loss)
-        return critic_loss
+        return actor_loss, critic_loss
 
     @tf.function
-    def _train_actor_body(self, states, actions, advantages):
+    def _train_actor_body(self, states, actions, advantages, logp_olds):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
                 log_probs = self.actor.compute_log_probs(states, actions)
