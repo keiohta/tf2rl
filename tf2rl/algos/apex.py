@@ -381,8 +381,6 @@ def prepare_experiment(env, args):
 
     kwargs = get_default_rb_dict(args.replay_buffer_size, env)
     global_rb = manager.PrioritizedReplayBuffer(**kwargs)
-    print(type(global_rb))
-    exit()
 
     # queues to share network parameters between a learner and explorers
     n_queue = 1 if args.n_env > 1 else args.n_explorer

@@ -36,6 +36,8 @@ ${prefix} examples/run_apex_dqn.py ${apex_arg} --n-env 64
 # On-policy agents
 on_pol_arg="--horizon 64"
 ${prefix} examples/run_vpg.py ${common_arg} ${on_pol_arg}
+${prefix} examples/run_ppo.py ${common_arg} ${on_pol_arg}
+${prefix} examples/run_ppo_atari.py ${common_arg} ${on_pol_arg}
 
 # Clean generated files
 rm -rf results/*TEST*

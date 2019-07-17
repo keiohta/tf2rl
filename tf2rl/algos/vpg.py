@@ -51,10 +51,13 @@ class VPG(OnPolicyAgent):
         super().__init__(name=name, **kwargs)
         self._is_discrete = is_discrete
 
+        # TODO: clean codes
         if actor_critic is not None:
             self.actor_critic = actor_critic
             self.actor_critic_optimizer = tf.keras.optimizers.Adam(
                 learning_rate=lr_actor)
+            self.actor = None
+            self.critic = None
         else:
             self.actor_critic = None
             if actor is None:
