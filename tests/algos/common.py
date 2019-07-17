@@ -139,12 +139,6 @@ class CommonOnPolActorCritic(CommonAlgos):
         self.assertEqual(logps_test.shape, (self.batch_size,))
 
     def test_train(self):
-        """In actor critic, train method is divided into
-        `train_actor` and `train_critic` methods
-        """
-        pass
-
-    def test_train_actor(self):
         if self.agent is None:
             return
         state = self.env.reset().astype(np.float32)
@@ -158,20 +152,11 @@ class CommonOnPolActorCritic(CommonAlgos):
             shape=(self.batch_size, 1),
             dtype=np.float32)
         logps = np.ones_like(advs)
-        self.agent.train_actor(obses, acts, advs, logps)
-
-    def test_train_critic(self):
-        if self.agent is None:
-            return
-        state = self.env.reset().astype(np.float32)
-        obses = np.zeros(
-            shape=(self.batch_size,)+state.shape,
-            dtype=np.float32)
         returns = np.zeros(
             shape=(self.batch_size, 1),
             dtype=np.float32)
 
-        self.agent.train_critic(obses, returns)
+        self.agent.train(obses, acts, advs, logps, returns)
 
 
 class CommonOnPolActorCriticContinuousAlgos(CommonOnPolActorCritic):
