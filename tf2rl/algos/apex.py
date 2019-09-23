@@ -11,10 +11,7 @@ from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_default_rb_dict
-
-
-logging.root.handlers[0].setFormatter(logging.Formatter(
-    fmt='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s'))
+from tf2rl.misc.initialize_logger import initialize_logger
 
 
 def import_tf():
@@ -26,12 +23,10 @@ def import_tf():
             for gpu in gpus:
                 tf.config.experimental.set_memory_growth(gpu, True)
             logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-            logging.info(
-                len(gpus), "Physical GPUs,",
-                len(logical_gpus), "Logical GPUs")
+            print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
         except RuntimeError as e:
             # Memory growth must be set before GPUs have been initialized
-            logging.error(e)
+            print(e)
     return tf
 
 
@@ -76,6 +71,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
         GPU id. If this is set to -1, then this process uses only CPU.
     """
     import_tf()
+    logger = logging.getLogger("tf2rl")
 
     if n_env > 1:
         envs = MultiThreadEnv(
@@ -168,7 +164,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
                 total_rewards = []
             msg += "FPS: {0:.2f}".format(
                 (n_sample - n_sample_old) / (time.time() - start))
-            logging.info(msg)
+            logger.info(msg)
 
             start = time.time()
             n_sample_old = n_sample
@@ -209,6 +205,7 @@ def learner(global_rb, trained_steps, is_training_done,
         List of Queues shared with explorers to send latest network parameters.
     """
     tf = import_tf()
+    logger = logging.getLogger("tf2rl")
 
     policy = policy_fn(env, "Learner", global_rb.get_buffer_size(), gpu=gpu)
 
@@ -242,7 +239,7 @@ def learner(global_rb, trained_steps, is_training_done,
                 queues[i].put(weights)
             fps = update_freq / (time.time() - start_time)
             tf.summary.scalar(name="apex/fps", data=fps)
-            logging.info("Update weights. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
+            logger.info("Update weights. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
                 fps, trained_steps.value))
             start_time = time.time()
 
@@ -284,6 +281,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
         If true, `render` will be called to visualize evaluation process.
     """
     tf = import_tf()
+    logger = logging.getLogger("tf2rl")
 
     output_dir = prepare_output_dir(
         args=None, user_specified_dir="./results", suffix="evaluator")
@@ -327,7 +325,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
                 if not queue.empty():
                     break
             avg_test_return /= n_evaluated_episode
-            logging.info("Evaluation: {} over {} run".format(
+            logger.info("Evaluation: {} over {} run".format(
                 avg_test_return, n_evaluated_episode))
             tf.summary.scalar(
                 name="apex/average_test_return", data=avg_test_return)
@@ -400,7 +398,8 @@ def prepare_experiment(env, args):
 
 
 def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
-    logging.getLogger().setLevel(logging.getLevelName(args.logging_level))
+    logger = initialize_logger(
+        logging_level=logging.getLevelName(args.logging_level))
 
     if args.n_env > 1:
         args.n_explorer = 1

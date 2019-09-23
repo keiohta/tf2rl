@@ -9,10 +9,7 @@ import tensorflow as tf
 from tf2rl.experiments.utils import save_path, frames_to_gif
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
-
-
-logging.root.handlers[0].setFormatter(logging.Formatter(
-    fmt='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s'))
+from tf2rl.misc.initialize_logger import initialize_logger
 
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -22,10 +19,10 @@ if gpus:
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
         logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-        logging.info(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
     except RuntimeError as e:
         # Memory growth must be set before GPUs have been initialized
-        logging.error(e)
+        print(e)
 
 
 class Trainer:
@@ -44,8 +41,9 @@ class Trainer:
         self._output_dir = prepare_output_dir(
             args=args, user_specified_dir="./results",
             suffix="{}_{}".format(self._policy.policy_name, args.dir_suffix))
-        self.logger = logging.getLogger(__name__)
-        logging.getLogger().setLevel(logging.getLevelName(args.logging_level))
+        self.logger = initialize_logger(
+            logging_level=logging.getLevelName(args.logging_level),
+            output_dir=self._output_dir)
 
         # Save and restore model
         checkpoint = tf.train.Checkpoint(policy=self._policy)

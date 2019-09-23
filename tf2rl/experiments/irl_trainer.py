@@ -1,6 +1,5 @@
 import os
 import time
-import logging
 
 import numpy as np
 import argparse
