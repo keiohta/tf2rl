@@ -162,7 +162,7 @@ class DDPG(OffPolicyAgent):
             dones = tf.expand_dims(dones, 1)
         td_errors = self._compute_td_error_body(
             states, actions, next_states, rewards, dones)
-        return np.ravel(td_errors.numpy())
+        return np.abs(np.ravel(td_errors.numpy()))
 
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
