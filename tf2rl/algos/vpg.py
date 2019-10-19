@@ -93,7 +93,7 @@ class VPG(OnPolicyAgent):
         is_single_input = state.ndim == self._state_ndim
         if is_single_input:
             state = np.expand_dims(state, axis=0).astype(np.float32)
-        action, logp = self._get_action_body(state, test)
+        action, logp, _ = self._get_action_body(state, test)
 
         if is_single_input:
             return action.numpy()[0], logp.numpy()
@@ -120,15 +120,15 @@ class VPG(OnPolicyAgent):
         if self.actor_critic:
             return self.actor_critic(state, test)
         else:
-            action, logp = self.actor(state, test)
+            action, logp, _ = self.actor(state, test)
             v = self.critic(state)
             return action, logp, v
 
     @tf.function
     def _get_action_body(self, state, test):
         if self.actor_critic is not None:
-            action, logp, _ = self.actor_critic(state, test)
-            return action, logp
+            action, logp, param = self.actor_critic(state, test)
+            return action, logp, param
         else:
             return self.actor(state, test)
 

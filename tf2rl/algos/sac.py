@@ -207,7 +207,7 @@ class SAC(OffPolicyAgent):
 
             # Compute TD errors for V-value func
             current_V = self.vf(states)
-            sample_actions, logp = self.actor(states)
+            sample_actions, logp, _ = self.actor(states)
 
             current_Q1 = self.qf1([states, sample_actions])
             current_Q2 = self.qf2([states, sample_actions])
