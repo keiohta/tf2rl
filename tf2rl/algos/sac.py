@@ -70,25 +70,32 @@ class SAC(OffPolicyAgent):
             name=name, memory_capacity=memory_capacity,
             n_warmup=n_warmup, **kwargs)
 
+        self._set_up_actor(state_shape, action_dim, actor_units, lr, max_action)
+        self._setup_critic_q(state_shape, action_dim, lr)
+        self._setup_critic_v(state_shape, lr)
+
+        # Set hyper-parameters
+        self.tau = tau
+        self.scale_reward = scale_reward
+
+    def _set_up_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
         self.actor = GaussianActor(
             state_shape, action_dim, max_action, squash=True,
-            tanh_mean=False, tanh_std=False)
+            units=actor_units, tanh_mean=False, tanh_std=False)
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
-        self.vf = CriticV(state_shape)
-        self.vf_target = CriticV(state_shape)
-        update_target_variables(self.vf_target.weights,
-                                self.vf.weights, tau=1.)
-        self.vf_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
-
+    def _setup_critic_q(self, state_shape, action_dim, lr):
         self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
         self.qf2 = CriticQ(state_shape, action_dim, name="qf2")
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
-        # Set hyper-parameters
-        self.tau = tau
-        self.scale_reward = scale_reward
+    def _setup_critic_v(self, state_shape, lr):
+        self.vf = CriticV(state_shape)
+        self.vf_target = CriticV(state_shape)
+        update_target_variables(self.vf_target.weights,
+                                self.vf.weights, tau=1.)
+        self.vf_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
     def get_action(self, state, test=False):
         assert isinstance(state, np.ndarray)
@@ -126,7 +133,7 @@ class SAC(OffPolicyAgent):
             rewards = tf.squeeze(rewards, axis=1)
             not_done = 1. - tf.cast(done, dtype=tf.float32)
 
-            # Update Critic
+            # Update Critic according to Eq.(8)
             with tf.GradientTape(persistent=True) as tape:
                 current_Q1 = self.qf1([states, actions])
                 current_Q2 = self.qf2([states, actions])
@@ -138,7 +145,7 @@ class SAC(OffPolicyAgent):
                 td_loss1 = tf.reduce_mean(huber_loss(
                     target_Q - current_Q1, delta=self.max_grad))
                 td_loss2 = tf.reduce_mean(huber_loss(
-                    target_Q - current_Q2, delta=self.max_grad))
+                    target_Q - current_Q2, delta=self.max_grad))  # Eq.(7)
 
             q1_grad = tape.gradient(td_loss1, self.qf1.trainable_variables)
             self.qf1_optimizer.apply_gradients(
@@ -151,7 +158,7 @@ class SAC(OffPolicyAgent):
 
             with tf.GradientTape(persistent=True) as tape:
                 current_V = self.vf(states)
-                sample_actions, logp = self.actor(states)
+                sample_actions, logp, _ = self.actor(states)
 
                 current_Q1 = self.qf1([states, sample_actions])
                 current_Q2 = self.qf2([states, sample_actions])
@@ -160,10 +167,10 @@ class SAC(OffPolicyAgent):
                 target_V = tf.stop_gradient(current_Q - logp)
                 td_errors = target_V - current_V
                 vf_loss_t = tf.reduce_mean(
-                    huber_loss(td_errors, delta=self.max_grad) * weights)
+                    huber_loss(td_errors, delta=self.max_grad) * weights)  # Eq.(5)
 
                 # TODO: Add reguralizer
-                policy_loss = tf.reduce_mean(logp - current_Q1)
+                policy_loss = tf.reduce_mean(logp - current_Q1)  # Eq.(12)
 
             vf_grad = tape.gradient(vf_loss_t, self.vf.trainable_variables)
             self.vf_optimizer.apply_gradients(

@@ -1,6 +1,4 @@
 import unittest
-import numpy as np
-import tensorflow as tf
 
 from tf2rl.algos.sac import SAC
 from tests.algos.common import CommonOffPolContinuousAlgos
