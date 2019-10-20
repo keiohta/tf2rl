@@ -53,25 +53,74 @@ class SACDiscrete(SAC):
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
+    def _setup_critic_v(self, state_shape, lr):
+        """
+        Do not need state-value function because it can be directly computed from Q-function.
+        See Eq.(10) in paper.
+
+        :param state_shape:
+        :param lr:
+        :return:
+        """
+        pass
+
+    def train(self, states, actions, next_states, rewards, done, weights=None):
+        # TODO: Replace `done` with `dones`
+        if weights is None:
+            weights = np.ones_like(rewards)
+
+        td_errors, actor_loss, logp_min, logp_max = \
+            self._train_body(states, actions, next_states,
+                             rewards, done, weights)
+
+        tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
+        tf.summary.scalar(name=self.policy_name+"/critic_loss", data=td_errors)
+        tf.summary.scalar(name=self.policy_name+"/logp_min", data=logp_min)
+        tf.summary.scalar(name=self.policy_name+"/logp_max", data=logp_max)
 
     @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights=None):
         with tf.device(self.device):
-            rewards = tf.squeeze(rewards, axis=1)
+            batch_size = states.shape[0]
+            # rewards = tf.squeeze(rewards, axis=1)
             not_done = 1. - tf.cast(done, dtype=tf.float32)
+            actions = tf.cast(actions, dtype=tf.int32)
 
+            indices = tf.concat(
+                values=[tf.expand_dims(tf.range(batch_size), axis=1),
+                        actions], axis=1)
+
+            # Update critic
             with tf.GradientTape(persistent=True) as tape:
-                current_Q1 = self.qf1([states, actions])
-                current_Q2 = self.qf2([states, actions])
-                vf_next_target = self.vf_target(next_states)
+                # Update critic
+                _, _, next_action_param = self.actor(next_states)
+                next_action_prob = next_action_param["prob"]
+                next_action_logp = tf.math.log(next_action_prob + 1e-8)
+                next_q = tf.minimum(self.qf1(next_states), self.qf2(next_states))
 
-                target_Q = tf.stop_gradient(
-                    self.scale_reward * rewards + not_done * self.discount * vf_next_target)
+                target_q = tf.expand_dims(tf.einsum(
+                    'ij,ij->i', next_action_prob, next_q - next_action_logp), axis=1)  # Eq.(10)
+                target_q = tf.stop_gradient(rewards + not_done * self.discount * target_q)
+
+                current_q1 = tf.expand_dims(
+                    tf.gather_nd(self.qf1(states), indices), axis=1)  # [batchsize, 1]
+                current_q2 = tf.expand_dims(
+                    tf.gather_nd(self.qf2(states), indices), axis=1)  # [batchsize, 1]
+                current_q = tf.minimum(current_q1, current_q2)
+                tf.assert_equal(target_q.shape, current_q1.shape)
 
                 td_loss1 = tf.reduce_mean(huber_loss(
-                    target_Q - current_Q1, delta=self.max_grad))
+                    target_q - current_q1, delta=self.max_grad))
                 td_loss2 = tf.reduce_mean(huber_loss(
-                    target_Q - current_Q2, delta=self.max_grad))  # Eq.(7)
+                    target_q - current_q2, delta=self.max_grad))  # Eq.(7)
+
+                # Update policy
+                _, _, current_action_param = self.actor(states)
+                current_action_prob = current_action_param["prob"]
+                current_action_logp = tf.math.log(current_action_prob + 1e-8)
+
+                policy_loss = tf.reduce_mean(
+                    tf.einsum('ij,ij->i', current_action_prob, current_action_logp - current_q))  # Eq.(12)
 
             q1_grad = tape.gradient(td_loss1, self.qf1.trainable_variables)
             self.qf1_optimizer.apply_gradients(
@@ -80,36 +129,74 @@ class SACDiscrete(SAC):
             self.qf2_optimizer.apply_gradients(
                 zip(q2_grad, self.qf2.trainable_variables))
 
-            del tape
-
-            with tf.GradientTape(persistent=True) as tape:
-                current_V = self.vf(states)
-                sample_actions, logp, param = self.actor(states)
-
-                current_Q1 = self.qf1([states, sample_actions])
-                current_Q2 = self.qf2([states, sample_actions])
-                current_Q = tf.minimum(current_Q1, current_Q2, axis=1)
-
-                target_V = tf.stop_gradient(
-                    tf.transpose(param["probs"]) * (current_Q - logp))
-                td_errors = target_V - current_V
-                vf_loss_t = tf.reduce_mean(
-                    huber_loss(td_errors, delta=self.max_grad) * weights)  # Eq.(10)
-
-                # TODO: Add reguralizer
-                policy_loss = tf.reduce_mean(logp - current_Q1)  # Eq.(12)
-
-            vf_grad = tape.gradient(vf_loss_t, self.vf.trainable_variables)
-            self.vf_optimizer.apply_gradients(
-                zip(vf_grad, self.vf.trainable_variables))
-            update_target_variables(
-                self.vf_target.weights, self.vf.weights, self.tau)
-
             actor_grad = tape.gradient(
                 policy_loss, self.actor.trainable_variables)
             self.actor_optimizer.apply_gradients(
                 zip(actor_grad, self.actor.trainable_variables))
 
-            del tape
+        return (td_loss1 + td_loss2) / 2., policy_loss, tf.reduce_min(current_action_logp), tf.reduce_max(current_action_logp)
 
-        return td_errors, policy_loss, vf_loss_t, td_loss1, tf.reduce_min(logp), tf.reduce_max(logp)
+    def compute_td_error(self, states, actions, next_states, rewards, dones):
+        td_erros_Q1, td_errors_Q2 = self._compute_td_error_body(
+            states, actions, next_states, rewards, dones)
+        return np.squeeze(
+            np.abs(td_erros_Q1.numpy()) +
+            np.abs(td_errors_Q2.numpy()))
+
+    @tf.function
+    def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
+        with tf.device(self.device):
+            batch_size = states.shape[0]
+            rewards = tf.squeeze(rewards, axis=1)
+            not_dones = 1. - tf.cast(dones, dtype=tf.float32)
+            actions = tf.cast(actions, dtype=tf.int32)
+
+            # Compute TD errors for V-value func
+            sample_actions, logp, param = self.actor(states)
+            probs = param["prob"]
+
+            indices = tf.concat(
+                values=[tf.expand_dims(tf.range(batch_size), axis=1),
+                        actions], axis=1)
+
+            # Compute TD errors for Q-value func
+            current_Q1 = tf.expand_dims(
+                tf.gather_nd(self.qf1(states), indices), axis=1)  # [batchsize, 1]
+            current_Q2 = tf.expand_dims(
+                tf.gather_nd(self.qf2(states), indices), axis=1)  # [batchsize, 1]
+            current_Q = tf.minimum(current_Q1, current_Q2)
+
+            target_Q = rewards + not_dones * self.discount * tf.stop_gradient(
+                tf.einsum('ij,ij->i', probs, current_Q - tf.math.log(probs + 1e-8)))  # Eq.(10)
+
+            td_errors_Q1 = target_Q - current_Q1
+            td_errors_Q2 = target_Q - current_Q2
+
+        return td_errors_Q1, td_errors_Q2
+
+
+if __name__ == "__main__":
+    import gym
+
+    env = gym.make('LunarLander-v2')
+    agent = SACDiscrete(
+        state_shape=env.observation_space.shape,
+        action_dim=env.action_space.n)
+    action = agent.get_action(env.observation_space.sample())
+    print(action)
+    batch_size = 4
+    state_dim = env.observation_space.high.size
+    act_dim = env.action_space.n
+
+    states = np.zeros(shape=(batch_size, state_dim))
+    next_states = np.zeros_like(states)
+    actions = np.expand_dims(
+        np.random.randint(0, act_dim, size=(batch_size), dtype=np.int32), axis=1)
+    dones = np.zeros(shape=(batch_size,), dtype=bool)
+    rewards = np.zeros(shape=(batch_size, 1), dtype=np.float32)
+
+    agent.compute_td_error(
+        states=states, actions=actions, next_states=states, dones=dones, rewards=rewards)
+
+    agent.train(
+        states=states, actions=actions, next_states=states, done=dones, rewards=rewards)

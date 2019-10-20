@@ -112,6 +112,7 @@ class SAC(OffPolicyAgent):
         return self.actor(state, test)[0]
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
+        # TODO: Replace `done` with `dones`
         if weights is None:
             weights = np.ones_like(rewards)
 
