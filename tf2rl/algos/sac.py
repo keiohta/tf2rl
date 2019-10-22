@@ -72,8 +72,8 @@ class SAC(OffPolicyAgent):
             n_warmup=n_warmup, **kwargs)
 
         self._set_up_actor(state_shape, action_dim, actor_units, lr, max_action)
-        self._setup_critic_q(state_shape, action_dim, lr)
         self._setup_critic_v(state_shape, lr)
+        self._setup_critic_q(state_shape, action_dim, lr)
 
         # Set hyper-parameters
         self.tau = tau
