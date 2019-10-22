@@ -87,6 +87,8 @@ class SAC(OffPolicyAgent):
     def _setup_critic_q(self, state_shape, action_dim, lr):
         self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
         self.qf2 = CriticQ(state_shape, action_dim, name="qf2")
+        update_target_variables(self.vf_target.weights,
+                                self.vf.weights, tau=1.)
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
@@ -134,7 +136,7 @@ class SAC(OffPolicyAgent):
             rewards = tf.squeeze(rewards, axis=1)
             not_done = 1. - tf.cast(done, dtype=tf.float32)
 
-            # Update Critic according to Eq.(8)
+            # Update Critic Q according to Eq.(8)
             with tf.GradientTape(persistent=True) as tape:
                 current_Q1 = self.qf1([states, actions])
                 current_Q2 = self.qf2([states, actions])

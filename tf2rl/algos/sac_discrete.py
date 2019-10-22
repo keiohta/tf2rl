@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
-from tf2rl.algos.sac import CriticV, SAC
+from tf2rl.algos.sac import SAC
 from tf2rl.policies.categorical_actor import CategoricalActor
 from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.misc.huber_loss import huber_loss
@@ -50,6 +50,12 @@ class SACDiscrete(SAC):
     def _setup_critic_q(self, state_shape, action_dim, lr):
         self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
         self.qf2 = CriticQ(state_shape, action_dim, name="qf2")
+        self.qf1_target = CriticQ(state_shape, action_dim, name="qf1_target")
+        self.qf2_target = CriticQ(state_shape, action_dim, name="qf2_target")
+        update_target_variables(self.qf1_target.weights,
+                                self.qf1.weights, tau=1.)
+        update_target_variables(self.qf2_target.weights,
+                                self.qf2.weights, tau=1.)
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
@@ -69,12 +75,13 @@ class SACDiscrete(SAC):
         if weights is None:
             weights = np.ones_like(rewards)
 
-        td_errors, actor_loss, logp_min, logp_max = \
+        td_errors, actor_loss, mean_ent, logp_min, logp_max = \
             self._train_body(states, actions, next_states,
                              rewards, done, weights)
 
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
         tf.summary.scalar(name=self.policy_name+"/critic_loss", data=td_errors)
+        tf.summary.scalar(name=self.policy_name + "/mean_ent", data=mean_ent)
         tf.summary.scalar(name=self.policy_name+"/logp_min", data=logp_min)
         tf.summary.scalar(name=self.policy_name+"/logp_max", data=logp_max)
 
@@ -90,13 +97,13 @@ class SACDiscrete(SAC):
                 values=[tf.expand_dims(tf.range(batch_size), axis=1),
                         actions], axis=1)
 
-            # Update critic
             with tf.GradientTape(persistent=True) as tape:
                 # Update critic
                 _, _, next_action_param = self.actor(next_states)
                 next_action_prob = next_action_param["prob"]
                 next_action_logp = tf.math.log(next_action_prob + 1e-8)
-                next_q = tf.minimum(self.qf1(next_states), self.qf2(next_states))
+                next_q = tf.minimum(
+                    self.qf1_target(next_states), self.qf2_target(next_states))
 
                 target_q = tf.expand_dims(tf.einsum(
                     'ij,ij->i', next_action_prob, next_q - next_action_logp), axis=1)  # Eq.(10)
@@ -120,7 +127,9 @@ class SACDiscrete(SAC):
                 current_action_logp = tf.math.log(current_action_prob + 1e-8)
 
                 policy_loss = tf.reduce_mean(
-                    tf.einsum('ij,ij->i', current_action_prob, current_action_logp - current_q))  # Eq.(12)
+                    tf.einsum('ij,ij->i', current_action_prob, current_action_logp - tf.stop_gradient(current_q)))  # Eq.(12)
+                mean_entropy = tf.reduce_mean(
+                    tf.einsum('ij,ij->i', current_action_prob, current_action_logp)) * (-1)
 
             q1_grad = tape.gradient(td_loss1, self.qf1.trainable_variables)
             self.qf1_optimizer.apply_gradients(
@@ -129,12 +138,18 @@ class SACDiscrete(SAC):
             self.qf2_optimizer.apply_gradients(
                 zip(q2_grad, self.qf2.trainable_variables))
 
+            update_target_variables(self.qf1_target.weights,
+                                    self.qf1.weights, tau=self.tau)
+            update_target_variables(self.qf2_target.weights,
+                                    self.qf2.weights, tau=self.tau)
+
             actor_grad = tape.gradient(
                 policy_loss, self.actor.trainable_variables)
             self.actor_optimizer.apply_gradients(
                 zip(actor_grad, self.actor.trainable_variables))
 
-        return (td_loss1 + td_loss2) / 2., policy_loss, tf.reduce_min(current_action_logp), tf.reduce_max(current_action_logp)
+        return (td_loss1 + td_loss2) / 2., policy_loss, mean_entropy, \
+               tf.reduce_min(current_action_logp), tf.reduce_max(current_action_logp)
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
         td_erros_Q1, td_errors_Q2 = self._compute_td_error_body(
