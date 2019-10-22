@@ -22,6 +22,7 @@ if __name__ == '__main__':
         memory_capacity=args.memory_capacity,
         max_action=env.action_space.high[0],
         batch_size=args.batch_size,
-        n_warmup=args.n_warmup)
+        n_warmup=args.n_warmup,
+        auto_alpha=args.auto_alpha)
     trainer = Trainer(policy, env, args, test_env=test_env)
     trainer()

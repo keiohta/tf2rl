@@ -1,4 +1,4 @@
-tensorflow==2.0.0b0
+tensorflow==2.0.0
 cpprb
 joblib
 gym
@@ -7,3 +7,4 @@ scipy
 opencv-python
 coveralls
 matplotlib
+gast==0.2.2
