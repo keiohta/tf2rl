@@ -15,6 +15,7 @@ class CriticQ(tf.keras.Model):
         to   Q: S -> R^|A|
     compared with continuous version of SAC
     """
+
     def __init__(self, state_shape, action_dim, name='qf'):
         super().__init__(name=name)
 
@@ -23,7 +24,7 @@ class CriticQ(tf.keras.Model):
         self.l3 = Dense(action_dim, name="L2", activation='linear')
 
         dummy_state = tf.constant(
-            np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+            np.zeros(shape=(1,) + state_shape, dtype=np.float32))
         self(dummy_state)
 
     def call(self, states):
@@ -39,6 +40,7 @@ class SACDiscrete(SAC):
             self,
             *args,
             **kwargs):
+        kwargs["name"] = "SAC_discrete"
         super().__init__(*args, **kwargs)
 
     def _set_up_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
@@ -79,11 +81,11 @@ class SACDiscrete(SAC):
             self._train_body(states, actions, next_states,
                              rewards, done, weights)
 
-        tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
-        tf.summary.scalar(name=self.policy_name+"/critic_loss", data=td_errors)
+        tf.summary.scalar(name=self.policy_name + "/actor_loss", data=actor_loss)
+        tf.summary.scalar(name=self.policy_name + "/critic_loss", data=td_errors)
         tf.summary.scalar(name=self.policy_name + "/mean_ent", data=mean_ent)
-        tf.summary.scalar(name=self.policy_name+"/logp_min", data=logp_min)
-        tf.summary.scalar(name=self.policy_name+"/logp_max", data=logp_max)
+        tf.summary.scalar(name=self.policy_name + "/logp_min", data=logp_min)
+        tf.summary.scalar(name=self.policy_name + "/logp_max", data=logp_max)
 
     @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights=None):
@@ -107,7 +109,8 @@ class SACDiscrete(SAC):
 
                 target_q = tf.expand_dims(tf.einsum(
                     'ij,ij->i', next_action_prob, next_q - next_action_logp), axis=1)  # Eq.(10)
-                target_q = tf.stop_gradient(rewards + not_done * self.discount * target_q)
+                target_q = tf.stop_gradient(
+                    self.scale_reward * rewards + not_done * self.discount * target_q)
 
                 current_q1 = tf.expand_dims(
                     tf.gather_nd(self.qf1(states), indices), axis=1)  # [batchsize, 1]
@@ -127,7 +130,8 @@ class SACDiscrete(SAC):
                 current_action_logp = tf.math.log(current_action_prob + 1e-8)
 
                 policy_loss = tf.reduce_mean(
-                    tf.einsum('ij,ij->i', current_action_prob, current_action_logp - tf.stop_gradient(current_q)))  # Eq.(12)
+                    tf.einsum('ij,ij->i', current_action_prob,
+                              current_action_logp - tf.stop_gradient(current_q)))  # Eq.(12)
                 mean_entropy = tf.reduce_mean(
                     tf.einsum('ij,ij->i', current_action_prob, current_action_logp)) * (-1)
 
