@@ -129,6 +129,10 @@ class SACDiscrete(SAC):
                 current_action_prob = current_action_param["prob"]
                 current_action_logp = tf.math.log(current_action_prob + 1e-8)
 
+                current_q1 = self.qf1(states)
+                current_q2 = self.qf2(states)
+                current_q = tf.minimum(current_q1, current_q2)
+
                 policy_loss = tf.reduce_mean(
                     tf.einsum('ij,ij->i', current_action_prob,
                               self.alpha * current_action_logp - tf.stop_gradient(current_q)))  # Eq.(12)
