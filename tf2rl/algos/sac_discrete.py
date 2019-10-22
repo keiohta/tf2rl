@@ -108,9 +108,9 @@ class SACDiscrete(SAC):
                     self.qf1_target(next_states), self.qf2_target(next_states))
 
                 target_q = tf.expand_dims(tf.einsum(
-                    'ij,ij->i', next_action_prob, next_q - next_action_logp), axis=1)  # Eq.(10)
+                    'ij,ij->i', next_action_prob, next_q - self.alpha * next_action_logp), axis=1)  # Eq.(10)
                 target_q = tf.stop_gradient(
-                    self.scale_reward * rewards + not_done * self.discount * target_q)
+                    rewards + not_done * self.discount * target_q)
 
                 current_q1 = tf.expand_dims(
                     tf.gather_nd(self.qf1(states), indices), axis=1)  # [batchsize, 1]
@@ -131,7 +131,7 @@ class SACDiscrete(SAC):
 
                 policy_loss = tf.reduce_mean(
                     tf.einsum('ij,ij->i', current_action_prob,
-                              current_action_logp - tf.stop_gradient(current_q)))  # Eq.(12)
+                              self.alpha * current_action_logp - tf.stop_gradient(current_q)))  # Eq.(12)
                 mean_entropy = tf.reduce_mean(
                     tf.einsum('ij,ij->i', current_action_prob, current_action_logp)) * (-1)
 
