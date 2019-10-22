@@ -34,9 +34,10 @@ Following papers have been implementd in tf2rl:
   - [Noisy Networks for Exploration](<https://arxiv.org/abs/1706.10295>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/networks/noisy_dense.py>)
   - [Distributed Prioritized Experience Replay](<https://arxiv.org/abs/1803.00933>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/apex.py>)
   - [Continuous control with deep reinforcement learning](https://arxiv.org/abs/1509.02971), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/ddpg.py>)
-  - [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](<https://arxiv.org/abs/1801.01290>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac.py>)
+  - [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](<https://arxiv.org/abs/1801.01290>), [Soft Actor-Critic Algorithms and Applications](https://arxiv.org/abs/1812.05905), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac.py>)
   - [Addressing Function Approximation Error in Actor-Critic Methods](<https://arxiv.org/abs/1802.09477>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/td3.py>)
   - [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/bi_res_ddpg.py>)
+  - [Soft Actor-Critic for Discrete Action Settings](https://arxiv.org/abs/1910.07207v1), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac_discrete.py>)
 - Imitation Learning
   - [Generative Adversarial Imitation Learning](<https://arxiv.org/abs/1606.03476>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/gail.py>)
   - [Spectral Normalization for Generative Adversarial Networks](<https://arxiv.org/abs/1802.05957>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/networks/spectral_norm_dense.py>)
