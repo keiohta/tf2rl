@@ -3,9 +3,9 @@ import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.sac import SAC
-from tf2rl.policies.categorical_actor import CategoricalActor
-from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.misc.huber_loss import huber_loss
+from tf2rl.misc.target_update_ops import update_target_variables
+from tf2rl.policies.categorical_actor import CategoricalActor
 
 
 class CriticQ(tf.keras.Model):
@@ -112,30 +112,25 @@ class SACDiscrete(SAC):
                 target_q = tf.stop_gradient(
                     rewards + not_done * self.discount * target_q)
 
-                current_q1 = tf.expand_dims(
-                    tf.gather_nd(self.qf1(states), indices), axis=1)  # [batchsize, 1]
-                current_q2 = tf.expand_dims(
-                    tf.gather_nd(self.qf2(states), indices), axis=1)  # [batchsize, 1]
-                current_q = tf.minimum(current_q1, current_q2)
-                tf.assert_equal(target_q.shape, current_q1.shape)
+                current_q1 = self.qf1(states)
+                current_q2 = self.qf2(states)
 
                 td_loss1 = tf.reduce_mean(huber_loss(
-                    target_q - current_q1, delta=self.max_grad))
+                    target_q - tf.expand_dims(tf.gather_nd(current_q1, indices), axis=1),
+                    delta=self.max_grad))
                 td_loss2 = tf.reduce_mean(huber_loss(
-                    target_q - current_q2, delta=self.max_grad))  # Eq.(7)
+                    target_q - tf.expand_dims(tf.gather_nd(current_q2, indices), axis=1),
+                    delta=self.max_grad))  # Eq.(7)
 
                 # Update policy
                 _, _, current_action_param = self.actor(states)
                 current_action_prob = current_action_param["prob"]
                 current_action_logp = tf.math.log(current_action_prob + 1e-8)
 
-                current_q1 = self.qf1(states)
-                current_q2 = self.qf2(states)
-                current_q = tf.minimum(current_q1, current_q2)
-
                 policy_loss = tf.reduce_mean(
                     tf.einsum('ij,ij->i', current_action_prob,
-                              self.alpha * current_action_logp - tf.stop_gradient(current_q)))  # Eq.(12)
+                              self.alpha * current_action_logp - tf.stop_gradient(
+                                  tf.minimum(current_q1, current_q2))))  # Eq.(12)
                 mean_entropy = tf.reduce_mean(
                     tf.einsum('ij,ij->i', current_action_prob, current_action_logp)) * (-1)
 
