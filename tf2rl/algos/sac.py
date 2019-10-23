@@ -78,6 +78,7 @@ class SAC(OffPolicyAgent):
         # Set hyper-parameters
         self.tau = tau
         self.auto_alpha = auto_alpha
+        self.state_ndim = len(state_shape)
         if auto_alpha:
             self.log_alpha = tf.Variable(0., dtype=tf.float32)
             self.alpha = tf.exp(self.log_alpha)
@@ -109,7 +110,7 @@ class SAC(OffPolicyAgent):
 
     def get_action(self, state, test=False):
         assert isinstance(state, np.ndarray)
-        is_single_state = len(state.shape) == 1
+        is_single_state = len(state.shape) == self.state_ndim
 
         state = np.expand_dims(state, axis=0).astype(
             np.float32) if is_single_state else state

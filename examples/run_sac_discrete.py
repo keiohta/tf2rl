@@ -3,7 +3,8 @@ import gym
 from tf2rl.algos.sac_discrete import SACDiscrete
 from tf2rl.experiments.trainer import Trainer
 from tf2rl.envs.utils import is_atari_env
-from tf2rl.networks.atari_model import AtariQFunc
+from tf2rl.envs.atari_wrapper import wrap_dqn
+from tf2rl.networks.atari_model import AtariQFunc, AtariCategoricalActor
 
 
 if __name__ == '__main__':
@@ -15,20 +16,43 @@ if __name__ == '__main__':
     parser.set_defaults(n_warmup=500)
     parser.set_defaults(batch_size=32)
     parser.set_defaults(memory_capacity=int(1e4))
+    parser.add_argument('--env-name', type=str,
+                        default="FreewayNoFrameskip-v4")
     args = parser.parse_args()
 
-    env = gym.make("CartPole-v0")
-    test_env = gym.make("CartPole-v0")
+    env = gym.make(args.env_name)
+    test_env = gym.make(args.env_name)
 
-    critic = AtariQFunc if is_atari_env(env) else None
-
-    policy = SACDiscrete(
-        state_shape=env.observation_space.shape,
-        action_dim=env.action_space.n,
-        discount=0.99,
-        gpu=args.gpu,
-        memory_capacity=args.memory_capacity,
-        batch_size=args.batch_size,
-        n_warmup=args.n_warmup)
+    if is_atari_env(env):
+        # Parameters comes from Appendix.B from original paper
+        # https://arxiv.org/abs/1910.07207
+        env = wrap_dqn(env, wrap_ndarray=True)
+        test_env = wrap_dqn(test_env, wrap_ndarray=True)
+        policy = SACDiscrete(
+            state_shape=env.observation_space.shape,
+            action_dim=env.action_space.n,
+            discount=0.99,
+            critic_fn=AtariQFunc,
+            actor_fn=AtariCategoricalActor,
+            lr=3e-4,
+            memory_capacity=int(1e6),
+            batch_size=64,
+            n_warmup=int(2e4),
+            update_interval=4,
+            gpu=args.gpu)
+        # Overwrite simulation settings
+        args.episode_max_steps = 108000
+        args.test_interval = int(1e5)
+        args.show_test_images = True
+        args.max_steps = int(1e9)
+    else:
+        policy = SACDiscrete(
+            state_shape=env.observation_space.shape,
+            action_dim=env.action_space.n,
+            discount=0.99,
+            memory_capacity=args.memory_capacity,
+            batch_size=args.batch_size,
+            n_warmup=args.n_warmup,
+            gpu=args.gpu)
     trainer = Trainer(policy, env, args, test_env=test_env)
     trainer()
