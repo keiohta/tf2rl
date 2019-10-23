@@ -1,11 +1,8 @@
 import gym
 
-import numpy as np
 import tensorflow as tf
-from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.algos.dqn import DQN
-from tf2rl.networks.noisy_dense import NoisyDense
 from tf2rl.envs.atari_wrapper import wrap_dqn
 from tf2rl.experiments.trainer import Trainer
 from tf2rl.networks.atari_model import AtariQFunc as QFunc
@@ -24,7 +21,6 @@ if __name__ == '__main__':
     parser.set_defaults(gpu=0)
     parser.set_defaults(show_test_images=True)
     args = parser.parse_args()
-
 
     env = wrap_dqn(gym.make(args.env_name))
     test_env = wrap_dqn(gym.make(args.env_name), reward_clipping=False)

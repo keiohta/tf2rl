@@ -10,10 +10,9 @@ from tf2rl.policies.categorical_actor import CategoricalActor
 
 class CriticQ(tf.keras.Model):
     """
-    The output of Q-function moves
+    Compared with original (continuous) version of SAC, the output of Q-function moves
         from Q: S x A -> R
         to   Q: S -> R^|A|
-    compared with original (continuous) version of SAC
     """
 
     def __init__(self, state_shape, action_dim, name='qf'):
@@ -39,21 +38,25 @@ class SACDiscrete(SAC):
     def __init__(
             self,
             *args,
+            actor_fn=None,
+            critic_fn=None,
             **kwargs):
         kwargs["name"] = "SAC_discrete"
+        self.actor_fn = actor_fn if actor_fn is not None else CategoricalActor
+        self.critic_fn = critic_fn if critic_fn is not None else CriticQ
         super().__init__(*args, **kwargs)
 
     def _set_up_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
         # The output of actor is categorical distribution
-        self.actor = CategoricalActor(
+        self.actor = self.actor_fn(
             state_shape, action_dim)
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
     def _setup_critic_q(self, state_shape, action_dim, lr):
-        self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
-        self.qf2 = CriticQ(state_shape, action_dim, name="qf2")
-        self.qf1_target = CriticQ(state_shape, action_dim, name="qf1_target")
-        self.qf2_target = CriticQ(state_shape, action_dim, name="qf2_target")
+        self.qf1 = self.critic_fn(state_shape, action_dim, name="qf1")
+        self.qf2 = self.critic_fn(state_shape, action_dim, name="qf2")
+        self.qf1_target = self.critic_fn(state_shape, action_dim, name="qf1_target")
+        self.qf2_target = self.critic_fn(state_shape, action_dim, name="qf2_target")
         update_target_variables(self.qf1_target.weights,
                                 self.qf1.weights, tau=1.)
         update_target_variables(self.qf2_target.weights,
@@ -64,11 +67,7 @@ class SACDiscrete(SAC):
     def _setup_critic_v(self, state_shape, lr):
         """
         Do not need state-value function because it can be directly computed from Q-function.
-        See Eq.(10) in paper.
-
-        :param state_shape:
-        :param lr:
-        :return:
+        See Eq.(10) in the paper.
         """
         pass
 
@@ -187,6 +186,6 @@ class SACDiscrete(SAC):
             td_errors_q1 = target_q - tf.expand_dims(
                 tf.gather_nd(current_q1, indices), axis=1)
             td_errors_q2 = target_q - tf.expand_dims(
-                tf.gather_nd(current_q2, indices))  # Eq.(7)
+                tf.gather_nd(current_q2, indices), axis=1)  # Eq.(7)
 
         return td_errors_q1, td_errors_q2
