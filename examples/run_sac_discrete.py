@@ -2,6 +2,8 @@ import gym
 
 from tf2rl.algos.sac_discrete import SACDiscrete
 from tf2rl.experiments.trainer import Trainer
+from tf2rl.envs.utils import is_atari_env
+from tf2rl.networks.atari_model import AtariQFunc
 
 
 if __name__ == '__main__':
@@ -17,6 +19,9 @@ if __name__ == '__main__':
 
     env = gym.make("CartPole-v0")
     test_env = gym.make("CartPole-v0")
+
+    critic = AtariQFunc if is_atari_env(env) else None
+
     policy = SACDiscrete(
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
