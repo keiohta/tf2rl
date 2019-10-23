@@ -143,9 +143,10 @@ class SAC(OffPolicyAgent):
         return td_errors
 
     @tf.function
-    def _train_body(self, states, actions, next_states, rewards, done, weights=None):
+    def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
-            rewards = tf.squeeze(rewards, axis=1)
+            if tf.equal(tf.rank(rewards), 2) is True:
+                rewards = tf.squeeze(rewards, axis=1)
             not_done = 1. - tf.cast(done, dtype=tf.float32)
 
             with tf.GradientTape(persistent=True) as tape:
@@ -158,9 +159,9 @@ class SAC(OffPolicyAgent):
                     rewards + not_done * self.discount * vf_next_target)
 
                 td_loss_q1 = tf.reduce_mean(huber_loss(
-                    target_q - current_q1, delta=self.max_grad))
+                    target_q - current_q1, delta=self.max_grad) * weights)
                 td_loss_q2 = tf.reduce_mean(huber_loss(
-                    target_q - current_q2, delta=self.max_grad))  # Eq.(7)
+                    target_q - current_q2, delta=self.max_grad) * weights)  # Eq.(7)
 
                 # Compute loss of critic V
                 current_v = self.vf(states)
@@ -176,7 +177,7 @@ class SAC(OffPolicyAgent):
 
                 # Compute loss of policy
                 policy_loss = tf.reduce_mean(
-                    self.alpha * logp - current_q1)  # Eq.(12)
+                    (self.alpha * logp - current_q1) * weights)  # Eq.(12)
 
                 # Compute loss of temperature parameter for entropy
                 if self.auto_alpha:
@@ -214,12 +215,9 @@ class SAC(OffPolicyAgent):
         if isinstance(actions, tf.Tensor):
             rewards = tf.expand_dims(rewards, axis=1)
             dones = tf.expand_dims(dones, 1)
-        td_errors_q1, td_errors_q2, td_errors_v = self._compute_td_error_body(
+        td_errors = self._compute_td_error_body(
             states, actions, next_states, rewards, dones)
-        return np.squeeze(
-            np.abs(td_errors_q1.numpy()) +
-            np.abs(td_errors_q2.numpy()) +
-            np.abs(td_errors_v.numpy()))
+        return td_errors.numpy()
 
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
@@ -228,27 +226,14 @@ class SAC(OffPolicyAgent):
 
             # Compute TD errors for Q-value func
             current_q1 = self.qf1([states, actions])
-            current_q2 = self.qf2([states, actions])
             vf_next_target = self.vf_target(next_states)
 
             target_q = tf.stop_gradient(
                 rewards + not_dones * self.discount * vf_next_target)
 
             td_errors_q1 = target_q - current_q1
-            td_errors_q2 = target_q - current_q2
 
-            # Compute TD errors for V-value func
-            current_v = self.vf(states)
-            sample_actions, logp, _ = self.actor(states)
-
-            current_q1 = self.qf1([states, sample_actions])
-            current_q2 = self.qf2([states, sample_actions])
-            current_q = tf.minimum(current_q1, current_q2)
-
-            target_v = tf.stop_gradient(current_q - self.alpha * logp)
-            td_errors_v = target_v - current_v
-
-        return td_errors_q1, td_errors_q2, td_errors_v
+        return td_errors_q1
 
     @staticmethod
     def get_argument(parser=None):
