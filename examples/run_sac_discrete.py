@@ -17,17 +17,17 @@ if __name__ == '__main__':
     parser.set_defaults(batch_size=32)
     parser.set_defaults(memory_capacity=int(1e4))
     parser.add_argument('--env-name', type=str,
-                        default="FreewayNoFrameskip-v4")
+                        default="SpaceInvadersNoFrameskip-v4")
     args = parser.parse_args()
 
     env = gym.make(args.env_name)
     test_env = gym.make(args.env_name)
 
     if is_atari_env(env):
-        # Parameters comes from Appendix.B from original paper
-        # https://arxiv.org/abs/1910.07207
+        # Parameters come from Appendix.B in original paper.
+        # See https://arxiv.org/abs/1910.07207
         env = wrap_dqn(env, wrap_ndarray=True)
-        test_env = wrap_dqn(test_env, wrap_ndarray=True)
+        test_env = wrap_dqn(test_env, wrap_ndarray=True, reward_clipping=False)
         policy = SACDiscrete(
             state_shape=env.observation_space.shape,
             action_dim=env.action_space.n,
