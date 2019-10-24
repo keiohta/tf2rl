@@ -39,6 +39,7 @@ if __name__ == '__main__':
             batch_size=64,
             n_warmup=int(2e4),
             update_interval=4,
+            target_update_interval=args.targt_update_interval,
             gpu=args.gpu)
         # Overwrite simulation settings
         args.episode_max_steps = 108000
@@ -53,6 +54,7 @@ if __name__ == '__main__':
             memory_capacity=args.memory_capacity,
             batch_size=args.batch_size,
             n_warmup=args.n_warmup,
+            target_update_interval=args.target_update_interval,
             gpu=args.gpu)
     trainer = Trainer(policy, env, args, test_env=test_env)
     trainer()

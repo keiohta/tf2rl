@@ -40,10 +40,14 @@ class SACDiscrete(SAC):
             *args,
             actor_fn=None,
             critic_fn=None,
+            target_update_interval=None,
             **kwargs):
         kwargs["name"] = "SAC_discrete"
         self.actor_fn = actor_fn if actor_fn is not None else CategoricalActor
         self.critic_fn = critic_fn if critic_fn is not None else CriticQ
+        self.target_hard_update = target_update_interval is not None
+        self.target_update_interval = target_update_interval
+        self.n_training = tf.Variable(0, dtype=tf.int32)
         super().__init__(*args, **kwargs)
 
     def _set_up_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
@@ -87,6 +91,8 @@ class SACDiscrete(SAC):
 
     @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights=None):
+        self.n_training.assign_add(1)
+
         with tf.device(self.device):
             batch_size = states.shape[0]
             not_dones = 1. - tf.cast(done, dtype=tf.float32)
@@ -138,10 +144,17 @@ class SACDiscrete(SAC):
             self.qf2_optimizer.apply_gradients(
                 zip(q2_grad, self.qf2.trainable_variables))
 
-            update_target_variables(self.qf1_target.weights,
-                                    self.qf1.weights, tau=self.tau)
-            update_target_variables(self.qf2_target.weights,
-                                    self.qf2.weights, tau=self.tau)
+            if self.target_hard_update:
+                if tf.equal(self.n_training % self.target_update_interval, 0) == True:
+                    update_target_variables(self.qf1_target.weights,
+                                            self.qf1.weights, tau=1.)
+                    update_target_variables(self.qf2_target.weights,
+                                            self.qf2.weights, tau=1.)
+            else:
+                update_target_variables(self.qf1_target.weights,
+                                        self.qf1.weights, tau=self.tau)
+                update_target_variables(self.qf2_target.weights,
+                                        self.qf2.weights, tau=self.tau)
 
             actor_grad = tape.gradient(
                 policy_loss, self.actor.trainable_variables)
@@ -189,3 +202,9 @@ class SACDiscrete(SAC):
                 tf.gather_nd(current_q2, indices), axis=1)  # Eq.(7)
 
         return td_errors_q1, td_errors_q2
+
+    @staticmethod
+    def get_argument(parser=None):
+        parser = SAC.get_argument(parser)
+        parser.add_argument('--target-update-interval', type=int, default=None)
+        return parser
