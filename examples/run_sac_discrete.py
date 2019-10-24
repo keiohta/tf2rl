@@ -26,6 +26,12 @@ if __name__ == '__main__':
     if is_atari_env(env):
         # Parameters come from Appendix.B in original paper.
         # See https://arxiv.org/abs/1910.07207
+        args.episode_max_steps = 108000
+        args.test_interval = int(1e5)
+        args.show_test_images = True
+        args.max_steps = int(1e9)
+        args.target_update_interval = 8000
+
         env = wrap_dqn(env, wrap_ndarray=True)
         test_env = wrap_dqn(test_env, wrap_ndarray=True, reward_clipping=False)
         policy = SACDiscrete(
@@ -39,13 +45,8 @@ if __name__ == '__main__':
             batch_size=64,
             n_warmup=int(2e4),
             update_interval=4,
-            target_update_interval=args.targt_update_interval,
+            target_update_interval=args.target_update_interval,
             gpu=args.gpu)
-        # Overwrite simulation settings
-        args.episode_max_steps = 108000
-        args.test_interval = int(1e5)
-        args.show_test_images = True
-        args.max_steps = int(1e9)
     else:
         policy = SACDiscrete(
             state_shape=env.observation_space.shape,
