@@ -119,11 +119,14 @@ class ShmemEnv(object):
 
         """
         self.logger = logging.getLogger(__name__)
+        self.action_space = action_space
+        self.observation_space = observation_space
 
         # processをspawnで立ち上げる。interpreterが新規に立つので起動は遅いが、tensorflowのメモリ空間を共有するとめんどうそうなので
         ctx = mp.get_context("spawn")
 
         num_envs = num_processes * envs_per_process
+        self.num_envs = num_envs
         # shape=(num_envs, observation_space.shape)
         obs_shape = (num_envs,) + observation_space.shape
         obs_size = int(np.prod(obs_shape))
@@ -191,6 +194,14 @@ class ShmemEnv(object):
     def observation(self):
         # タイミングによっては考慮不要
         return self.np_obs_next.copy()
+
+    @property
+    def action_shape(self):
+        return (self.num_envs,) + self.action_space.shape
+
+    @property
+    def observation_shape(self):
+        return (self.num_envs,) + self.observation_space.shape
 
     def close(self):
         for proc in self.list_proc:
