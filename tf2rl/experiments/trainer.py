@@ -111,11 +111,14 @@ class Trainer:
 
             if total_steps >= self._policy.n_warmup and total_steps % self._policy.update_interval == 0:
                 samples = replay_buffer.sample(self._policy.batch_size)
-                td_error = self._policy.train(
+                self._policy.train(
                     samples["obs"], samples["act"], samples["next_obs"],
                     samples["rew"], np.array(samples["done"], dtype=np.float32),
                     None if not self._use_prioritized_rb else samples["weights"])
                 if self._use_prioritized_rb:
+                    td_error = self._policy.compute_td_error(
+                        samples["obs"], samples["act"], samples["next_obs"],
+                        samples["rew"], np.array(samples["done"], dtype=np.float32))
                     replay_buffer.update_priorities(
                         samples["indexes"], np.abs(td_error) + 1e-6)
                 if total_steps % self._test_interval == 0:
@@ -142,7 +145,6 @@ class Trainer:
             episode_return = 0.
             frames = []
             obs = self._test_env.reset()
-            done = False
             for _ in range(self._episode_max_steps):
                 action = self._policy.get_action(obs, test=True)
                 next_obs, reward, done, _ = self._test_env.step(action)

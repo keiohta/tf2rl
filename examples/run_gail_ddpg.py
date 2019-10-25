@@ -3,7 +3,6 @@ import gym
 
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.algos.gail import GAIL
-from tf2rl.experiments.trainer import Trainer
 from tf2rl.experiments.irl_trainer import IRLTrainer
 from tf2rl.experiments.utils import restore_latest_n_traj
 

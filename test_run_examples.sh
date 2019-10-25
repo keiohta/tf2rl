@@ -9,6 +9,7 @@ ${prefix} examples/run_ddpg.py ${common_arg} ${off_pol_arg}
 ${prefix} examples/run_bi_res_ddpg.py ${common_arg} ${off_pol_arg}
 ${prefix} examples/run_td3.py ${common_arg} ${off_pol_arg}
 ${prefix} examples/run_sac.py ${common_arg} ${off_pol_arg}
+${prefix} examples/run_sac_discrete.py ${common_arg} ${off_pol_arg}
 
 # DQN variants
 ${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg}
