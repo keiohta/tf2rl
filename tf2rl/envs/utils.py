@@ -1,6 +1,5 @@
 import gym
 from gym.spaces import Discrete, Box
-from gym.envs import mujoco, atari
 
 
 def is_discrete(space):
@@ -22,12 +21,14 @@ def get_act_dim(action_space):
 
 
 def is_mujoco_env(env):
+    from gym.envs import mujoco
     if not hasattr(env, "env"):
         return False
     return gym.envs.mujoco.mujoco_env.MujocoEnv in env.env.__class__.__bases__
 
 
 def is_atari_env(env):
+    from gym.envs import atari
     if not hasattr(env, "env"):
         return False
     return gym.envs.atari.atari_env.AtariEnv == env.env.__class__

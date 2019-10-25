@@ -146,7 +146,7 @@ class SAC(OffPolicyAgent):
     @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
-            if tf.equal(tf.rank(rewards), 2) is True:
+            if tf.rank(rewards) == 2:
                 rewards = tf.squeeze(rewards, axis=1)
             not_done = 1. - tf.cast(done, dtype=tf.float32)
 
