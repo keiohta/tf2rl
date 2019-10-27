@@ -146,7 +146,7 @@ class SACDiscrete(SAC):
                 zip(q2_grad, self.qf2.trainable_variables))
 
             if self.target_hard_update:
-                if tf.equal(self.n_training % self.target_update_interval, 0) == True:
+                if self.n_training % self.target_update_interval == 0:
                     update_target_variables(self.qf1_target.weights,
                                             self.qf1.weights, tau=1.)
                     update_target_variables(self.qf2_target.weights,
@@ -163,14 +163,14 @@ class SACDiscrete(SAC):
                 zip(actor_grad, self.actor.trainable_variables))
 
         return (td_loss1 + td_loss2) / 2., policy_loss, mean_ent, \
-               tf.reduce_min(current_action_logp), tf.reduce_max(current_action_logp)
+            tf.reduce_min(current_action_logp), tf.reduce_max(current_action_logp)
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
-        td_erros_Q1, td_errors_Q2 = self._compute_td_error_body(
+        td_errors_q1, td_errors_q2 = self._compute_td_error_body(
             states, actions, next_states, rewards, dones)
         return np.squeeze(
-            np.abs(td_erros_Q1.numpy()) +
-            np.abs(td_errors_Q2.numpy()))
+            np.abs(td_errors_q1.numpy()) +
+            np.abs(td_errors_q2.numpy()))
 
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
