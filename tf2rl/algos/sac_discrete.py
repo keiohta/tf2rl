@@ -90,7 +90,7 @@ class SACDiscrete(SAC):
         tf.summary.scalar(name=self.policy_name + "/logp_max", data=logp_max)
 
     @tf.function
-    def _train_body(self, states, actions, next_states, rewards, done, weights=None):
+    def _train_body(self, states, actions, next_states, rewards, done, weights):
         self.n_training.assign_add(1)
 
         with tf.device(self.device):
@@ -110,6 +110,7 @@ class SACDiscrete(SAC):
                 next_q = tf.minimum(
                     self.qf1_target(next_states), self.qf2_target(next_states))
 
+                # Compute state value function V by directly computes expectation
                 target_q = tf.expand_dims(tf.einsum(
                     'ij,ij->i', next_action_prob, next_q - self.alpha * next_action_logp), axis=1)  # Eq.(10)
                 target_q = tf.stop_gradient(
@@ -120,10 +121,10 @@ class SACDiscrete(SAC):
 
                 td_loss1 = tf.reduce_mean(huber_loss(
                     target_q - tf.expand_dims(tf.gather_nd(current_q1, indices), axis=1),
-                    delta=self.max_grad))
+                    delta=self.max_grad) * weights)
                 td_loss2 = tf.reduce_mean(huber_loss(
                     target_q - tf.expand_dims(tf.gather_nd(current_q2, indices), axis=1),
-                    delta=self.max_grad))  # Eq.(7)
+                    delta=self.max_grad) * weights)  # Eq.(7)
 
                 # Compute actor loss
                 _, _, current_action_param = self.actor(states)
@@ -133,7 +134,7 @@ class SACDiscrete(SAC):
                 policy_loss = tf.reduce_mean(
                     tf.einsum('ij,ij->i', current_action_prob,
                               self.alpha * current_action_logp - tf.stop_gradient(
-                                  tf.minimum(current_q1, current_q2))))  # Eq.(12)
+                                  tf.minimum(current_q1, current_q2))) * weights)  # Eq.(12)
                 mean_ent = tf.reduce_mean(
                     tf.einsum('ij,ij->i', current_action_prob, current_action_logp)) * (-1)
 
