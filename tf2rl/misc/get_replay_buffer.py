@@ -5,7 +5,7 @@ from gym.spaces.discrete import Discrete
 from gym.spaces.dict import Dict
 
 # from cpprb import NstepReplayBuffer, NstepPrioritizedReplayBuffer
-from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
+from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.envs.utils import is_discrete
