@@ -4,7 +4,7 @@ import time
 import numpy as np
 import tensorflow as tf
 
-from cpprb.experimental import ReplayBuffer
+from cpprb import ReplayBuffer
 
 from tf2rl.experiments.trainer import Trainer
 from tf2rl.experiments.utils import save_path, frames_to_gif

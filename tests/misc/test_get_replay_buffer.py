@@ -4,8 +4,8 @@ import os
 import numpy as np
 import gym
 
-from cpprb.experimental import ReplayBuffer
-from cpprb.experimental import PrioritizedReplayBuffer
+from cpprb import ReplayBuffer
+from cpprb import PrioritizedReplayBuffer
 
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.algos.policy_base import OnPolicyAgent, OffPolicyAgent
