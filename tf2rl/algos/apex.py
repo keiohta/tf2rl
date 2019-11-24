@@ -339,7 +339,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
 
 def apex_argument(parser=None):
     if parser is None:
-        parser = argparse.ArgumentParser()
+        parser = argparse.ArgumentParser(conflict_handler='resolve')
     parser.add_argument('--n-training', type=int, default=1e7,
                         help='number of times to apply batch update')
     parser.add_argument('--episode-max-steps', type=int, default=int(1e3),
