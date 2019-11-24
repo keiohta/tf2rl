@@ -9,7 +9,7 @@ from tf2rl.algos.apex import apex_argument, run
 from tf2rl.misc.target_update_ops import update_target_variables
 
 
-def test_run(parser):
+def test_run():
     parser = apex_argument()
     parser.set_defaults(n_training=10)
     parser.set_defaults(param_update_freq=1)
