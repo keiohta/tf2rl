@@ -12,9 +12,8 @@ python:
 script:
   - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
   - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
-  - pip install -r test_requirements.txt
-  - pip install .[examples]
-  - coverage run --source=tf2rl setup.py test
+  - pip install .[examples,test]
+  - coverage run --source=tf2rl -m unittest discover
   - bash test_run_examples.sh
 after_success:
   - coveralls
