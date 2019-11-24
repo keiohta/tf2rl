@@ -23,7 +23,7 @@ class TestApeX(unittest.TestCase):
     def test_run_discrete(self):
         from tf2rl.algos.dqn import DQN
         parser = DQN.get_argument(self.parser)
-        args = parser.parse_args()
+        args,_ = parser.parse_known_args()
 
         def env_fn():
             return gym.make("CartPole-v0")
@@ -57,7 +57,7 @@ class TestApeX(unittest.TestCase):
     def test_run_continuous(self):
         from tf2rl.algos.ddpg import DDPG
         parser = DDPG.get_argument(self.parser)
-        args = parser.parse_args()
+        args,_ = parser.parse_known_args()
 
         def env_fn():
             return gym.make('Pendulum-v0')
