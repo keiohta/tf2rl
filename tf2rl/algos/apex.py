@@ -90,6 +90,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
     if n_env > 1:
         kwargs["env_dict"]["priorities"] = {}
     local_rb = ReplayBuffer(**kwargs)
+    local_idx = np.arange(buffer_size)
 
     if n_env == 1:
         s = env.reset()
@@ -137,7 +138,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
 
         # Add collected experiences to global replay buffer
         if local_rb.get_stored_size() == buffer_size:
-            samples = local_rb.sample(local_rb.get_stored_size())
+            samples = local_rb._encode_sample(local_idx)
             if n_env > 1:
                 priorities = np.squeeze(samples["priorities"])
             else:
