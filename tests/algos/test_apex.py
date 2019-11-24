@@ -29,7 +29,7 @@ def _test_run_discrete(parser):
     def env_fn():
         return gym.make("CartPole-v0")
 
-    def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
+    def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1,*args,**kwargs):
         return DQN(
             name=name,
             state_shape=env.observation_space.shape,
@@ -65,7 +65,7 @@ def _test_run_continuous(parser):
 
     sample_env = env_fn()
 
-    def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1):
+    def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1,*args,**kwargs):
         return DDPG(
             state_shape=env.observation_space.shape,
             action_dim=env.action_space.high.size,
