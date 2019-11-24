@@ -54,7 +54,7 @@ class TestApeX(unittest.TestCase):
         run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn)
 
 
-    def test_run_continuous():
+    def test_run_continuous(self):
         from tf2rl.algos.ddpg import DDPG
         parser = DDPG.get_argument(self.parser)
         args = parser.parse_args()
