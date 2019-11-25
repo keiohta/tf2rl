@@ -399,7 +399,7 @@ def prepare_experiment(env, args):
 
 
 def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
-    logger = initialize_logger(
+    initialize_logger(
         logging_level=logging.getLevelName(args.logging_level))
 
     if args.n_env > 1:

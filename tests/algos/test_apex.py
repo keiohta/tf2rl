@@ -16,19 +16,20 @@ class TestApeX(unittest.TestCase):
         cls.parser.set_defaults(n_training=10)
         cls.parser.set_defaults(param_update_freq=1)
         cls.parser.set_defaults(test_freq=10)
+        cls.parser.set_defaults(n_explorer=2)
         cls.parser.set_defaults(n_env=64)
         cls.parser.set_defaults(local_buffer_size=64)
-
 
     def test_run_discrete(self):
         from tf2rl.algos.dqn import DQN
         parser = DQN.get_argument(self.parser)
-        args,_ = parser.parse_known_args()
+        parser.set_defaults(n_warmup=1)
+        args, _ = parser.parse_known_args()
 
         def env_fn():
             return gym.make("CartPole-v0")
 
-        def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1,*args,**kwargs):
+        def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1, *args, **kwargs):
             return DQN(
                 name=name,
                 state_shape=env.observation_space.shape,
@@ -53,18 +54,16 @@ class TestApeX(unittest.TestCase):
 
         run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn)
 
-
     def test_run_continuous(self):
         from tf2rl.algos.ddpg import DDPG
         parser = DDPG.get_argument(self.parser)
-        args,_ = parser.parse_known_args()
+        parser.set_defaults(n_warmup=1)
+        args, _ = parser.parse_known_args()
 
         def env_fn():
             return gym.make('Pendulum-v0')
 
-        sample_env = env_fn()
-
-        def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1,*args,**kwargs):
+        def policy_fn(env, name, memory_capacity=int(1e6), gpu=-1, *args, **kwargs):
             return DDPG(
                 state_shape=env.observation_space.shape,
                 action_dim=env.action_space.high.size,
