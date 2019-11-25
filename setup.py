@@ -9,7 +9,8 @@ install_requires = [
 extras_require = {
     "tf": ["tensorflow==2.0.0"],
     "tf_gpu": ["tensorflow-gpu==2.0.0"],
-    "examples": ["gym", "gym[atari]", "roboschool", "opencv-python"]
+    "examples": ["gym", "gym[atari]", "roboschool", "opencv-python"],
+    "test": ["coveralls","gym","matplotlib"]
 }
 
 setup(
@@ -22,5 +23,4 @@ setup(
     license="MIT",
     packages=find_packages("."),
     install_requires=install_requires,
-    extras_require=extras_require,
-    test_suite='tests')
+    extras_require=extras_require)

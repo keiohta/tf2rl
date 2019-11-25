@@ -86,7 +86,7 @@ Also, when a bug fix is proposed, tests should be added to avoid regression.
 To run tests:
 
 ```bash
-$ python setup.py test
+$ python -m unittest discover
 ```
 
 
