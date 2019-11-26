@@ -14,6 +14,6 @@ script:
   - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
   - pip install .[examples,test,tf]
   - coverage run --source=tf2rl -m unittest discover
-  - bash test_run_examples.sh
+  - ./test_run_examples.sh
 after_success:
   - coveralls
