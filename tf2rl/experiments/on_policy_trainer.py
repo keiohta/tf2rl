@@ -28,7 +28,7 @@ class OnPolicyTrainer(Trainer):
         self.replay_buffer = get_replay_buffer(
             self._policy, self._env)
         kwargs_local_buf = get_default_rb_dict(
-            size=self._episode_max_steps, env=self._env)
+            size=self._policy.horizon, env=self._env)
         kwargs_local_buf["env_dict"]["logp"] = {}
         kwargs_local_buf["env_dict"]["val"] = {}
         if is_discrete(self._env.action_space):
@@ -56,7 +56,7 @@ class OnPolicyTrainer(Trainer):
                     adv = samples["adv"]
                 for idx in range(int(self._policy.horizon / self._policy.batch_size)):
                     target = slice(idx*self._policy.batch_size,
-                                (idx+1)*self._policy.batch_size)
+                        (idx+1)*self._policy.batch_size)
                     self._policy.train(
                         states=samples["obs"][target],
                         actions=samples["act"][target],
