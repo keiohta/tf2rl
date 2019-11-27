@@ -46,9 +46,15 @@ class TestNoisyDQN(CommonOffPolDiscreteAlgos):
 
     def get_actions(self, states, test):
         if test:
-            return self.agent.get_action(states, test=test)
+            return self.agent.q_func(states).numpy()
         else:
-            return np.array([self.agent.get_action(state) for state in states])
+            return np.array([self.agent.q_func(np.expand_dims(state, axis=0)).numpy()[0] for state in states])
+
+    def test_get_action_greedy(self):
+        states = np.zeros(
+            shape=(self.batch_size, self.env.reset().astype(np.float32).shape[0]), dtype=np.float32)
+        q_values = np.array([self.agent.q_func(np.expand_dims(state, axis=0)).numpy()[0] for state in states])
+        self.assertEqual(np.prod(np.all(q_values == q_values[0, :], axis=0)), 0)
 
 
 class TestCategoricalDQN(CommonOffPolDiscreteAlgos):
