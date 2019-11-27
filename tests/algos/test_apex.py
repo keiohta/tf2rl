@@ -17,7 +17,7 @@ class TestApeX(unittest.TestCase):
         cls.parser.set_defaults(param_update_freq=1)
         cls.parser.set_defaults(test_freq=10)
         cls.parser.set_defaults(n_explorer=2)
-        cls.parser.set_defaults(n_env=64)
+        cls.parser.set_defaults(n_env=4)
         cls.parser.set_defaults(local_buffer_size=64)
 
     def test_run_discrete(self):
@@ -67,6 +67,7 @@ class TestApeX(unittest.TestCase):
             return DDPG(
                 state_shape=env.observation_space.shape,
                 action_dim=env.action_space.high.size,
+                n_warmup=500,
                 gpu=-1)
 
         def get_weights_fn(policy):

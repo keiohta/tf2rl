@@ -97,8 +97,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
         episode_steps = 0
         total_reward = 0.
         total_rewards = []
-    else:
-        obses = envs.py_reset()
+
     start = time.time()
     n_sample, n_sample_old = 0, 0
 

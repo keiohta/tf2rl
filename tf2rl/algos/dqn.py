@@ -123,7 +123,7 @@ class DQN(OffPolicyAgent):
                 tf.reshape(self._z_list, [1, self.q_func._n_atoms]),
                 tf.constant([self._action_dim, 1]))
 
-        # Set hyperparameters
+        # Set hyper-parameters
         if epsilon_min is not None and not enable_noisy_dqn:
             assert epsilon > epsilon_min
             self.epsilon_min = epsilon_min
