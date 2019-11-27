@@ -2,6 +2,8 @@ from setuptools import setup, Extension, find_packages
 
 install_requires = [
     "cpprb>=8.0.0",
+    "setuptools>=41.0.0",
+    "numpy>=1.16.0",
     "joblib",
     "scipy"
 ]
@@ -9,7 +11,7 @@ install_requires = [
 extras_require = {
     "tf": ["tensorflow==2.0.0"],
     "tf_gpu": ["tensorflow-gpu==2.0.0"],
-    "examples": ["gym", "gym[atari]", "roboschool", "opencv-python"],
+    "examples": ["gym", "gym[atari]", "roboschool==1.0.48", "opencv-python"],
     "test": ["coveralls", "gym", "matplotlib", "gast==0.2.2"]
 }
 
