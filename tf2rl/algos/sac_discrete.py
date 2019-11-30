@@ -86,10 +86,10 @@ class SACDiscrete(SAC):
         tf.summary.scalar(name=self.policy_name + "/logp_max", data=logp_max)
 
     @tf.function
-    def _train_body(self, states, actions, next_states, rewards, done, weights=None):
+    def _train_body(self, states, actions, next_states, rewards, dones, weights=None):
         with tf.device(self.device):
             batch_size = states.shape[0]
-            not_dones = 1. - tf.cast(done, dtype=tf.float32)
+            not_dones = 1. - tf.cast(dones, dtype=tf.float32)
             actions = tf.cast(actions, dtype=tf.int32)
 
             indices = tf.concat(
