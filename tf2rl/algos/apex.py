@@ -224,10 +224,12 @@ def learner(global_rb, trained_steps, is_training_done,
         tf.summary.experimental.set_step(trained_steps.value)
         lock.acquire()
         samples = global_rb.sample(policy.batch_size)
+        lock.release()
         td_errors = policy.train(
             samples["obs"], samples["act"], samples["next_obs"],
             samples["rew"], samples["done"], samples["weights"])
         writer.flush()
+        lock.acquire()
         global_rb.update_priorities(
             samples["indexes"], np.abs(td_errors)+1e-6)
         lock.release()
