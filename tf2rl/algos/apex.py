@@ -378,6 +378,7 @@ def prepare_experiment(env, args):
     manager.start()
 
     kwargs = get_default_rb_dict(args.replay_buffer_size, env)
+    kwargs["check_for_update"] = True
     global_rb = manager.PrioritizedReplayBuffer(**kwargs)
 
     # queues to share network parameters between a learner and explorers
