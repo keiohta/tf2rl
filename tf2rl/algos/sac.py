@@ -95,8 +95,6 @@ class SAC(OffPolicyAgent):
     def _setup_critic_q(self, state_shape, action_dim, lr):
         self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
         self.qf2 = CriticQ(state_shape, action_dim, name="qf2")
-        update_target_variables(self.vf_target.weights,
-                                self.vf.weights, tau=1.)
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
@@ -170,7 +168,8 @@ class SAC(OffPolicyAgent):
                 current_q1 = self.qf1([states, sample_actions])
                 current_q2 = self.qf2([states, sample_actions])
 
-                target_v = tf.stop_gradient(tf.minimum(current_q1, current_q2) - self.alpha * logp)
+                target_v = tf.stop_gradient(
+                    tf.minimum(current_q1, current_q2) - self.alpha * logp)
                 td_errors = target_v - current_v
                 td_loss_v = tf.reduce_mean(
                     huber_loss(td_errors, delta=self.max_grad) * weights)  # Eq.(5)
