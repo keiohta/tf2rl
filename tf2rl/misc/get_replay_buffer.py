@@ -4,8 +4,7 @@ from gym.spaces.box import Box
 from gym.spaces.discrete import Discrete
 from gym.spaces.dict import Dict
 
-# from cpprb import NstepReplayBuffer, NstepPrioritizedReplayBuffer
-from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
+from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.envs.utils import is_discrete
@@ -62,10 +61,11 @@ def get_replay_buffer(policy, env, use_prioritized_rb=False,
 
     # N-step prioritized
     if use_prioritized_rb and use_nstep_rb:
-        kwargs["n_step"] = n_step
-        kwargs["discount"] = policy.discount
-        raise NotImplementedError
-        # return NstepPrioritizedReplayBuffer(**kwargs)
+        kwargs["Nstep"] = {"size": n_step,
+                           "gamma": policy.discount,
+                           "rew": "rew",
+                           "next": "next_obs"}
+        return PrioritizedReplayBuffer(**kwargs)
 
     if len(obs_shape) == 3:
         kwargs["env_dict"]["obs"]["dtype"] = np.ubyte
@@ -77,9 +77,10 @@ def get_replay_buffer(policy, env, use_prioritized_rb=False,
 
     # N-step
     if use_nstep_rb:
-        kwargs["n_step"] = n_step
-        kwargs["discount"] = policy.discount
-        raise NotImplementedError
-        # return NstepReplayBuffer(**kwargs)
+        kwargs["Nstep"] = {"size": n_step,
+                           "gamma": policy.discount,
+                           "rew": "rew",
+                           "next": "next_obs"}
+        return ReplayBuffer(**kwargs)
 
     return ReplayBuffer(**kwargs)

@@ -42,6 +42,7 @@ class CommonOffPolAlgos(CommonAlgos):
             shape=(self.batch_size, state.shape[0]), dtype=np.float32)
         actions_train = self.agent.get_action(states, test=False)
         actions_test = self.agent.get_action(states, test=True)
+
         if self.is_discrete:
             self.assertEqual(
                 actions_train.shape, (self.batch_size,))
@@ -52,6 +53,23 @@ class CommonOffPolAlgos(CommonAlgos):
                 actions_train.shape, (self.batch_size, self.action_dim))
             self.assertEqual(
                 actions_test.shape, (self.batch_size, self.action_dim))
+
+    def test_get_action_greedy(self):
+        if self.agent is None:
+            return
+        # Multiple inputs
+        states = np.zeros(
+            shape=(self.batch_size, self.env.reset().astype(np.float32).shape[0]), dtype=np.float32)
+        actions_train = self.agent.get_action(states, test=False)
+        actions_test = self.agent.get_action(states, test=True)
+
+        # All actions should be same if `test=True`, and not same if `test=False`
+        if self.is_discrete:
+            self.assertEqual(np.prod(np.unique(actions_test).shape), 1)
+            self.assertGreater(np.prod(np.unique(actions_train).shape), 1)
+        else:
+            self.assertEqual(np.prod(np.all(actions_test == actions_test[0, :], axis=0)), 1)
+            self.assertEqual(np.prod(np.all(actions_train == actions_train[0, :], axis=0)), 0)
 
     def test_train(self):
         if self.agent is None:

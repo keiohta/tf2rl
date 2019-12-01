@@ -1,9 +1,8 @@
 # This is an implementation of noisy linear layer defined in following paper:
 # Noisy Networks for Exploration, https://arxiv.org/abs/1706.10295
 # Forked from https://github.com/LuEE-C/Noisy-A3C-Keras/blob/master/NoisyDense.py
-# Fixed bug by Kei Ohta
+# Fixed a bug by Kei Ohta
 
-import numpy as np
 import tensorflow as tf
 
 from tensorflow.keras import backend as K
@@ -43,7 +42,6 @@ class NoisyDense(tf.keras.layers.Layer):
         self.trainable = trainable
 
     def build(self, input_shape):
-        # TODO: Enable to remove noise
         assert len(input_shape) >= 2
         self.input_dim = input_shape[-1]
         self.kernel_shape = tf.constant((self.input_dim, self.units))

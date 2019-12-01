@@ -6,7 +6,7 @@ import multiprocessing
 from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
 
-from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
+from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
@@ -90,14 +90,14 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
     if n_env > 1:
         kwargs["env_dict"]["priorities"] = {}
     local_rb = ReplayBuffer(**kwargs)
+    local_idx = np.arange(buffer_size)
 
     if n_env == 1:
         s = env.reset()
         episode_steps = 0
         total_reward = 0.
         total_rewards = []
-    else:
-        obses = envs.py_reset()
+
     start = time.time()
     n_sample, n_sample_old = 0, 0
 
@@ -137,7 +137,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
 
         # Add collected experiences to global replay buffer
         if local_rb.get_stored_size() == buffer_size:
-            samples = local_rb.sample(local_rb.get_stored_size())
+            samples = local_rb._encode_sample(local_idx)
             if n_env > 1:
                 priorities = np.squeeze(samples["priorities"])
             else:
@@ -338,7 +338,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
 
 def apex_argument(parser=None):
     if parser is None:
-        parser = argparse.ArgumentParser()
+        parser = argparse.ArgumentParser(conflict_handler='resolve')
     parser.add_argument('--n-training', type=int, default=1e7,
                         help='number of times to apply batch update')
     parser.add_argument('--episode-max-steps', type=int, default=int(1e3),
@@ -398,7 +398,7 @@ def prepare_experiment(env, args):
 
 
 def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
-    logger = initialize_logger(
+    initialize_logger(
         logging_level=logging.getLevelName(args.logging_level))
 
     if args.n_env > 1:

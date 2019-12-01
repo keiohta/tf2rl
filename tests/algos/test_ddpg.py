@@ -1,6 +1,4 @@
 import unittest
-import numpy as np
-import tensorflow as tf
 
 from tf2rl.algos.ddpg import DDPG
 from tests.algos.common import CommonOffPolContinuousAlgos
@@ -14,6 +12,7 @@ class TestDDPG(CommonOffPolContinuousAlgos):
             state_shape=cls.continuous_env.observation_space.shape,
             action_dim=cls.continuous_env.action_space.low.size,
             batch_size=cls.batch_size,
+            sigma=0.5,  # Make noise bigger to easier to test
             gpu=-1)
 
 

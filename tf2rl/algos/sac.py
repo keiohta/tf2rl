@@ -96,8 +96,6 @@ class SAC(OffPolicyAgent):
     def _setup_critic_q(self, state_shape, action_dim, lr):
         self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
         self.qf2 = CriticQ(state_shape, action_dim, name="qf2")
-        update_target_variables(self.vf_target.weights,
-                                self.vf.weights, tau=1.)
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
@@ -122,14 +120,14 @@ class SAC(OffPolicyAgent):
     def _get_action_body(self, state, test):
         return self.actor(state, test)[0]
 
-    def train(self, states, actions, next_states, rewards, done, weights=None):
+    def train(self, states, actions, next_states, rewards, dones, weights=None):
         # TODO: Replace `done` with `dones`
         if weights is None:
             weights = np.ones_like(rewards)
 
         td_errors, actor_loss, vf_loss, qf_loss, logp_min, logp_max = \
             self._train_body(states, actions, next_states,
-                             rewards, done, weights)
+                             rewards, dones, weights)
 
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
         tf.summary.scalar(name=self.policy_name+"/critic_V_loss", data=vf_loss)
@@ -144,11 +142,11 @@ class SAC(OffPolicyAgent):
         return td_errors
 
     @tf.function
-    def _train_body(self, states, actions, next_states, rewards, done, weights):
+    def _train_body(self, states, actions, next_states, rewards, dones, weights):
         with tf.device(self.device):
             if tf.rank(rewards) == 2:
                 rewards = tf.squeeze(rewards, axis=1)
-            not_done = 1. - tf.cast(done, dtype=tf.float32)
+            not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
             with tf.GradientTape(persistent=True) as tape:
                 # Compute loss of critic Q
@@ -157,7 +155,7 @@ class SAC(OffPolicyAgent):
                 vf_next_target = self.vf_target(next_states)
 
                 target_q = tf.stop_gradient(
-                    rewards + not_done * self.discount * vf_next_target)
+                    rewards + not_dones * self.discount * vf_next_target)
 
                 td_loss_q1 = tf.reduce_mean(huber_loss(
                     target_q - current_q1, delta=self.max_grad) * weights)
@@ -171,7 +169,8 @@ class SAC(OffPolicyAgent):
                 current_q1 = self.qf1([states, sample_actions])
                 current_q2 = self.qf2([states, sample_actions])
 
-                target_v = tf.stop_gradient(tf.minimum(current_q1, current_q2) - self.alpha * logp)
+                target_v = tf.stop_gradient(
+                    tf.minimum(current_q1, current_q2) - self.alpha * logp)
                 td_errors = target_v - current_v
                 td_loss_v = tf.reduce_mean(
                     huber_loss(td_errors, delta=self.max_grad) * weights)  # Eq.(5)
