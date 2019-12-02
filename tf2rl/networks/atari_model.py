@@ -94,7 +94,7 @@ class AtariQFunc(AtariBaseModel):
 
 
 class AtariCategoricalActor(CategoricalActor, AtariBaseModel):
-    def __init__(self, state_shape, action_dim,
+    def __init__(self, state_shape, action_dim, units=None,
                  name="AtariCategoricalActor"):
         self.dist = Categorical(dim=action_dim)
         self.action_dim = action_dim
@@ -114,7 +114,7 @@ class AtariCategoricalActor(CategoricalActor, AtariBaseModel):
 
 
 class AtariCategoricalActorCritic(CategoricalActorCritic):
-    def __init__(self, state_shape, action_dim,
+    def __init__(self, state_shape, action_dim, units=None,
                  name="AtariCategoricalActorCritic"):
         tf.keras.Model.__init__(self, name=name)
         self.dist = Categorical(dim=action_dim)
