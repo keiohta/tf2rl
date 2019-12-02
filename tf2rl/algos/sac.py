@@ -9,11 +9,11 @@ from tf2rl.misc.huber_loss import huber_loss
 
 
 class CriticV(tf.keras.Model):
-    def __init__(self, state_shape, name='vf'):
+    def __init__(self, state_shape, critic_units=[256, 256], name='vf'):
         super().__init__(name=name)
 
-        self.l1 = Dense(256, name="L1", activation='relu')
-        self.l2 = Dense(256, name="L2", activation='relu')
+        self.l1 = Dense(critic_units[0], name="L1", activation='relu')
+        self.l2 = Dense(critic_units[1], name="L2", activation='relu')
         self.l3 = Dense(1, name="L3", activation='linear')
 
         dummy_state = tf.constant(
@@ -29,11 +29,11 @@ class CriticV(tf.keras.Model):
 
 
 class CriticQ(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, name='qf'):
+    def __init__(self, state_shape, action_dim, critic_units=[256, 256], name='qf'):
         super().__init__(name=name)
 
-        self.l1 = Dense(256, name="L1", activation='relu')
-        self.l2 = Dense(256, name="L2", activation='relu')
+        self.l1 = Dense(critic_units[0], name="L1", activation='relu')
+        self.l2 = Dense(critic_units[1], name="L2", activation='relu')
         self.l3 = Dense(1, name="L2", activation='linear')
 
         dummy_state = tf.constant(
@@ -61,6 +61,7 @@ class SAC(OffPolicyAgent):
             max_action=1.,
             lr=3e-4,
             actor_units=[256, 256],
+            critic_units=[256, 256],
             tau=0.005,
             alpha=.2,
             auto_alpha=False,
@@ -71,43 +72,45 @@ class SAC(OffPolicyAgent):
             name=name, memory_capacity=memory_capacity,
             n_warmup=n_warmup, **kwargs)
 
-        self._set_up_actor(state_shape, action_dim, actor_units, lr, max_action)
-        self._setup_critic_v(state_shape, lr)
-        self._setup_critic_q(state_shape, action_dim, lr)
+        self._setup_actor(state_shape, action_dim, actor_units, lr, max_action)
+        self._setup_critic_v(state_shape, critic_units, lr)
+        self._setup_critic_q(state_shape, action_dim, critic_units, lr)
 
         # Set hyper-parameters
         self.tau = tau
         self.auto_alpha = auto_alpha
+        self.state_ndim = len(state_shape)
         if auto_alpha:
             self.log_alpha = tf.Variable(0., dtype=tf.float32)
-            self.alpha = tf.exp(self.log_alpha)
+            self.alpha = tf.Variable(0., dtype=tf.float32)
+            self.alpha.assign(tf.exp(self.log_alpha))
             self.target_alpha = -action_dim
             self.alpha_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         else:
             self.alpha = alpha
 
-    def _set_up_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
+    def _setup_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
         self.actor = GaussianActor(
             state_shape, action_dim, max_action, squash=True,
             units=actor_units, tanh_mean=False, tanh_std=False)
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
-    def _setup_critic_q(self, state_shape, action_dim, lr):
-        self.qf1 = CriticQ(state_shape, action_dim, name="qf1")
-        self.qf2 = CriticQ(state_shape, action_dim, name="qf2")
+    def _setup_critic_q(self, state_shape, action_dim, critic_units, lr):
+        self.qf1 = CriticQ(state_shape, action_dim, critic_units, name="qf1")
+        self.qf2 = CriticQ(state_shape, action_dim, critic_units, name="qf2")
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
-    def _setup_critic_v(self, state_shape, lr):
-        self.vf = CriticV(state_shape)
-        self.vf_target = CriticV(state_shape)
+    def _setup_critic_v(self, state_shape, critic_units, lr):
+        self.vf = CriticV(state_shape, critic_units)
+        self.vf_target = CriticV(state_shape, critic_units)
         update_target_variables(self.vf_target.weights,
                                 self.vf.weights, tau=1.)
         self.vf_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
     def get_action(self, state, test=False):
         assert isinstance(state, np.ndarray)
-        is_single_state = len(state.shape) == 1
+        is_single_state = len(state.shape) == self.state_ndim
 
         state = np.expand_dims(state, axis=0).astype(
             np.float32) if is_single_state else state
@@ -124,7 +127,7 @@ class SAC(OffPolicyAgent):
         if weights is None:
             weights = np.ones_like(rewards)
 
-        td_errors, actor_loss, vf_loss, qf_loss, logp_min, logp_max = \
+        td_errors, actor_loss, vf_loss, qf_loss, logp_min, logp_max, logp_mean = \
             self._train_body(states, actions, next_states,
                              rewards, dones, weights)
 
@@ -133,9 +136,10 @@ class SAC(OffPolicyAgent):
         tf.summary.scalar(name=self.policy_name+"/critic_Q_loss", data=qf_loss)
         tf.summary.scalar(name=self.policy_name+"/logp_min", data=logp_min)
         tf.summary.scalar(name=self.policy_name+"/logp_max", data=logp_max)
+        tf.summary.scalar(name=self.policy_name+"/logp_mean", data=logp_mean)
         if self.auto_alpha:
-            self.alpha = tf.exp(self.log_alpha)
             tf.summary.scalar(name=self.policy_name + "/log_ent", data=self.log_alpha)
+            tf.summary.scalar(name=self.policy_name+"/logp_mean+target", data=logp_mean+self.target_alpha)
         tf.summary.scalar(name=self.policy_name+"/ent", data=self.alpha)
 
         return td_errors
@@ -143,7 +147,7 @@ class SAC(OffPolicyAgent):
     @tf.function
     def _train_body(self, states, actions, next_states, rewards, dones, weights):
         with tf.device(self.device):
-            if tf.equal(tf.rank(rewards), 2) == True:
+            if tf.rank(rewards) == 2:
                 rewards = tf.squeeze(rewards, axis=1)
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
@@ -167,16 +171,17 @@ class SAC(OffPolicyAgent):
                 sample_actions, logp, _ = self.actor(states)  # Resample actions to update V
                 current_q1 = self.qf1([states, sample_actions])
                 current_q2 = self.qf2([states, sample_actions])
+                current_min_q = tf.minimum(current_q1, current_q2)
 
                 target_v = tf.stop_gradient(
-                    tf.minimum(current_q1, current_q2) - self.alpha * logp)
+                    current_min_q - self.alpha * logp)
                 td_errors = target_v - current_v
                 td_loss_v = tf.reduce_mean(
                     huber_loss(td_errors, delta=self.max_grad) * weights)  # Eq.(5)
 
                 # Compute loss of policy
                 policy_loss = tf.reduce_mean(
-                    (self.alpha * logp - current_q1) * weights)  # Eq.(12)
+                    (self.alpha * logp - current_min_q) * weights)  # Eq.(12)
 
                 # Compute loss of temperature parameter for entropy
                 if self.auto_alpha:
@@ -205,10 +210,11 @@ class SAC(OffPolicyAgent):
                 alpha_grad = tape.gradient(alpha_loss, [self.log_alpha])
                 self.alpha_optimizer.apply_gradients(
                     zip(alpha_grad, [self.log_alpha]))
+                self.alpha.assign(tf.exp(self.log_alpha))
 
             del tape
 
-        return td_errors, policy_loss, td_loss_v, td_loss_q1, tf.reduce_min(logp), tf.reduce_max(logp)
+        return td_errors, policy_loss, td_loss_v, td_loss_q1, tf.reduce_min(logp), tf.reduce_max(logp), tf.reduce_mean(logp)
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
         if isinstance(actions, tf.Tensor):
@@ -237,5 +243,6 @@ class SAC(OffPolicyAgent):
     @staticmethod
     def get_argument(parser=None):
         parser = OffPolicyAgent.get_argument(parser)
+        parser.add_argument('--alpha', type=float, default=0.2)
         parser.add_argument('--auto-alpha', action="store_true")
         return parser

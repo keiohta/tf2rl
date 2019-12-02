@@ -3,23 +3,13 @@ import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.networks.noisy_dense import NoisyDense
-from tf2rl.policies.categorical_actor import CategoricalActorCritic
+from tf2rl.policies.categorical_actor import CategoricalActorCritic, CategoricalActor
 from tf2rl.distributions.categorical import Categorical
 
 
-class AtariQFunc(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=None,
-                 name="QFunc", enable_dueling_dqn=False,
-                 enable_noisy_dqn=False, enable_categorical_dqn=False,
-                 n_atoms=51):
+class AtariBaseModel(tf.keras.Model):
+    def __init__(self, name, enable_noisy_dqn=False):
         super().__init__(name=name)
-        self._enable_dueling_dqn = enable_dueling_dqn
-        self._enable_noisy_dqn = enable_noisy_dqn
-        self._enable_categorical_dqn = enable_categorical_dqn
-        if enable_categorical_dqn:
-            self._action_dim = action_dim
-            self._n_atoms = n_atoms
-            action_dim = (action_dim + int(enable_dueling_dqn)) * n_atoms
 
         DenseLayer = NoisyDense if enable_noisy_dqn else Dense
 
@@ -31,6 +21,36 @@ class AtariQFunc(tf.keras.Model):
                             padding='valid', activation='relu')
         self.flat = Flatten()
         self.fc1 = DenseLayer(512, activation='relu')
+
+    def call(self, inputs):
+        # TODO: This type conversion seems to be bottle neck
+        features = tf.divide(tf.cast(inputs, tf.float32),
+                             tf.constant(255.))
+        features = self.conv1(features)
+        features = self.conv2(features)
+        features = self.conv3(features)
+        features = self.flat(features)
+        features = self.fc1(features)
+        return features
+
+
+class AtariQFunc(AtariBaseModel):
+    def __init__(self, state_shape, action_dim, units=None,
+                 name="QFunc", enable_dueling_dqn=False,
+                 enable_noisy_dqn=False, enable_categorical_dqn=False,
+                 n_atoms=51):
+        self._enable_dueling_dqn = enable_dueling_dqn
+        self._enable_noisy_dqn = enable_noisy_dqn
+        self._enable_categorical_dqn = enable_categorical_dqn
+        if enable_categorical_dqn:
+            self._action_dim = action_dim
+            self._n_atoms = n_atoms
+            action_dim = (action_dim + int(enable_dueling_dqn)) * n_atoms
+
+        # Build base layers
+        super().__init__(name, enable_noisy_dqn)
+        DenseLayer = NoisyDense if enable_noisy_dqn else Dense
+
         self.fc2 = DenseLayer(action_dim, activation='linear')
 
         if self._enable_dueling_dqn and not enable_categorical_dqn:
@@ -42,14 +62,9 @@ class AtariQFunc(tf.keras.Model):
                                              dtype=np.float32)))
 
     def call(self, inputs):
-        # TODO: This type conversion seems to be bottle neck
-        features = tf.divide(tf.cast(inputs, tf.float32),
-                             tf.constant(255.))
-        features = self.conv1(features)
-        features = self.conv2(features)
-        features = self.conv3(features)
-        features = self.flat(features)
-        features = self.fc1(features)
+        # Extract features on base layers
+        features = super().call(inputs)
+
         if self._enable_categorical_dqn:
             features = self.fc2(features)
             if self._enable_dueling_dqn:
@@ -78,8 +93,28 @@ class AtariQFunc(tf.keras.Model):
             return q_values
 
 
+class AtariCategoricalActor(CategoricalActor, AtariBaseModel):
+    def __init__(self, state_shape, action_dim, units=None,
+                 name="AtariCategoricalActor"):
+        self.dist = Categorical(dim=action_dim)
+        self.action_dim = action_dim
+
+        # Build base layers
+        AtariBaseModel.__init__(self, name, state_shape)
+
+        # Build top layer
+        self.prob = Dense(action_dim, activation='softmax')
+
+        self(tf.constant(
+            np.zeros(shape=(1,)+state_shape, dtype=np.uint8)))
+
+    def _compute_feature(self, states):
+        # Extract features on base layers
+        return AtariBaseModel.call(self, states)
+
+
 class AtariCategoricalActorCritic(CategoricalActorCritic):
-    def __init__(self, state_shape, action_dim,
+    def __init__(self, state_shape, action_dim, units=None,
                  name="AtariCategoricalActorCritic"):
         tf.keras.Model.__init__(self, name=name)
         self.dist = Categorical(dim=action_dim)
