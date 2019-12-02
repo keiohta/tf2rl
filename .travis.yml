@@ -13,6 +13,7 @@ script:
   - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
   - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
   - pip install -U .[examples,test,tf]
+  - pip install gym[atari]
   - coverage run --source=tf2rl -m unittest discover
   - ./test_run_examples.sh
 after_success:
