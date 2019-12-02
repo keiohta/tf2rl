@@ -1,7 +1,7 @@
 from setuptools import setup, Extension, find_packages
 
 install_requires = [
-    "cpprb>=8.0.0",
+    "cpprb>=8.1.1",
     "setuptools>=41.0.0",
     "numpy>=1.16.0",
     "joblib",
