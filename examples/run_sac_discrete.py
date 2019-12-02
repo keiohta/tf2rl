@@ -26,11 +26,13 @@ if __name__ == '__main__':
     if is_atari_env(env):
         # Parameters come from Appendix.B in original paper.
         # See https://arxiv.org/abs/1910.07207
-        args.episode_max_steps = 108000
-        args.test_interval = int(1e5)
-        args.show_test_images = True
-        args.max_steps = int(1e9)
-        args.target_update_interval = 8000
+        parser.set_defaults(episode_max_steps=108000)
+        parser.set_defaults(test_interval=int(1e5))
+        parser.set_defaults(show_test_images=True)
+        parser.set_defaults(max_steps=int(1e9))
+        parser.set_defaults(target_update_interval=8000)
+        parser.set_defaults(n_warmup=int(2e4))
+        args = parser.parse_args()
         if args.gpu == -1:
             print("Are you sure you're trying to solve Atari without GPU?")
 
@@ -45,7 +47,7 @@ if __name__ == '__main__':
             lr=3e-4,
             memory_capacity=args.memory_capacity,
             batch_size=64,
-            n_warmup=int(2e4),
+            n_warmup=args.n_warmup,
             update_interval=4,
             target_update_interval=args.target_update_interval,
             auto_alpha=args.auto_alpha,

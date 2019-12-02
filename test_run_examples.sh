@@ -33,10 +33,10 @@ run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-c
 
 # ApeX
 apex_arg="--gpu-explorer -1 --gpu-learner -1 --gpu-evaluator -1 --logging-level WARNING --n-training 4 --batch-size 32 --param-update-freq 1 --local-buffer-size 64 --test-freq 1"
-run "${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 1"
-run "${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 64"
-run "${prefix} examples/run_apex_dqn.py ${apex_arg} --n-env 1"
-run "${prefix} examples/run_apex_dqn.py ${apex_arg} --n-env 64"
+run "${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 1 --n-explorer 2"
+run "${prefix} examples/run_apex_ddpg.py ${apex_arg} --n-env 8"
+run "${prefix} examples/run_apex_dqn.py ${apex_arg} --n-env 1 --n-explorer 2"
+run "${prefix} examples/run_apex_dqn.py ${apex_arg} --n-env 8"
 
 # GAIL
 # TODO: test run_gail_ddpg
