@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import gym
 
-from tf2rl.envs.atari_wrapper import wrap_dqn, LazyFrames
+from tf2rl.envs.atari_wrapper import wrap_dqn
 
 
 class TestAtariWrapper(unittest.TestCase):

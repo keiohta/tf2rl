@@ -1,7 +1,7 @@
 import unittest
 import gym
 
-from tf2rl.envs.utils import is_discrete, is_atari_env
+from tf2rl.envs.utils import is_discrete
 
 
 class TestUtils(unittest.TestCase):

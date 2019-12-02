@@ -12,7 +12,7 @@ extras_require = {
     "tf": ["tensorflow==2.0.0"],
     "tf_gpu": ["tensorflow-gpu==2.0.0"],
     "examples": ["gym", "gym[atari]", "roboschool==1.0.48", "opencv-python"],
-    "test": ["coveralls", "gym", "matplotlib", "gast==0.2.2"]
+    "test": ["coveralls", "gym", "gym[atari]", "matplotlib", "gast==0.2.2"]
 }
 
 setup(
