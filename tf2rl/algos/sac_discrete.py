@@ -15,11 +15,11 @@ class CriticQ(tf.keras.Model):
         to   Q: S -> R^|A|
     """
 
-    def __init__(self, state_shape, action_dim, name='qf'):
+    def __init__(self, state_shape, action_dim, critic_units=[256, 256], name='qf'):
         super().__init__(name=name)
 
-        self.l1 = Dense(256, name="L1", activation='relu')
-        self.l2 = Dense(256, name="L2", activation='relu')
+        self.l1 = Dense(critic_units[0], name="L1", activation='relu')
+        self.l2 = Dense(critic_units[1], name="L2", activation='relu')
         self.l3 = Dense(action_dim, name="L2", activation='linear')
 
         dummy_state = tf.constant(
@@ -37,6 +37,8 @@ class CriticQ(tf.keras.Model):
 class SACDiscrete(SAC):
     def __init__(
             self,
+            state_shape,
+            action_dim,
             *args,
             actor_fn=None,
             critic_fn=None,
@@ -48,19 +50,23 @@ class SACDiscrete(SAC):
         self.target_hard_update = target_update_interval is not None
         self.target_update_interval = target_update_interval
         self.n_training = tf.Variable(0, dtype=tf.int32)
-        super().__init__(*args, **kwargs)
+        super().__init__(state_shape, action_dim, *args, **kwargs)
+        if self.auto_alpha:
+            # Referring author's implementation of original paper:
+            # https://github.com/p-christ/Deep-Reinforcement-Learning-Algorithms-with-PyTorch/blob/master/agents/actor_critic_agents/SAC_Discrete.pyhttps://github.com/p-christ/Deep-Reinforcement-Learning-Algorithms-with-PyTorch/blob/master/agents/actor_critic_agents/SAC_Discrete.py
+            self.target_alpha = -np.log((1.0 / action_dim)) * 0.98
 
     def _setup_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
         # The output of actor is categorical distribution
         self.actor = self.actor_fn(
-            state_shape, action_dim)
+            state_shape, action_dim, actor_units)
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
-    def _setup_critic_q(self, state_shape, action_dim, lr):
-        self.qf1 = self.critic_fn(state_shape, action_dim, name="qf1")
-        self.qf2 = self.critic_fn(state_shape, action_dim, name="qf2")
-        self.qf1_target = self.critic_fn(state_shape, action_dim, name="qf1_target")
-        self.qf2_target = self.critic_fn(state_shape, action_dim, name="qf2_target")
+    def _setup_critic_q(self, state_shape, action_dim, critic_units, lr):
+        self.qf1 = self.critic_fn(state_shape, action_dim, critic_units, name="qf1")
+        self.qf2 = self.critic_fn(state_shape, action_dim, critic_units, name="qf2")
+        self.qf1_target = self.critic_fn(state_shape, action_dim, critic_units, name="qf1_target")
+        self.qf2_target = self.critic_fn(state_shape, action_dim, critic_units, name="qf2_target")
         update_target_variables(self.qf1_target.weights,
                                 self.qf1.weights, tau=1.)
         update_target_variables(self.qf2_target.weights,
@@ -68,7 +74,7 @@ class SACDiscrete(SAC):
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
-    def _setup_critic_v(self, state_shape, lr):
+    def _setup_critic_v(self, *args, **kwargs):
         """
         Do not need state-value function because it can be directly computed from Q-function.
         See Eq.(10) in the paper.
@@ -79,7 +85,7 @@ class SACDiscrete(SAC):
         if weights is None:
             weights = np.ones_like(rewards)
 
-        td_errors, actor_loss, mean_ent, logp_min, logp_max = \
+        td_errors, actor_loss, mean_ent, logp_min, logp_max, logp_mean = \
             self._train_body(states, actions, next_states,
                              rewards, dones, weights)
 
@@ -88,6 +94,10 @@ class SACDiscrete(SAC):
         tf.summary.scalar(name=self.policy_name + "/mean_ent", data=mean_ent)
         tf.summary.scalar(name=self.policy_name + "/logp_min", data=logp_min)
         tf.summary.scalar(name=self.policy_name + "/logp_max", data=logp_max)
+        if self.auto_alpha:
+            tf.summary.scalar(name=self.policy_name + "/log_ent", data=self.log_alpha)
+            tf.summary.scalar(name=self.policy_name+"/logp_mean+target", data=logp_mean+self.target_alpha)
+        tf.summary.scalar(name=self.policy_name + "/ent", data=self.alpha)
 
     @tf.function
     def _train_body(self, states, actions, next_states, rewards, dones, weights):
@@ -136,6 +146,10 @@ class SACDiscrete(SAC):
                 mean_ent = tf.reduce_mean(
                     tf.einsum('ij,ij->i', current_action_prob, current_action_logp)) * (-1)
 
+                if self.auto_alpha:
+                    alpha_loss = -tf.reduce_mean(
+                        (self.log_alpha * tf.stop_gradient(current_action_logp + self.target_alpha)))
+
             q1_grad = tape.gradient(td_loss1, self.qf1.trainable_variables)
             self.qf1_optimizer.apply_gradients(
                 zip(q1_grad, self.qf1.trainable_variables))
@@ -160,8 +174,15 @@ class SACDiscrete(SAC):
             self.actor_optimizer.apply_gradients(
                 zip(actor_grad, self.actor.trainable_variables))
 
+            if self.auto_alpha:
+                alpha_grad = tape.gradient(alpha_loss, [self.log_alpha])
+                self.alpha_optimizer.apply_gradients(
+                    zip(alpha_grad, [self.log_alpha]))
+                self.alpha.assign(tf.exp(self.log_alpha))
+
         return (td_loss1 + td_loss2) / 2., policy_loss, mean_ent, \
-            tf.reduce_min(current_action_logp), tf.reduce_max(current_action_logp)
+            tf.reduce_min(current_action_logp), tf.reduce_max(current_action_logp), \
+            tf.reduce_mean(current_action_logp)
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
         td_errors_q1, td_errors_q2 = self._compute_td_error_body(
