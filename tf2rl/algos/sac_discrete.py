@@ -46,7 +46,7 @@ class SACDiscrete(SAC):
         self.critic_fn = critic_fn if critic_fn is not None else CriticQ
         super().__init__(*args, **kwargs)
 
-    def _set_up_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
+    def _setup_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
         # The output of actor is categorical distribution
         self.actor = self.actor_fn(
             state_shape, action_dim)
