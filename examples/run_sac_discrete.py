@@ -43,7 +43,7 @@ if __name__ == '__main__':
             critic_fn=AtariQFunc,
             actor_fn=AtariCategoricalActor,
             lr=3e-4,
-            memory_capacity=int(1e6),
+            memory_capacity=args.memory_capacity,
             batch_size=64,
             n_warmup=int(2e4),
             update_interval=4,
