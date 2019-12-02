@@ -1,9 +1,5 @@
 #!/bin/bash -eu
 
-# Already written in setup.py but somehow does not install
-# TODO: Fix this
-pip install gym[atari]
-
 prefix="python -u"
 common_arg="--gpu -1 --logging-level WARNING --max-steps 256 --batch-size 32 --dir-suffix TEST"
 off_pol_arg="--n-warmup 64 --memory-capacity 256"
