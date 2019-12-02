@@ -12,17 +12,10 @@ from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.initialize_logger import initialize_logger
 
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-    try:
-        # Currently, memory growth needs to be the same across GPUs
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
-        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-    except RuntimeError as e:
-        # Memory growth must be set before GPUs have been initialized
-        print(e)
+if tf.config.experimental.list_physical_devices('GPU'):
+    for cur_device in tf.config.experimental.list_physical_devices("GPU"):
+        print(cur_device)
+        tf.config.experimental.set_memory_growth(cur_device, enable=True)
 
 
 class Trainer:
@@ -109,29 +102,33 @@ class Trainer:
                 episode_return = 0
                 episode_start_time = time.time()
 
-            if total_steps >= self._policy.n_warmup and total_steps % self._policy.update_interval == 0:
+            if total_steps < self._policy.n_warmup:
+                continue
+
+            if total_steps % self._policy.update_interval == 0:
                 samples = replay_buffer.sample(self._policy.batch_size)
-                self._policy.train(
-                    samples["obs"], samples["act"], samples["next_obs"],
-                    samples["rew"], np.array(samples["done"], dtype=np.float32),
-                    None if not self._use_prioritized_rb else samples["weights"])
+                with tf.summary.record_if(total_steps % self._save_summary_interval == 0):
+                    self._policy.train(
+                        samples["obs"], samples["act"], samples["next_obs"],
+                        samples["rew"], np.array(samples["done"], dtype=np.float32),
+                        None if not self._use_prioritized_rb else samples["weights"])
                 if self._use_prioritized_rb:
                     td_error = self._policy.compute_td_error(
                         samples["obs"], samples["act"], samples["next_obs"],
                         samples["rew"], np.array(samples["done"], dtype=np.float32))
                     replay_buffer.update_priorities(
                         samples["indexes"], np.abs(td_error) + 1e-6)
-                if total_steps % self._test_interval == 0:
-                    avg_test_return = self.evaluate_policy(total_steps)
-                    self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
-                        total_steps, avg_test_return, self._test_episodes))
-                    tf.summary.scalar(
-                        name="Common/average_test_return", data=avg_test_return)
-                    tf.summary.scalar(name="Common/fps", data=fps)
 
-                    self.writer.flush()
+            if total_steps % self._test_interval == 0:
+                avg_test_return = self.evaluate_policy(total_steps)
+                self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
+                    total_steps, avg_test_return, self._test_episodes))
+                tf.summary.scalar(
+                    name="Common/average_test_return", data=avg_test_return)
+                tf.summary.scalar(name="Common/fps", data=fps)
+                self.writer.flush()
 
-            if total_steps % self._model_save_interval == 0:
+            if total_steps % self._save_model_interval == 0:
                 self.checkpoint_manager.save()
 
         tf.summary.flush()
@@ -182,8 +179,10 @@ class Trainer:
         self._episode_max_steps = args.episode_max_steps \
             if args.episode_max_steps is not None \
             else args.max_steps
+        self._n_experiments = args.n_experiments
         self._show_progress = args.show_progress
-        self._model_save_interval = args.save_model_interval
+        self._save_model_interval = args.save_model_interval
+        self._save_summary_interval = args.save_summary_interval
         # replay buffer
         self._use_prioritized_rb = args.use_prioritized_rb
         self._use_nstep_rb = args.use_nstep_rb
@@ -205,12 +204,16 @@ class Trainer:
                             help='Maximum number steps to interact with env.')
         parser.add_argument('--episode-max-steps', type=int, default=int(1e3),
                             help='Maximum steps in an episode')
+        parser.add_argument('--n-experiments', type=int, default=1,
+                            help='Number of experiments')
         parser.add_argument('--show-progress', action='store_true',
                             help='Call `render` in training process')
         parser.add_argument('--gpu', type=int, default=0,
                             help='GPU id')
         parser.add_argument('--save-model-interval', type=int, default=int(1e4),
                             help='Interval to save model')
+        parser.add_argument('--save-summary-interval', type=int, default=int(1e3),
+                            help='Interval to save summary')
         parser.add_argument('--model-dir', type=str, default=None,
                             help='Directory to restore model')
         parser.add_argument('--dir-suffix', type=str, default='',

@@ -72,44 +72,52 @@ class IRLTrainer(Trainer):
                     fps = episode_steps / (time.time() - episode_start_time)
                     self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
                         n_episode, int(total_steps), episode_steps, episode_return, fps))
+                    tf.summary.scalar(
+                        name="Common/training_return", data=episode_return)
 
                     episode_steps = 0
                     episode_return = 0
                     episode_start_time = time.time()
 
-                if total_steps >= self._policy.n_warmup:
+                if total_steps < self._policy.n_warmup:
+                    continue
+
+                if total_steps % self._policy.update_interval == 0:
                     samples = replay_buffer.sample(self._policy.batch_size)
                     # Train policy
                     rew = self._irl.inference(samples["obs"], samples["act"])
-                    td_error = self._policy.train(
-                        samples["obs"], samples["act"], samples["next_obs"],
-                        rew, samples["done"],
-                        None if not self._use_prioritized_rb else samples["weights"])
-                    if self._use_prioritized_rb:
-                        replay_buffer.update_priorities(
-                            samples["indexes"], np.abs(td_error) + 1e-6)
+                    with tf.summary.record_if(total_steps % self._save_summary_interval == 0):
+                        self._policy.train(
+                            samples["obs"], samples["act"], samples["next_obs"],
+                            rew, samples["done"],
+                            None if not self._use_prioritized_rb else samples["weights"])
+                        if self._use_prioritized_rb:
+                            td_error = self._policy.compute_td_error(
+                                samples["obs"], samples["act"], samples["next_obs"],
+                                rew, samples["done"])
+                            replay_buffer.update_priorities(
+                                samples["indexes"], np.abs(td_error) + 1e-6)
 
-                    # Train IRL
-                    for _ in range(self._irl.n_training):
-                        samples = replay_buffer.sample(self._irl.batch_size)
-                        indices = np.random.randint(self._expert_obs.shape[0],
-                                                    size=self._irl.batch_size)
-                        self._irl.train(
-                            samples["obs"], samples["act"],
-                            self._expert_obs[indices], self._expert_act[indices])
+                        # Train IRL
+                        for _ in range(self._irl.n_training):
+                            samples = replay_buffer.sample(self._irl.batch_size)
+                            indices = np.random.randint(self._expert_obs.shape[0],
+                                                        size=self._irl.batch_size)
+                            self._irl.train(
+                                samples["obs"], samples["act"],
+                                self._expert_obs[indices], self._expert_act[indices])
 
-                    if total_steps % self._test_interval == 0:
-                        avg_test_return = self.evaluate_policy(total_steps)
-                        self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
-                            total_steps, avg_test_return, self._test_episodes))
-                        tf.summary.scalar(
-                            name="Common/average_test_return", data=avg_test_return)
-                        tf.summary.scalar(
-                            name="Common/fps", data=fps)
+                if total_steps % self._test_interval == 0:
+                    avg_test_return = self.evaluate_policy(total_steps)
+                    self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
+                        total_steps, avg_test_return, self._test_episodes))
+                    tf.summary.scalar(
+                        name="Common/average_test_return", data=avg_test_return)
+                    tf.summary.scalar(
+                        name="Common/fps", data=fps)
+                    self.writer.flush()
 
-                        self.writer.flush()
-
-                if total_steps % self._model_save_interval == 0:
+                if total_steps % self._save_model_interval == 0:
                     self.checkpoint_manager.save()
 
             tf.summary.flush()

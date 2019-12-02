@@ -72,7 +72,7 @@ class OnPolicyTrainer(Trainer):
                     name="Common/average_test_return", data=avg_test_return)
                 self.writer.flush()
 
-            if total_steps % self._model_save_interval == 0:
+            if total_steps % self._save_model_interval == 0:
                 self.checkpoint_manager.save()
 
         tf.summary.flush()
