@@ -1,7 +1,7 @@
 import unittest
 import gym
 
-from tf2rl.envs.utils import is_discrete, is_mujoco_env, is_atari_env
+from tf2rl.envs.utils import is_discrete, is_atari_env
 
 
 class TestUtils(unittest.TestCase):
@@ -11,7 +11,9 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(is_discrete(discrete_space))
         self.assertFalse(is_discrete(continuous_space))
 
+    @unittest.skip('Skip this because this needs to install mujoco_py and its license')
     def test_is_mujoco_env(self):
+        from tf2rl.envs.utils import is_mujoco_env
         self.assertTrue(is_mujoco_env(
             gym.make("HalfCheetah-v2")))
         self.assertFalse(is_mujoco_env(
