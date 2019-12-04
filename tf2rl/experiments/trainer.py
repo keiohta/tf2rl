@@ -42,6 +42,8 @@ class Trainer:
         checkpoint = tf.train.Checkpoint(policy=self._policy)
         self.checkpoint_manager = tf.train.CheckpointManager(
             checkpoint, directory=self._output_dir, max_to_keep=5)
+        if args.evaluate:
+            assert args.model_dir is not None
         if args.model_dir is not None:
             assert os.path.isdir(args.model_dir)
             path_ckpt = tf.train.latest_checkpoint(args.model_dir)
@@ -219,6 +221,8 @@ class Trainer:
         parser.add_argument('--dir-suffix', type=str, default='',
                             help='Suffix for directory that contains results')
         # test settings
+        parser.add_argument('--evaluate', action='store_true',
+                            help='Evaluate trained model')
         parser.add_argument('--test-interval', type=int, default=int(1e4),
                             help='Interval to evaluate trained model')
         parser.add_argument('--show-test-progress', action='store_true',
