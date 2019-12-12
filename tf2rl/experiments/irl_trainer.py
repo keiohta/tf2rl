@@ -33,7 +33,7 @@ class IRLTrainer(Trainer):
         tf.summary.experimental.set_step(total_steps)
         episode_steps = 0
         episode_return = 0
-        episode_start_time = time.time()
+        episode_start_time = time.perf_counter()
         n_episode = 0
 
         replay_buffer = get_replay_buffer(
@@ -69,7 +69,7 @@ class IRLTrainer(Trainer):
                     obs = self._env.reset()
 
                     n_episode += 1
-                    fps = episode_steps / (time.time() - episode_start_time)
+                    fps = episode_steps / (time.perf_counter() - episode_start_time)
                     self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
                         n_episode, int(total_steps), episode_steps, episode_return, fps))
                     tf.summary.scalar(
@@ -77,7 +77,7 @@ class IRLTrainer(Trainer):
 
                     episode_steps = 0
                     episode_return = 0
-                    episode_start_time = time.time()
+                    episode_start_time = time.perf_counter()
 
                 if total_steps < self._policy.n_warmup:
                     continue
