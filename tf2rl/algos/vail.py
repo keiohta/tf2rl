@@ -82,7 +82,8 @@ class VAIL(GAIL):
         self._step_reg_param = tf.constant(1e-5, dtype=tf.float32)
         self._enable_gp = enable_gp
 
-    def train(self, agent_states, agent_acts, expert_states, expert_acts):
+    def train(self, agent_states, agent_acts, agent_next_states,
+              expert_states, expert_acts, expert_next_states):
         loss, accuracy, real_kl, fake_kl, js_divergence = self._train_body(
             agent_states, agent_acts, expert_states, expert_acts)
         tf.summary.scalar(name=self.policy_name+"/DiscriminatorLoss", data=loss)

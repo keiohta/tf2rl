@@ -27,6 +27,8 @@ class IRLTrainer(Trainer):
         # TODO: Add assertion to check dimention of expert demos and current policy, env is the same
         self._expert_obs = expert_obs
         self._expert_act = expert_act
+        # Minus one to get next obs
+        self._random_range = range(expert_obs.shape[0] - 1)
 
     def __call__(self):
         total_steps = 0
@@ -85,7 +87,7 @@ class IRLTrainer(Trainer):
                 if total_steps % self._policy.update_interval == 0:
                     samples = replay_buffer.sample(self._policy.batch_size)
                     # Train policy
-                    rew = self._irl.inference(samples["obs"], samples["act"])
+                    rew = self._irl.inference(samples["obs"], samples["act"], samples["next_obs"])
                     with tf.summary.record_if(total_steps % self._save_summary_interval == 0):
                         self._policy.train(
                             samples["obs"], samples["act"], samples["next_obs"],
@@ -101,11 +103,13 @@ class IRLTrainer(Trainer):
                         # Train IRL
                         for _ in range(self._irl.n_training):
                             samples = replay_buffer.sample(self._irl.batch_size)
-                            indices = np.random.randint(self._expert_obs.shape[0],
-                                                        size=self._irl.batch_size)
+                            # Do not allow duplication!!!
+                            indices = np.random.choice(
+                                self._random_range, self._irl.batch_size, replace=False)
                             self._irl.train(
-                                samples["obs"], samples["act"],
-                                self._expert_obs[indices], self._expert_act[indices])
+                                samples["obs"], samples["act"], samples["next_obs"],
+                                self._expert_obs[indices], self._expert_act[indices],
+                                self._expert_obs[indices+1])
 
                 if total_steps % self._test_interval == 0:
                     avg_test_return = self.evaluate_policy(total_steps)
