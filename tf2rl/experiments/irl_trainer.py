@@ -1,14 +1,10 @@
-import os
 import time
 
 import numpy as np
-import argparse
 import tensorflow as tf
 
-from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.experiments.trainer import Trainer
-from tf2rl.experiments.utils import save_path
 
 
 class IRLTrainer(Trainer):
@@ -19,6 +15,7 @@ class IRLTrainer(Trainer):
             args,
             irl,
             expert_obs,
+            expert_next_obs,
             expert_act,
             test_env=None):
         self._irl = irl
@@ -26,9 +23,10 @@ class IRLTrainer(Trainer):
         super().__init__(policy, env, args, test_env)
         # TODO: Add assertion to check dimention of expert demos and current policy, env is the same
         self._expert_obs = expert_obs
+        self._expert_next_obs = expert_next_obs
         self._expert_act = expert_act
         # Minus one to get next obs
-        self._random_range = range(expert_obs.shape[0] - 1)
+        self._random_range = range(expert_obs.shape[0])
 
     def __call__(self):
         total_steps = 0
@@ -109,7 +107,7 @@ class IRLTrainer(Trainer):
                             self._irl.train(
                                 samples["obs"], samples["act"], samples["next_obs"],
                                 self._expert_obs[indices], self._expert_act[indices],
-                                self._expert_obs[indices+1])
+                                self._expert_next_obs[indices])
 
                 if total_steps % self._test_interval == 0:
                     avg_test_return = self.evaluate_policy(total_steps)

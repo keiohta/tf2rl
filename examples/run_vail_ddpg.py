@@ -2,7 +2,6 @@ import gym
 
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.algos.vail import VAIL
-from tf2rl.experiments.trainer import Trainer
 from tf2rl.experiments.irl_trainer import IRLTrainer
 from tf2rl.experiments.utils import restore_latest_n_traj
 
@@ -41,5 +40,5 @@ if __name__ == '__main__':
     expert_trajs = restore_latest_n_traj(
         args.expert_path_dir, n_path=20, max_steps=1000)
     trainer = IRLTrainer(policy, env, args, irl, expert_trajs["obses"],
-                         expert_trajs["acts"], test_env)
+                         expert_trajs["next_obses"], expert_trajs["acts"], test_env)
     trainer()
