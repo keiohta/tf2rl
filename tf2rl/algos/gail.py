@@ -69,7 +69,7 @@ class GAIL(IRLPolicy):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
                 real_logits = self.disc([expert_states, expert_acts])
-                fake_logits = self.disc([agent_states, expert_acts])
+                fake_logits = self.disc([agent_states, agent_acts])
                 loss = -(tf.reduce_mean(tf.math.log(real_logits + epsilon)) +
                          tf.reduce_mean(tf.math.log(1. - fake_logits + epsilon)))
             grads = tape.gradient(loss, self.disc.trainable_variables)
