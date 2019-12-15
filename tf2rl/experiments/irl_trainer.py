@@ -105,9 +105,12 @@ class IRLTrainer(Trainer):
                             indices = np.random.choice(
                                 self._random_range, self._irl.batch_size, replace=False)
                             self._irl.train(
-                                samples["obs"], samples["act"], samples["next_obs"],
-                                self._expert_obs[indices], self._expert_act[indices],
-                                self._expert_next_obs[indices])
+                                agent_states=samples["obs"],
+                                agent_acts=samples["act"],
+                                agent_next_states=samples["next_obs"],
+                                expert_states=self._expert_obs[indices],
+                                expert_acts=self._expert_act[indices],
+                                expert_next_states=self._expert_next_obs[indices])
 
                 if total_steps % self._test_interval == 0:
                     avg_test_return = self.evaluate_policy(total_steps)

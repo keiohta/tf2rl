@@ -42,8 +42,8 @@ class GAIfO(GAIL):
         self.optimizer = tf.keras.optimizers.Adam(
             learning_rate=lr, beta_1=0.5)
 
-    def train(self, agent_states, agent_acts, agent_next_states,
-              expert_states, expert_acts, expert_next_states):
+    def train(self, agent_states, agent_next_states,
+              expert_states, expert_next_states, **kwargs):
         loss, accuracy, js_divergence = self._train_body(
             agent_states, agent_next_states, expert_states, expert_next_states)
         tf.summary.scalar(name=self.policy_name+"/DiscriminatorLoss", data=loss)
