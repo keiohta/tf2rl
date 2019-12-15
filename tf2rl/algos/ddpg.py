@@ -15,12 +15,12 @@ class Actor(Network):
         units = np.append(units,[action_dim],axis=0)
         activation.append("linear")
 
+        self.max_action = max_action
+
         super().__init__(input_shape=(1,)+state_shape,
                          units=units,
                          activation=activation,
                          name=name)
-
-        self.max_action = max_action
 
     def call(self, inputs):
         features = super().call(inputs)
