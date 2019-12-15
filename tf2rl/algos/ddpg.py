@@ -5,10 +5,10 @@ from tensorflow.keras.layers import Dense
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.misc.huber_loss import huber_loss
-from tf2rl.networks.network_base import Network, StateActionNetwork
+from tf2rl.networks.network_base import StateNetwork, StateActionNetwork
 
 
-class Actor(Network):
+class Actor(StateNetwork):
     def __init__(self, state_shape, action_dim, max_action, units=(400, 300), name="Actor"):
         units = np.asarray(units)
         activation = ["relu"] * units.shape[0]
@@ -17,10 +17,11 @@ class Actor(Network):
 
         self.max_action = max_action
 
-        super().__init__(input_shape=(1,)+state_shape,
-                         units=units,
+        super().__init__(units=units,
                          activation=activation,
                          name=name)
+
+        self._dummy_call(state_shape,action_dim)
 
     def call(self, inputs):
         features = super().call(inputs)
@@ -35,13 +36,11 @@ class Critic(StateActionNetwork):
         units = np.append(units,[1],axis=0)
         activation.append("linear")
 
-        input_shape = np.asarray((1,) + state_shape)
-        input_shape[1] += action_dim
-
-        super().__init__(input_shape=input_shape,
-                         units=units,
+        super().__init__(units=units,
                          activation=activation,
                          name=name)
+
+        self._dummy_call(state_shape,action_dim)
 
 
 class DDPG(OffPolicyAgent):
