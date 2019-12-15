@@ -92,6 +92,7 @@ class Trainer:
 
             if done or episode_steps == self._episode_max_steps:
                 obs = self._env.reset()
+                replay_buffer.on_episode_end()
 
                 n_episode += 1
                 fps = episode_steps / (time.perf_counter() - episode_start_time)
