@@ -8,9 +8,9 @@ class Network(tf.keras.Model):
 
         self.L = []
         for i in range(len(units)):
-            self.L.append(Dense(units[i]),
-                          activation=activation[i],
-                          name=f"L{i}")
+            self.L.append(Dense(units[i],
+                                activation=activation[i],
+                                name=f"L{i}"))
 
         with tf.device("/cpu:0"):
             self(tf.constant(np.zeros(input_shape, dtype=np.float32)))
