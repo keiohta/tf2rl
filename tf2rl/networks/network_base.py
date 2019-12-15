@@ -24,8 +24,8 @@ class StateNetwork(tf.keras.Model):
 class StateActionNetwork(StateNetwork):
     def _dummy_call(self,state_shape,action_dim):
         with tf.device("/cpu:0"):
-            self(tf.constant(np.zeros((1,)+state_shape, dtype=np.float32)),
-                 tf.constant(np.zeros([1, action_dim], dtype=np.float32)))
+            self((tf.constant(np.zeros((1,)+state_shape, dtype=np.float32)),
+                  tf.constant(np.zeros([1, action_dim], dtype=np.float32))))
 
     def call(self, inputs):
         states, action = inputs
