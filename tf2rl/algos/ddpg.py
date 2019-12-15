@@ -8,7 +8,7 @@ from tf2rl.misc.huber_loss import huber_loss
 
 
 class Actor(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, max_action, units=[400, 300], name="Actor"):
+    def __init__(self, state_shape, action_dim, max_action, units=(400, 300), name="Actor"):
         super().__init__(name=name)
 
         self.l1 = Dense(units[0], name="L1")
@@ -29,7 +29,7 @@ class Actor(tf.keras.Model):
 
 
 class Critic(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=[400, 300], name="Critic"):
+    def __init__(self, state_shape, action_dim, units=(400, 300), name="Critic"):
         super().__init__(name=name)
 
         self.l1 = Dense(units[0], name="L1")
@@ -61,8 +61,8 @@ class DDPG(OffPolicyAgent):
             max_action=1.,
             lr_actor=0.001,
             lr_critic=0.001,
-            actor_units=[400, 300],
-            critic_units=[400, 300],
+            actor_units=(400, 300),
+            critic_units=(400, 300),
             sigma=0.1,
             tau=0.005,
             n_warmup=int(1e4),
