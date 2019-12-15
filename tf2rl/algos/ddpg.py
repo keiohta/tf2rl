@@ -28,28 +28,20 @@ class Actor(Network):
         return action
 
 
-class Critic(tf.keras.Model):
+class Critic(StateActionNetwork):
     def __init__(self, state_shape, action_dim, units=(400, 300), name="Critic"):
-        super().__init__(name=name)
+        units = np.asarray(units)
+        activation = ["relu"] * units.shape[0]
+        units = np.append(units,1,axis=0)
+        activation.append("linear")
 
-        self.l1 = Dense(units[0], name="L1")
-        self.l2 = Dense(units[1], name="L2")
-        self.l3 = Dense(1, name="L3")
+        input_shape = np.asarray((1,) + state_shape)
+        input_shape[1] += action_dim
 
-        dummy_state = tf.constant(
-            np.zeros(shape=(1,)+state_shape, dtype=np.float32))
-        dummy_action = tf.constant(
-            np.zeros(shape=[1, action_dim], dtype=np.float32))
-        with tf.device("/cpu:0"):
-            self([dummy_state, dummy_action])
-
-    def call(self, inputs):
-        states, actions = inputs
-        features = tf.concat([states, actions], axis=1)
-        features = tf.nn.relu(self.l1(features))
-        features = tf.nn.relu(self.l2(features))
-        features = self.l3(features)
-        return features
+        super().__init__(input_shape=input_shape,
+                         units=units,
+                         activation=activation,
+                         name=name)
 
 
 class DDPG(OffPolicyAgent):
