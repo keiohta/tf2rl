@@ -70,7 +70,7 @@ class GAIfO(GAIL):
             fake_logits, real_logits)
         return loss, accuracy, js_divergence
 
-    def inference(self, states, actions, next_states):
+    def inference(self, states, next_states, **kwargs):
         assert states.shape == next_states.shape
         if states.ndim == 1:
             states = np.expand_dims(states, axis=0)

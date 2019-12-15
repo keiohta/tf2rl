@@ -212,7 +212,10 @@ class CommonIRLAlgos(CommonAlgos):
             shape=(self.discrete_env.action_space.n,),
             dtype=np.float32)
         action[self.discrete_env.action_space.sample()] = 1.
-        self.irl_discrete.inference(state, action, state)
+        self.irl_discrete.inference(
+            states=state,
+            actions=action,
+            next_states=state)
 
     def test_inference_continuous(self):
         if self.irl_continuous is None:
@@ -223,7 +226,10 @@ class CommonIRLAlgos(CommonAlgos):
         action = np.zeros(
             shape=(self.continuous_env.action_space.low.size,),
             dtype=np.float32)
-        self.irl_continuous.inference(state, action, state)
+        self.irl_continuous.inference(
+            states=state,
+            actions=action,
+            next_states=state)
 
     def test_train_discrete(self):
         if self.irl_discrete is None:

@@ -85,7 +85,10 @@ class IRLTrainer(Trainer):
                 if total_steps % self._policy.update_interval == 0:
                     samples = replay_buffer.sample(self._policy.batch_size)
                     # Train policy
-                    rew = self._irl.inference(samples["obs"], samples["act"], samples["next_obs"])
+                    rew = self._irl.inference(
+                        states=samples["obs"],
+                        actions=samples["act"],
+                        next_states=samples["next_obs"])
                     with tf.summary.record_if(total_steps % self._save_summary_interval == 0):
                         self._policy.train(
                             samples["obs"], samples["act"], samples["next_obs"],
@@ -101,16 +104,7 @@ class IRLTrainer(Trainer):
                         # Train IRL
                         for _ in range(self._irl.n_training):
                             samples = replay_buffer.sample(self._irl.batch_size)
-                            # Do not allow duplication!!!
-                            indices = np.random.choice(
-                                self._random_range, self._irl.batch_size, replace=False)
-                            self._irl.train(
-                                agent_states=samples["obs"],
-                                agent_acts=samples["act"],
-                                agent_next_states=samples["next_obs"],
-                                expert_states=self._expert_obs[indices],
-                                expert_acts=self._expert_act[indices],
-                                expert_next_states=self._expert_next_obs[indices])
+                            self._irl.train(**self._get_train_kwargs(samples))
 
                 if total_steps % self._test_interval == 0:
                     avg_test_return = self.evaluate_policy(total_steps)
@@ -126,6 +120,18 @@ class IRLTrainer(Trainer):
                     self.checkpoint_manager.save()
 
             tf.summary.flush()
+
+    def _get_train_kwargs(self, samples):
+        # Do not allow duplication!!!
+        indices = np.random.choice(
+            self._random_range, self._irl.batch_size, replace=False)
+        kwargs = {
+            "agent_states": samples["obs"],
+            "agent_acts": samples["act"],
+            "agent_next_states": samples["next_obs"],
+            "expert_states": self._expert_obs[indices],
+            "expert_acts": self._expert_act[indices],
+            "expert_next_states": self._expert_next_obs[indices]}
 
     @staticmethod
     def get_argument(parser=None):

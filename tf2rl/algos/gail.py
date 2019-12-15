@@ -84,7 +84,7 @@ class GAIL(IRLPolicy):
             fake_logits, real_logits)
         return loss, accuracy, js_divergence
 
-    def inference(self, states, actions, next_states):
+    def inference(self, states, actions, **kwargs):
         if states.ndim == actions.ndim == 1:
             states = np.expand_dims(states, axis=0)
             actions = np.expand_dims(actions, axis=0)
