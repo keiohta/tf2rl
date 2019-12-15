@@ -5,25 +5,25 @@ from tensorflow.keras.layers import Dense
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.misc.huber_loss import huber_loss
+from tf2rl.networks.network_base import Network, StateActionNetwork
 
 
-class Actor(tf.keras.Model):
+class Actor(Network):
     def __init__(self, state_shape, action_dim, max_action, units=(400, 300), name="Actor"):
-        super().__init__(name=name)
+        units = np.asarray(units)
+        activation = ["relu"] * units.shape[0]
+        units = np.append(units,action_dim,axis=0)
+        activation.append("linear")
 
-        self.l1 = Dense(units[0], name="L1")
-        self.l2 = Dense(units[1], name="L2")
-        self.l3 = Dense(action_dim, name="L3")
+        super().__init__(input_shape=(1,)+state_shape,
+                         units=units,
+                         activation=activation,
+                         name=name)
 
         self.max_action = max_action
 
-        with tf.device("/cpu:0"):
-            self(tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
-
     def call(self, inputs):
-        features = tf.nn.relu(self.l1(inputs))
-        features = tf.nn.relu(self.l2(features))
-        features = self.l3(features)
+        features = super().call(inputs)
         action = self.max_action * tf.nn.tanh(features)
         return action
 
