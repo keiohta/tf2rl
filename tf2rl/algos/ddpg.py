@@ -12,7 +12,7 @@ class Actor(Network):
     def __init__(self, state_shape, action_dim, max_action, units=(400, 300), name="Actor"):
         units = np.asarray(units)
         activation = ["relu"] * units.shape[0]
-        units = np.append(units,action_dim,axis=0)
+        units = np.append(units,[action_dim],axis=0)
         activation.append("linear")
 
         super().__init__(input_shape=(1,)+state_shape,
@@ -32,7 +32,7 @@ class Critic(StateActionNetwork):
     def __init__(self, state_shape, action_dim, units=(400, 300), name="Critic"):
         units = np.asarray(units)
         activation = ["relu"] * units.shape[0]
-        units = np.append(units,1,axis=0)
+        units = np.append(units,[1],axis=0)
         activation.append("linear")
 
         input_shape = np.asarray((1,) + state_shape)
