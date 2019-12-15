@@ -13,7 +13,7 @@ class Network(tf.keras.Model):
                           name=f"L{i}")
 
         with tf.device("/cpu:0"):
-            self.(tf.constant(np.zeros(input_shape, dtype=np.float32)))
+            self(tf.constant(np.zeros(input_shape, dtype=np.float32)))
 
     def call(self, inputs):
         for l in self.L:
