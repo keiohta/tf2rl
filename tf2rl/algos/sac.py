@@ -240,6 +240,20 @@ class SAC(OffPolicyAgent):
 
         return td_errors_q1
 
+    def get_logp(self, state):
+        assert isinstance(state, np.ndarray)
+        is_single_state = len(state.shape) == self.state_ndim
+
+        state = np.expand_dims(state, axis=0).astype(
+            np.float32) if is_single_state else state
+        logp = self._get_logp_body(tf.constant(state))
+
+        return logp.numpy()[0] if is_single_state else logp.numpy()
+
+    @tf.function
+    def _get_logp_body(self, state):
+        return self.actor(state)[1]
+
     @staticmethod
     def get_argument(parser=None):
         parser = OffPolicyAgent.get_argument(parser)

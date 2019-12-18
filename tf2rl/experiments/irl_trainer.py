@@ -5,6 +5,7 @@ import tensorflow as tf
 
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.experiments.trainer import Trainer
+from tf2rl.algos.airl import AIRL
 
 
 class IRLTrainer(Trainer):
@@ -17,7 +18,11 @@ class IRLTrainer(Trainer):
             expert_obs,
             expert_next_obs,
             expert_act,
+            expert_logp=None,
             test_env=None):
+        if isinstance(irl, AIRL):
+            assert expert_logp is not None
+            assert hasattr(policy, "get_logp")
         self._irl = irl
         args.dir_suffix = self._irl.policy_name + args.dir_suffix
         super().__init__(policy, env, args, test_env)
@@ -25,6 +30,7 @@ class IRLTrainer(Trainer):
         self._expert_obs = expert_obs
         self._expert_next_obs = expert_next_obs
         self._expert_act = expert_act
+        self._expert_logp = expert_logp
         # Minus one to get next obs
         self._random_range = range(expert_obs.shape[0])
 
@@ -37,8 +43,9 @@ class IRLTrainer(Trainer):
         n_episode = 0
 
         replay_buffer = get_replay_buffer(
-            self._policy, self._env, self._use_prioritized_rb,
-            self._use_nstep_rb, self._n_step)
+            policy=self._policy, env=self._env, irl=self._irl,
+            use_prioritized_rb=self._use_prioritized_rb,
+            use_nstep_rb=self._use_nstep_rb, n_step=self._n_step)
 
         obs = self._env.reset()
 
@@ -61,8 +68,11 @@ class IRLTrainer(Trainer):
                 if hasattr(self._env, "_max_episode_steps") and \
                         episode_steps == self._env._max_episode_steps:
                     done_flag = False
-                replay_buffer.add(obs=obs, act=action,
-                                  next_obs=next_obs, rew=reward, done=done_flag)
+                data = {"obs": obs, "act": action, "next_obs": next_obs,
+                        "rew": reward, "done": done_flag}
+                if isinstance(self._irl, AIRL):
+                    data["logp"] = self._policy.get_logp(obs)
+                replay_buffer.add(**data)
                 obs = next_obs
 
                 if done or episode_steps == self._episode_max_steps:
@@ -132,6 +142,10 @@ class IRLTrainer(Trainer):
             "expert_states": self._expert_obs[indices],
             "expert_acts": self._expert_act[indices],
             "expert_next_states": self._expert_next_obs[indices]}
+        if isinstance(self._irl, AIRL):
+            kwargs["agent_logps"] = samples["logp"]
+            kwargs["expert_logps"] = self._expert_logp[indices]
+        return kwargs
 
     @staticmethod
     def get_argument(parser=None):

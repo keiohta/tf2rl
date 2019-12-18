@@ -240,13 +240,18 @@ class CommonIRLAlgos(CommonAlgos):
         actions = np.zeros(
             shape=(self.batch_size, self.discrete_env.action_space.n),
             dtype=np.float32)
+        logps = np.ones(
+            shape=(self.batch_size,),
+            dtype=np.float32)
         self.irl_discrete.train(
             agent_states=states,
             agent_acts=actions,
             agent_next_states=states,
+            agent_logps=logps,
             expert_states=states,
             expert_acts=actions,
-            expert_next_states=states)
+            expert_next_states=states,
+            expert_logps=logps)
 
     def test_train_continuous(self):
         if self.irl_continuous is None:
@@ -257,13 +262,18 @@ class CommonIRLAlgos(CommonAlgos):
         actions = np.zeros(
             shape=(self.batch_size, self.continuous_env.action_space.low.size),
             dtype=np.float32)
+        logps = np.ones(
+            shape=(self.batch_size,),
+            dtype=np.float32)
         self.irl_continuous.train(
             agent_states=states,
             agent_acts=actions,
             agent_next_states=states,
+            agent_logps=logps,
             expert_states=states,
             expert_acts=actions,
-            expert_next_states=states)
+            expert_next_states=states,
+            expert_logps=logps)
 
 
 if __name__ == '__main__':

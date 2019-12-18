@@ -34,8 +34,8 @@ class TestApeX(unittest.TestCase):
                 name=name,
                 state_shape=env.observation_space.shape,
                 action_dim=env.action_space.n,
-                n_warmup=500,
-                target_replace_interval=300,
+                n_warmup=100,
+                target_replace_interval=100,
                 batch_size=32,
                 memory_capacity=memory_capacity,
                 discount=0.99,
@@ -67,7 +67,7 @@ class TestApeX(unittest.TestCase):
             return DDPG(
                 state_shape=env.observation_space.shape,
                 action_dim=env.action_space.high.size,
-                n_warmup=500,
+                n_warmup=100,
                 gpu=-1)
 
         def get_weights_fn(policy):

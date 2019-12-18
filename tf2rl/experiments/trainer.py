@@ -139,7 +139,7 @@ class Trainer:
         avg_test_return = 0.
         if self._save_test_path:
             replay_buffer = get_replay_buffer(
-                self._policy, self._test_env, size=self._episode_max_steps)
+                self._policy, self._test_env, save_logp=True, size=self._episode_max_steps)
         for i in range(self._test_episodes):
             episode_return = 0.
             frames = []
@@ -148,8 +148,13 @@ class Trainer:
                 action = self._policy.get_action(obs, test=True)
                 next_obs, reward, done, _ = self._test_env.step(action)
                 if self._save_test_path:
-                    replay_buffer.add(obs=obs, act=action,
-                                      next_obs=next_obs, rew=reward, done=done)
+                    data = {"obs": obs, "act": action, "next_obs": next_obs,
+                              "rew": reward, "done": done}
+                    if hasattr(self._policy, "get_logp"):
+                        data["logp"] = self._policy.get_logp(obs)
+                    else:
+                        data["logp"] = None
+                    replay_buffer.add(**data)
 
                 if self._save_test_movie:
                     frames.append(self._test_env.render(mode='rgb_array'))

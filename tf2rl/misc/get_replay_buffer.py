@@ -6,6 +6,7 @@ from gym.spaces.discrete import Discrete
 from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.algos.policy_base import OffPolicyAgent
+from tf2rl.algos.airl import AIRL
 from tf2rl.envs.utils import is_discrete
 
 
@@ -33,13 +34,19 @@ def get_default_rb_dict(size, env):
             "done": {}}}
 
 
-def get_replay_buffer(policy, env, use_prioritized_rb=False,
+def get_replay_buffer(policy, env, irl=None, save_logp=False, use_prioritized_rb=False,
                       use_nstep_rb=False, n_step=1, size=None):
     if policy is None or env is None:
         return None
 
     obs_shape = get_space_size(env.observation_space)
     kwargs = get_default_rb_dict(policy.memory_capacity, env)
+
+    if irl is not None and isinstance(irl, AIRL):
+        kwargs["env_dict"]["logp"] = {}
+
+    if save_logp:
+        kwargs["env_dict"]["logp"] = {}
 
     if size is not None:
         kwargs["size"] = size

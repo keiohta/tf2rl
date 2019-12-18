@@ -18,7 +18,7 @@ class TestUtils(unittest.TestCase):
             action_dim=cls.env.action_space.n,
             memory_capacity=2**4)
         cls.replay_buffer = get_replay_buffer(
-            policy, cls.env)
+            policy, cls.env, save_logp=True)
         cls.output_dir = os.path.join(
             os.path.dirname(__file__),
             "tests")
@@ -28,10 +28,11 @@ class TestUtils(unittest.TestCase):
     def test_save_path(self):
         n_store_episodes = 10
         obs = np.ones(shape=self.env.observation_space.shape, dtype=np.float32)
+        logp = 0
         for epi in range(n_store_episodes):
             for i in range(self.replay_buffer.get_buffer_size()):
                 self.replay_buffer.add(
-                    obs=obs*i, act=i, rew=0., next_obs=obs*(i+1), done=False)
+                    obs=obs*i, act=i, rew=0., next_obs=obs*(i+1), logp=logp, done=False)
             save_path(
                 self.replay_buffer.sample(
                     self.replay_buffer.get_buffer_size()),
