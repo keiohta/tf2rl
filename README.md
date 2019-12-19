@@ -10,13 +10,13 @@ TF2RL is a deep reinforcement learning library that implements various deep rein
 ## Algorithms
 Following algorithms are supported:
 
-|                          Algorithm                           | Dicrete action | Continuous action |                  Support                   | Category                 |
-| :----------------------------------------------------------: | :------------: | :---------------: | :----------------------------------------: | ------------------------ |
-| [VPG](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [PPO](<https://arxiv.org/abs/1707.06347>) |       ✓        |         ✓         |  [GAE](https://arxiv.org/abs/1506.02438)   | Model-free On-policy RL  |
-| [DQN](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf) (including [DDQN](https://arxiv.org/abs/1509.06461), [Prior. DQN](https://arxiv.org/abs/1511.05952), [Duel. DQN](https://arxiv.org/abs/1511.06581), [Distrib. DQN](<https://arxiv.org/abs/1707.06887>), [Noisy DQN](<https://arxiv.org/abs/1706.10295>)) |       ✓        |         -         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
-| [DDPG](https://arxiv.org/abs/1509.02971) (including [TD3](<https://arxiv.org/abs/1802.09477>), [BiResDDPG](<https://arxiv.org/abs/1905.01072>)) |       -        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
-|          [SAC](<https://arxiv.org/abs/1801.01290>)           |       ✓        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
-| [GAIL](<https://arxiv.org/abs/1606.03476>), [GAIfO](<https://arxiv.org/abs/1807.06158>), [VAIL](<https://arxiv.org/abs/1810.00821>) (including [Spectral Normalization](<https://arxiv.org/abs/1802.05957>)) |       ✓        |         ✓         |                     -                      | Imitation Learning       |
+|                          Algorithm                           | Dicrete action | Continuous action |                       Support                        | Category                 |
+| :----------------------------------------------------------: | :------------: | :---------------: | :--------------------------------------------------: | ------------------------ |
+| [VPG](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [PPO](<https://arxiv.org/abs/1707.06347>) |       ✓        |         ✓         |       [GAE](https://arxiv.org/abs/1506.02438)        | Model-free On-policy RL  |
+| [DQN](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf) (including [DDQN](https://arxiv.org/abs/1509.06461), [Prior. DQN](https://arxiv.org/abs/1511.05952), [Duel. DQN](https://arxiv.org/abs/1511.06581), [Distrib. DQN](<https://arxiv.org/abs/1707.06887>), [Noisy DQN](<https://arxiv.org/abs/1706.10295>)) |       ✓        |         -         |      [ApeX](<https://arxiv.org/abs/1803.00933>)      | Model-free Off-policy RL |
+| [DDPG](https://arxiv.org/abs/1509.02971) (including [TD3](<https://arxiv.org/abs/1802.09477>), [BiResDDPG](<https://arxiv.org/abs/1905.01072>)) |       -        |         ✓         |      [ApeX](<https://arxiv.org/abs/1803.00933>)      | Model-free Off-policy RL |
+|          [SAC](<https://arxiv.org/abs/1801.01290>)           |       ✓        |         ✓         |      [ApeX](<https://arxiv.org/abs/1803.00933>)      | Model-free Off-policy RL |
+| [GAIL](<https://arxiv.org/abs/1606.03476>), [AIRL](<https://arxiv.org/abs/1710.11248>), [GAIfO](<https://arxiv.org/abs/1807.06158>), [VAIL](<https://arxiv.org/abs/1810.00821>) |       ✓        |         ✓         | [Spectral Norm.](<https://arxiv.org/abs/1802.05957>) | Imitation Learning       |
 
 Following papers have been implementd in tf2rl:
 
@@ -40,6 +40,7 @@ Following papers have been implementd in tf2rl:
   - [Soft Actor-Critic for Discrete Action Settings](https://arxiv.org/abs/1910.07207v1), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac_discrete.py>)
 - Imitation Learning
   - [Generative Adversarial Imitation Learning](<https://arxiv.org/abs/1606.03476>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/gail.py>)
+  - [Learning Robust Rewards with Adversarial Inverse Reinforcement Learning](<https://arxiv.org/abs/1710.11248>), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/airl.py)
   - [Spectral Normalization for Generative Adversarial Networks](<https://arxiv.org/abs/1802.05957>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/networks/spectral_norm_dense.py>)
   - [Generative Adversarial Imitation from Observation](<https://arxiv.org/abs/1807.06158>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/gail.py>)
   - [Variational Discriminator Bottleneck: Improving Imitation Learning, Inverse RL, and GANs by Constraining Information Flow](<https://arxiv.org/abs/1810.00821>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/vail.py>)
