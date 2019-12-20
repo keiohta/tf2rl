@@ -2,8 +2,6 @@
 
 import unittest
 import gym
-import numpy as np
-import tensorflow as tf
 
 from tf2rl.algos.apex import apex_argument, run
 from tf2rl.misc.target_update_ops import update_target_variables
