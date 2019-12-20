@@ -32,8 +32,8 @@ class TestApeX(unittest.TestCase):
                 name=name,
                 state_shape=env.observation_space.shape,
                 action_dim=env.action_space.n,
-                n_warmup=100,
-                target_replace_interval=100,
+                n_warmup=500,
+                target_replace_interval=300,
                 batch_size=32,
                 memory_capacity=memory_capacity,
                 discount=0.99,
@@ -50,7 +50,7 @@ class TestApeX(unittest.TestCase):
             update_target_variables(
                 policy.q_func_target.weights, qfunc_target_weights, tau=1.)
 
-        run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn)
+        # run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn)
 
     def test_run_continuous(self):
         from tf2rl.algos.ddpg import DDPG
@@ -65,7 +65,7 @@ class TestApeX(unittest.TestCase):
             return DDPG(
                 state_shape=env.observation_space.shape,
                 action_dim=env.action_space.high.size,
-                n_warmup=100,
+                n_warmup=500,
                 gpu=-1)
 
         def get_weights_fn(policy):

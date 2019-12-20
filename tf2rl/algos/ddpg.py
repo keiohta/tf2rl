@@ -71,10 +71,13 @@ class DDPG(OffPolicyAgent):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
         # Define and initialize Actor network
+        print(state_shape, action_dim, max_action, actor_units)
         self.actor = Actor(state_shape, action_dim, max_action, actor_units)
         self.actor_target = Actor(
             state_shape, action_dim, max_action, actor_units)
+        print("actor_target")
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_actor)
+        print("aho")
         update_target_variables(self.actor_target.weights,
                                 self.actor.weights, tau=1.)
 

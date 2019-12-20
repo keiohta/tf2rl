@@ -74,10 +74,14 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
     else:
         env = env_fn()
 
+    print(envs)
+
     policy = policy_fn(
         env=env, name="Explorer",
         memory_capacity=global_rb.get_buffer_size(),
         noise_level=noise_level, gpu=gpu)
+
+    print(policy)
 
     kwargs = get_default_rb_dict(buffer_size, env)
     if n_env > 1:
@@ -114,9 +118,12 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
                 episode_steps = 0
         else:
             n_sample += n_env
+            print(n_sample)
             obses = envs.py_observation()
+            print(obses)
             actions = policy.get_action(obses, tensor=True)
             next_obses, rewards, dones, _ = envs.step(actions)
+            print(next_obses)
             td_errors = policy.compute_td_error(
                 states=obses, actions=actions, next_states=next_obses,
                 rewards=rewards, dones=dones)
