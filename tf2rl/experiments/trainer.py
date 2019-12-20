@@ -63,8 +63,9 @@ class Trainer:
         n_episode = 0
 
         replay_buffer = get_replay_buffer(
-            self._policy, self._env, self._use_prioritized_rb,
-            self._use_nstep_rb, self._n_step)
+            policy=self._policy, env=self._env,
+            use_prioritized_rb=self._use_prioritized_rb,
+            use_nstep_rb=self._use_nstep_rb, n_step=self._n_step)
 
         obs = self._env.reset()
 
