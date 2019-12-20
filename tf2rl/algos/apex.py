@@ -120,9 +120,9 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
             td_errors = policy.compute_td_error(
                 states=obses, actions=actions, next_states=next_obses,
                 rewards=rewards, dones=dones)
-            local_rb.add(obs=obses, act=actions, next_obs=next_obses,
-                         rew=rewards, done=dones,
-                         priorities=np.abs(td_errors+1e-6))
+            local_rb.add(
+                obs=obses, act=actions, next_obs=next_obses,
+                rew=rewards, done=dones, priorities=np.abs(td_errors))
 
         # Periodically copy weights of explorer
         if not queue.empty():
@@ -305,7 +305,6 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
                 n_evaluated_episode += 1
                 episode_return = 0.
                 obs = env.reset()
-                done = False
                 for _ in range(episode_max_steps):
                     action = policy.get_action(obs, test=True)
                     next_obs, reward, done, _ = env.step(action)
