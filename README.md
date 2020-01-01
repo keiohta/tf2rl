@@ -18,7 +18,7 @@ Following algorithms are supported:
 |          [SAC](<https://arxiv.org/abs/1801.01290>)           |       ✓        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
 | [GAIL](<https://arxiv.org/abs/1606.03476>), [GAIfO](<https://arxiv.org/abs/1807.06158>), [VAIL](<https://arxiv.org/abs/1810.00821>) (including [Spectral Normalization](<https://arxiv.org/abs/1802.05957>)) |       ✓        |         ✓         |                     -                      | Imitation Learning       |
 
-Following papers have been implementd in tf2rl:
+Following papers have been implemented in tf2rl:
 
 - Model-free On-policy RL
   - [Policy Gradient Methods for Reinforcement Learning with Function Approximation](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/vpg.py>)
