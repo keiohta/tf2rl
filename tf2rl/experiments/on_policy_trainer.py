@@ -48,10 +48,15 @@ class OnPolicyTrainer(Trainer):
                     name="Common/training_return", data=avg_training_return)
 
             # Train actor critic
+            if self._policy.normalize_adv:
+                samples = self.replay_buffer._encode_sample(np.arange(self._policy.horizon))
+                mean_adv = np.mean(samples["adv"])
+                std_adv = np.std(samples["adv"])
             for _ in range(self._policy.n_epoch):
-                samples = self.replay_buffer.sample(self._policy.horizon)
+                samples = self.replay_buffer._encode_sample(
+                    np.random.permutation(self._policy.horizon))
                 if self._policy.normalize_adv:
-                    adv = (samples["adv"] - np.mean(samples["adv"])) / np.std(samples["adv"])
+                    adv = (samples["adv"] - mean_adv) / (std_adv + 1e-8)
                 else:
                     adv = samples["adv"]
                 for idx in range(int(self._policy.horizon / self._policy.batch_size)):
@@ -85,10 +90,7 @@ class OnPolicyTrainer(Trainer):
         obs = self._env.reset()
         for _ in range(self._policy.horizon):
             act, logp, val = self._policy.get_action_and_val(obs)
-            # TODO: Clean code
-            clipped_act = act if not hasattr(self._env.action_space, "high") else \
-                np.clip(act, self._env.action_space.low, self._env.action_space.high)
-            next_obs, reward, done, _ = self._env.step(clipped_act)
+            next_obs, reward, done, _ = self._env.step(act)
             if self._show_progress:
                 self._env.render()
             episode_steps += 1
