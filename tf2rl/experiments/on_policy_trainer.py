@@ -55,8 +55,8 @@ class OnPolicyTrainer(Trainer):
                 else:
                     adv = samples["adv"]
                 for idx in range(int(self._policy.horizon / self._policy.batch_size)):
-                    target = slice(idx*self._policy.batch_size,
-                        (idx+1)*self._policy.batch_size)
+                    target = slice(idx * self._policy.batch_size,
+                                   (idx + 1) * self._policy.batch_size)
                     self._policy.train(
                         states=samples["obs"][target],
                         actions=samples["act"][target],
@@ -109,8 +109,9 @@ class OnPolicyTrainer(Trainer):
                 obs = self._env.reset()
                 n_episode += 1
                 fps = episode_steps / (time.time() - episode_start_time)
-                self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
-                    n_episode, int(total_steps), episode_steps, episode_return, fps))
+                self.logger.info(
+                    "Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
+                        n_episode, int(total_steps), episode_steps, episode_return, fps))
 
                 tf.summary.scalar(name="Common/fps", data=fps)
                 episode_returns.append(episode_return)
@@ -163,7 +164,6 @@ class OnPolicyTrainer(Trainer):
             episode_return = 0.
             frames = []
             obs = self._test_env.reset()
-            done = False
             for _ in range(self._episode_max_steps):
                 act, _ = self._policy.get_action(obs, test=True)
                 act = act if not hasattr(self._env.action_space, "high") else \
@@ -195,5 +195,5 @@ class OnPolicyTrainer(Trainer):
             images = tf.cast(
                 tf.expand_dims(np.array(obs).transpose(2, 0, 1), axis=3),
                 tf.uint8)
-            tf.summary.image('train/input_img', images,)
+            tf.summary.image('train/input_img', images, )
         return avg_test_return / self._test_episodes
