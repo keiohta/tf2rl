@@ -16,7 +16,7 @@ def get_space_size(space):
     elif isinstance(space, Discrete):
         return [1, ]  # space.n
     else:
-        raise NotImplementedError("Assuming to use Box or Discrete")
+        raise NotImplementedError("Assuming to use Box or Discrete, not {}".format(type(space)))
 
 
 def get_default_rb_dict(size, env):

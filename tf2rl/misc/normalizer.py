@@ -51,5 +51,16 @@ class NormalizerNumpy:
         self._mean_diff += numerator * (x - self._mean)
         self._var = self._mean_diff / self._n
 
-    def normalize(self, x):
+    def normalize(self, x, update=False):
+        if update:
+            self.observe(x)
         return (x - self._mean) / (np.sqrt(self._var) + 1e-8)
+
+    def get_params(self):
+        return self._n, self._mean, self._mean_diff, self._var
+
+    def set_params(self, n, mean, mean_diff, var):
+        self._n = n
+        self._mean = mean
+        self._mean_diff = mean_diff
+        self._var = var

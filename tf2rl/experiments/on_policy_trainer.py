@@ -158,6 +158,9 @@ class OnPolicyTrainer(Trainer):
         self.local_buffer.clear()
 
     def evaluate_policy(self, total_steps):
+        if self._normalize_obs:
+            self._test_env.normalizer.set_params(
+                *self._env.normalizer.get_params())
         avg_test_return = 0.
         if self._save_test_path:
             replay_buffer = get_replay_buffer(

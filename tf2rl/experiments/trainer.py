@@ -10,6 +10,7 @@ from tf2rl.experiments.utils import save_path, frames_to_gif
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.initialize_logger import initialize_logger
+from tf2rl.envs.normalize_obs_env import NormalizeObsEnv
 
 
 if tf.config.experimental.list_physical_devices('GPU'):
@@ -25,10 +26,13 @@ class Trainer:
             env,
             args,
             test_env=None):
+        self._set_from_args(args)
         self._policy = policy
         self._env = env
         self._test_env = self._env if test_env is None else test_env
-        self._set_from_args(args)
+        if self._normalize_obs:
+            self._env = NormalizeObsEnv(self._env)
+            self._test_env = NormalizeObsEnv(self._test_env)
 
         # prepare log directory
         self._output_dir = prepare_output_dir(
@@ -136,6 +140,9 @@ class Trainer:
         tf.summary.flush()
 
     def evaluate_policy(self, total_steps):
+        if self._normalize_obs:
+            self._test_env.normalizer.set_params(
+                *self._env.normalizer.get_params())
         avg_test_return = 0.
         if self._save_test_path:
             replay_buffer = get_replay_buffer(
@@ -185,6 +192,7 @@ class Trainer:
         self._show_progress = args.show_progress
         self._save_model_interval = args.save_model_interval
         self._save_summary_interval = args.save_summary_interval
+        self._normalize_obs = args.normalize_obs
         # replay buffer
         self._use_prioritized_rb = args.use_prioritized_rb
         self._use_nstep_rb = args.use_nstep_rb
@@ -220,6 +228,8 @@ class Trainer:
                             help='Directory to restore model')
         parser.add_argument('--dir-suffix', type=str, default='',
                             help='Suffix for directory that contains results')
+        parser.add_argument('--normalize-obs', action='store_true',
+                            help='Normalize observation')
         # test settings
         parser.add_argument('--evaluate', action='store_true',
                             help='Evaluate trained model')
