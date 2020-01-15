@@ -42,7 +42,6 @@ class VPG(OnPolicyAgent):
             critic_units=[256, 256],
             lr_actor=1e-3,
             lr_critic=3e-3,
-            tanh_std=False,
             fix_std=False,
             const_std=0.3,
             hidden_activation="relu",
@@ -68,8 +67,7 @@ class VPG(OnPolicyAgent):
                     self.actor = GaussianActor(
                         state_shape, action_dim, max_action, actor_units,
                         hidden_activation=hidden_activation,
-                        fix_std=fix_std, tanh_std=tanh_std,
-                        const_std=const_std, state_independent_std=True)
+                        fix_std=fix_std, const_std=const_std, state_independent_std=True)
             else:
                 self.actor = actor
             if critic is None:

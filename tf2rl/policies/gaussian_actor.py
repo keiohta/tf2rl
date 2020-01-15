@@ -12,14 +12,13 @@ class GaussianActor(tf.keras.Model):
 
     def __init__(self, state_shape, action_dim, max_action,
                  units=[256, 256], hidden_activation="relu",
-                 tanh_mean=False, tanh_std=False,
+                 tanh_mean=False,
                  fix_std=False, const_std=0.1,
                  state_independent_std=False,
                  squash=False, name='GaussianPolicy'):
         super().__init__(name=name)
         self.dist = DiagonalGaussian(dim=action_dim)
         self._fix_std = fix_std
-        self._tanh_std = tanh_std
         self._const_std = const_std
         self._max_action = max_action
         self._squash = squash
@@ -35,9 +34,8 @@ class GaussianActor(tf.keras.Model):
                     initial_value=-0.5*np.ones(action_dim, dtype=np.float32),
                     dtype=tf.float32, name="logstd")
             else:
-                activation = 'tanh' if tanh_std else None
                 self.out_log_std = Dense(
-                    action_dim, name="L_sigma", activation=activation)
+                    action_dim, name="L_sigma")
 
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
@@ -62,12 +60,8 @@ class GaussianActor(tf.keras.Model):
                     multiples=[mean.shape[0], 1])
             else:
                 log_std = self.out_log_std(features)
-                if self._tanh_std:
-                    log_std = self.LOG_SIG_CAP_MIN + 0.5 * \
-                        (self.LOG_SIG_CAP_MAX - self.LOG_SIG_CAP_MIN) * (log_std + 1)
-                else:
-                    log_std = tf.clip_by_value(
-                        log_std, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
+                log_std = tf.clip_by_value(
+                    log_std, self.LOG_SIG_CAP_MIN, self.LOG_SIG_CAP_MAX)
 
         return {"mean": mean, "log_std": log_std}
 
