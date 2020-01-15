@@ -23,7 +23,6 @@ class OnPolicyTrainer(Trainer):
         total_steps = 0
         n_episode = 0
 
-        # TODO: clean codes
         # Prepare buffer
         self.replay_buffer = get_replay_buffer(
             self._policy, self._env)
@@ -52,22 +51,23 @@ class OnPolicyTrainer(Trainer):
                 samples = self.replay_buffer._encode_sample(np.arange(self._policy.horizon))
                 mean_adv = np.mean(samples["adv"])
                 std_adv = np.std(samples["adv"])
-            for _ in range(self._policy.n_epoch):
-                samples = self.replay_buffer._encode_sample(
-                    np.random.permutation(self._policy.horizon))
-                if self._policy.normalize_adv:
-                    adv = (samples["adv"] - mean_adv) / (std_adv + 1e-8)
-                else:
-                    adv = samples["adv"]
-                for idx in range(int(self._policy.horizon / self._policy.batch_size)):
-                    target = slice(idx * self._policy.batch_size,
-                                   (idx + 1) * self._policy.batch_size)
-                    self._policy.train(
-                        states=samples["obs"][target],
-                        actions=samples["act"][target],
-                        advantages=adv[target],
-                        logp_olds=samples["logp"][target],
-                        returns=samples["ret"][target])
+            with tf.summary.record_if(total_steps % self._save_summary_interval == 0):
+                for _ in range(self._policy.n_epoch):
+                    samples = self.replay_buffer._encode_sample(
+                        np.random.permutation(self._policy.horizon))
+                    if self._policy.normalize_adv:
+                        adv = (samples["adv"] - mean_adv) / (std_adv + 1e-8)
+                    else:
+                        adv = samples["adv"]
+                    for idx in range(int(self._policy.horizon / self._policy.batch_size)):
+                        target = slice(idx * self._policy.batch_size,
+                                       (idx + 1) * self._policy.batch_size)
+                        self._policy.train(
+                            states=samples["obs"][target],
+                            actions=samples["act"][target],
+                            advantages=adv[target],
+                            logp_olds=samples["logp"][target],
+                            returns=samples["ret"][target])
 
             if total_steps % self._test_interval == 0:
                 avg_test_return = self.evaluate_policy(total_steps)
