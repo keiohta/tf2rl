@@ -11,7 +11,6 @@ class PPO(VPG):
             clip_ratio=0.2,
             name="PPO",
             **kwargs):
-        kwargs["hidden_activation"] = "tanh"
         super().__init__(name=name, **kwargs)
         self.clip = clip
         self.clip_ratio = clip_ratio
@@ -47,15 +46,6 @@ class PPO(VPG):
                           data=tf.reduce_mean(ratio))
         tf.summary.scalar(name=self.policy_name+"/critic_loss",
                           data=critic_loss)
-        # DEBUG START
-        from tf2rl.policies.gaussian_actor import GaussianActor
-        if isinstance(self.actor, GaussianActor):
-            if self.actor._state_independent_std:
-                tf.summary.scalar(name=self.policy_name+"/lop_std_mean",
-                                  data=tf.reduce_mean(self.actor.out_log_std))
-        tf.summary.scalar(name=self.policy_name+"/actions",
-                          data=tf.reduce_mean(actions))
-        # DEBUG END
         return actor_loss, critic_loss
 
     @tf.function

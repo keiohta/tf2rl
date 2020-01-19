@@ -1,14 +1,10 @@
-import os
 import time
 
 import numpy as np
-import argparse
 import tensorflow as tf
 
-from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.experiments.trainer import Trainer
-from tf2rl.experiments.utils import save_path
 
 
 class IRLTrainer(Trainer):
@@ -19,6 +15,7 @@ class IRLTrainer(Trainer):
             args,
             irl,
             expert_obs,
+            expert_next_obs,
             expert_act,
             test_env=None):
         self._irl = irl
@@ -26,14 +23,17 @@ class IRLTrainer(Trainer):
         super().__init__(policy, env, args, test_env)
         # TODO: Add assertion to check dimention of expert demos and current policy, env is the same
         self._expert_obs = expert_obs
+        self._expert_next_obs = expert_next_obs
         self._expert_act = expert_act
+        # Minus one to get next obs
+        self._random_range = range(expert_obs.shape[0])
 
     def __call__(self):
         total_steps = 0
         tf.summary.experimental.set_step(total_steps)
         episode_steps = 0
         episode_return = 0
-        episode_start_time = time.time()
+        episode_start_time = time.perf_counter()
         n_episode = 0
 
         replay_buffer = get_replay_buffer(
@@ -69,7 +69,7 @@ class IRLTrainer(Trainer):
                     obs = self._env.reset()
 
                     n_episode += 1
-                    fps = episode_steps / (time.time() - episode_start_time)
+                    fps = episode_steps / (time.perf_counter() - episode_start_time)
                     self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
                         n_episode, int(total_steps), episode_steps, episode_return, fps))
                     tf.summary.scalar(
@@ -77,7 +77,7 @@ class IRLTrainer(Trainer):
 
                     episode_steps = 0
                     episode_return = 0
-                    episode_start_time = time.time()
+                    episode_start_time = time.perf_counter()
 
                 if total_steps < self._policy.n_warmup:
                     continue
@@ -85,7 +85,7 @@ class IRLTrainer(Trainer):
                 if total_steps % self._policy.update_interval == 0:
                     samples = replay_buffer.sample(self._policy.batch_size)
                     # Train policy
-                    rew = self._irl.inference(samples["obs"], samples["act"])
+                    rew = self._irl.inference(samples["obs"], samples["act"], samples["next_obs"])
                     with tf.summary.record_if(total_steps % self._save_summary_interval == 0):
                         self._policy.train(
                             samples["obs"], samples["act"], samples["next_obs"],
@@ -101,11 +101,16 @@ class IRLTrainer(Trainer):
                         # Train IRL
                         for _ in range(self._irl.n_training):
                             samples = replay_buffer.sample(self._irl.batch_size)
-                            indices = np.random.randint(self._expert_obs.shape[0],
-                                                        size=self._irl.batch_size)
+                            # Do not allow duplication!!!
+                            indices = np.random.choice(
+                                self._random_range, self._irl.batch_size, replace=False)
                             self._irl.train(
-                                samples["obs"], samples["act"],
-                                self._expert_obs[indices], self._expert_act[indices])
+                                agent_states=samples["obs"],
+                                agent_acts=samples["act"],
+                                agent_next_states=samples["next_obs"],
+                                expert_states=self._expert_obs[indices],
+                                expert_acts=self._expert_act[indices],
+                                expert_next_states=self._expert_next_obs[indices])
 
                 if total_steps % self._test_interval == 0:
                     avg_test_return = self.evaluate_policy(total_steps)

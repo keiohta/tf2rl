@@ -10,6 +10,7 @@ from tf2rl.experiments.utils import save_path, frames_to_gif
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.initialize_logger import initialize_logger
+from tf2rl.envs.normalize_obs_env import NormalizeObsEnv
 
 
 if tf.config.experimental.list_physical_devices('GPU'):
@@ -25,10 +26,13 @@ class Trainer:
             env,
             args,
             test_env=None):
+        self._set_from_args(args)
         self._policy = policy
         self._env = env
         self._test_env = self._env if test_env is None else test_env
-        self._set_from_args(args)
+        if self._normalize_obs:
+            self._env = NormalizeObsEnv(self._env)
+            self._test_env = NormalizeObsEnv(self._test_env)
 
         # prepare log directory
         self._output_dir = prepare_output_dir(
@@ -42,6 +46,8 @@ class Trainer:
         checkpoint = tf.train.Checkpoint(policy=self._policy)
         self.checkpoint_manager = tf.train.CheckpointManager(
             checkpoint, directory=self._output_dir, max_to_keep=5)
+        if args.evaluate:
+            assert args.model_dir is not None
         if args.model_dir is not None:
             assert os.path.isdir(args.model_dir)
             path_ckpt = tf.train.latest_checkpoint(args.model_dir)
@@ -57,7 +63,7 @@ class Trainer:
         tf.summary.experimental.set_step(total_steps)
         episode_steps = 0
         episode_return = 0
-        episode_start_time = time.time()
+        episode_start_time = time.perf_counter()
         n_episode = 0
 
         replay_buffer = get_replay_buffer(
@@ -92,7 +98,7 @@ class Trainer:
                 obs = self._env.reset()
 
                 n_episode += 1
-                fps = episode_steps / (time.time() - episode_start_time)
+                fps = episode_steps / (time.perf_counter() - episode_start_time)
                 self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
                     n_episode, total_steps, episode_steps, episode_return, fps))
                 tf.summary.scalar(
@@ -100,7 +106,7 @@ class Trainer:
 
                 episode_steps = 0
                 episode_return = 0
-                episode_start_time = time.time()
+                episode_start_time = time.perf_counter()
 
             if total_steps < self._policy.n_warmup:
                 continue
@@ -134,6 +140,9 @@ class Trainer:
         tf.summary.flush()
 
     def evaluate_policy(self, total_steps):
+        if self._normalize_obs:
+            self._test_env.normalizer.set_params(
+                *self._env.normalizer.get_params())
         avg_test_return = 0.
         if self._save_test_path:
             replay_buffer = get_replay_buffer(
@@ -183,6 +192,7 @@ class Trainer:
         self._show_progress = args.show_progress
         self._save_model_interval = args.save_model_interval
         self._save_summary_interval = args.save_summary_interval
+        self._normalize_obs = args.normalize_obs
         # replay buffer
         self._use_prioritized_rb = args.use_prioritized_rb
         self._use_nstep_rb = args.use_nstep_rb
@@ -218,7 +228,11 @@ class Trainer:
                             help='Directory to restore model')
         parser.add_argument('--dir-suffix', type=str, default='',
                             help='Suffix for directory that contains results')
+        parser.add_argument('--normalize-obs', action='store_true',
+                            help='Normalize observation')
         # test settings
+        parser.add_argument('--evaluate', action='store_true',
+                            help='Evaluate trained model')
         parser.add_argument('--test-interval', type=int, default=int(1e4),
                             help='Interval to evaluate trained model')
         parser.add_argument('--show-test-progress', action='store_true',

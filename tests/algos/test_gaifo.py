@@ -1,20 +1,18 @@
 import unittest
 
-from tf2rl.algos.gail import GAIL
+from tf2rl.algos.gaifo import GAIfO
 from tests.algos.common import CommonIRLAlgos
 
 
-class TestGAIL(CommonIRLAlgos):
+class TestGAIfO(CommonIRLAlgos):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.irl_discrete = GAIL(
+        cls.irl_discrete = GAIfO(
             state_shape=cls.discrete_env.observation_space.shape,
-            action_dim=cls.discrete_env.action_space.n,
             gpu=-1)
-        cls.irl_continuous = GAIL(
+        cls.irl_continuous = GAIfO(
             state_shape=cls.continuous_env.observation_space.shape,
-            action_dim=cls.continuous_env.action_space.low.size,
             gpu=-1)
 
 

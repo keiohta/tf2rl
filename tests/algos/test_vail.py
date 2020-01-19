@@ -1,7 +1,5 @@
 import unittest
-import gym
 import numpy as np
-import tensorflow as tf
 
 from tf2rl.algos.vail import VAIL
 from tests.algos.common import CommonIRLAlgos

@@ -46,19 +46,23 @@ def load_trajectories(filenames, max_steps=None):
         paths.append(joblib.load(filename))
 
     def get_obs_and_act(path):
+        obses = path['obs'][:-1]
+        next_obses = path['obs'][1:]
+        actions = path['act'][:-1]
         if max_steps is not None:
-            return path['obs'][:max_steps], path['act'][:max_steps]
+            return obses[:max_steps], next_obses[:max_steps], actions[:max_steps-1]
         else:
-            return path['obs'], path['act']
+            return obses, next_obses, actions
 
     for i, path in enumerate(paths):
         if i == 0:
-            obses, acts = get_obs_and_act(path)
+            obses, next_obses, acts = get_obs_and_act(path)
         else:
-            obs, act = get_obs_and_act(path)
+            obs, next_obs, act = get_obs_and_act(path)
             obses = np.vstack((obs, obses))
+            next_obses = np.vstack((next_obs, next_obses))
             acts = np.vstack((act, acts))
-    return {'obses': obses, 'acts': acts}
+    return {'obses': obses, 'next_obses': next_obses, 'acts': acts}
 
 
 def frames_to_gif(frames, prefix, save_dir, interval=50, fps=30):

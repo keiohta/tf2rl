@@ -49,7 +49,6 @@ class OnPolicyAgent(Policy):
             lam=0.95,
             enable_gae=True,
             normalize_adv=True,
-            n_epoch_critic=1,
             entropy_coef=0.01,
             vfunc_coef=1.,
             **kwargs):
@@ -57,7 +56,6 @@ class OnPolicyAgent(Policy):
         self.lam = lam
         self.enable_gae = enable_gae
         self.normalize_adv = normalize_adv
-        self.n_epoch_critic = n_epoch_critic
         self.entropy_coef = entropy_coef
         self.vfunc_coef = vfunc_coef
         kwargs["n_warmup"] = 0
