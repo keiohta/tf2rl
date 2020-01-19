@@ -9,11 +9,11 @@ from tf2rl.envs.atari_wrapper import LazyFrames
 
 
 class CriticV(tf.keras.Model):
-    def __init__(self, state_shape, units, name='qf'):
+    def __init__(self, state_shape, units, name='critic_v', hidden_activation='relu'):
         super().__init__(name=name)
 
-        self.l1 = Dense(units[0], name="L1", activation='relu')
-        self.l2 = Dense(units[1], name="L2", activation='relu')
+        self.l1 = Dense(units[0], name="L1", activation=hidden_activation)
+        self.l2 = Dense(units[1], name="L2", activation=hidden_activation)
         self.l3 = Dense(1, name="L2", activation='linear')
 
         with tf.device('/cpu:0'):
@@ -44,7 +44,8 @@ class VPG(OnPolicyAgent):
             lr_critic=3e-3,
             fix_std=False,
             const_std=0.3,
-            hidden_activation="relu",
+            hidden_activation_actor="relu",
+            hidden_activation_critic="relu",
             name="VPG",
             **kwargs):
         super().__init__(name=name, **kwargs)
@@ -66,12 +67,13 @@ class VPG(OnPolicyAgent):
                 else:
                     self.actor = GaussianActor(
                         state_shape, action_dim, max_action, actor_units,
-                        hidden_activation=hidden_activation,
+                        hidden_activation=hidden_activation_actor,
                         fix_std=fix_std, const_std=const_std, state_independent_std=True)
             else:
                 self.actor = actor
             if critic is None:
-                self.critic = CriticV(state_shape, critic_units)
+                self.critic = CriticV(state_shape, critic_units,
+                                      hidden_activation=hidden_activation_critic)
             else:
                 self.critic = critic
             self.actor_optimizer = tf.keras.optimizers.Adam(

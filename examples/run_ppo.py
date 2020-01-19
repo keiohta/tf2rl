@@ -21,16 +21,6 @@ if __name__ == '__main__':
     env = gym.make(args.env_name)
     test_env = gym.make(args.env_name)
 
-    # DEBUG
-    args.normalize_adv = True
-    args.enable_gae = True
-    if args.env_name == "Pendulum-v0":
-        discount = 0.9
-        lam = 0.95
-    else:
-        discount = 0.995
-        lam = 0.97
-
     policy = PPO(
         state_shape=env.observation_space.shape,
         action_dim=get_act_dim(env.action_space),
@@ -43,10 +33,11 @@ if __name__ == '__main__':
         n_epoch=10,
         lr_actor=3e-4,
         lr_critic=3e-4,
-        # discount=0.995,
-        # lam=0.97,
-        discount=discount,
-        lam=lam,
+        hidden_activation_actor="tanh",
+        hidden_activation_critic="tanh",
+        discount=0.99,
+        lam=0.95,
+        entropy_coef=0.,
         horizon=args.horizon,
         normalize_adv=args.normalize_adv,
         enable_gae=args.enable_gae,

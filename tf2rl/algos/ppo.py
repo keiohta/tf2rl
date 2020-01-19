@@ -11,7 +11,6 @@ class PPO(VPG):
             clip_ratio=0.2,
             name="PPO",
             **kwargs):
-        kwargs["hidden_activation"] = "tanh"
         super().__init__(name=name, **kwargs)
         self.clip = clip
         self.clip_ratio = clip_ratio
