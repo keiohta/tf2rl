@@ -20,9 +20,6 @@ class OnPolicyTrainer(Trainer):
             "Test interval should be divisible by policy horizon"
 
     def __call__(self):
-        total_steps = 0
-        n_episode = 0
-
         # Prepare buffer
         self.replay_buffer = get_replay_buffer(
             self._policy, self._env)
@@ -34,17 +31,52 @@ class OnPolicyTrainer(Trainer):
             kwargs_local_buf["env_dict"]["act"]["dtype"] = np.int32
         self.local_buffer = ReplayBuffer(**kwargs_local_buf)
 
+        episode_steps = 0
+        episode_return = 0
+        episode_start_time = time.time()
+        total_steps = np.array(0, dtype=np.int32)
+        n_epoisode = 0
+        obs = self._env.reset()
+
         tf.summary.experimental.set_step(total_steps)
         while total_steps < self._max_steps:
             # Collect samples
-            n_episode, total_rewards = self._collect_sample(n_episode, total_steps)
-            total_steps += self._policy.horizon
-            tf.summary.experimental.set_step(total_steps)
+            for _ in range(self._policy.horizon):
+                act, logp, val = self._policy.get_action_and_val(obs)
+                next_obs, reward, done, _ = self._env.step(act)
+                if self._show_progress:
+                    self._env.render()
 
-            if len(total_rewards) > 0:
-                avg_training_return = sum(total_rewards) / len(total_rewards)
-                tf.summary.scalar(
-                    name="Common/training_return", data=avg_training_return)
+                episode_steps += 1
+                total_steps += 1
+                episode_return += reward
+
+                done_flag = done
+                if hasattr(self._env, "_max_episode_steps") and \
+                        episode_steps == self._env._max_episode_steps:
+                    done_flag = False
+                self.local_buffer.add(
+                    obs=obs, act=act, next_obs=next_obs,
+                    rew=reward, done=done_flag, logp=logp, val=val)
+                obs = next_obs
+
+                if done or episode_steps == self._episode_max_steps:
+                    tf.summary.experimental.set_step(total_steps)
+                    self.finish_horizon()
+                    obs = self._env.reset()
+                    n_epoisode += 1
+                    fps = episode_steps / (time.time() - episode_start_time)
+                    self.logger.info(
+                        "Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
+                            n_epoisode, int(total_steps), episode_steps, episode_return, fps))
+                    tf.summary.scalar(name="Common/training_return", data=episode_return)
+                    tf.summary.scalar(name="Common/fps", data=fps)
+                    episode_steps = 0
+                    episode_return = 0
+                    episode_start_time = time.time()
+            self.finish_horizon(last_val=val)
+
+            tf.summary.experimental.set_step(total_steps)
 
             # Train actor critic
             if self._policy.normalize_adv:
@@ -82,61 +114,7 @@ class OnPolicyTrainer(Trainer):
 
         tf.summary.flush()
 
-    def _collect_sample(self, n_episode, total_steps):
-        episode_steps = 0
-        episode_return = 0
-        episode_returns = []
-        episode_start_time = time.time()
-        obs = self._env.reset()
-        for _ in range(self._policy.horizon):
-            act, logp, val = self._policy.get_action_and_val(obs)
-            next_obs, reward, done, _ = self._env.step(act)
-            if self._show_progress:
-                self._env.render()
-            episode_steps += 1
-            episode_return += reward
-
-            done_flag = done
-            if hasattr(self._env, "_max_episode_steps") and \
-                    episode_steps == self._env._max_episode_steps:
-                done_flag = False
-            self.local_buffer.add(
-                obs=obs, act=act, next_obs=next_obs,
-                rew=reward, done=done_flag, logp=logp, val=val)
-            obs = next_obs
-
-            if done or episode_steps == self._episode_max_steps:
-                total_steps += episode_steps
-                self.finish_horizon()
-                obs = self._env.reset()
-                n_episode += 1
-                fps = episode_steps / (time.time() - episode_start_time)
-                self.logger.info(
-                    "Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
-                        n_episode, int(total_steps), episode_steps, episode_return, fps))
-
-                tf.summary.scalar(name="Common/fps", data=fps)
-                episode_returns.append(episode_return)
-                episode_steps = 0
-                episode_return = 0
-                episode_start_time = time.time()
-        self.finish_horizon(last_val=val)
-        return n_episode, episode_returns
-
     def finish_horizon(self, last_val=0):
-        """
-        Call this at the end of a trajectory, or when one gets cut off
-        by an epoch ending. This looks back in the buffer to where the
-        trajectory started, and uses rewards and value estimates from
-        the whole trajectory to compute advantage estimates with GAE-Lambda,
-        as well as compute the rewards-to-go for each state, to use as
-        the targets for the value function.
-        The "last_val" argument should be 0 if the trajectory ended
-        because the agent reached a terminal state (died), and otherwise
-        should be V(s_T), the value function estimated for the last state.
-        This allows us to bootstrap the reward-to-go calculation to account
-        for timesteps beyond the arbitrary episode horizon (or epoch cutoff).
-        """
         samples = self.local_buffer._encode_sample(
             np.arange(self.local_buffer.get_stored_size()))
         rews = np.append(samples["rew"], last_val)
