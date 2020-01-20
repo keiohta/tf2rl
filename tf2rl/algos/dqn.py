@@ -5,6 +5,7 @@ from tensorflow.keras.layers import Dense
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.networks.noisy_dense import NoisyDense
 from tf2rl.envs.atari_wrapper import LazyFrames
+from tf2rl.envs.utils import to_one_hot
 from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.misc.huber_loss import huber_loss
 
@@ -72,6 +73,7 @@ class DQN(OffPolicyAgent):
             self,
             state_shape,
             action_dim,
+            discrete_input,
             q_func=None,
             name="DQN",
             lr=0.001,
@@ -89,6 +91,9 @@ class DQN(OffPolicyAgent):
             enable_categorical_dqn=False,
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
+
+        self.discrete_input = discrete_input
+        self._obs_dim = state_shape[0]
 
         q_func = q_func if q_func is not None else QFunc
         # Define and initialize Q-function network
@@ -147,9 +152,12 @@ class DQN(OffPolicyAgent):
     def get_action(self, state, test=False, tensor=False):
         if isinstance(state, LazyFrames):
             state = np.array(state)
-        if not tensor:
-            assert isinstance(state, np.ndarray)
-        is_single_input = state.ndim == self._state_ndim
+        if self.discrete_input:
+            is_single_input = not isinstance(state, np.ndarray)
+        else:
+            if not tensor:
+                assert isinstance(state, np.ndarray)
+            is_single_input = state.ndim == self._state_ndim
 
         if not test and np.random.rand() < self.epsilon:
             if is_single_input:
@@ -162,8 +170,12 @@ class DQN(OffPolicyAgent):
             else:
                 return action
 
-        state = np.expand_dims(state, axis=0).astype(
-            np.float32) if is_single_input else state
+        if self.discrete_input:
+            # make one-hot vector
+            state = to_one_hot(state, self._obs_dim)
+        else:
+            state = np.expand_dims(state, axis=0).astype(
+                np.float32) if is_single_input else state
         if self._enable_categorical_dqn:
             action = self._get_action_body_distributional(tf.constant(state))
         else:
@@ -191,6 +203,9 @@ class DQN(OffPolicyAgent):
     def train(self, states, actions, next_states, rewards, done, weights=None):
         if weights is None:
             weights = np.ones_like(rewards)
+        if self.discrete_input:
+            states = to_one_hot(states, self._obs_dim)
+            next_states = to_one_hot(next_states, self._obs_dim)
         td_errors, q_func_loss = self._train_body(
             states, actions, next_states, rewards, done, weights)
 

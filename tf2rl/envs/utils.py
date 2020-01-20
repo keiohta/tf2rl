@@ -1,3 +1,4 @@
+import numpy as np
 import gym
 from gym.spaces import Discrete, Box
 
@@ -18,6 +19,27 @@ def get_act_dim(action_space):
         return action_space.low.size
     else:
         raise NotImplementedError
+
+
+def get_shape(space):
+    if isinstance(space, Discrete):
+        return (space.n,)
+    elif isinstance(space, Box):
+        return space.shape
+    else:
+        raise ValueError("{} is not currently supported".format(type(space)))
+
+
+def to_one_hot(input, size):
+    if isinstance(input, list):
+        input = np.array(input)
+    elif not isinstance(input, np.ndarray):
+        input = np.array([input])
+    if input.ndim == 2:
+        input = np.squeeze(input)
+    temp = np.zeros((input.shape[0], size))
+    temp[np.arange(input.shape[0]), input.astype(np.int32)] = 1
+    return temp
 
 
 def is_mujoco_env(env):

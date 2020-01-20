@@ -3,6 +3,23 @@ import numpy as np
 import gym
 
 
+class DummyDiscreteEnv(gym.Env):
+    def __init__(self):
+        self.obs_dim, self.act_dim = 10, 2
+        self.observation_space = gym.spaces.discrete.Discrete(self.obs_dim)
+        self.action_space = gym.spaces.discrete.Discrete(self.act_dim)
+
+    def _get_obs(self):
+        return np.random.randint(self.obs_dim)
+
+    def reset(self):
+        return self._get_obs()
+
+    def step(self, action):
+        assert action < self.act_dim
+        return self._get_obs(), 0, False, {}
+
+
 class CommonAlgos(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
