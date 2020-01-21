@@ -169,7 +169,7 @@ class Trainer:
             prefix = "step_{0:08d}_epi_{1:02d}_return_{2:010.4f}".format(
                 total_steps, i, episode_return)
             if self._save_test_path:
-                save_path(replay_buffer.sample(self._episode_max_steps),
+                save_path(replay_buffer._encode_sample(np.arange(self._episode_max_steps)),
                           os.path.join(self._output_dir, prefix + ".pkl"))
                 replay_buffer.clear()
             if self._save_test_movie:
