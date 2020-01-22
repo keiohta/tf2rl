@@ -16,8 +16,6 @@ from tf2rl.envs.utils import is_discrete
 class OnPolicyTrainer(Trainer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        assert self._test_interval % self._policy.horizon == 0, \
-            "Test interval should be divisible by policy horizon"
 
     def __call__(self):
         # Prepare buffer
@@ -74,6 +72,18 @@ class OnPolicyTrainer(Trainer):
                     episode_steps = 0
                     episode_return = 0
                     episode_start_time = time.time()
+
+                if total_steps % self._test_interval == 0:
+                    avg_test_return = self.evaluate_policy(total_steps)
+                    self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
+                        total_steps, avg_test_return, self._test_episodes))
+                    tf.summary.scalar(
+                        name="Common/average_test_return", data=avg_test_return)
+                    self.writer.flush()
+
+                if total_steps % self._save_model_interval == 0:
+                    self.checkpoint_manager.save()
+
             self.finish_horizon(last_val=val)
 
             tf.summary.experimental.set_step(total_steps)
@@ -100,17 +110,6 @@ class OnPolicyTrainer(Trainer):
                             advantages=adv[target],
                             logp_olds=samples["logp"][target],
                             returns=samples["ret"][target])
-
-            if total_steps % self._test_interval == 0:
-                avg_test_return = self.evaluate_policy(total_steps)
-                self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
-                    total_steps, avg_test_return, self._test_episodes))
-                tf.summary.scalar(
-                    name="Common/average_test_return", data=avg_test_return)
-                self.writer.flush()
-
-            if total_steps % self._save_model_interval == 0:
-                self.checkpoint_manager.save()
 
         tf.summary.flush()
 
