@@ -36,7 +36,7 @@ class Trainer:
 
         # prepare log directory
         self._output_dir = prepare_output_dir(
-            args=args, user_specified_dir="./results",
+            args=args, user_specified_dir=self._logdir,
             suffix="{}_{}".format(self._policy.policy_name, args.dir_suffix))
         self.logger = initialize_logger(
             logging_level=logging.getLevelName(args.logging_level),
@@ -193,6 +193,7 @@ class Trainer:
         self._save_model_interval = args.save_model_interval
         self._save_summary_interval = args.save_summary_interval
         self._normalize_obs = args.normalize_obs
+        self._logdir = args.logdir
         # replay buffer
         self._use_prioritized_rb = args.use_prioritized_rb
         self._use_nstep_rb = args.use_nstep_rb
@@ -230,6 +231,8 @@ class Trainer:
                             help='Suffix for directory that contains results')
         parser.add_argument('--normalize-obs', action='store_true',
                             help='Normalize observation')
+        parser.add_argument('--logdir', type=str, default='results',
+                            help='Output directory')
         # test settings
         parser.add_argument('--evaluate', action='store_true',
                             help='Evaluate trained model')
