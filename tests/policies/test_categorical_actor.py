@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-import tensorflow as tf
 
 from tf2rl.policies.categorical_actor import CategoricalActor
 from tests.policies.common import CommonModel
@@ -18,14 +17,14 @@ class TestCategoricalActor(CommonModel):
     def test_call(self):
         # Single input
         state = np.random.rand(
-            1, self.discrete_env.observation_space.low.size)
+            1, self.discrete_env.observation_space.low.size).astype(np.float32)
         self._test_call(
             inputs=state,
             expected_action_shapes=(1,),
             expected_log_prob_shapes=(1,))
         # Multiple inputs
         states = np.random.rand(
-            self.batch_size, self.discrete_env.observation_space.low.size)
+            self.batch_size, self.discrete_env.observation_space.low.size).astype(np.float32)
         self._test_call(
             inputs=states,
             expected_action_shapes=(self.batch_size,),
@@ -34,7 +33,7 @@ class TestCategoricalActor(CommonModel):
     def test_compute_log_probs(self):
         # Single input
         state = np.random.rand(
-            1, self.discrete_env.observation_space.low.size)
+            1, self.discrete_env.observation_space.low.size).astype(np.float32)
         action = np.random.randint(
             self.discrete_env.action_space.n, size=1)
         self._test_compute_log_probs(
@@ -43,7 +42,7 @@ class TestCategoricalActor(CommonModel):
             expected_shapes=(1,))
         # Multiple inputs
         states = np.random.rand(
-            self.batch_size, self.discrete_env.observation_space.low.size)
+            self.batch_size, self.discrete_env.observation_space.low.size).astype(np.float32)
         actions = np.random.randint(
             self.discrete_env.action_space.n, size=self.batch_size)
         self._test_compute_log_probs(

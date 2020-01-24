@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-import tensorflow as tf
 
 from tf2rl.policies.gaussian_actor import GaussianActor
 from tests.policies.common import CommonModel
@@ -28,14 +27,14 @@ class TestGaussianActor(CommonModel):
         """Not fix sigma"""
         # Single input
         state = np.random.rand(
-            1, self.continuous_env.observation_space.low.size)
+            1, self.continuous_env.observation_space.low.size).astype(np.float32)
         self._test_call(
             state,
             (1, self.continuous_env.action_space.low.size),
             (1,))
         # Multiple inputs
         states = np.random.rand(
-            self.batch_size, self.continuous_env.observation_space.low.size)
+            self.batch_size, self.continuous_env.observation_space.low.size).astype(np.float32)
         self._test_call(
             states,
             (self.batch_size, self.continuous_env.action_space.low.size),
@@ -43,7 +42,7 @@ class TestGaussianActor(CommonModel):
 
         """Fix sigma"""
         state = np.random.rand(
-            1, self.continuous_env.observation_space.low.size)
+            1, self.continuous_env.observation_space.low.size).astype(np.float32)
         self._test_call(
             state,
             (1, self.continuous_env.action_space.low.size),
@@ -51,7 +50,7 @@ class TestGaussianActor(CommonModel):
             policy=self.policy_fixed_sigma)
         # Multiple inputs
         states = np.random.rand(
-            self.batch_size, self.continuous_env.observation_space.low.size)
+            self.batch_size, self.continuous_env.observation_space.low.size).astype(np.float32)
         self._test_call(
             states,
             (self.batch_size, self.continuous_env.action_space.low.size),
