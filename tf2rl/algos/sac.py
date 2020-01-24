@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
-from tf2rl.policies.gaussian_actor import GaussianActor
+from tf2rl.policies.tfp_gaussian_actor import GaussianActor
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.misc.huber_loss import huber_loss
@@ -91,8 +91,7 @@ class SAC(OffPolicyAgent):
 
     def _setup_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
         self.actor = GaussianActor(
-            state_shape, action_dim, max_action, squash=True,
-            units=actor_units)
+            state_shape, action_dim, max_action, squash=True, units=actor_units)
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
     def _setup_critic_q(self, state_shape, action_dim, critic_units, lr):
