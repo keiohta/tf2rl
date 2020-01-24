@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Dense
 from tf2rl.algos.sac import SAC
 from tf2rl.misc.huber_loss import huber_loss
 from tf2rl.misc.target_update_ops import update_target_variables
-from tf2rl.policies.categorical_actor import CategoricalActor
+from tf2rl.policies.tfp_categorical_actor import CategoricalActor
 
 
 class CriticQ(tf.keras.Model):

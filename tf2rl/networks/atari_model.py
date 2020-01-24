@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.networks.noisy_dense import NoisyDense
-from tf2rl.policies.categorical_actor import CategoricalActorCritic, CategoricalActor
+from tf2rl.policies.tfp_categorical_actor import CategoricalActorCritic, CategoricalActor
 from tf2rl.distributions.categorical import Categorical
 
 
