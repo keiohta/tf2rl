@@ -95,7 +95,7 @@ class VAIL(GAIL):
 
     @tf.function
     def _compute_kl_latent(self, means, log_stds):
-        """
+        r"""
         Compute KL divergence of latent spaces over standard Normal
         distribution to compute loss in eq.5.  The formulation of
         KL divergence between two normal distributions is as follows:
