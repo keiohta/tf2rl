@@ -35,6 +35,9 @@ class CategoricalActor(tf.keras.Model):
         probs = self.prob(features)
         return {"prob": probs}
 
+    def compute_prob(self, states):
+        return self._compute_dist(states)["prob"]
+
     def call(self, states, test=False):
         """
         Compute actions and log probability of the selected action
@@ -50,7 +53,7 @@ class CategoricalActor(tf.keras.Model):
         log_prob = self.dist.log_likelihood(
             tf.one_hot(indices=action, depth=self.action_dim), param)
 
-        return action, log_prob, param
+        return action, log_prob
 
     def compute_entropy(self, states):
         param = self._compute_dist(states)

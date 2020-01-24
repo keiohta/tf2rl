@@ -168,7 +168,7 @@ class SAC(OffPolicyAgent):
                 # Compute loss of critic V
                 current_v = self.vf(states)
 
-                sample_actions, logp, _ = self.actor(states)  # Resample actions to update V
+                sample_actions, logp = self.actor(states)  # Resample actions to update V
                 current_q1 = self.qf1([states, sample_actions])
                 current_q2 = self.qf2([states, sample_actions])
                 current_min_q = tf.minimum(current_q1, current_q2)
