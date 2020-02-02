@@ -50,6 +50,20 @@ class TestCategoricalActor(CommonModel):
             actions=actions,
             expected_shapes=(self.batch_size,))
 
+    def test_compute_prob(self):
+        # Single input
+        state = np.random.rand(
+            1, self.discrete_env.observation_space.low.size).astype(np.float32)
+        result = self.policy.compute_prob(state)
+        expected_shape = (1, self.discrete_env.action_space.n)
+        self.assertEqual(result.shape, expected_shape)
+        # Multiple inputs
+        states = np.random.rand(
+            self.batch_size, self.discrete_env.observation_space.low.size).astype(np.float32)
+        results = self.policy.compute_prob(states)
+        expected_shape = (self.batch_size, self.discrete_env.action_space.n)
+        self.assertEqual(results.shape, expected_shape)
+
 
 if __name__ == '__main__':
     unittest.main()

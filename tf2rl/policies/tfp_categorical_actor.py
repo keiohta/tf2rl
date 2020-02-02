@@ -40,7 +40,8 @@ class CategoricalActor(tf.keras.Model):
         return dist
 
     def compute_prob(self, states):
-        return self._compute_dist(states)["prob"]
+        dist = self._compute_dist(states)
+        return dist.logits
 
     def call(self, states, test=False):
         """
@@ -52,7 +53,7 @@ class CategoricalActor(tf.keras.Model):
         dist = self._compute_dist(states)
 
         if test:
-            action = dist.mean()  # (size,)
+            action = tf.argmax(dist.logits, axis=1)  # (size,)
         else:
             action = dist.sample()  # (size,)
         log_prob = dist.prob(action)
@@ -70,20 +71,8 @@ class CategoricalActor(tf.keras.Model):
         :param actions (tf.Tensor): Tensors of NOT one-hot vector.
             They will be converted to one-hot vector inside this function.
         """
-        param = self._compute_dist(states)
-        actions = tf.one_hot(
-            indices=tf.squeeze(actions),
-            depth=self.action_dim)
-        param["prob"] = tf.cond(
-            tf.math.greater(tf.rank(actions), tf.rank(param["prob"])),
-            lambda: tf.expand_dims(param["prob"], axis=0),
-            lambda: param["prob"])
-        actions = tf.cond(
-            tf.math.greater(tf.rank(param["prob"]), tf.rank(actions)),
-            lambda: tf.expand_dims(actions, axis=0),
-            lambda: actions)
-        log_prob = self.dist.log_likelihood(actions, param)
-        return log_prob
+        dist = self._compute_dist(states)
+        return dist.log_prob(actions)
 
 
 class CategoricalActorCritic(CategoricalActor):
