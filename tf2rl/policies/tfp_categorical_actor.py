@@ -21,6 +21,14 @@ class CategoricalActor(tf.keras.Model):
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
+    def _compute_features(self, states):
+        features = states
+
+        for cur_layer in self.base_layers:
+            features = cur_layer(features)
+
+        return features
+
     def _compute_dist(self, states):
         """
         Compute categorical distribution
@@ -29,10 +37,7 @@ class CategoricalActor(tf.keras.Model):
             NN outputs probabilities of K classes
         :return: Categorical distribution
         """
-        features = states
-
-        for cur_layer in self.base_layers:
-            features = cur_layer(features)
+        features = self._compute_features(states)
 
         probs = self.out_prob(features)
         dist = tfp.distributions.Categorical(probs)
