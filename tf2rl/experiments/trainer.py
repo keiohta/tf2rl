@@ -5,12 +5,13 @@ import argparse
 
 import numpy as np
 import tensorflow as tf
+from gym.spaces import Box
 
 from tf2rl.experiments.utils import save_path, frames_to_gif
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.initialize_logger import initialize_logger
-from tf2rl.envs.normalize_obs_env import NormalizeObsEnv
+from tf2rl.envs.normalizer import EmpiricalNormalizer
 
 
 if tf.config.experimental.list_physical_devices('GPU'):
@@ -31,8 +32,9 @@ class Trainer:
         self._env = env
         self._test_env = self._env if test_env is None else test_env
         if self._normalize_obs:
-            self._env = NormalizeObsEnv(self._env)
-            self._test_env = NormalizeObsEnv(self._test_env)
+            assert isinstance(env.observation_space, Box)
+            self._obs_normalizer = EmpiricalNormalizer(
+                shape=env.observation_space.shape)
 
         # prepare log directory
         self._output_dir = prepare_output_dir(

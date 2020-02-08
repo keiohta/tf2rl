@@ -40,6 +40,8 @@ class OnPolicyTrainer(Trainer):
         while total_steps < self._max_steps:
             # Collect samples
             for _ in range(self._policy.horizon):
+                if self._normalize_obs:
+                    obs = self._obs_normalizer(obs, update=False)
                 act, logp, val = self._policy.get_action_and_val(obs)
                 next_obs, reward, done, _ = self._env.step(act)
                 if self._show_progress:
@@ -93,10 +95,15 @@ class OnPolicyTrainer(Trainer):
                 samples = self.replay_buffer._encode_sample(np.arange(self._policy.horizon))
                 mean_adv = np.mean(samples["adv"])
                 std_adv = np.std(samples["adv"])
+                # Update normalizer
+                if self._normalize_obs:
+                    self._obs_normalizer.experience(samples["obs"])
             with tf.summary.record_if(total_steps % self._save_summary_interval == 0):
                 for _ in range(self._policy.n_epoch):
                     samples = self.replay_buffer._encode_sample(
                         np.random.permutation(self._policy.horizon))
+                    if self._normalize_obs:
+                        samples["obs"] = self._obs_normalizer(samples["obs"], update=False)
                     if self._policy.normalize_adv:
                         adv = (samples["adv"] - mean_adv) / (std_adv + 1e-8)
                     else:
@@ -135,9 +142,6 @@ class OnPolicyTrainer(Trainer):
         self.local_buffer.clear()
 
     def evaluate_policy(self, total_steps):
-        if self._normalize_obs:
-            self._test_env.normalizer.set_params(
-                *self._env.normalizer.get_params())
         avg_test_return = 0.
         if self._save_test_path:
             replay_buffer = get_replay_buffer(
@@ -147,6 +151,8 @@ class OnPolicyTrainer(Trainer):
             frames = []
             obs = self._test_env.reset()
             for _ in range(self._episode_max_steps):
+                if self._normalize_obs:
+                    obs = self._obs_normalizer(obs, update=False)
                 act, _ = self._policy.get_action(obs, test=True)
                 act = act if not hasattr(self._env.action_space, "high") else \
                     np.clip(act, self._env.action_space.low, self._env.action_space.high)
