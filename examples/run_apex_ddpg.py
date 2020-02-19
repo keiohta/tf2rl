@@ -8,7 +8,7 @@ from tf2rl.misc.target_update_ops import update_target_variables
 if __name__ == '__main__':
     parser = apex_argument()
     parser.add_argument('--env-name', type=str,
-                        default="Penduluv-v0")
+                        default="Pendulum-v0")
     parser = DDPG.get_argument(parser)
     args = parser.parse_args()
 
