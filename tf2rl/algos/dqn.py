@@ -241,7 +241,12 @@ class DQN(OffPolicyAgent):
             actions = tf.expand_dims(actions, axis=1)
             rewards = tf.expand_dims(rewards, axis=1)
             dones = tf.expand_dims(dones, 1)
-        return self._compute_td_error_body(states, actions, next_states, rewards, dones)
+        if self._enable_categorical_dqn:
+            return self._compute_td_error_body_distributional(
+                states, actions, next_states, rewards, dones)
+        else:
+            return self._compute_td_error_body(
+                states, actions, next_states, rewards, dones)
 
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
