@@ -1,7 +1,4 @@
-import argparse
-import numpy as np
 import gym
-import roboschool
 
 from tf2rl.algos.apex import apex_argument, run
 from tf2rl.algos.ddpg import DDPG
@@ -11,7 +8,7 @@ from tf2rl.misc.target_update_ops import update_target_variables
 if __name__ == '__main__':
     parser = apex_argument()
     parser.add_argument('--env-name', type=str,
-                        default="RoboschoolAtlasForwardWalk-v1")
+                        default="Penduluv-v0")
     parser = DDPG.get_argument(parser)
     args = parser.parse_args()
 

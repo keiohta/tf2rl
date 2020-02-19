@@ -1,4 +1,3 @@
-import roboschool
 import gym
 
 from tf2rl.algos.bi_res_ddpg import BiResDDPG
@@ -8,7 +7,7 @@ from tf2rl.experiments.trainer import Trainer
 if __name__ == '__main__':
     parser = Trainer.get_argument()
     parser = BiResDDPG.get_argument(parser)
-    parser.add_argument('--env-name', type=str, default="RoboschoolAnt-v1")
+    parser.add_argument('--env-name', type=str, default="Penduluv-v0")
     parser.set_defaults(batch_size=100)
     parser.set_defaults(n_warmup=10000)
     args = parser.parse_args()

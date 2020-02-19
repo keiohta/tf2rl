@@ -9,12 +9,12 @@ from tf2rl.experiments.utils import restore_latest_n_traj
 if __name__ == '__main__':
     parser = IRLTrainer.get_argument()
     parser = VAIL.get_argument(parser)
-    parser.add_argument('--env-name', type=str, default="RoboschoolReacher-v1")
+    parser.add_argument('--env-name', type=str, default="Penduluv-v0")
     args = parser.parse_args()
 
     if args.expert_path_dir is None:
         print("Plaese generate demonstrations first")
-        print("python examples/run_sac.py --env-name=RoboschoolReacher-v1 --save-test-path --test-interval=50000")
+        print("python examples/run_sac.py --env-name=Penduluv-v0 --save-test-path --test-interval=50000")
         exit()
 
     units = [400, 300]
