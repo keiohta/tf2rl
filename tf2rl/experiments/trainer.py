@@ -45,16 +45,16 @@ class Trainer:
             output_dir=self._output_dir)
 
         # Save and restore model
-        checkpoint = tf.train.Checkpoint(policy=self._policy)
+        self._checkpoint = tf.train.Checkpoint(policy=self._policy)
         self.checkpoint_manager = tf.train.CheckpointManager(
-            checkpoint, directory=self._output_dir, max_to_keep=5)
+            self._checkpoint, directory=self._output_dir, max_to_keep=5)
         if args.evaluate:
             assert args.model_dir is not None
         if args.model_dir is not None:
             assert os.path.isdir(args.model_dir)
-            path_ckpt = tf.train.latest_checkpoint(args.model_dir)
-            checkpoint.restore(path_ckpt)
-            self.logger.info("Restored {}".format(path_ckpt))
+            self._latest_path_ckpt = tf.train.latest_checkpoint(args.model_dir)
+            self._checkpoint.restore(self._latest_path_ckpt)
+            self.logger.info("Restored {}".format(self._latest_path_ckpt))
 
         # prepare TensorBoard output
         self.writer = tf.summary.create_file_writer(self._output_dir)
@@ -141,7 +141,25 @@ class Trainer:
 
         tf.summary.flush()
 
+    def evaluate_policy_continuously(self):
+        """
+        Periodically search the latest checkpoint, and keep evaluating with the latest model until user kills process.
+        """
+        if self._model_dir is None:
+            self.logger.error("Please specify model directory by passing command line argument `--model-dir`")
+            exit(-1)
+
+        self.evaluate_policy(total_steps=0)
+        while True:
+            latest_path_ckpt = tf.train.latest_checkpoint(self._model_dir)
+            if self._latest_path_ckpt != latest_path_ckpt:
+                self._latest_path_ckpt = latest_path_ckpt
+                self._checkpoint.restore(self._latest_path_ckpt)
+                self.logger.info("Restored {}".format(self._latest_path_ckpt))
+            self.evaluate_policy(total_steps=0)
+
     def evaluate_policy(self, total_steps):
+        tf.summary.experimental.set_step(total_steps)
         if self._normalize_obs:
             self._test_env.normalizer.set_params(
                 *self._env.normalizer.get_params())
@@ -196,6 +214,7 @@ class Trainer:
         self._save_summary_interval = args.save_summary_interval
         self._normalize_obs = args.normalize_obs
         self._logdir = args.logdir
+        self._model_dir = args.model_dir
         # replay buffer
         self._use_prioritized_rb = args.use_prioritized_rb
         self._use_nstep_rb = args.use_nstep_rb
