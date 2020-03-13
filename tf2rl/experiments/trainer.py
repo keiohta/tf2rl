@@ -44,21 +44,25 @@ class Trainer:
             logging_level=logging.getLevelName(args.logging_level),
             output_dir=self._output_dir)
 
-        # Save and restore model
-        self._checkpoint = tf.train.Checkpoint(policy=self._policy)
-        self.checkpoint_manager = tf.train.CheckpointManager(
-            self._checkpoint, directory=self._output_dir, max_to_keep=5)
         if args.evaluate:
             assert args.model_dir is not None
-        if args.model_dir is not None:
-            assert os.path.isdir(args.model_dir)
-            self._latest_path_ckpt = tf.train.latest_checkpoint(args.model_dir)
-            self._checkpoint.restore(self._latest_path_ckpt)
-            self.logger.info("Restored {}".format(self._latest_path_ckpt))
+        self._set_check_point(args.model_dir)
 
         # prepare TensorBoard output
         self.writer = tf.summary.create_file_writer(self._output_dir)
         self.writer.set_as_default()
+
+    def _set_check_point(self, model_dir):
+        # Save and restore model
+        self._checkpoint = tf.train.Checkpoint(policy=self._policy)
+        self.checkpoint_manager = tf.train.CheckpointManager(
+            self._checkpoint, directory=self._output_dir, max_to_keep=5)
+
+        if model_dir is not None:
+            assert os.path.isdir(model_dir)
+            self._latest_path_ckpt = tf.train.latest_checkpoint(model_dir)
+            self._checkpoint.restore(self._latest_path_ckpt)
+            self.logger.info("Restored {}".format(self._latest_path_ckpt))
 
     def __call__(self):
         total_steps = 0
