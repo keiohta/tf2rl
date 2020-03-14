@@ -1,11 +1,10 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
-from cpprb.experimental import ReplayBuffer
+from cpprb import ReplayBuffer
 
 from tf2rl.experiments.trainer import Trainer
 from tf2rl.misc.get_replay_buffer import get_space_size
-from tf2rl.envs.utils import is_discrete
 
 
 class MLP(tf.keras.Model):
@@ -91,7 +90,7 @@ class MPCTrainer(Trainer):
         obs_dim = self._env.observation_space.high.size
         act_dim = self._env.action_space.high.size
         self._dynamics_model = MLP(
-            input_dim=obs_dim+act_dim,
+            input_dim=obs_dim + act_dim,
             output_dim=obs_dim,
             gpu=args.gpu)
         self._optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
@@ -103,6 +102,7 @@ class MPCTrainer(Trainer):
         total_steps = 0
         tf.summary.experimental.set_step(total_steps)
         # Gather dataset of random trajectories
+        self.logger.info("Ramdomly collect {} samples...".format(self._n_random_rollout * self._episode_max_steps))
         self.collect_sample_randomly()
 
         for i in range(self._max_iter):
@@ -125,8 +125,7 @@ class MPCTrainer(Trainer):
                 obs = next_obs
             tf.summary.experimental.set_step(total_steps)
             tf.summary.scalar("mpc/total_rew", total_rew)
-            self.logger.info("iter={0: 3d} total_rew: {1:4.4f}".format(
-                i, total_rew))
+            self.logger.info("iter={0: 3d} total_rew: {1:4.4f}".format(i, total_rew))
 
     def _mpc(self, obs):
         init_actions = self._policy.get_actions(
