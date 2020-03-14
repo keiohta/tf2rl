@@ -1,20 +1,16 @@
 import gym
 
-import numpy as np
 import tensorflow as tf
-from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.algos.dqn import DQN
-from tf2rl.networks.noisy_dense import NoisyDense
 from tf2rl.envs.atari_wrapper import wrap_dqn
 from tf2rl.experiments.trainer import Trainer
-from tf2rl.networks.dqn_model import AtariQFunc as QFunc
+from tf2rl.networks.atari_model import AtariQFunc as QFunc
 
 
 if __name__ == '__main__':
     parser = Trainer.get_argument()
     parser = DQN.get_argument(parser)
-    parser.add_argument("--replay-buffer-size", type=int, default=int(1e6))
     parser.add_argument('--env-name', type=str,
                         default="SpaceInvadersNoFrameskip-v4")
     parser.set_defaults(episode_max_steps=108000)
@@ -23,6 +19,7 @@ if __name__ == '__main__':
     parser.set_defaults(save_model_interval=500000)
     parser.set_defaults(gpu=0)
     parser.set_defaults(show_test_images=True)
+    parser.set_defaults(memory_capacity=int(1e6))
     args = parser.parse_args()
 
     env = wrap_dqn(gym.make(args.env_name))
@@ -41,7 +38,7 @@ if __name__ == '__main__':
         n_warmup=50000,
         target_replace_interval=10000,
         batch_size=32,
-        memory_capacity=args.replay_buffer_size,
+        memory_capacity=args.memory_capacity,
         discount=0.99,
         epsilon=1.,
         epsilon_min=0.1,

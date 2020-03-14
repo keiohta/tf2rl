@@ -20,16 +20,16 @@ class TestCategoricalActor(CommonModel):
         state = np.random.rand(
             1, self.discrete_env.observation_space.low.size)
         self._test_call(
-            state,
-            (1,),
-            (1,))
+            inputs=state,
+            expected_action_shapes=(1,),
+            expected_log_prob_shapes=(1,))
         # Multiple inputs
         states = np.random.rand(
             self.batch_size, self.discrete_env.observation_space.low.size)
         self._test_call(
-            states,
-            (self.batch_size,),
-            (self.batch_size,))
+            inputs=states,
+            expected_action_shapes=(self.batch_size,),
+            expected_log_prob_shapes=(self.batch_size,))
 
     def test_compute_log_probs(self):
         # Single input

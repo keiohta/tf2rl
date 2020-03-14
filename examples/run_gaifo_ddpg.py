@@ -1,20 +1,20 @@
 import gym
 
 from tf2rl.algos.ddpg import DDPG
-from tf2rl.algos.vail import VAIL
+from tf2rl.algos.gaifo import GAIfO
 from tf2rl.experiments.irl_trainer import IRLTrainer
 from tf2rl.experiments.utils import restore_latest_n_traj
 
 
 if __name__ == '__main__':
     parser = IRLTrainer.get_argument()
-    parser = VAIL.get_argument(parser)
+    parser = GAIfO.get_argument(parser)
     parser.add_argument('--env-name', type=str, default="Pendulum-v0")
     args = parser.parse_args()
 
     if args.expert_path_dir is None:
         print("Plaese generate demonstrations first")
-        print("python examples/run_sac.py --env-name=Pendulum-v0 --save-test-path --test-interval=50000")
+        print("python examples/run_sac.py --env-name~Pendulum-v0 --save-test-path --test-interval=50000")
         exit()
 
     units = [400, 300]
@@ -30,9 +30,8 @@ if __name__ == '__main__':
         critic_units=units,
         n_warmup=10000,
         batch_size=100)
-    irl = VAIL(
+    irl = GAIfO(
         state_shape=env.observation_space.shape,
-        action_dim=env.action_space.high.size,
         units=units,
         enable_sn=args.enable_sn,
         batch_size=32,

@@ -15,7 +15,7 @@ class DiagonalGaussian(Distribution):
     def kl(self, old_param, new_param):
         """
         Compute KL divergence of two distributions as:
-            (\mu_1 - \mu_2)^2 + \sigma_1^2 - \sigma_2^2 } / (2 * \sigma_2^2) + ln(\sigma_2 / \sigma_1)
+            {(\mu_1 - \mu_2)^2 + \sigma_1^2 - \sigma_2^2} / (2 * \sigma_2^2) + ln(\sigma_2 / \sigma_1)
 
         :param old_param (Dict):
             Gaussian distribution to compare with that contains
@@ -59,4 +59,4 @@ class DiagonalGaussian(Distribution):
 
     def entropy(self, param):
         log_stds = param["log_std"]
-        return tf.math.sum(log_stds + tf.math.log(tf.math.sqrt(2 * tf.math.pi * np.e)), axis=-1)
+        return tf.reduce_sum(log_stds + tf.math.log(tf.math.sqrt(2 * np.pi * np.e)), axis=-1)

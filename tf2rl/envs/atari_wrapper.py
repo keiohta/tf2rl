@@ -328,6 +328,21 @@ class LazyFrames(object):
         return self._force()[..., i]
 
 
+class NdarrayFrames(gym.Wrapper):
+    def __init__(self, env):
+        gym.Wrapper.__init__(self, env)
+
+    def reset(self):
+        obs = self.env.reset()
+        assert isinstance(obs, LazyFrames)
+        return np.array(obs)
+
+    def step(self, action):
+        next_obs, rew, done, env_info = self.env.step(action)
+        assert isinstance(next_obs, LazyFrames)
+        return np.array(next_obs), rew, done, env_info
+
+
 def make_atari(env_id, max_episode_steps=None):
     env = gym.make(env_id)
     assert 'NoFrameskip' in env.spec.id
@@ -355,7 +370,8 @@ def wrap_deepmind(env, episode_life=True, clip_rewards=True, frame_stack=False, 
 
 
 # forked from https://github.com/Shmuma/ptan/blob/master/ptan/common/wrappers.py
-def wrap_dqn(env, stack_frames=4, episodic_life=True, reward_clipping=True):
+def wrap_dqn(env, stack_frames=4, episodic_life=True,
+             reward_clipping=True, wrap_ndarray=False):
     """
     Apply a common set of wrappers for Atari games.
     """
@@ -370,4 +386,6 @@ def wrap_dqn(env, stack_frames=4, episodic_life=True, reward_clipping=True):
     env = FrameStack(env, stack_frames)
     if reward_clipping:
         env = ClipRewardEnv(env)
+    if wrap_ndarray:
+        env = NdarrayFrames(env)
     return env

@@ -97,7 +97,8 @@ class DDPG(OffPolicyAgent):
         state = np.expand_dims(state, axis=0).astype(
             np.float32) if is_single_state else state
         action = self._get_action_body(
-            tf.constant(state), self.sigma * test, tf.constant(self.actor.max_action, dtype=tf.float32))
+            tf.constant(state), self.sigma * (1. - test),
+            tf.constant(self.actor.max_action, dtype=tf.float32))
         if tensor:
             return action
         else:
@@ -162,7 +163,7 @@ class DDPG(OffPolicyAgent):
             dones = tf.expand_dims(dones, 1)
         td_errors = self._compute_td_error_body(
             states, actions, next_states, rewards, dones)
-        return np.ravel(td_errors.numpy())
+        return np.abs(np.ravel(td_errors.numpy()))
 
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):

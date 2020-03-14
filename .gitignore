@@ -1,4 +1,7 @@
 results/*
+*/results/*
+*/*/results/*
+*/*/*/results/*
 __pycache__/
 
 *.egg-info/*

@@ -5,25 +5,26 @@
 [![PyPI version](https://badge.fury.io/py/tf2rl.svg)](https://badge.fury.io/py/tf2rl)
 
 # TF2RL
-TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using TensorFlow 2.0.
+TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using TensorFlow 2.x.
 
 ## Algorithms
 Following algorithms are supported:
 
 |                          Algorithm                           | Dicrete action | Continuous action |                  Support                   | Category                 |
 | :----------------------------------------------------------: | :------------: | :---------------: | :----------------------------------------: | ------------------------ |
-| [VPG](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf) |       ✓        |         ✓         |  [GAE](https://arxiv.org/abs/1506.02438)   | Model-free On-policy RL  |
+| [VPG](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [PPO](<https://arxiv.org/abs/1707.06347>) |       ✓        |         ✓         |  [GAE](https://arxiv.org/abs/1506.02438)   | Model-free On-policy RL  |
 | [DQN](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf) (including [DDQN](https://arxiv.org/abs/1509.06461), [Prior. DQN](https://arxiv.org/abs/1511.05952), [Duel. DQN](https://arxiv.org/abs/1511.06581), [Distrib. DQN](<https://arxiv.org/abs/1707.06887>), [Noisy DQN](<https://arxiv.org/abs/1706.10295>)) |       ✓        |         -         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
 | [DDPG](https://arxiv.org/abs/1509.02971) (including [TD3](<https://arxiv.org/abs/1802.09477>), [BiResDDPG](<https://arxiv.org/abs/1905.01072>)) |       -        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
-|          [SAC](<https://arxiv.org/abs/1801.01290>)           |       -        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
-| [GAIL](<https://arxiv.org/abs/1606.03476>), [VAIL](<https://arxiv.org/abs/1810.00821>) (including [Spectral Normalization](<https://arxiv.org/abs/1802.05957>)) |       ✓        |         ✓         |                     -                      | Imitation Learning       |
+|          [SAC](<https://arxiv.org/abs/1801.01290>)           |       ✓        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
+| [GAIL](<https://arxiv.org/abs/1606.03476>), [GAIfO](<https://arxiv.org/abs/1807.06158>), [VAIL](<https://arxiv.org/abs/1810.00821>) (including [Spectral Normalization](<https://arxiv.org/abs/1802.05957>)) |       ✓        |         ✓         |                     -                      | Imitation Learning       |
 
-Following papers have been implementd in tf2rl:
+Following papers have been implemented in tf2rl:
 
-- Model-free On-policy
+- Model-free On-policy RL
   - [Policy Gradient Methods for Reinforcement Learning with Function Approximation](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/vpg.py>)
   - [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/abs/1506.02438), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/misc/discount_cumsum.py>)
-- Model-free Off-policy
+  - [Proximal Policy Optimization Algorithms](<https://arxiv.org/abs/1707.06347>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/ppo.py>)
+- Model-free Off-policy RL
   - [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
   - [Human-level control through Deep Reinforcement Learning](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
   - [Deep Reinforcement Learning with Double Q-learning](https://arxiv.org/abs/1509.06461), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/dqn.py>)
@@ -33,12 +34,14 @@ Following papers have been implementd in tf2rl:
   - [Noisy Networks for Exploration](<https://arxiv.org/abs/1706.10295>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/networks/noisy_dense.py>)
   - [Distributed Prioritized Experience Replay](<https://arxiv.org/abs/1803.00933>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/apex.py>)
   - [Continuous control with deep reinforcement learning](https://arxiv.org/abs/1509.02971), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/ddpg.py>)
-  - [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](<https://arxiv.org/abs/1801.01290>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac.py>)
+  - [Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor](<https://arxiv.org/abs/1801.01290>), [Soft Actor-Critic Algorithms and Applications](https://arxiv.org/abs/1812.05905), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac.py>)
   - [Addressing Function Approximation Error in Actor-Critic Methods](<https://arxiv.org/abs/1802.09477>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/td3.py>)
   - [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/bi_res_ddpg.py>)
+  - [Soft Actor-Critic for Discrete Action Settings](https://arxiv.org/abs/1910.07207v1), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac_discrete.py>)
 - Imitation Learning
   - [Generative Adversarial Imitation Learning](<https://arxiv.org/abs/1606.03476>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/gail.py>)
   - [Spectral Normalization for Generative Adversarial Networks](<https://arxiv.org/abs/1802.05957>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/networks/spectral_norm_dense.py>)
+  - [Generative Adversarial Imitation from Observation](<https://arxiv.org/abs/1807.06158>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/gail.py>)
   - [Variational Discriminator Bottleneck: Improving Imitation Learning, Inverse RL, and GANs by Constraining Information Flow](<https://arxiv.org/abs/1810.00821>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/vail.py>)
 
 ## Installation
@@ -87,7 +90,16 @@ You can check implemented algorithms in [examples](https://github.com/keiohta/tf
 For example if you want to train DDPG agent:
 
 ```bash
-# You must change directory to avoid importing local files.
+# You must change directory to avoid importing local files
 $ cd examples
-$ python run_ddpg.py
+# For options, please specify --help or read code for options
+$ python run_ddpg.py [options]
 ```
+
+You can see the training progress/results from TensorBoard as follows:
+
+```bash
+# When executing `run_**.py`, its logs are automatically generated under `./results`
+$ tensorboard --logdir results
+```
+

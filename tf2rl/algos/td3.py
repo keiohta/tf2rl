@@ -103,7 +103,7 @@ class TD3(DDPG):
             update_target_variables(
                 self.actor_target.weights, self.actor.weights, self.tau)
 
-            return actor_loss, critic_loss, np.abs(td_error1) + np.abs(td_error2)
+            return actor_loss, critic_loss, tf.abs(td_error1) + tf.abs(td_error2)
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
         td_errors1, td_errors2 = self._compute_td_error_body(

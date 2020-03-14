@@ -1,9 +1,7 @@
-import roboschool
 import gym
 
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.algos.gail import GAIL
-from tf2rl.experiments.trainer import Trainer
 from tf2rl.experiments.irl_trainer import IRLTrainer
 from tf2rl.experiments.utils import restore_latest_n_traj
 
@@ -11,12 +9,12 @@ from tf2rl.experiments.utils import restore_latest_n_traj
 if __name__ == '__main__':
     parser = IRLTrainer.get_argument()
     parser = GAIL.get_argument(parser)
-    parser.add_argument('--env-name', type=str, default="RoboschoolReacher-v1")
+    parser.add_argument('--env-name', type=str, default="Pendulum-v0")
     args = parser.parse_args()
 
     if args.expert_path_dir is None:
         print("Plaese generate demonstrations first")
-        print("python examples/run_sac.py --env-name=RoboschoolReacher-v1 --save-test-path --test-interval=50000")
+        print("python examples/run_sac.py --env-name=Pendulum-v0 --save-test-path --test-interval=50000")
         exit()
 
     units = [400, 300]
@@ -42,5 +40,5 @@ if __name__ == '__main__':
     expert_trajs = restore_latest_n_traj(
         args.expert_path_dir, n_path=20, max_steps=1000)
     trainer = IRLTrainer(policy, env, args, irl, expert_trajs["obses"],
-                         expert_trajs["acts"], test_env)
+                         expert_trajs["next_obses"], expert_trajs["acts"], test_env)
     trainer()

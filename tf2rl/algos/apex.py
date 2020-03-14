@@ -6,32 +6,20 @@ import multiprocessing
 from multiprocessing import Process, Queue, Value, Event, Lock
 from multiprocessing.managers import SyncManager
 
-from cpprb.experimental import ReplayBuffer, PrioritizedReplayBuffer
+from cpprb import ReplayBuffer, PrioritizedReplayBuffer
 
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.get_replay_buffer import get_default_rb_dict
-
-
-logging.root.handlers[0].setFormatter(logging.Formatter(
-    fmt='%(asctime)s [%(levelname)s] (%(filename)s:%(lineno)s) %(message)s'))
+from tf2rl.misc.initialize_logger import initialize_logger
 
 
 def import_tf():
     import tensorflow as tf
-    gpus = tf.config.experimental.list_physical_devices('GPU')
-    if gpus:
-        try:
-            # Currently, memory growth needs to be the same across GPUs
-            for gpu in gpus:
-                tf.config.experimental.set_memory_growth(gpu, True)
-            logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-            logging.info(
-                len(gpus), "Physical GPUs,",
-                len(logical_gpus), "Logical GPUs")
-        except RuntimeError as e:
-            # Memory growth must be set before GPUs have been initialized
-            logging.error(e)
+    if tf.config.experimental.list_physical_devices('GPU'):
+        for cur_device in tf.config.experimental.list_physical_devices("GPU"):
+            print(cur_device)
+            tf.config.experimental.set_memory_growth(cur_device, enable=True)
     return tf
 
 
@@ -76,6 +64,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
         GPU id. If this is set to -1, then this process uses only CPU.
     """
     import_tf()
+    logger = logging.getLogger("tf2rl")
 
     if n_env > 1:
         envs = MultiThreadEnv(
@@ -94,14 +83,14 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
     if n_env > 1:
         kwargs["env_dict"]["priorities"] = {}
     local_rb = ReplayBuffer(**kwargs)
+    local_idx = np.arange(buffer_size)
 
     if n_env == 1:
         s = env.reset()
         episode_steps = 0
         total_reward = 0.
         total_rewards = []
-    else:
-        obses = envs.py_reset()
+
     start = time.time()
     n_sample, n_sample_old = 0, 0
 
@@ -141,7 +130,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
 
         # Add collected experiences to global replay buffer
         if local_rb.get_stored_size() == buffer_size:
-            samples = local_rb.sample(local_rb.get_stored_size())
+            samples = local_rb._encode_sample(local_idx)
             if n_env > 1:
                 priorities = np.squeeze(samples["priorities"])
             else:
@@ -168,7 +157,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
                 total_rewards = []
             msg += "FPS: {0:.2f}".format(
                 (n_sample - n_sample_old) / (time.time() - start))
-            logging.info(msg)
+            logger.info(msg)
 
             start = time.time()
             n_sample_old = n_sample
@@ -209,6 +198,7 @@ def learner(global_rb, trained_steps, is_training_done,
         List of Queues shared with explorers to send latest network parameters.
     """
     tf = import_tf()
+    logger = logging.getLogger("tf2rl")
 
     policy = policy_fn(env, "Learner", global_rb.get_buffer_size(), gpu=gpu)
 
@@ -227,10 +217,12 @@ def learner(global_rb, trained_steps, is_training_done,
         tf.summary.experimental.set_step(trained_steps.value)
         lock.acquire()
         samples = global_rb.sample(policy.batch_size)
+        lock.release()
         td_errors = policy.train(
             samples["obs"], samples["act"], samples["next_obs"],
             samples["rew"], samples["done"], samples["weights"])
         writer.flush()
+        lock.acquire()
         global_rb.update_priorities(
             samples["indexes"], np.abs(td_errors)+1e-6)
         lock.release()
@@ -242,7 +234,7 @@ def learner(global_rb, trained_steps, is_training_done,
                 queues[i].put(weights)
             fps = update_freq / (time.time() - start_time)
             tf.summary.scalar(name="apex/fps", data=fps)
-            logging.info("Update weights. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
+            logger.info("Update weights. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
                 fps, trained_steps.value))
             start_time = time.time()
 
@@ -284,6 +276,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
         If true, `render` will be called to visualize evaluation process.
     """
     tf = import_tf()
+    logger = logging.getLogger("tf2rl")
 
     output_dir = prepare_output_dir(
         args=None, user_specified_dir="./results", suffix="evaluator")
@@ -327,7 +320,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
                 if not queue.empty():
                     break
             avg_test_return /= n_evaluated_episode
-            logging.info("Evaluation: {} over {} run".format(
+            logger.info("Evaluation: {} over {} run".format(
                 avg_test_return, n_evaluated_episode))
             tf.summary.scalar(
                 name="apex/average_test_return", data=avg_test_return)
@@ -340,7 +333,7 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
 
 def apex_argument(parser=None):
     if parser is None:
-        parser = argparse.ArgumentParser()
+        parser = argparse.ArgumentParser(conflict_handler='resolve')
     parser.add_argument('--n-training', type=int, default=1e7,
                         help='number of times to apply batch update')
     parser.add_argument('--episode-max-steps', type=int, default=int(1e3),
@@ -380,6 +373,7 @@ def prepare_experiment(env, args):
     manager.start()
 
     kwargs = get_default_rb_dict(args.replay_buffer_size, env)
+    kwargs["check_for_update"] = True
     global_rb = manager.PrioritizedReplayBuffer(**kwargs)
 
     # queues to share network parameters between a learner and explorers
@@ -400,7 +394,8 @@ def prepare_experiment(env, args):
 
 
 def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
-    logging.getLogger().setLevel(logging.getLevelName(args.logging_level))
+    initialize_logger(
+        logging_level=logging.getLevelName(args.logging_level))
 
     if args.n_env > 1:
         args.n_explorer = 1

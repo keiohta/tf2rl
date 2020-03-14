@@ -42,6 +42,7 @@ class CommonOffPolAlgos(CommonAlgos):
             shape=(self.batch_size, state.shape[0]), dtype=np.float32)
         actions_train = self.agent.get_action(states, test=False)
         actions_test = self.agent.get_action(states, test=True)
+
         if self.is_discrete:
             self.assertEqual(
                 actions_train.shape, (self.batch_size,))
@@ -52,6 +53,23 @@ class CommonOffPolAlgos(CommonAlgos):
                 actions_train.shape, (self.batch_size, self.action_dim))
             self.assertEqual(
                 actions_test.shape, (self.batch_size, self.action_dim))
+
+    def test_get_action_greedy(self):
+        if self.agent is None:
+            return
+        # Multiple inputs
+        states = np.zeros(
+            shape=(self.batch_size, self.env.reset().astype(np.float32).shape[0]), dtype=np.float32)
+        actions_train = self.agent.get_action(states, test=False)
+        actions_test = self.agent.get_action(states, test=True)
+
+        # All actions should be same if `test=True`, and not same if `test=False`
+        if self.is_discrete:
+            self.assertEqual(np.prod(np.unique(actions_test).shape), 1)
+            self.assertGreater(np.prod(np.unique(actions_train).shape), 1)
+        else:
+            self.assertEqual(np.prod(np.all(actions_test == actions_test[0, :], axis=0)), 1)
+            self.assertEqual(np.prod(np.all(actions_train == actions_train[0, :], axis=0)), 0)
 
     def test_train(self):
         if self.agent is None:
@@ -139,12 +157,6 @@ class CommonOnPolActorCritic(CommonAlgos):
         self.assertEqual(logps_test.shape, (self.batch_size,))
 
     def test_train(self):
-        """In actor critic, train method is divided into
-        `train_actor` and `train_critic` methods
-        """
-        pass
-
-    def test_train_actor(self):
         if self.agent is None:
             return
         state = self.env.reset().astype(np.float32)
@@ -158,20 +170,11 @@ class CommonOnPolActorCritic(CommonAlgos):
             shape=(self.batch_size, 1),
             dtype=np.float32)
         logps = np.ones_like(advs)
-        self.agent.train_actor(obses, acts, advs, logps)
-
-    def test_train_critic(self):
-        if self.agent is None:
-            return
-        state = self.env.reset().astype(np.float32)
-        obses = np.zeros(
-            shape=(self.batch_size,)+state.shape,
-            dtype=np.float32)
         returns = np.zeros(
             shape=(self.batch_size, 1),
             dtype=np.float32)
 
-        self.agent.train_critic(obses, returns)
+        self.agent.train(obses, acts, advs, logps, returns)
 
 
 class CommonOnPolActorCriticContinuousAlgos(CommonOnPolActorCritic):
@@ -209,7 +212,7 @@ class CommonIRLAlgos(CommonAlgos):
             shape=(self.discrete_env.action_space.n,),
             dtype=np.float32)
         action[self.discrete_env.action_space.sample()] = 1.
-        self.irl_discrete.inference(state, action)
+        self.irl_discrete.inference(state, action, state)
 
     def test_inference_continuous(self):
         if self.irl_continuous is None:
@@ -220,7 +223,7 @@ class CommonIRLAlgos(CommonAlgos):
         action = np.zeros(
             shape=(self.continuous_env.action_space.low.size,),
             dtype=np.float32)
-        self.irl_continuous.inference(state, action)
+        self.irl_continuous.inference(state, action, state)
 
     def test_train_discrete(self):
         if self.irl_discrete is None:
@@ -231,7 +234,13 @@ class CommonIRLAlgos(CommonAlgos):
         actions = np.zeros(
             shape=(self.batch_size, self.discrete_env.action_space.n),
             dtype=np.float32)
-        self.irl_discrete.train(states, actions, states, actions)
+        self.irl_discrete.train(
+            agent_states=states,
+            agent_acts=actions,
+            agent_next_states=states,
+            expert_states=states,
+            expert_acts=actions,
+            expert_next_states=states)
 
     def test_train_continuous(self):
         if self.irl_continuous is None:
@@ -242,7 +251,13 @@ class CommonIRLAlgos(CommonAlgos):
         actions = np.zeros(
             shape=(self.batch_size, self.continuous_env.action_space.low.size),
             dtype=np.float32)
-        self.irl_continuous.train(states, actions, states, actions)
+        self.irl_continuous.train(
+            agent_states=states,
+            agent_acts=actions,
+            agent_next_states=states,
+            expert_states=states,
+            expert_acts=actions,
+            expert_next_states=states)
 
 
 if __name__ == '__main__':
