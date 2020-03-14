@@ -148,6 +148,7 @@ class MPCTrainer(Trainer):
             assert rewards.shape == total_rewards.shape
             total_rewards += rewards
             obses = next_obses
+
         idx = np.argmax(total_rewards)
         return init_actions[idx]
 
@@ -195,8 +196,7 @@ class MPCTrainer(Trainer):
             loss = self._fit_dynamics_body(x, y)
             self.logger.debug("batch: {} loss: {:2.6f}".format(batch, loss))
         tf.summary.scalar("mpc/model_loss", loss)
-        self.logger.info("iter={0: 3d} loss: {1:2.8f}".format(
-            n_iter, loss))
+        self.logger.info("iter={0: 3d} loss: {1:2.8f}".format(n_iter, loss))
 
     @staticmethod
     def get_argument(parser=None):
