@@ -62,15 +62,13 @@ class RandomPolicy:
 class MPCTrainer(Trainer):
     def __init__(
             self,
+            policy,
             env,
             args,
             reward_fn,
             buffer_size=int(1e6),
             lr=0.001,
             **kwargs):
-        policy = RandomPolicy(
-            max_action=env.action_space.high[0],
-            act_dim=env.action_space.high.size)
         super().__init__(policy, env, args, **kwargs)
 
         # Prepare buffer that stores transitions (s, a, s')
@@ -164,7 +162,10 @@ class MPCTrainer(Trainer):
         for _ in range(self._n_random_rollout):
             obs = self._env.reset()
             for _ in range(self._episode_max_steps):
-                act = self._policy.get_action()
+                act = np.random.uniform(
+                    low=self._env.action_space.low,
+                    high=self._env.action_space.high,
+                    size=self._env.action_space.shape[0])
                 next_obs, _, done, _ = self._env.step(act)
                 self.dynamics_buffer.add(
                     obs=obs, act=act, next_obs=next_obs)
