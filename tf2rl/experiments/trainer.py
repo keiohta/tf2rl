@@ -244,8 +244,6 @@ class Trainer:
                             help='Number of experiments')
         parser.add_argument('--show-progress', action='store_true',
                             help='Call `render` in training process')
-        parser.add_argument('--gpu', type=int, default=0,
-                            help='GPU id')
         parser.add_argument('--save-model-interval', type=int, default=int(1e4),
                             help='Interval to save model')
         parser.add_argument('--save-summary-interval', type=int, default=int(1e3),

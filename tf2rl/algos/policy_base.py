@@ -35,6 +35,8 @@ class Policy(tf.keras.Model):
             parser = argparse.ArgumentParser(conflict_handler='resolve')
         parser.add_argument('--n-warmup', type=int, default=int(1e4))
         parser.add_argument('--batch-size', type=int, default=32)
+        parser.add_argument('--gpu', type=int, default=0,
+                            help='GPU id')
         return parser
 
 

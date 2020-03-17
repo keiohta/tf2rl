@@ -1,5 +1,4 @@
 import numpy as np
-
 from gym.spaces.box import Box
 from gym.spaces.discrete import Discrete
 from gym.spaces.dict import Dict
