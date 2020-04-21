@@ -91,12 +91,14 @@ class TD3(DDPG):
                 actor_loss = - \
                     tf.reduce_mean(self.critic([states, next_actions]))
 
-            if tf.math.equal(self._it % self._actor_update_freq, 0):
+            remainder = tf.math.mod(self._it, self._actor_update_freq)
+            def optimize_actor():
                 actor_grad = tape.gradient(
                     actor_loss, self.actor.trainable_variables)
-                self.actor_optimizer.apply_gradients(
+                return self.actor_optimizer.apply_gradients(
                     zip(actor_grad, self.actor.trainable_variables))
 
+            tf.cond(pred=tf.equal(remainder, 0), true_fn=optimize_actor, false_fn=tf.no_op)
             # Update target networks
             update_target_variables(
                 self.critic_target.weights, self.critic.weights, self.tau)
