@@ -47,7 +47,12 @@ Following papers have been implemented in tf2rl:
   - [Generative Adversarial Imitation from Observation](<https://arxiv.org/abs/1807.06158>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/gail.py>)
   - [Variational Discriminator Bottleneck: Improving Imitation Learning, Inverse RL, and GANs by Constraining Information Flow](<https://arxiv.org/abs/1810.00821>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/vail.py>)
 
+Also, some useful techniques are implemented:
+
+- [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/tools/vae.py)
+
 ## Installation
+
 You can install `tf2rl` from PyPI:
 
 ```bash
