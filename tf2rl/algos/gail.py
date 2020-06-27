@@ -97,8 +97,6 @@ class GAIL(IRLPolicy):
 
     @staticmethod
     def get_argument(parser=None):
-        import argparse
-        if parser is None:
-            parser = argparse.ArgumentParser(conflict_handler='resolve')
+        parser = IRLPolicy.get_argument(parser)
         parser.add_argument('--enable-sn', action='store_true')
         return parser
