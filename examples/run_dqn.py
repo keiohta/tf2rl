@@ -13,10 +13,11 @@ if __name__ == '__main__':
     parser.set_defaults(n_warmup=500)
     parser.set_defaults(batch_size=32)
     parser.set_defaults(memory_capacity=int(1e4))
+    parser.add_argument('--env-name', type=str, default="CartPole-v0")
     args = parser.parse_args()
 
-    env = gym.make("CartPole-v0")
-    test_env = gym.make("CartPole-v0")
+    env = gym.make(args.env_name)
+    test_env = gym.make(args.env_name)
     policy = DQN(
         enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
