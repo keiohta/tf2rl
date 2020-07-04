@@ -147,7 +147,7 @@ class MPCTrainer(Trainer):
                 np.concatenate([obses, acts], axis=1))
             assert obses.shape == obs_diffs.shape
             next_obses = obses + obs_diffs
-            rewards = self._reward_fn(obses, next_obses, acts)
+            rewards = self._reward_fn(obses, acts)
             assert rewards.shape == total_rewards.shape
             total_rewards += rewards
             obses = next_obses
