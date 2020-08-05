@@ -127,9 +127,7 @@ class SAC(OffPolicyAgent):
         if weights is None:
             weights = np.ones_like(rewards)
 
-        td_errors, actor_loss, vf_loss, qf_loss, logp_min, logp_max, logp_mean = \
-            self._train_body(states, actions, next_states,
-                             rewards, dones, weights)
+        td_errors, actor_loss, vf_loss, qf_loss, logp_min, logp_max, logp_mean = self._train_body(states, actions, next_states, rewards, dones, weights)
 
         tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
         tf.summary.scalar(name=self.policy_name+"/critic_V_loss", data=vf_loss)

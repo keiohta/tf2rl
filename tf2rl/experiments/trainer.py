@@ -93,8 +93,8 @@ class Trainer:
             tf.summary.experimental.set_step(total_steps)
 
             done_flag = done
-            if hasattr(self._env, "_max_episode_steps") and \
-                    episode_steps == self._env._max_episode_steps:
+            if (hasattr(self._env, "_max_episode_steps") and
+                episode_steps == self._env._max_episode_steps):
                 done_flag = False
             replay_buffer.add(obs=obs, act=action,
                               next_obs=next_obs, rew=reward, done=done_flag)
@@ -209,9 +209,9 @@ class Trainer:
     def _set_from_args(self, args):
         # experiment settings
         self._max_steps = args.max_steps
-        self._episode_max_steps = args.episode_max_steps \
-            if args.episode_max_steps is not None \
-            else args.max_steps
+        self._episode_max_steps = (args.episode_max_steps
+                                   if args.episode_max_steps is not None
+                                   else args.max_steps)
         self._n_experiments = args.n_experiments
         self._show_progress = args.show_progress
         self._save_model_interval = args.save_model_interval

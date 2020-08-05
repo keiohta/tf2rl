@@ -18,9 +18,7 @@ class PPO(VPG):
     def train(self, states, actions, advantages, logp_olds, returns):
         # Train actor and critic
         if self.actor_critic is not None:
-            actor_loss, critic_loss, logp_news, ratio, ent = \
-                self._train_actor_critic_body(
-                    states, actions, advantages, logp_olds, returns)
+            actor_loss, critic_loss, logp_news, ratio, ent = self._train_actor_critic_body(states, actions, advantages, logp_olds, returns)
         else:
             actor_loss, logp_news, ratio, ent = self._train_actor_body(
                 states, actions, advantages, logp_olds)

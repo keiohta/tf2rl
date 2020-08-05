@@ -87,8 +87,8 @@ class VPG(OnPolicyAgent):
     def get_action(self, state, test=False):
         if isinstance(state, LazyFrames):
             state = np.array(state)
-        assert isinstance(state, np.ndarray), \
-            "Input instance should be np.ndarray, not {}".format(type(state))
+        msg = "Input instance should be np.ndarray, not {}".format(type(state))
+        assert isinstance(state, np.ndarray), msg
 
         is_single_input = state.ndim == self._state_ndim
         if is_single_input:

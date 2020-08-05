@@ -151,8 +151,8 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
             msg += "Samples: {0: 7d}\t".format(n_sample)
             msg += "TDErr: {0:.5f}\t".format(np.average(priorities))
             if n_env == 1:
-                ave_rew = 0 if len(total_rewards) == 0 else \
-                    sum(total_rewards) / len(total_rewards)
+                ave_rew = (0 if len(total_rewards) == 0 else
+                           sum(total_rewards) / len(total_rewards))
                 msg += "AveEpiRew: {0:.3f}\t".format(ave_rew)
                 total_rewards = []
             msg += "FPS: {0:.2f}".format(
@@ -405,8 +405,7 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
 
     env = env_fn()
 
-    global_rb, queues, is_training_done, lock, trained_steps = \
-        prepare_experiment(env, args)
+    global_rb, queues, is_training_done, lock, trained_steps = prepare_experiment(env, args)
 
     noise = 0.3
     tasks = []

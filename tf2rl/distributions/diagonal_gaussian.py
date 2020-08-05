@@ -28,8 +28,9 @@ class DiagonalGaussian(Distribution):
         old_std = tf.math.exp(old_log_stds)
         new_std = tf.math.exp(new_log_stds)
 
-        numerator = tf.math.square(old_means - new_means) \
-            + tf.math.square(old_std) - tf.math.square(new_std)
+        numerator = (tf.math.square(old_means - new_means)
+                     + tf.math.square(old_std)
+                     - tf.math.square(new_std))
         denominator = 2 * tf.math.square(new_std) + 1e-8
         return tf.math.reduce_sum(numerator / denominator + new_log_stds - old_log_stds)
 
@@ -47,9 +48,9 @@ class DiagonalGaussian(Distribution):
         log_stds = param["log_std"]
         assert means.shape == log_stds.shape
         zs = (x - means) / tf.exp(log_stds)
-        return - tf.reduce_sum(log_stds, axis=-1) \
-               - 0.5 * tf.reduce_sum(tf.square(zs), axis=-1) \
-               - 0.5 * self.dim * tf.math.log(2 * np.pi)
+        return (- tf.reduce_sum(log_stds, axis=-1)
+                - 0.5 * tf.reduce_sum(tf.square(zs), axis=-1)
+                - 0.5 * self.dim * tf.math.log(2 * np.pi))
 
     def sample(self, param):
         means = param["mean"]

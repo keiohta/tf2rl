@@ -102,8 +102,8 @@ class DQN(OffPolicyAgent):
             "enable_categorical_dqn": enable_categorical_dqn}
         self.q_func = q_func(**kwargs_dqn)
         self.q_func_target = q_func(**kwargs_dqn)
-        self.q_func_optimizer = optimizer if optimizer is not None else \
-            tf.keras.optimizers.Adam(learning_rate=lr)
+        self.q_func_optimizer = (optimizer if optimizer is not None else
+                                 tf.keras.optimizers.Adam(learning_rate=lr))
         update_target_variables(self.q_func_target.weights,
                                 self.q_func.weights, tau=1.)
 
@@ -114,8 +114,7 @@ class DQN(OffPolicyAgent):
         # Distributional DQN
         if enable_categorical_dqn:
             self._v_max, self._v_min = 10., -10.
-            self._delta_z = (self._v_max - self._v_min) / \
-                (self.q_func._n_atoms - 1)
+            self._delta_z = (self._v_max - self._v_min) / (self.q_func._n_atoms - 1)
             self._z_list = tf.constant(
                 [self._v_min + i *
                     self._delta_z for i in range(self.q_func._n_atoms)],

@@ -63,8 +63,8 @@ class OnPolicyAgent(Policy):
         kwargs["n_warmup"] = 0
         kwargs["memory_capacity"] = self.horizon
         super().__init__(**kwargs)
-        assert self.horizon % self.batch_size == 0, \
-            "Horizon should be divisible by batch size"
+        msg = "Horizon should be divisible by batch size"
+        assert self.horizon % self.batch_size == 0, msg
 
     @staticmethod
     def get_argument(parser=None):

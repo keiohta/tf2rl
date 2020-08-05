@@ -52,8 +52,8 @@ class OnPolicyTrainer(Trainer):
                 episode_return += reward
 
                 done_flag = done
-                if hasattr(self._env, "_max_episode_steps") and \
-                        episode_steps == self._env._max_episode_steps:
+                if (hasattr(self._env, "_max_episode_steps") and
+                    episode_steps == self._env._max_episode_steps):
                     done_flag = False
                 self.local_buffer.add(
                     obs=obs, act=act, next_obs=next_obs,
@@ -154,8 +154,8 @@ class OnPolicyTrainer(Trainer):
                 if self._normalize_obs:
                     obs = self._obs_normalizer(obs, update=False)
                 act, _ = self._policy.get_action(obs, test=True)
-                act = act if not hasattr(self._env.action_space, "high") else \
-                    np.clip(act, self._env.action_space.low, self._env.action_space.high)
+                act = (act if not hasattr(self._env.action_space, "high") else
+                       np.clip(act, self._env.action_space.low, self._env.action_space.high))
                 next_obs, reward, done, _ = self._test_env.step(act)
                 if self._save_test_path:
                     replay_buffer.add(
