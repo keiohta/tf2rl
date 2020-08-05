@@ -29,7 +29,7 @@ class Categorical(Distribution):
         """
         probs = param["prob"]
         msg = "Different shape inputted. "
-        msg +="You might have forgotten to convert `x` to one-hot vector."
+        msg += "You might have forgotten to convert `x` to one-hot vector."
         assert probs.shape == x.shape, msg
         return tf.math.log(tf.reduce_sum(probs * x, axis=1) + self._tiny)
 
