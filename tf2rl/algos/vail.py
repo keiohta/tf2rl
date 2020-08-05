@@ -105,9 +105,8 @@ class VAIL(GAIL):
         So, the resulting equation can be computed as:
             ln(1 / \sigma_1) + (\mu_1^2 + \sigma_1^2 - 1) / 2
         """
-        return tf.reduce_sum(
-            -log_stds + (tf.square(means) + tf.square(tf.exp(log_stds)) - 1.) / 2.,
-                axis=-1)
+        return tf.reduce_sum(-log_stds +
+                             (tf.square(means) + tf.square(tf.exp(log_stds)) - 1.) / 2., axis=-1)
 
     @tf.function
     def _train_body(self, agent_states, agent_acts, expert_states, expert_acts):
