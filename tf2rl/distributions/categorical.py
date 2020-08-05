@@ -6,7 +6,7 @@ from tf2rl.distributions.base import Distribution
 
 class Categorical(Distribution):
     def kl(self, old_param, new_param):
-        """
+        r"""
         Compute the KL divergence of two Categorical distribution as:
             p_1 * (\log p_1  - \log p_2)
         """
@@ -19,7 +19,7 @@ class Categorical(Distribution):
         return (tf.reduce_sum(new_prob * x) + self._tiny) / (tf.reduce_sum(old_prob * x) + self._tiny)
 
     def log_likelihood(self, x, param):
-        """
+        r"""
         Compute log likelihood as:
             \log \sum(p_i * x_i)
 

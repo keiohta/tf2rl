@@ -13,7 +13,7 @@ class DiagonalGaussian(Distribution):
         return self._dim
 
     def kl(self, old_param, new_param):
-        """
+        r"""
         Compute KL divergence of two distributions as:
             {(\mu_1 - \mu_2)^2 + \sigma_1^2 - \sigma_2^2} / (2 * \sigma_2^2) + ln(\sigma_2 / \sigma_1)
 
