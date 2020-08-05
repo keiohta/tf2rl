@@ -77,9 +77,8 @@ class GAIL(IRLPolicy):
             self.optimizer.apply_gradients(
                 zip(grads, self.disc.trainable_variables))
 
-        accuracy = \
-            tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. + \
-            tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.
+        accuracy = (tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. +
+                    tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.)
         js_divergence = self._compute_js_divergence(
             fake_logits, real_logits)
         return loss, accuracy, js_divergence

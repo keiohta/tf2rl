@@ -142,9 +142,8 @@ class VAIL(GAIL):
             tf.constant(0., dtype=tf.float32),
             self._reg_param + self._step_reg_param * (kl_loss - self._kl_target)))
 
-        accuracy = \
-            tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. + \
-            tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.
+        accuracy = (tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. +
+                    tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.)
         js_divergence = self._compute_js_divergence(
             fake_logits, real_logits)
         return loss, accuracy, real_kl, fake_kl, js_divergence
