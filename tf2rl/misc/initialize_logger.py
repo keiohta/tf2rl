@@ -36,6 +36,7 @@ def initialize_logger(logging_level=logging.INFO, output_dir="results/", filenam
         # Overwrite logging setting
         logger.handlers[0] = stream_handler
         if save_log:
+            logger.handlers[1].close()
             logger.handlers[1] = file_handler
 
     logger.propagate = False
