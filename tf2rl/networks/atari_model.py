@@ -86,8 +86,9 @@ class AtariQFunc(AtariBaseModel):
             if self._enable_dueling_dqn:
                 advantages = self.fc2(features)
                 v_values = self.fc3(features)
-                q_values = v_values + \
-                    (advantages - tf.reduce_mean(advantages, axis=1, keepdims=True))
+                q_values = (v_values
+                            + (advantages
+                               - tf.reduce_mean(advantages, axis=1, keepdims=True)))
             else:
                 q_values = self.fc2(features)
             return q_values
