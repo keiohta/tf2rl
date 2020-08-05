@@ -28,8 +28,9 @@ class Categorical(Distribution):
         :return (tf.Tensor): Log probabilities
         """
         probs = param["prob"]
-        assert probs.shape == x.shape, \
-            "Different shape inputted. You might have forgotten to convert `x` to one-hot vector."
+        msg = "Different shape inputted. "
+        msg +="You might have forgotten to convert `x` to one-hot vector."
+        assert probs.shape == x.shape, msg
         return tf.math.log(tf.reduce_sum(probs * x, axis=1) + self._tiny)
 
     def sample(self, param):
