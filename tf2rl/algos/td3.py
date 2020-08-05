@@ -95,6 +95,7 @@ class TD3(DDPG):
                 actor_loss = - tf.reduce_mean(self.critic([states, next_actions]))
 
             remainder = tf.math.mod(self._it, self._actor_update_freq)
+
             def optimize_actor():
                 actor_grad = tape.gradient(
                     actor_loss, self.actor.trainable_variables)
