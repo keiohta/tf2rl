@@ -86,12 +86,14 @@ class NoisyDense(tf.keras.layers.Layer):
 
     def call(self, inputs):
         # Implement Eq.(9)
-        perturbed_kernel = self.kernel + \
-            self.sigma_kernel * K.random_uniform(shape=self.kernel_shape)
+        perturbed_kernel = (self.kernel
+                            + self.sigma_kernel
+                            * K.random_uniform(shape=self.kernel_shape))
         outputs = K.dot(inputs, perturbed_kernel)
         if self.use_bias:
-            perturbed_bias = self.bias + \
-                self.sigma_bias * K.random_uniform(shape=self.bias_shape)
+            perturbed_bias = (self.bias
+                              + self.sigma_bias
+                              * K.random_uniform(shape=self.bias_shape))
             outputs = K.bias_add(outputs, perturbed_bias)
         if self.activation is not None:
             outputs = self.activation(outputs)
