@@ -180,9 +180,11 @@ class SACDiscrete(SAC):
                     zip(alpha_grad, [self.log_alpha]))
                 self.alpha.assign(tf.exp(self.log_alpha))
 
-        return (td_loss1 + td_loss2) / 2., policy_loss, mean_ent, \
-            tf.reduce_min(current_action_logp), tf.reduce_max(current_action_logp), \
-            tf.reduce_mean(current_action_logp)
+        return ((td_loss1 + td_loss2) / 2.,
+                policy_loss, mean_ent,
+                tf.reduce_min(current_action_logp),
+                tf.reduce_max(current_action_logp),
+                tf.reduce_mean(current_action_logp))
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
         td_errors_q1, td_errors_q2 = self._compute_td_error_body(
