@@ -1,4 +1,6 @@
-#!/bin/bash -eu
+#!/bin/bash
+
+set -eu
 
 prefix="python -u"
 common_arg="--gpu -1 --logging-level WARNING --max-steps 256 --batch-size 32 --dir-suffix TEST"
