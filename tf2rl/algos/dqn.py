@@ -192,7 +192,8 @@ class DQN(OffPolicyAgent):
         if weights is None:
             weights = np.ones_like(rewards)
         td_errors, q_func_loss = self._train_body(
-            states, actions, next_states, rewards, done, weights)
+            tf.constant(states), tf.constant(actions), tf.constant(next_states),
+            tf.constant(rewards), tf.constant(done), tf.constant(weights))
 
         tf.summary.scalar(name=self.policy_name +
                           "/q_func_Loss", data=q_func_loss)
