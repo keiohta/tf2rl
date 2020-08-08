@@ -6,7 +6,7 @@ from tf2rl.distributions.base import Distribution
 
 class Categorical(Distribution):
     def kl(self, old_param, new_param):
-        """
+        r"""
         Compute the KL divergence of two Categorical distribution as:
             p_1 * (\log p_1  - \log p_2)
         """
@@ -19,7 +19,7 @@ class Categorical(Distribution):
         return (tf.reduce_sum(new_prob * x) + self._tiny) / (tf.reduce_sum(old_prob * x) + self._tiny)
 
     def log_likelihood(self, x, param):
-        """
+        r"""
         Compute log likelihood as:
             \log \sum(p_i * x_i)
 
@@ -28,8 +28,9 @@ class Categorical(Distribution):
         :return (tf.Tensor): Log probabilities
         """
         probs = param["prob"]
-        assert probs.shape == x.shape, \
-            "Different shape inputted. You might have forgotten to convert `x` to one-hot vector."
+        msg = "Different shape inputted. "
+        msg += "You might have forgotten to convert `x` to one-hot vector."
+        assert probs.shape == x.shape, msg
         return tf.math.log(tf.reduce_sum(probs * x, axis=1) + self._tiny)
 
     def sample(self, param):

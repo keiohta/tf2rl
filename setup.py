@@ -12,13 +12,13 @@ extras_require = {
     "tf": ["tensorflow==2.0.0"],
     "tf_gpu": ["tensorflow-gpu==2.0.0"],
     "examples": ["gym[atari]", "opencv-python"],
-    "test": ["coveralls", "gym[atari]", "matplotlib", "gast==0.2.2"]
+    "test": ["coveralls", "gym[atari]", "matplotlib"]
 }
 
 setup(
     name="tf2rl",
     version="0.1.14",
-    description="Deep Reinforcement Learning for TensorFlow2.0",
+    description="Deep Reinforcement Learning for TensorFlow2",
     url="https://github.com/keiohta/tf2rl",
     author="Kei Ohta",
     author_email="dev.ohtakei@gmail.com",

@@ -85,9 +85,7 @@ class SACDiscrete(SAC):
         if weights is None:
             weights = np.ones_like(rewards)
 
-        td_errors, actor_loss, mean_ent, logp_min, logp_max, logp_mean = \
-            self._train_body(states, actions, next_states,
-                             rewards, dones, weights)
+        td_errors, actor_loss, mean_ent, logp_min, logp_max, logp_mean = self._train_body(states, actions, next_states, rewards, dones, weights)
 
         tf.summary.scalar(name=self.policy_name + "/actor_loss", data=actor_loss)
         tf.summary.scalar(name=self.policy_name + "/critic_loss", data=td_errors)
@@ -180,9 +178,11 @@ class SACDiscrete(SAC):
                     zip(alpha_grad, [self.log_alpha]))
                 self.alpha.assign(tf.exp(self.log_alpha))
 
-        return (td_loss1 + td_loss2) / 2., policy_loss, mean_ent, \
-            tf.reduce_min(current_action_logp), tf.reduce_max(current_action_logp), \
-            tf.reduce_mean(current_action_logp)
+        return ((td_loss1 + td_loss2) / 2.,
+                policy_loss, mean_ent,
+                tf.reduce_min(current_action_logp),
+                tf.reduce_max(current_action_logp),
+                tf.reduce_mean(current_action_logp))
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
         td_errors_q1, td_errors_q2 = self._compute_td_error_body(
