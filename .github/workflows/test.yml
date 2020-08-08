@@ -56,3 +56,4 @@ jobs:
         working-directory: './tests'
       - run: ./test_run_examples.sh
         shell: bash
+        if: ((startsWith(runner.os, 'Windows') != true) || (matrix.python == '3.7'))
