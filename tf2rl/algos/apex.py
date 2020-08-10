@@ -3,7 +3,7 @@ import numpy as np
 import argparse
 import logging
 import multiprocessing
-from multiprocessing import Process, Queue, Value, Event, Lock
+from multiprocessing import Process, Value, Event
 from multiprocessing.managers import SyncManager
 
 from cpprb import ReplayBuffer, PrioritizedReplayBuffer

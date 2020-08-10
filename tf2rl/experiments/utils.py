@@ -1,11 +1,9 @@
 import os
-import random
 
 import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 from matplotlib import animation
-import tensorflow as tf
 
 
 def save_path(samples, filename):

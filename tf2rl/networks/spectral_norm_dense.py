@@ -1,6 +1,4 @@
-import numpy as np
 import tensorflow as tf
-from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Dense
 from tensorflow.python.eager import context
 from tensorflow.python.framework import common_shapes
@@ -52,7 +50,7 @@ class SNDense(Dense):
         rank = common_shapes.rank(inputs)
         if rank > 2:
             # Broadcasting is required for the inputs.
-            outputs = standard_ops.tensordot(inputs, w, [[rank - 1], [0]])
+            outputs = tf.tensordot(inputs, w, [[rank - 1], [0]])
             # Reshape the output back to the original ndim of the input.
             if not context.executing_eagerly():
                 shape = inputs.get_shape().as_list()

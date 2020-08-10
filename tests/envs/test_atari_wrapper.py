@@ -7,6 +7,7 @@ import gym
 
 from tf2rl.envs.atari_wrapper import wrap_dqn
 
+
 @unittest.skipIf((platform.system() == 'Windows') and (sys.version_info.minor >= 8),
                  "atari-py doesn't work at Windows with Python3.8 and later")
 class TestAtariWrapper(unittest.TestCase):
