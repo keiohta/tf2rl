@@ -7,9 +7,9 @@ from tf2rl.experiments.trainer import Trainer
 from tf2rl.misc.get_replay_buffer import get_space_size
 
 
-class MLP(tf.keras.Model):
+class DynamicsModel(tf.keras.Model):
     def __init__(self, input_dim, output_dim, units=[32, 32],
-                 name="MLP", gpu=0):
+                 name="DymamicsModel", gpu=0):
         self.device = "/gpu:{}".format(gpu) if gpu >= 0 else "/cpu:0"
         super().__init__(name=name)
 
@@ -67,6 +67,7 @@ class MPCTrainer(Trainer):
             args,
             reward_fn,
             buffer_size=int(1e6),
+            n_dynamics_model=1,
             lr=0.001,
             **kwargs):
         super().__init__(policy, env, args, **kwargs)
@@ -84,17 +85,23 @@ class MPCTrainer(Trainer):
                     "shape": get_space_size(self._env.action_space)}}}
         self.dynamics_buffer = ReplayBuffer(**rb_dict)
 
-        # Dynamics model
-        obs_dim = self._env.observation_space.high.size
-        act_dim = self._env.action_space.high.size
-        self._dynamics_model = MLP(
-            input_dim=obs_dim + act_dim,
-            output_dim=obs_dim,
-            gpu=args.gpu)
-        self._optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
+        self._n_dynamics_model = n_dynamics_model
 
         # Reward function
         self._reward_fn = reward_fn
+        self._prepare_dynamics_model(gpu=args.gpu, lr=lr)
+
+    def _prepare_dynamics_model(self, gpu=0, lr=0.001):
+        # Dynamics model
+        obs_dim = self._env.observation_space.high.size
+        act_dim = self._env.action_space.high.size
+        self._dynamics_models = [
+            DynamicsModel(
+                input_dim=obs_dim + act_dim,
+                output_dim=obs_dim,
+                gpu=gpu) for _ in range(self._n_dynamics_model)]
+        self._optimizers = [
+            tf.keras.optimizers.Adam(learning_rate=lr) for _ in range(self._n_dynamics_model)]
 
     def _set_check_point(self, model_dir):
         # Save and restore model
@@ -110,7 +117,7 @@ class MPCTrainer(Trainer):
 
         for i in range(self._max_iter):
             # Train dynamics f(s, a) according to eq.(2)
-            self.fit_dynamics(i)
+            mean_loss = self.fit_dynamics()
 
             total_rew = 0.
 
@@ -128,7 +135,15 @@ class MPCTrainer(Trainer):
                 obs = next_obs
             tf.summary.experimental.set_step(total_steps)
             tf.summary.scalar("mpc/total_rew", total_rew)
-            self.logger.info("iter={0: 3d} total_rew: {1:4.4f}".format(i, total_rew))
+            self.logger.info("iter={0: 3d} total_rew: {1:4.4f} loss: {2:2.8f}".format(i, total_rew, mean_loss))
+
+    def predict_next_state(self, obses, acts):
+        obs_diffs = np.zeros_like(obses)
+        inputs = np.concatenate([obses, acts], axis=1)
+        for dynamics_model in self._dynamics_models:
+            obs_diffs += dynamics_model.predict(inputs)
+        obs_diffs /= self._n_dynamics_model
+        return obses + obs_diffs
 
     def _mpc(self, obs):
         init_actions = self._policy.get_actions(
@@ -143,10 +158,7 @@ class MPCTrainer(Trainer):
                 acts = self._policy.get_actions(
                     batch_size=self._n_sample)
             assert obses.shape[0] == acts.shape[0]
-            obs_diffs = self._dynamics_model.predict(
-                np.concatenate([obses, acts], axis=1))
-            assert obses.shape == obs_diffs.shape
-            next_obses = obses + obs_diffs
+            next_obses = self.predict_next_state(obses, acts)
             rewards = self._reward_fn(obses, acts)
             assert rewards.shape == total_rewards.shape
             total_rewards += rewards
@@ -179,30 +191,36 @@ class MPCTrainer(Trainer):
                     break
 
     @tf.function
-    def _fit_dynamics_body(self, inputs, labels):
+    def _fit_dynamics_body(self, inputs, labels, dynamics_model, optimizer):
         with tf.GradientTape() as tape:
-            predicts = self._dynamics_model(inputs)
+            predicts = dynamics_model(inputs)
             loss = tf.reduce_mean(0.5 * tf.square(labels - predicts))
         grads = tape.gradient(
-            loss, self._dynamics_model.trainable_variables)
-        self._optimizer.apply_gradients(
-            zip(grads, self._dynamics_model.trainable_variables))
+            loss, dynamics_model.trainable_variables)
+        optimizer.apply_gradients(
+            zip(grads, dynamics_model.trainable_variables))
         return loss
 
-    def fit_dynamics(self, n_iter, n_epoch=1):
-        samples = self.dynamics_buffer.sample(
-            self.dynamics_buffer.get_stored_size())
+    def fit_dynamics(self, n_epoch=1):
+        samples = self.dynamics_buffer.sample(self.dynamics_buffer.get_stored_size())
         inputs = np.concatenate([samples["obs"], samples["act"]], axis=1)
         labels = samples["next_obs"] - samples["obs"]
+
         dataset = tf.data.Dataset.from_tensor_slices((inputs, labels))
         dataset = dataset.batch(self._batch_size)
         dataset = dataset.shuffle(buffer_size=1000)
         dataset = dataset.repeat(n_epoch)
-        for batch, (x, y) in enumerate(dataset):
-            loss = self._fit_dynamics_body(x, y)
-            self.logger.debug("batch: {} loss: {:2.6f}".format(batch, loss))
-        tf.summary.scalar("mpc/model_loss", loss)
-        self.logger.info("iter={0: 3d} loss: {1:2.8f}".format(n_iter, loss))
+
+        all_model_loss = 0.
+        for model_idx, (dynamics_model, optimizer) in enumerate(zip(self._dynamics_models, self._optimizers)):
+            mean_loss = 0.
+            for batch, (x, y) in enumerate(dataset):
+                mean_loss += self._fit_dynamics_body(x, y, dynamics_model, optimizer)
+            mean_loss /= (batch + 1)
+            all_model_loss += mean_loss
+            tf.summary.scalar("mpc/model_{}_loss".format(model_idx), mean_loss)
+        all_model_loss /= self._n_dynamics_model
+        return all_model_loss
 
     @staticmethod
     def get_argument(parser=None):
