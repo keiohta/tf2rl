@@ -133,6 +133,7 @@ class MPCTrainer(Trainer):
                 if done:
                     break
                 obs = next_obs
+
             tf.summary.experimental.set_step(total_steps)
             tf.summary.scalar("mpc/total_rew", total_rew)
             self.logger.info("iter={0: 3d} total_rew: {1:4.4f} loss: {2:2.8f}".format(i, total_rew, mean_loss))
@@ -191,15 +192,18 @@ class MPCTrainer(Trainer):
                     break
 
     @tf.function
-    def _fit_dynamics_body(self, inputs, labels, dynamics_model, optimizer):
-        with tf.GradientTape() as tape:
-            predicts = dynamics_model(inputs)
-            loss = tf.reduce_mean(0.5 * tf.square(labels - predicts))
-        grads = tape.gradient(
-            loss, dynamics_model.trainable_variables)
-        optimizer.apply_gradients(
-            zip(grads, dynamics_model.trainable_variables))
-        return loss
+    def _fit_dynamics_body(self, inputs, labels):
+        losses = []
+        for dynamics_model, optimizer in zip(self._dynamics_models, self._optimizers):
+            with tf.GradientTape() as tape:
+                predicts = dynamics_model(inputs)
+                loss = tf.reduce_mean(0.5 * tf.square(labels - predicts))
+            grads = tape.gradient(
+                loss, dynamics_model.trainable_variables)
+            optimizer.apply_gradients(
+                zip(grads, dynamics_model.trainable_variables))
+            losses.append(loss)
+        return tf.convert_to_tensor(losses)
 
     def fit_dynamics(self, n_epoch=1):
         samples = self.dynamics_buffer.sample(self.dynamics_buffer.get_stored_size())
@@ -211,16 +215,15 @@ class MPCTrainer(Trainer):
         dataset = dataset.shuffle(buffer_size=1000)
         dataset = dataset.repeat(n_epoch)
 
-        all_model_loss = 0.
-        for model_idx, (dynamics_model, optimizer) in enumerate(zip(self._dynamics_models, self._optimizers)):
-            mean_loss = 0.
-            for batch, (x, y) in enumerate(dataset):
-                mean_loss += self._fit_dynamics_body(x, y, dynamics_model, optimizer)
-            mean_loss /= (batch + 1)
-            all_model_loss += mean_loss
+        mean_losses = np.zeros(shape=(self._n_dynamics_model,), dtype=np.float32)
+        for batch, (x, y) in enumerate(dataset):
+            _mean_losses = self._fit_dynamics_body(x, y)
+            mean_losses += _mean_losses.numpy()
+        mean_losses /= (batch + 1)
+
+        for model_idx, mean_loss in enumerate(mean_losses):
             tf.summary.scalar("mpc/model_{}_loss".format(model_idx), mean_loss)
-        all_model_loss /= self._n_dynamics_model
-        return all_model_loss
+        return np.mean(mean_losses)
 
     @staticmethod
     def get_argument(parser=None):
