@@ -46,13 +46,14 @@ class RandomPolicy:
         self._act_dim = act_dim
         self.policy_name = "RandomPolicy"
 
-    def get_action(self):
+    def get_action(self, obs):
         return np.random.uniform(
             low=-self._max_action,
             high=self._max_action,
             size=self._act_dim)
 
-    def get_actions(self, batch_size):
+    def get_actions(self, obses):
+        batch_size = obses.shape[0]
         return np.random.uniform(
             low=-self._max_action,
             high=self._max_action,
@@ -72,6 +73,14 @@ class MPCTrainer(Trainer):
             **kwargs):
         super().__init__(policy, env, args, **kwargs)
 
+        self.dynamics_buffer = ReplayBuffer(**self._prepare_dynamics_buffer_dict(buffer_size=buffer_size))
+        self._n_dynamics_model = n_dynamics_model
+
+        # Reward function
+        self._reward_fn = reward_fn
+        self._prepare_dynamics_model(gpu=args.gpu, lr=lr)
+
+    def _prepare_dynamics_buffer_dict(self, buffer_size):
         # Prepare buffer that stores transitions (s, a, s')
         rb_dict = {
             "size": buffer_size,
@@ -83,13 +92,7 @@ class MPCTrainer(Trainer):
                     "shape": get_space_size(self._env.observation_space)},
                 "act": {
                     "shape": get_space_size(self._env.action_space)}}}
-        self.dynamics_buffer = ReplayBuffer(**rb_dict)
-
-        self._n_dynamics_model = n_dynamics_model
-
-        # Reward function
-        self._reward_fn = reward_fn
-        self._prepare_dynamics_model(gpu=args.gpu, lr=lr)
+        return rb_dict
 
     def _prepare_dynamics_model(self, gpu=0, lr=0.001):
         # Dynamics model
@@ -113,11 +116,11 @@ class MPCTrainer(Trainer):
         tf.summary.experimental.set_step(total_steps)
         # Gather dataset of random trajectories
         self.logger.info("Ramdomly collect {} samples...".format(self._n_random_rollout * self._episode_max_steps))
-        self.collect_sample_randomly()
+        self.collect_episodes(n_rollout=self._n_random_rollout)
 
         for i in range(self._max_iter):
             # Train dynamics f(s, a) according to eq.(2)
-            mean_loss = self.fit_dynamics()
+            mean_loss = self.fit_dynamics(n_epoch=1)
 
             total_rew = 0.
 
@@ -147,17 +150,15 @@ class MPCTrainer(Trainer):
         return obses + obs_diffs
 
     def _mpc(self, obs):
-        init_actions = self._policy.get_actions(
-            batch_size=self._n_sample)
-        total_rewards = np.zeros(shape=(self._n_sample,))
         obses = np.tile(obs, (self._n_sample, 1))
+        init_actions = self._policy.get_actions(obses)
+        total_rewards = np.zeros(shape=(self._n_sample,))
 
         for i in range(self._horizon):
             if i == 0:
                 acts = init_actions
             else:
-                acts = self._policy.get_actions(
-                    batch_size=self._n_sample)
+                acts = self._policy.get_actions(obses)
             assert obses.shape[0] == acts.shape[0]
             next_obses = self.predict_next_state(obses, acts)
             rewards = self._reward_fn(obses, acts)
@@ -176,14 +177,11 @@ class MPCTrainer(Trainer):
         self._n_random_rollout = args.n_random_rollout
         self._batch_size = args.batch_size
 
-    def collect_sample_randomly(self):
-        for _ in range(self._n_random_rollout):
+    def collect_episodes(self, n_rollout=1):
+        for _ in range(n_rollout):
             obs = self._env.reset()
             for _ in range(self._episode_max_steps):
-                act = np.random.uniform(
-                    low=self._env.action_space.low,
-                    high=self._env.action_space.high,
-                    size=self._env.action_space.shape[0])
+                act = self._policy.get_action(obs)
                 next_obs, _, done, _ = self._env.step(act)
                 self.dynamics_buffer.add(
                     obs=obs, act=act, next_obs=next_obs)
@@ -205,10 +203,15 @@ class MPCTrainer(Trainer):
             losses.append(loss)
         return tf.convert_to_tensor(losses)
 
-    def fit_dynamics(self, n_epoch=1):
+    def _make_inputs_output_pairs(self, n_epoch):
         samples = self.dynamics_buffer.sample(self.dynamics_buffer.get_stored_size())
         inputs = np.concatenate([samples["obs"], samples["act"]], axis=1)
         labels = samples["next_obs"] - samples["obs"]
+
+        return inputs, labels
+
+    def fit_dynamics(self, n_epoch=1):
+        inputs, labels = self._make_inputs_output_pairs(n_epoch)
 
         dataset = tf.data.Dataset.from_tensor_slices((inputs, labels))
         dataset = dataset.batch(self._batch_size)
