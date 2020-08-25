@@ -1,0 +1,3 @@
+[flake8]
+ignore = E129,E226,E303,E501,W503,W504,E741
+exclude = .git,__pycache__,egg-info,.eggs,prepare_output_dir.py

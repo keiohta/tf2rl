@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-import tensorflow as tf
 
 from tf2rl.policies.categorical_actor import CategoricalActor
 from tests.policies.common import CommonModel

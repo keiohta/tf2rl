@@ -1,7 +1,5 @@
 import unittest
 
-import os
-import numpy as np
 import gym
 
 from cpprb import ReplayBuffer

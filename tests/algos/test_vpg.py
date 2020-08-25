@@ -1,7 +1,4 @@
 import unittest
-import gym
-import numpy as np
-import tensorflow as tf
 
 from tf2rl.algos.vpg import VPG
 from tests.algos.common import CommonOnPolActorCriticContinuousAlgos, CommonOnPolActorCriticDiscreteAlgos

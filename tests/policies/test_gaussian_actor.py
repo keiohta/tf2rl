@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-import tensorflow as tf
 
 from tf2rl.policies.gaussian_actor import GaussianActor
 from tests.policies.common import CommonModel
