@@ -178,7 +178,7 @@ class VPG(OnPolicyAgent):
             with tf.GradientTape() as tape:
                 current_V = self.critic(states)
                 td_errors = tf.squeeze(returns) - current_V
-                critic_loss = tf.reduce_mean(0.5 * tf.square(td_errors))
+                critic_loss = tf.reduce_mean(tf.square(td_errors))
             critic_grad = tape.gradient(
                 critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(
