@@ -1,0 +1,20 @@
+# syntax = docker/dockerfile:experimental
+FROM tensorflow/tensorflow:2.2.1-gpu
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt update \
+	&& apt install -y --no-install-recommends \
+	libopencv-dev \
+	python3-opengl \
+	&& apt clean \
+	&& rm -rf /var/lib/apt/lists/*
+
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+	pip install -U \
+	matplotlib \
+	tensorflow_probability==0.10.* \
+	tf2rl
+
+CMD ["/bin/bash"]
