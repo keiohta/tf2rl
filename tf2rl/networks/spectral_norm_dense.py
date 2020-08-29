@@ -47,17 +47,8 @@ class SNDense(Dense):
     def call(self, inputs):
         w = self.compute_spectral_norm()
         inputs = ops.convert_to_tensor(inputs, dtype=self.dtype)
-        rank = common_shapes.rank(inputs)
-        if rank > 2:
-            # Broadcasting is required for the inputs.
-            outputs = tf.tensordot(inputs, w, [[rank - 1], [0]])
-            # Reshape the output back to the original ndim of the input.
-            if not context.executing_eagerly():
-                shape = inputs.get_shape().as_list()
-                output_shape = shape[:-1] + [self.units]
-                outputs.set_shape(output_shape)
-        else:
-            outputs = gen_math_ops.mat_mul(inputs, w)
+        outputs = gen_math_ops.mat_mul(inputs, w)
+
         if self.use_bias:
             outputs = nn.bias_add(outputs, self.bias)
         if self.activation is not None:
