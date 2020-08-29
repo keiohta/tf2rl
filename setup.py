@@ -9,15 +9,15 @@ install_requires = [
 ]
 
 extras_require = {
-    "tf": ["tensorflow"],
-    "tf_gpu": ["tensorflow-gpu"],
+    "tf": ["tensorflow>=2.0.0"],
+    "tf_gpu": ["tensorflow-gpu>=2.0.0"],
     "examples": ["gym[atari]", "opencv-python"],
-    "test": ["coveralls", "gym[atari]", "matplotlib"]
+    "test": ["coveralls", "gym[atari]", "matplotlib", "opencv-python"]
 }
 
 setup(
     name="tf2rl",
-    version="0.1.15",
+    version="0.1.16",
     description="Deep Reinforcement Learning for TensorFlow2",
     url="https://github.com/keiohta/tf2rl",
     author="Kei Ohta",

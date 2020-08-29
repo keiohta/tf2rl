@@ -1,10 +1,12 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
 from tensorflow.python.eager import context
-from tensorflow.python.framework import common_shapes
 from tensorflow.python.ops import gen_math_ops
-from tensorflow.python.framework import ops
+from tensorflow.python.ops import sparse_ops
+from tensorflow.python.ops import standard_ops
+from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import nn
+from tensorflow.python.keras import backend as K
 
 
 class SNDense(Dense):
@@ -46,18 +48,21 @@ class SNDense(Dense):
 
     def call(self, inputs):
         w = self.compute_spectral_norm()
-        inputs = ops.convert_to_tensor(inputs, dtype=self.dtype)
-        rank = common_shapes.rank(inputs)
+        rank = len(inputs.shape)
         if rank > 2:
             # Broadcasting is required for the inputs.
-            outputs = tf.tensordot(inputs, w, [[rank - 1], [0]])
+            outputs = standard_ops.tensordot(inputs, w, [[rank - 1], [0]])
             # Reshape the output back to the original ndim of the input.
             if not context.executing_eagerly():
-                shape = inputs.get_shape().as_list()
-                output_shape = shape[:-1] + [self.units]
+                shape = inputs.shape.as_list()
+                output_shape = shape[:-1] + [w.shape[-1]]
                 outputs.set_shape(output_shape)
         else:
-            outputs = gen_math_ops.mat_mul(inputs, w)
+            inputs = math_ops.cast(inputs, self._compute_dtype)
+            if K.is_sparse(inputs):
+                outputs = sparse_ops.sparse_tensor_dense_matmul(inputs, w)
+            else:
+                outputs = gen_math_ops.mat_mul(inputs, w)
         if self.use_bias:
             outputs = nn.bias_add(outputs, self.bias)
         if self.activation is not None:
