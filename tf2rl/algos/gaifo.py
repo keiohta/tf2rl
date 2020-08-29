@@ -23,7 +23,7 @@ class Discriminator(DiscriminatorGAIL):
         dummy_next_state = tf.constant(
             np.zeros(shape=(1,) + state_shape, dtype=np.float32))
         with tf.device("/cpu:0"):
-            self(np.concatenate((dummy_state, dummy_next_state), axis=1))
+            self(tf.concat((dummy_state, dummy_next_state), axis=1))
 
 
 class GAIfO(GAIL):

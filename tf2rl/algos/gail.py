@@ -22,7 +22,7 @@ class Discriminator(tf.keras.Model):
         dummy_action = tf.constant(
             np.zeros(shape=(1, action_dim), dtype=np.float32))
         with tf.device("/cpu:0"):
-            self(np.concatenate((dummy_state, dummy_action), axis=1))
+            self(tf.concat((dummy_state, dummy_action), axis=1))
 
     def call(self, inputs):
         features = self.l1(inputs)
