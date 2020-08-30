@@ -119,7 +119,7 @@ class TD3(DDPG):
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
-            not_dones = 1. - dones
+            not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
             # Get noisy action
             next_action = self.actor_target(next_states)

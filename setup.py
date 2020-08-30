@@ -17,7 +17,7 @@ extras_require = {
 
 setup(
     name="tf2rl",
-    version="0.1.17",
+    version="0.1.18",
     description="Deep Reinforcement Learning for TensorFlow2",
     url="https://github.com/keiohta/tf2rl",
     author="Kei Ohta",
