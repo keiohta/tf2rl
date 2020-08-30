@@ -27,6 +27,13 @@ class Trainer:
             env,
             args,
             test_env=None):
+        if isinstance(args, dict):
+            _args = args
+            args = policy.__class__.get_argument(Trainer.get_argument())
+            args = args.parse_args([])
+            for k, v in _args.items():
+                setattr(args, k, v)
+
         self._set_from_args(args)
         self._policy = policy
         self._env = env
