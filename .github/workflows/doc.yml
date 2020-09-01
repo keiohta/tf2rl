@@ -24,6 +24,7 @@ jobs:
       - run: pip install sphinx sphinx-rtd-theme recommonmark tensorflow
       - run: pip install ".[test]"
       - run: sphinx-apidoc -F -o doc tf2rl/
+      - run: rm doc/index.rst
       - run: sphinx-build -b html doc public
       - uses: actions/upload-artifact@v2
         with:
