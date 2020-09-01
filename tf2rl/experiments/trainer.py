@@ -32,7 +32,10 @@ class Trainer:
             args = policy.__class__.get_argument(Trainer.get_argument())
             args = args.parse_args([])
             for k, v in _args.items():
-                setattr(args, k, v)
+                if hasattr(args, k):
+                    setattr(args, k, v)
+                else:
+                    raise ValueError(f"{k} is invalid parameter.")
 
         self._set_from_args(args)
         self._policy = policy
