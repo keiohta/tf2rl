@@ -20,8 +20,7 @@ class TestTrainer(unittest.TestCase):
                       max_action=env.action_space.high[0],
                       batch_size=32,
                       n_warmup=10)
-        trainer = Trainer(policy, env, {}, test_env=test_env)
-        print(trainer)
+        Trainer(policy, env, {}, test_env=test_env)
 
     def test_with_args(self):
         """
