@@ -1,0 +1,549 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tf2rl.misc package &mdash; TF2RL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tf2rl.networks package" href="tf2rl.networks.html" />
+    <link rel="prev" title="tf2rl.experiments package" href="tf2rl.experiments.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> TF2RL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="tf2rl.html">tf2rl package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tf2rl.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.algos.html">tf2rl.algos package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.distributions.html">tf2rl.distributions package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.envs.html">tf2rl.envs package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.experiments.html">tf2rl.experiments package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.misc package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.discount_cumsum">tf2rl.misc.discount_cumsum module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.get_replay_buffer">tf2rl.misc.get_replay_buffer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.huber_loss">tf2rl.misc.huber_loss module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.initialize_logger">tf2rl.misc.initialize_logger module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.normalizer">tf2rl.misc.normalizer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.periodic_ops">tf2rl.misc.periodic_ops module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.prepare_output_dir">tf2rl.misc.prepare_output_dir module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.target_update_ops">tf2rl.misc.target_update_ops module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.networks.html">tf2rl.networks package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.policies.html">tf2rl.policies package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.tools.html">tf2rl.tools package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tf2rl.html#module-tf2rl">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TF2RL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="tf2rl.html">tf2rl package</a> &raquo;</li>
+        
+      <li>tf2rl.misc package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tf2rl.misc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tf2rl-misc-package">
+<h1>tf2rl.misc package<a class="headerlink" href="#tf2rl-misc-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tf2rl.misc.discount_cumsum">
+<span id="tf2rl-misc-discount-cumsum-module"></span><h2>tf2rl.misc.discount_cumsum module<a class="headerlink" href="#module-tf2rl.misc.discount_cumsum" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tf2rl.misc.discount_cumsum.discount_cumsum">
+<code class="sig-prename descclassname">tf2rl.misc.discount_cumsum.</code><code class="sig-name descname">discount_cumsum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">discount</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.discount_cumsum.discount_cumsum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forked from rllab for computing discounted cumulative sums of vectors.</p>
+<dl class="simple">
+<dt>:param x (np.ndarray or tf.Tensor)</dt><dd><p>vector of [x0, x1, x2]</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return output</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>[x0 + discount * x1 + discount^2 * x2,</dt><dd><p>x1 + discount * x2,
+x2]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.misc.get_replay_buffer">
+<span id="tf2rl-misc-get-replay-buffer-module"></span><h2>tf2rl.misc.get_replay_buffer module<a class="headerlink" href="#module-tf2rl.misc.get_replay_buffer" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tf2rl.misc.get_replay_buffer.get_default_rb_dict">
+<code class="sig-prename descclassname">tf2rl.misc.get_replay_buffer.</code><code class="sig-name descname">get_default_rb_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">size</span></em>, <em class="sig-param"><span class="n">env</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.get_replay_buffer.get_default_rb_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.misc.get_replay_buffer.get_replay_buffer">
+<code class="sig-prename descclassname">tf2rl.misc.get_replay_buffer.</code><code class="sig-name descname">get_replay_buffer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">policy</span></em>, <em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">use_prioritized_rb</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_nstep_rb</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_step</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">size</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.get_replay_buffer.get_replay_buffer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.misc.get_replay_buffer.get_space_size">
+<code class="sig-prename descclassname">tf2rl.misc.get_replay_buffer.</code><code class="sig-name descname">get_space_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">space</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.get_replay_buffer.get_space_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.misc.huber_loss">
+<span id="tf2rl-misc-huber-loss-module"></span><h2>tf2rl.misc.huber_loss module<a class="headerlink" href="#module-tf2rl.misc.huber_loss" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tf2rl.misc.huber_loss.huber_loss">
+<code class="sig-prename descclassname">tf2rl.misc.huber_loss.</code><code class="sig-name descname">huber_loss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">delta</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.huber_loss.huber_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the huber loss.
+<a class="reference external" href="https://en.wikipedia.org/wiki/Huber_loss">https://en.wikipedia.org/wiki/Huber_loss</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>(</strong><strong>np.ndarray</strong><strong> or </strong><strong>tf.Tensor</strong><strong>)</strong> (<em>x</em>) – Values to compute the huber loss.</p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong> (<em>delta</em>) – Positive floating point value. Represents the
+maximum possible gradient magnitude.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return (tf.Tensor)</dt>
+<dd class="field-even"><p>The huber loss.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.misc.initialize_logger">
+<span id="tf2rl-misc-initialize-logger-module"></span><h2>tf2rl.misc.initialize_logger module<a class="headerlink" href="#module-tf2rl.misc.initialize_logger" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tf2rl.misc.initialize_logger.initialize_logger">
+<code class="sig-prename descclassname">tf2rl.misc.initialize_logger.</code><code class="sig-name descname">initialize_logger</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">logging_level</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">output_dir</span><span class="o">=</span><span class="default_value">'results/'</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">save_log</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.initialize_logger.initialize_logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.misc.normalizer">
+<span id="tf2rl-misc-normalizer-module"></span><h2>tf2rl.misc.normalizer module<a class="headerlink" href="#module-tf2rl.misc.normalizer" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tf2rl.misc.normalizer.Normalizer">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.misc.normalizer.</code><code class="sig-name descname">Normalizer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mean_only</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.Normalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Normalize input data online. This is based on following:
+<a class="reference external" href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm">https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm</a></p>
+<dl class="py method">
+<dt id="tf2rl.misc.normalizer.Normalizer.normalize">
+<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.Normalizer.normalize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.misc.normalizer.Normalizer.observe">
+<code class="sig-name descname">observe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.Normalizer.observe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute next mean and std</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>(</strong><strong>float</strong><strong>)</strong> (<em>x</em>) – Input data</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.misc.normalizer.NormalizerNumpy">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.misc.normalizer.</code><code class="sig-name descname">NormalizerNumpy</code><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.misc.normalizer.NormalizerNumpy.get_params">
+<code class="sig-name descname">get_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy.get_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.misc.normalizer.NormalizerNumpy.normalize">
+<code class="sig-name descname">normalize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">update</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy.normalize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.misc.normalizer.NormalizerNumpy.observe">
+<code class="sig-name descname">observe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy.observe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.misc.normalizer.NormalizerNumpy.set_params">
+<code class="sig-name descname">set_params</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">mean</span></em>, <em class="sig-param"><span class="n">mean_diff</span></em>, <em class="sig-param"><span class="n">var</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy.set_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.misc.periodic_ops">
+<span id="tf2rl-misc-periodic-ops-module"></span><h2>tf2rl.misc.periodic_ops module<a class="headerlink" href="#module-tf2rl.misc.periodic_ops" title="Permalink to this headline">¶</a></h2>
+<p>Periodic execution ops.</p>
+<p>It is very common in Reinforcement Learning for certain ops to only need to be
+executed periodically, for example: once every N agent steps. The ops below
+support this common use-case by wrapping a subgraph as a periodic op that only
+actually executes the underlying computation once every N evaluations of the op,
+behaving as a no-op in all other calls.</p>
+<dl class="py function">
+<dt id="tf2rl.misc.periodic_ops.periodically">
+<code class="sig-prename descclassname">tf2rl.misc.periodic_ops.</code><code class="sig-name descname">periodically</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">body</span></em>, <em class="sig-param"><span class="n">period</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'periodically'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.periodic_ops.periodically" title="Permalink to this definition">¶</a></dt>
+<dd><p>Periodically performs a tensorflow op.</p>
+<p>The body tensorflow op will be executed every <cite>period</cite> times the periodically
+op is executed. More specifically, with <cite>n</cite> the number of times the op has
+been executed, the body will be executed when <cite>n</cite> is a non zero positive
+multiple of <cite>period</cite> (i.e. there exist an integer <cite>k &gt; 0</cite> such that
+<cite>k * period == n</cite>).</p>
+<p>If <cite>period</cite> is 0 or <cite>None</cite>, it would not perform any op and would return a
+<cite>tf.no_op()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>(</strong><strong>callable</strong><strong>)</strong> (<em>body</em>) – callable that returns the tensorflow op to be performed every time
+an internal counter is divisible by the period. The op must have no
+output (for example, a tf.group()).</p></li>
+<li><p><strong>(</strong><strong>int</strong><strong>)</strong> (<em>period</em>) – inverse frequency with which to perform the op.</p></li>
+<li><p><strong>(</strong><strong>str</strong><strong>)</strong> (<em>name</em>) – name of the variable_scope.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – if body is not a callable.</p></li>
+<li><p><strong>ValueError</strong> – if period is negative.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An op that periodically performs the specified op.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.misc.prepare_output_dir">
+<span id="tf2rl-misc-prepare-output-dir-module"></span><h2>tf2rl.misc.prepare_output_dir module<a class="headerlink" href="#module-tf2rl.misc.prepare_output_dir" title="Permalink to this headline">¶</a></h2>
+<p>MIT License</p>
+<p>Copyright (c) 2017 Preferred Networks, Inc.</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+<dl class="py function">
+<dt id="tf2rl.misc.prepare_output_dir.is_return_code_zero">
+<code class="sig-prename descclassname">tf2rl.misc.prepare_output_dir.</code><code class="sig-name descname">is_return_code_zero</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.prepare_output_dir.is_return_code_zero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if the given command’s return code is zero.
+All the messages to stdout or stderr are suppressed.
+forked from <a class="reference external" href="https://github.com/chainer/chainerrl/blob/master/chainerrl/misc/is_return_code_zero.py">https://github.com/chainer/chainerrl/blob/master/chainerrl/misc/is_return_code_zero.py</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.misc.prepare_output_dir.is_under_git_control">
+<code class="sig-prename descclassname">tf2rl.misc.prepare_output_dir.</code><code class="sig-name descname">is_under_git_control</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.prepare_output_dir.is_under_git_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true iff the current directory is under git control.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.misc.prepare_output_dir.prepare_output_dir">
+<code class="sig-prename descclassname">tf2rl.misc.prepare_output_dir.</code><code class="sig-name descname">prepare_output_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span></em>, <em class="sig-param"><span class="n">user_specified_dir</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">argv</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time_format</span><span class="o">=</span><span class="default_value">'%Y%m%dT%H%M%S.%f'</span></em>, <em class="sig-param"><span class="n">suffix</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.prepare_output_dir.prepare_output_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare a directory for outputting training results.
+An output directory, which ends with the current datetime string,
+is created. Then the following infomation is saved into the directory:</p>
+<blockquote>
+<div><p>args.txt: command line arguments
+command.txt: command itself
+environ.txt: environmental variables</p>
+</div></blockquote>
+<p>Additionally, if the current directory is under git control, the following
+information is saved:</p>
+<blockquote>
+<div><p>git-head.txt: result of <cite>git rev-parse HEAD</cite>
+git-status.txt: result of <cite>git status</cite>
+git-log.txt: result of <cite>git log</cite>
+git-diff.txt: result of <cite>git diff</cite></p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>(</strong><strong>dict</strong><strong> or </strong><strong>argparse.Namespace</strong><strong>)</strong> (<em>args</em>) – Arguments to save</p></li>
+<li><p><strong>(</strong><strong>str</strong><strong> or </strong><strong>None</strong><strong>)</strong> (<em>user_specified_dir</em>) – If str is specified, the output
+directory is created under that path. If not specified, it is
+created as a new temporary directory instead.</p></li>
+<li><p><strong>(</strong><strong>list</strong><strong> or </strong><strong>None</strong><strong>)</strong> (<em>argv</em>) – The list of command line arguments passed to a
+script. If not specified, sys.argv is used instead.</p></li>
+<li><p><strong>(</strong><strong>str</strong><strong>)</strong> (<em>time_format</em>) – Format used to represent the current datetime. The</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param default format is the basic format of ISO 8601.
+:return: Path of the output directory created by this function (str).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.misc.target_update_ops">
+<span id="tf2rl-misc-target-update-ops-module"></span><h2>tf2rl.misc.target_update_ops module<a class="headerlink" href="#module-tf2rl.misc.target_update_ops" title="Permalink to this headline">¶</a></h2>
+<p>Tensorflow ops for updating target networks.</p>
+<p>Tensorflow ops that are used to update a target network from a source network.
+This is used in agents such as DQN or DPG, which use a target network that
+changes more slowly than the online network, in order to improve stability.</p>
+<dl class="py function">
+<dt id="tf2rl.misc.target_update_ops.periodic_target_update">
+<code class="sig-prename descclassname">tf2rl.misc.target_update_ops.</code><code class="sig-name descname">periodic_target_update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_variables</span></em>, <em class="sig-param"><span class="n">source_variables</span></em>, <em class="sig-param"><span class="n">update_period</span></em>, <em class="sig-param"><span class="n">tau</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">use_locking</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'periodic_target_update'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.target_update_ops.periodic_target_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an op to periodically update a list of target variables.</p>
+<p>The <cite>update_target_variables</cite> op is executed every <cite>update_period</cite>
+executions of the <cite>periodic_target_update</cite> op.</p>
+<p>The update rule is:
+<cite>target_variable = (1 - tau) * target_variable + tau * source_variable</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_variables</strong> – a list of the variables to be updated.</p></li>
+<li><p><strong>source_variables</strong> – a list of the variables used for the update.</p></li>
+<li><p><strong>update_period</strong> – inverse frequency with which to apply the update.</p></li>
+<li><p><strong>tau</strong> – weight used to gate the update. The permitted range is 0 &lt; tau &lt;= 1,
+with small tau representing an incremental update, and tau == 1
+representing a full update (that is, a straight copy).</p></li>
+<li><p><strong>use_locking</strong> – use <cite>tf.variable.Assign</cite>’s locking option when assigning
+source variable values to target variables.</p></li>
+<li><p><strong>name</strong> – sets the <cite>name_scope</cite> for this op.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An op that periodically updates <cite>target_variables</cite> with <cite>source_variables</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.misc.target_update_ops.update_target_variables">
+<code class="sig-prename descclassname">tf2rl.misc.target_update_ops.</code><code class="sig-name descname">update_target_variables</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">target_variables</span></em>, <em class="sig-param"><span class="n">source_variables</span></em>, <em class="sig-param"><span class="n">tau</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">use_locking</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'update_target_variables'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.target_update_ops.update_target_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an op to update a list of target variables from source variables.</p>
+<p>The update rule is:
+<cite>target_variable = (1 - tau) * target_variable + tau * source_variable</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_variables</strong> – a list of the variables to be updated.</p></li>
+<li><p><strong>source_variables</strong> – a list of the variables used for the update.</p></li>
+<li><p><strong>tau</strong> – weight used to gate the update. The permitted range is 0 &lt; tau &lt;= 1,
+with small tau representing an incremental update, and tau == 1
+representing a full update (that is, a straight copy).</p></li>
+<li><p><strong>use_locking</strong> – use <cite>tf.Variable.assign</cite>’s locking option when assigning
+source variable values to target variables.</p></li>
+<li><p><strong>name</strong> – sets the <cite>name_scope</cite> for this op.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – when tau is not a Python float</p></li>
+<li><p><strong>ValueError</strong> – when tau is out of range, or the source and target variables
+have different numbers or shapes.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An op that executes all the variable updates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.misc">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tf2rl.misc" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tf2rl.networks.html" class="btn btn-neutral float-right" title="tf2rl.networks package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tf2rl.experiments.html" class="btn btn-neutral float-left" title="tf2rl.experiments package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Kei Ohta
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

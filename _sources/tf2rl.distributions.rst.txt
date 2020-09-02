@@ -1,0 +1,37 @@
+tf2rl.distributions package
+===========================
+
+Submodules
+----------
+
+tf2rl.distributions.base module
+-------------------------------
+
+.. automodule:: tf2rl.distributions.base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.distributions.categorical module
+--------------------------------------
+
+.. automodule:: tf2rl.distributions.categorical
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.distributions.diagonal\_gaussian module
+---------------------------------------------
+
+.. automodule:: tf2rl.distributions.diagonal_gaussian
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: tf2rl.distributions
+   :members:
+   :undoc-members:
+   :show-inheritance:

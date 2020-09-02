@@ -1,0 +1,53 @@
+tf2rl.envs package
+==================
+
+Submodules
+----------
+
+tf2rl.envs.atari\_wrapper module
+--------------------------------
+
+.. automodule:: tf2rl.envs.atari_wrapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.envs.env\_utils module
+----------------------------
+
+.. automodule:: tf2rl.envs.env_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.envs.multi\_thread\_env module
+------------------------------------
+
+.. automodule:: tf2rl.envs.multi_thread_env
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.envs.normalizer module
+----------------------------
+
+.. automodule:: tf2rl.envs.normalizer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.envs.utils module
+-----------------------
+
+.. automodule:: tf2rl.envs.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: tf2rl.envs
+   :members:
+   :undoc-members:
+   :show-inheritance:

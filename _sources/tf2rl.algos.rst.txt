@@ -1,0 +1,117 @@
+tf2rl.algos package
+===================
+
+Submodules
+----------
+
+tf2rl.algos.apex module
+-----------------------
+
+.. automodule:: tf2rl.algos.apex
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.bi\_res\_ddpg module
+--------------------------------
+
+.. automodule:: tf2rl.algos.bi_res_ddpg
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.ddpg module
+-----------------------
+
+.. automodule:: tf2rl.algos.ddpg
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.dqn module
+----------------------
+
+.. automodule:: tf2rl.algos.dqn
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.gaifo module
+------------------------
+
+.. automodule:: tf2rl.algos.gaifo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.gail module
+-----------------------
+
+.. automodule:: tf2rl.algos.gail
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.policy\_base module
+-------------------------------
+
+.. automodule:: tf2rl.algos.policy_base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.ppo module
+----------------------
+
+.. automodule:: tf2rl.algos.ppo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.sac module
+----------------------
+
+.. automodule:: tf2rl.algos.sac
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.sac\_discrete module
+--------------------------------
+
+.. automodule:: tf2rl.algos.sac_discrete
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.td3 module
+----------------------
+
+.. automodule:: tf2rl.algos.td3
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.vail module
+-----------------------
+
+.. automodule:: tf2rl.algos.vail
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.algos.vpg module
+----------------------
+
+.. automodule:: tf2rl.algos.vpg
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: tf2rl.algos
+   :members:
+   :undoc-members:
+   :show-inheritance:

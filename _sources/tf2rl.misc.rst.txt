@@ -1,0 +1,77 @@
+tf2rl.misc package
+==================
+
+Submodules
+----------
+
+tf2rl.misc.discount\_cumsum module
+----------------------------------
+
+.. automodule:: tf2rl.misc.discount_cumsum
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.misc.get\_replay\_buffer module
+-------------------------------------
+
+.. automodule:: tf2rl.misc.get_replay_buffer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.misc.huber\_loss module
+-----------------------------
+
+.. automodule:: tf2rl.misc.huber_loss
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.misc.initialize\_logger module
+------------------------------------
+
+.. automodule:: tf2rl.misc.initialize_logger
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.misc.normalizer module
+----------------------------
+
+.. automodule:: tf2rl.misc.normalizer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.misc.periodic\_ops module
+-------------------------------
+
+.. automodule:: tf2rl.misc.periodic_ops
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.misc.prepare\_output\_dir module
+--------------------------------------
+
+.. automodule:: tf2rl.misc.prepare_output_dir
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.misc.target\_update\_ops module
+-------------------------------------
+
+.. automodule:: tf2rl.misc.target_update_ops
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: tf2rl.misc
+   :members:
+   :undoc-members:
+   :show-inheritance:

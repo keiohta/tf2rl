@@ -1,0 +1,392 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tf2rl.distributions package &mdash; TF2RL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tf2rl.envs package" href="tf2rl.envs.html" />
+    <link rel="prev" title="tf2rl.algos package" href="tf2rl.algos.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> TF2RL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="tf2rl.html">tf2rl package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tf2rl.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.algos.html">tf2rl.algos package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.distributions package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.distributions.base">tf2rl.distributions.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.distributions.categorical">tf2rl.distributions.categorical module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.distributions.diagonal_gaussian">tf2rl.distributions.diagonal_gaussian module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.distributions">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.envs.html">tf2rl.envs package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.experiments.html">tf2rl.experiments package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.misc.html">tf2rl.misc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.networks.html">tf2rl.networks package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.policies.html">tf2rl.policies package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.tools.html">tf2rl.tools package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tf2rl.html#module-tf2rl">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TF2RL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="tf2rl.html">tf2rl package</a> &raquo;</li>
+        
+      <li>tf2rl.distributions package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tf2rl.distributions.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tf2rl-distributions-package">
+<h1>tf2rl.distributions package<a class="headerlink" href="#tf2rl-distributions-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tf2rl.distributions.base">
+<span id="tf2rl-distributions-base-module"></span><h2>tf2rl.distributions.base module<a class="headerlink" href="#module-tf2rl.distributions.base" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tf2rl.distributions.base.Distribution">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.distributions.base.</code><code class="sig-name descname">Distribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dim</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.base.Distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.distributions.base.Distribution.dim">
+<em class="property">property </em><code class="sig-name descname">dim</code><a class="headerlink" href="#tf2rl.distributions.base.Distribution.dim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.base.Distribution.entropy">
+<code class="sig-name descname">entropy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dist</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.base.Distribution.entropy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.base.Distribution.kl">
+<code class="sig-name descname">kl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">old_dist</span></em>, <em class="sig-param"><span class="n">new_dist</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.base.Distribution.kl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the KL divergence of two distributions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.base.Distribution.likelihood_ratio">
+<code class="sig-name descname">likelihood_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">old_dist</span></em>, <em class="sig-param"><span class="n">new_dist</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.base.Distribution.likelihood_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.base.Distribution.log_likelihood">
+<code class="sig-name descname">log_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">xs</span></em>, <em class="sig-param"><span class="n">dist</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.base.Distribution.log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.base.Distribution.log_likelihood_sym">
+<code class="sig-name descname">log_likelihood_sym</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">dist</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.base.Distribution.log_likelihood_sym" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.distributions.categorical">
+<span id="tf2rl-distributions-categorical-module"></span><h2>tf2rl.distributions.categorical module<a class="headerlink" href="#module-tf2rl.distributions.categorical" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tf2rl.distributions.categorical.Categorical">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.distributions.categorical.</code><code class="sig-name descname">Categorical</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dim</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.categorical.Categorical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tf2rl.distributions.base.Distribution" title="tf2rl.distributions.base.Distribution"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.distributions.base.Distribution</span></code></a></p>
+<dl class="py method">
+<dt id="tf2rl.distributions.categorical.Categorical.entropy">
+<code class="sig-name descname">entropy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.categorical.Categorical.entropy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.categorical.Categorical.kl">
+<code class="sig-name descname">kl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">old_param</span></em>, <em class="sig-param"><span class="n">new_param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.categorical.Categorical.kl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Compute the KL divergence of two Categorical distribution as:</dt><dd><p>p_1 * (log p_1  - log p_2)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.categorical.Categorical.likelihood_ratio">
+<code class="sig-name descname">likelihood_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">old_param</span></em>, <em class="sig-param"><span class="n">new_param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.categorical.Categorical.likelihood_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.categorical.Categorical.log_likelihood">
+<code class="sig-name descname">log_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.categorical.Categorical.log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Compute log likelihood as:</dt><dd><p>log sum(p_i * x_i)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>(</strong><strong>tf.Tensor</strong><strong> or </strong><strong>np.ndarray</strong><strong>)</strong> (<em>x</em>) – Values to compute log likelihood</p></li>
+<li><p><strong>(</strong><strong>Dict</strong><strong>)</strong> (<em>param</em>) – Dictionary that contains probabilities of outputs</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return (tf.Tensor)</dt>
+<dd class="field-even"><p>Log probabilities</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.categorical.Categorical.sample">
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.categorical.Categorical.sample" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.distributions.diagonal_gaussian">
+<span id="tf2rl-distributions-diagonal-gaussian-module"></span><h2>tf2rl.distributions.diagonal_gaussian module<a class="headerlink" href="#module-tf2rl.distributions.diagonal_gaussian" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tf2rl.distributions.diagonal_gaussian.DiagonalGaussian">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.distributions.diagonal_gaussian.</code><code class="sig-name descname">DiagonalGaussian</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dim</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.diagonal_gaussian.DiagonalGaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tf2rl.distributions.base.Distribution" title="tf2rl.distributions.base.Distribution"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.distributions.base.Distribution</span></code></a></p>
+<dl class="py method">
+<dt id="tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.dim">
+<em class="property">property </em><code class="sig-name descname">dim</code><a class="headerlink" href="#tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.dim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.entropy">
+<code class="sig-name descname">entropy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.entropy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.kl">
+<code class="sig-name descname">kl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">old_param</span></em>, <em class="sig-param"><span class="n">new_param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.kl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Compute KL divergence of two distributions as:</dt><dd><p>{(mu_1 - mu_2)^2 + sigma_1^2 - sigma_2^2} / (2 * sigma_2^2) + ln(sigma_2 / sigma_1)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>(</strong><strong>Dict</strong><strong>)</strong> (<em>new_param</em>) – Gaussian distribution to compare with that contains
+means: (batch_size * output_dim)
+std: (batch_size * output_dim)</p></li>
+<li><p><strong>(</strong><strong>Dict</strong><strong>)</strong> – Same contents with old_param</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.likelihood_ratio">
+<code class="sig-name descname">likelihood_ratio</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">old_param</span></em>, <em class="sig-param"><span class="n">new_param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.likelihood_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.log_likelihood">
+<code class="sig-name descname">log_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Compute log likelihood as:</dt><dd><p>TODO: write equation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.sample">
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">param</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.distributions.diagonal_gaussian.DiagonalGaussian.sample" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.distributions">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tf2rl.distributions" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tf2rl.envs.html" class="btn btn-neutral float-right" title="tf2rl.envs package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tf2rl.algos.html" class="btn btn-neutral float-left" title="tf2rl.algos package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Kei Ohta
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

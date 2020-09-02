@@ -1,0 +1,53 @@
+tf2rl.experiments package
+=========================
+
+Submodules
+----------
+
+tf2rl.experiments.irl\_trainer module
+-------------------------------------
+
+.. automodule:: tf2rl.experiments.irl_trainer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.experiments.mpc\_trainer module
+-------------------------------------
+
+.. automodule:: tf2rl.experiments.mpc_trainer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.experiments.on\_policy\_trainer module
+--------------------------------------------
+
+.. automodule:: tf2rl.experiments.on_policy_trainer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.experiments.trainer module
+--------------------------------
+
+.. automodule:: tf2rl.experiments.trainer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.experiments.utils module
+------------------------------
+
+.. automodule:: tf2rl.experiments.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: tf2rl.experiments
+   :members:
+   :undoc-members:
+   :show-inheritance:

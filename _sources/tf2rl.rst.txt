@@ -1,0 +1,25 @@
+tf2rl package
+=============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   tf2rl.algos
+   tf2rl.distributions
+   tf2rl.envs
+   tf2rl.experiments
+   tf2rl.misc
+   tf2rl.networks
+   tf2rl.policies
+   tf2rl.tools
+
+Module contents
+---------------
+
+.. automodule:: tf2rl
+   :members:
+   :undoc-members:
+   :show-inheritance:

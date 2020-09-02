@@ -1,0 +1,699 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tf2rl.envs package &mdash; TF2RL  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="tf2rl.experiments package" href="tf2rl.experiments.html" />
+    <link rel="prev" title="tf2rl.distributions package" href="tf2rl.distributions.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> TF2RL
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="tf2rl.html">tf2rl package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tf2rl.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.algos.html">tf2rl.algos package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.distributions.html">tf2rl.distributions package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.envs package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.atari_wrapper">tf2rl.envs.atari_wrapper module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.env_utils">tf2rl.envs.env_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.multi_thread_env">tf2rl.envs.multi_thread_env module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.normalizer">tf2rl.envs.normalizer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.utils">tf2rl.envs.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.experiments.html">tf2rl.experiments package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.misc.html">tf2rl.misc package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.networks.html">tf2rl.networks package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.policies.html">tf2rl.policies package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tf2rl.tools.html">tf2rl.tools package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tf2rl.html#module-tf2rl">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TF2RL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="tf2rl.html">tf2rl package</a> &raquo;</li>
+        
+      <li>tf2rl.envs package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tf2rl.envs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tf2rl-envs-package">
+<h1>tf2rl.envs package<a class="headerlink" href="#tf2rl-envs-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tf2rl.envs.atari_wrapper">
+<span id="tf2rl-envs-atari-wrapper-module"></span><h2>tf2rl.envs.atari_wrapper module<a class="headerlink" href="#module-tf2rl.envs.atari_wrapper" title="Permalink to this headline">¶</a></h2>
+<p>The MIT License</p>
+<p>Copyright (c) 2017 OpenAI (<a class="reference external" href="http://openai.com">http://openai.com</a>)</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</p>
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.ClipRewardEnv">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">ClipRewardEnv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ClipRewardEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.RewardWrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.ClipRewardEnv.reward">
+<code class="sig-name descname">reward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reward</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ClipRewardEnv.reward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bin reward to {+1, 0, -1} by its sign.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.EpisodicLifeEnv">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">EpisodicLifeEnv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.EpisodicLifeEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.EpisodicLifeEnv.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.EpisodicLifeEnv.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset only when lives are exhausted.
+This way all states are still reachable even though lives are episodic,
+and the learner need not know about any of this behind-the-scenes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.EpisodicLifeEnv.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.EpisodicLifeEnv.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run one timestep of the environment’s dynamics. When end of
+episode is reached, you are responsible for calling <cite>reset()</cite>
+to reset this environment’s state.</p>
+<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
+</dd>
+<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
+reward (float) : amount of reward returned after previous action
+done (bool): whether the episode has ended, in which case further step() calls will return undefined results
+info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.FireResetEnv">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">FireResetEnv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FireResetEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.FireResetEnv.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FireResetEnv.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the state of the environment and returns an initial observation.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>observation (object): the initial observation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.FireResetEnv.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ac</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FireResetEnv.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run one timestep of the environment’s dynamics. When end of
+episode is reached, you are responsible for calling <cite>reset()</cite>
+to reset this environment’s state.</p>
+<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
+</dd>
+<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
+reward (float) : amount of reward returned after previous action
+done (bool): whether the episode has ended, in which case further step() calls will return undefined results
+info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.FrameStack">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">FrameStack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">k</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FrameStack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.FrameStack.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FrameStack.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the state of the environment and returns an initial observation.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>observation (object): the initial observation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.FrameStack.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FrameStack.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run one timestep of the environment’s dynamics. When end of
+episode is reached, you are responsible for calling <cite>reset()</cite>
+to reset this environment’s state.</p>
+<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
+</dd>
+<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
+reward (float) : amount of reward returned after previous action
+done (bool): whether the episode has ended, in which case further step() calls will return undefined results
+info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.LazyFrames">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">LazyFrames</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frames</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.LazyFrames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.MaxAndSkipEnv">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">MaxAndSkipEnv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">skip</span><span class="o">=</span><span class="default_value">4</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.MaxAndSkipEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.MaxAndSkipEnv.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.MaxAndSkipEnv.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the state of the environment and returns an initial observation.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>observation (object): the initial observation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.MaxAndSkipEnv.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.MaxAndSkipEnv.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Repeat action, sum reward, and max over last observations.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.NdarrayFrames">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">NdarrayFrames</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NdarrayFrames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.NdarrayFrames.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NdarrayFrames.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the state of the environment and returns an initial observation.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>observation (object): the initial observation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.NdarrayFrames.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NdarrayFrames.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run one timestep of the environment’s dynamics. When end of
+episode is reached, you are responsible for calling <cite>reset()</cite>
+to reset this environment’s state.</p>
+<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
+</dd>
+<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
+reward (float) : amount of reward returned after previous action
+done (bool): whether the episode has ended, in which case further step() calls will return undefined results
+info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.NoopResetEnv">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">NoopResetEnv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">noop_max</span><span class="o">=</span><span class="default_value">30</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NoopResetEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.NoopResetEnv.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NoopResetEnv.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do no-op action for a number of steps in [1, noop_max].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.NoopResetEnv.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ac</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NoopResetEnv.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run one timestep of the environment’s dynamics. When end of
+episode is reached, you are responsible for calling <cite>reset()</cite>
+to reset this environment’s state.</p>
+<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
+</dd>
+<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
+reward (float) : amount of reward returned after previous action
+done (bool): whether the episode has ended, in which case further step() calls will return undefined results
+info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.ProcessFrame84">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">ProcessFrame84</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ProcessFrame84" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.ObservationWrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.ProcessFrame84.observation">
+<code class="sig-name descname">observation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ProcessFrame84.observation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.ProcessFrame84.process">
+<em class="property">static </em><code class="sig-name descname">process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ProcessFrame84.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.ScaledFloatFrame">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">ScaledFloatFrame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ScaledFloatFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.ObservationWrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.ScaledFloatFrame.observation">
+<code class="sig-name descname">observation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">observation</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ScaledFloatFrame.observation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="tf2rl.envs.atari_wrapper.WarpFrame">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">WarpFrame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">width</span><span class="o">=</span><span class="default_value">84</span></em>, <em class="sig-param"><span class="n">height</span><span class="o">=</span><span class="default_value">84</span></em>, <em class="sig-param"><span class="n">grayscale</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">dict_space_key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.WarpFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.ObservationWrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.atari_wrapper.WarpFrame.observation">
+<code class="sig-name descname">observation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.WarpFrame.observation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.envs.atari_wrapper.make_atari">
+<code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">make_atari</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env_id</span></em>, <em class="sig-param"><span class="n">max_episode_steps</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.make_atari" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.envs.atari_wrapper.wrap_deepmind">
+<code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">wrap_deepmind</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">episode_life</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">clip_rewards</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">frame_stack</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">scale</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.wrap_deepmind" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure environment for DeepMind-style Atari.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.envs.atari_wrapper.wrap_dqn">
+<code class="sig-prename descclassname">tf2rl.envs.atari_wrapper.</code><code class="sig-name descname">wrap_dqn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">stack_frames</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">episodic_life</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">reward_clipping</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">wrap_ndarray</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.wrap_dqn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a common set of wrappers for Atari games.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.envs.env_utils">
+<span id="tf2rl-envs-env-utils-module"></span><h2>tf2rl.envs.env_utils module<a class="headerlink" href="#module-tf2rl.envs.env_utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tf2rl.envs.env_utils.get_act_dim">
+<code class="sig-prename descclassname">tf2rl.envs.env_utils.</code><code class="sig-name descname">get_act_dim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.env_utils.get_act_dim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.envs.multi_thread_env">
+<span id="tf2rl-envs-multi-thread-env-module"></span><h2>tf2rl.envs.multi_thread_env module<a class="headerlink" href="#module-tf2rl.envs.multi_thread_env" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.multi_thread_env.</code><code class="sig-name descname">MultiThreadEnv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env_fn</span></em>, <em class="sig-param"><span class="n">batch_size</span></em>, <em class="sig-param"><span class="n">thread_pool</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">max_episode_steps</span><span class="o">=</span><span class="default_value">1000</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This contains multiple environments.
+When step() is called, all of them forward one-step.</p>
+<p>This serve tensorflow operators to manipulate multiple environments.</p>
+<dl class="py method">
+<dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv.max_action">
+<em class="property">property </em><code class="sig-name descname">max_action</code><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.max_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv.min_action">
+<em class="property">property </em><code class="sig-name descname">min_action</code><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.min_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv.original_env">
+<em class="property">property </em><code class="sig-name descname">original_env</code><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.original_env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv.py_observation">
+<code class="sig-name descname">py_observation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.py_observation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv.py_reset">
+<code class="sig-name descname">py_reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.py_reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv.py_step">
+<code class="sig-name descname">py_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">actions</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.py_step" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>actions</strong> (<em>np.array</em>) – np.float32 [batch_size, dim_action]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>(obs, reward, done)</p>
+<p>obs = [batch_size, C, H, W]
+reward = [batch_size]
+done = [batch_size]</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv.state_dim">
+<em class="property">property </em><code class="sig-name descname">state_dim</code><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.state_dim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">actions</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>take 1-step in all environments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>action</strong> (<em>tf.Tensor</em>) – float32[batch_size, dim_action]</p></li>
+<li><p><strong>name</strong> – Operator名</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>(tf.Tensor, tf.Tensor, tf.Tensor)</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><blockquote>
+<div><p>(obs, reward, done)</p>
+</div></blockquote>
+<p>obs = [batch_size, dim_obs]
+reward = [batch_size]
+done = [batch_size]
+reach_limit = [batch_size] : whether each environment reached time limit or not.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.envs.normalizer">
+<span id="tf2rl-envs-normalizer-module"></span><h2>tf2rl.envs.normalizer module<a class="headerlink" href="#module-tf2rl.envs.normalizer" title="Permalink to this headline">¶</a></h2>
+<p>MIT License</p>
+<p>Copyright (c) 2017 Preferred Networks, Inc.</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+<dl class="py class">
+<dt id="tf2rl.envs.normalizer.EmpiricalNormalizer">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.normalizer.</code><code class="sig-name descname">EmpiricalNormalizer</code><span class="sig-paren">(</span><em class="sig-param">shape</em>, <em class="sig-param">batch_axis=0</em>, <em class="sig-param">eps=0.01</em>, <em class="sig-param">dtype=&lt;class 'numpy.float32'&gt;</em>, <em class="sig-param">until=None</em>, <em class="sig-param">clip_threshold=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Normalize mean and variance of values based on emprical values.
+Args:</p>
+<blockquote>
+<div><p>shape (int or tuple of int): Shape of input values except batch axis.
+batch_axis (int): Batch axis.
+eps (float): Small value for stability.
+dtype (dtype): Dtype of input values.
+until (int or None): If this arg is specified, the link learns input</p>
+<blockquote>
+<div><p>values until the sum of batch sizes exceeds it.</p>
+</div></blockquote>
+</div></blockquote>
+<dl class="py method">
+<dt id="tf2rl.envs.normalizer.EmpiricalNormalizer.experience">
+<code class="sig-name descname">experience</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer.experience" title="Permalink to this definition">¶</a></dt>
+<dd><p>Learn input values without computing the output values of them</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.normalizer.EmpiricalNormalizer.inverse">
+<code class="sig-name descname">inverse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer.inverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.normalizer.EmpiricalNormalizer.mean">
+<em class="property">property </em><code class="sig-name descname">mean</code><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.normalizer.EmpiricalNormalizer.std">
+<em class="property">property </em><code class="sig-name descname">std</code><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.envs.utils">
+<span id="tf2rl-envs-utils-module"></span><h2>tf2rl.envs.utils module<a class="headerlink" href="#module-tf2rl.envs.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="tf2rl.envs.utils.get_act_dim">
+<code class="sig-prename descclassname">tf2rl.envs.utils.</code><code class="sig-name descname">get_act_dim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action_space</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.utils.get_act_dim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.envs.utils.is_atari_env">
+<code class="sig-prename descclassname">tf2rl.envs.utils.</code><code class="sig-name descname">is_atari_env</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.utils.is_atari_env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.envs.utils.is_discrete">
+<code class="sig-prename descclassname">tf2rl.envs.utils.</code><code class="sig-name descname">is_discrete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">space</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.utils.is_discrete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="tf2rl.envs.utils.is_mujoco_env">
+<code class="sig-prename descclassname">tf2rl.envs.utils.</code><code class="sig-name descname">is_mujoco_env</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.utils.is_mujoco_env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.envs">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tf2rl.envs" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tf2rl.experiments.html" class="btn btn-neutral float-right" title="tf2rl.experiments package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tf2rl.distributions.html" class="btn btn-neutral float-left" title="tf2rl.distributions package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Kei Ohta
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
