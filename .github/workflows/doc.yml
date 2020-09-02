@@ -1,6 +1,6 @@
 name: Document
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   doc:
