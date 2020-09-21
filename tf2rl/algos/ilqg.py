@@ -10,10 +10,12 @@ from tf2rl.misc.initialize_logger import initialize_logger
 class ILQG:
     def __init__(
             self,
+            make_env,
             mu=1.5,
             min_mu=1e-8,
             max_mu=1e16,
-            tol_cost=1e-7):
+            tol_cost=1e-7,
+            max_steps=100):
         """Generate locally-optimal controls using iterative LQG.
         Variable names follow the symbols in
         "Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization".
@@ -23,19 +25,75 @@ class ILQG:
         :param max_mu: maximum coefficient for regularization
         :param tol_cost: tolerance cost to stop iLQG optimization
         """
+        self._env = make_env()
+        self._make_env = make_env
         self._logger = initialize_logger(save_log=False)
         self._tol_cost = tol_cost
+        self._mu = mu
         self._min_mu = min_mu
         self._max_mu = max_mu
-        self._mu = mu
+        self._max_steps = max_steps
         # Coefficients for improved line search in Eq.12
         self._alphas = np.power(10, np.linspace(0, -3, 21))
+        self._X, self._U, self._cost = None, None, None
 
-    def optimize(self, make_env, X, U, cost=None, max_iter=1):
-        if cost is None:
-            cost = np.inf
+    def initialize(self, initial_state=None):
+        if initial_state is not None:
+            self._env.set_state_vector(initial_state)
+        self._X, self._U, self._cost = self.rollout(initial_state, policy="ou")
 
-        dynamics = NumericalDiffDynamics(make_env)
+    def rollout(self, initial_state=None, policy="zeros"):
+        """Generate a trajectory by using the given policy.
+
+        :param make_env: a function to make an environment
+        :param policy: "zeros" uses zero-vector control. "random" generates control from uniform distribution.
+        :param max_steps: if None, rollout while done is False.
+        :return:
+         (X, U, cost)
+        """
+        if initial_state is not None:
+            self._env.set_state_vector(initial_state)
+        else:
+            self._env.reset()
+
+        X = [self._env.get_state_vector()]
+        U = []
+        cost = 0.
+
+        while True:
+            if policy == "zeros":
+                u = np.zeros(self._env.dim_control, dtype=NP_DTYPE)
+            elif policy == "ou" or policy == "random":
+                random_action = np.random.uniform(low=-self._env.action_space.high[0],
+                                                  high=self._env.action_space.high[0],
+                                                  size=self._env.dim_control)
+                if len(U) == 0 or policy == "random":
+                    u = np.copy(random_action)
+                else:
+                    u += random_action
+                    u = np.clip(u, self._env.action_space.low, self._env.action_space.high)
+            else:
+                raise ValueError("Unknown policy : {}".format(policy))
+
+            cur_cost = self._env.cost_state() + self._env.cost_control(u)
+
+            _, _, done, _ = self._env.step(u)
+            cost += cur_cost
+
+            U.append(u)
+            X.append(self._env.get_state_vector())
+
+            if self._max_steps is not None and len(U) == self._max_steps:
+                break
+
+            if done:
+                break
+
+        return np.array(X, dtype=NP_DTYPE), np.array(U, dtype=NP_DTYPE), cost
+
+    def optimize(self, max_iter=1):
+        dynamics = NumericalDiffDynamics(self._make_env)
+        X, U, cost = self._X, self._U, self._cost
 
         for _ in range(max_iter):
             k, K = self.backward(X, U, dynamics)
@@ -43,7 +101,7 @@ class ILQG:
             # Compute a new trajectory with improved line search, Eq.8, 12
             min_cost = np.inf
             for cur_alpha in self._alphas:
-                cur_X, cur_U, cur_cost = self.forward(make_env, X, U, k, K, cur_alpha)
+                cur_X, cur_U, cur_cost = self.forward(self._make_env, X, U, k, K, cur_alpha)
 
                 if cur_cost < min_cost:
                     new_X, new_U, min_cost = cur_X, cur_U, cur_cost
@@ -58,7 +116,7 @@ class ILQG:
             X, U = new_X, new_U
             cost = min_cost
 
-        return X, U, cost
+        self._X, self._U, self._cost = X, U, cost
 
     def backward(self, X, U, dynamics):
         """
@@ -174,6 +232,18 @@ class ILQG:
             new_X[t + 1] = x
 
         return new_X, new_U, cost
+
+    @property
+    def X(self):
+        return self._X
+
+    @property
+    def U(self):
+        return self._U
+
+    @property
+    def cost(self):
+        return self._cost
 
     @staticmethod
     def get_argument(parser=None):

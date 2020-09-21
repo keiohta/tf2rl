@@ -4,7 +4,7 @@ from gym.envs.mujoco.reacher import ReacherEnv
 
 from tf2rl.algos.ilqg import ILQG
 from tf2rl.envs.numerical_diff_dynamics import ILQGInterfaceEnv
-from tf2rl.misc.ilqg_utils import rollout, visualize_rollout
+from tf2rl.misc.ilqg_utils import visualize_rollout
 from tf2rl.misc.initialize_logger import initialize_logger
 
 
@@ -46,6 +46,10 @@ class ReacherILQGEnv(ReacherEnv, ILQGInterfaceEnv):
     @property
     def dim_state(self):
         return self.model.nq + self.model.nv
+
+    @property
+    def dim_control(self):
+        return 2
 
 
 class PendulumILQGEnv(PendulumEnv, ILQGInterfaceEnv):
@@ -90,7 +94,6 @@ def main():
     parser.add_argument("--env-name", choices=["Pendulum", "Reacher"], default="Reacher")
     args = parser.parse_args()
 
-    lqr = ILQG()
     if args.env_name == "Pendulum":
         make_env = PendulumILQGEnv
         args.horizon = 100
@@ -98,18 +101,19 @@ def main():
         make_env = ReacherILQGEnv
         args.horizon = 50
 
-    X, U, cost = rollout(make_env=make_env, max_steps=args.horizon, policy="ou")
+    ilqg = ILQG(make_env)
+    ilqg.initialize()
 
-    logger.info("Initial trajectory: T = {} cost = {}".format(len(U), cost))
+    logger.info("Initial trajectory: T = {} cost = {}".format(len(ilqg.U), ilqg.cost))
     viewer_env = make_env()
-    visualize_rollout(viewer_env=viewer_env, initial_state=X[0], U=U, save_movie=args.save_movie,
+    visualize_rollout(viewer_env=viewer_env, initial_state=ilqg.X[0], U=ilqg.U, save_movie=args.save_movie,
                       prefix="{}_{}".format(args.env_name, 0))
 
     for i in range(args.max_iter_optimization):
-        X, U, cost = lqr.optimize(make_env, X=X, U=U, cost=cost, max_iter=args.max_iter_each_step)
-        logger.info("Step {} trajectory: cost = {}".format(i + 1, cost))
+        ilqg.optimize(max_iter=args.max_iter_each_step)
+        logger.info("Step {} trajectory: cost = {}".format(i + 1, ilqg.cost))
         if (i + 1) % args.visualize_interval == 0:
-            visualize_rollout(viewer_env=viewer_env, initial_state=X[0], U=U, save_movie=args.save_movie,
+            visualize_rollout(viewer_env=viewer_env, initial_state=ilqg.X[0], U=ilqg.U, save_movie=args.save_movie,
                               prefix="{}_{}".format(args.env_name, i + 1))
 
 

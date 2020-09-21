@@ -16,57 +16,6 @@ def is_pos_def(x):
     return np.all(np.linalg.eigvals(x) > 0)
 
 
-def rollout(make_env, policy="zeros", max_steps=None):
-    """Generate a trajectory by using the given policy.
-
-    :param make_env: a function to make an environment
-    :param policy: "zeros" uses zero-vector control. "random" generates control from uniform distribution.
-    :param max_steps: if None, rollout while done is False.
-    :return:
-     (X, U, cost)
-    """
-    env = make_env()
-    env.reset()
-    dim_action = env.action_space.shape[0]
-
-    X = [env.get_state_vector()]
-    U = []
-    cost = 0.
-
-    while True:
-        if policy == "zeros":
-            u = np.zeros(dim_action, dtype=NP_DTYPE)
-        elif policy == "ou" or policy == "random":
-            random_action = np.random.uniform(low=-env.action_space.high[0],
-                                              high=env.action_space.high[0],
-                                              size=dim_action)
-            if len(U) == 0 or policy == "random":
-                u = np.copy(random_action)
-            else:
-                u += random_action
-                u = np.clip(u, env.action_space.low, env.action_space.high)
-        else:
-            raise ValueError("Unknown policy : {}".format(policy))
-
-        cost_state = env.cost_state()
-        cost_control = env.cost_control(u)
-        cur_cost = cost_state + cost_control
-
-        _, _, done, _ = env.step(u)
-        cost += cur_cost
-
-        U.append(u)
-        X.append(env.get_state_vector())
-
-        if max_steps is not None and len(U) == max_steps:
-            break
-
-        if done:
-            break
-
-    return np.array(X, dtype=NP_DTYPE), np.array(U, dtype=NP_DTYPE), cost
-
-
 def visualize_rollout(viewer_env, initial_state, U, save_movie, prefix):
     frames = []
 
