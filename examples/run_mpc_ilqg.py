@@ -30,13 +30,12 @@ def main():
 
     real_env = make_env()
     for epi_idx in range(100):
-        X, U, cost = [], [], 0.
+        cost = 0.
 
         # Reset state
         real_env.reset()
         frames = [real_env.render(mode="rgb_array")]
         ilqg.initialize(initial_state=real_env.get_state_vector())
-        X.append(real_env.get_state_vector())
 
         for i in range(ilqg.horizon):
             u = ilqg.get_next_action(state=real_env.get_state_vector())
