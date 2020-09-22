@@ -43,7 +43,8 @@ class OnPolicyTrainer(Trainer):
                 if self._normalize_obs:
                     obs = self._obs_normalizer(obs, update=False)
                 act, logp, val = self._policy.get_action_and_val(obs)
-                env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+                if not is_discrete(self._env.action_space):
+                    env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
                 next_obs, reward, done, _ = self._env.step(env_act)
                 if self._show_progress:
                     self._env.render()
@@ -155,7 +156,7 @@ class OnPolicyTrainer(Trainer):
                 if self._normalize_obs:
                     obs = self._obs_normalizer(obs, update=False)
                 act, _ = self._policy.get_action(obs, test=True)
-                act = (act if not hasattr(self._env.action_space, "high") else
+                act = (act if not is_discrete(self._env.action_space) else
                        np.clip(act, self._env.action_space.low, self._env.action_space.high))
                 next_obs, reward, done, _ = self._test_env.step(act)
                 if self._save_test_path:
