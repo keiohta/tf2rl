@@ -17,14 +17,22 @@ class MeTrpoTrainer(MPCTrainer):
         super().__init__(*args, **kwargs)
         self._n_eval_episodes_per_model = n_eval_episodes_per_model
 
+        # Replay buffer to train policy
         self.replay_buffer = get_replay_buffer(self._policy, self._env)
-        kwargs_local_buf = get_default_rb_dict(
-            size=self._policy.horizon, env=self._env)
-        kwargs_local_buf["env_dict"]["val"] = {}
-        kwargs_local_buf["size"] = self._episode_max_steps
-        if is_discrete(self._env.action_space):
-            kwargs_local_buf["env_dict"]["act"]["dtype"] = np.int32
-        self.local_buffer = ReplayBuffer(**kwargs_local_buf)
+
+        # Replay buffer to compute GAE
+        rb_dict = {
+            "size": self._episode_max_steps,
+            "default_dtype": np.float32,
+            "env_dict": {
+                "obs": {"shape": self._env.observation_space.shape},
+                "act": {"shape": self._env.action_space.shape},
+                "next_obs": {"shape": self._env.observation_space.shape},
+                "rew": {},
+                "done": {},
+                "logp": {},
+                "val": {}}}
+        self.local_buffer = ReplayBuffer(**rb_dict)
 
     def predict_next_state(self, obses, acts, idx=None):
         is_single_input = obses.ndim == acts.ndim and acts.ndim == 1
@@ -35,11 +43,10 @@ class MeTrpoTrainer(MPCTrainer):
         inputs = np.concatenate([obses, acts], axis=1)
         idx = np.random.randint(self._n_dynamics_model) if idx is None else idx
         obs_diffs = self._dynamics_models[idx].predict(inputs)
-        # obs_diffs /= self._n_dynamics_model
 
         if is_single_input:
-            # assert obses.shape == obs_diffs.shape, "shape mismatch: {}, {}".format(obses.shape, obs_diffs[0].shape)
             return obses[0] + obs_diffs
+
         return obses + obs_diffs
 
     def _make_inputs_output_pairs(self, n_epoch):
@@ -54,43 +61,50 @@ class MeTrpoTrainer(MPCTrainer):
         tf.summary.experimental.set_step(total_steps)
 
         while True:
-            # Collect samples
-            self.collect_steps_real_env()
+            # Collect (s, a, s') pairs in a real environment
+            self.collect_transitions_real_env()
             total_steps += self._n_collect_steps
             tf.summary.experimental.set_step(total_steps)
 
-            # Fit dynamics models
+            # Train dynamics models
             self.fit_dynamics(n_epoch=1)
-            # if self._debug:
-            ret_real_env, ret_sim_env = self._evaluate_model()
-            self.logger.info("Returns (real, sim) = ({: .3f}, {: .3f})".format(ret_real_env, ret_sim_env))
+            if self._debug:
+                ret_real_env, ret_sim_env = self._evaluate_model()
+                self.logger.info("Returns (real, sim) = ({: .3f}, {: .3f})".format(ret_real_env, ret_sim_env))
 
-            n_updates = 0
+            # Prepare initial states for evaluation
             init_states_for_eval = np.array([
                 self._env.reset() for _ in range(self._n_dynamics_model * self._n_eval_episodes_per_model)])
+
+            # Returns to evaluate policy improvement
             returns_before_update = self._evaluate_current_return(init_states_for_eval)
+
+            n_updates = 0
+            improve_ratios = []
             while True:
                 n_updates += 1
 
-                # Generate samples using dynamics models
-                average_return = self.collect_steps_sim_env()
+                # Generate samples using dynamics models (simulated env)
+                average_return = self.collect_transitions_sim_env()
 
                 # Update policy
                 self.update_policy()
-                # self._visualize_current_performance()
 
+                # Evaluate policy improvement
                 returns_after_update = self._evaluate_current_return(init_states_for_eval)
                 improved_ratio = np.sum(returns_after_update > returns_before_update) / (
                             self._n_dynamics_model * self._n_eval_episodes_per_model)
-                self.logger.info("Training total steps: {0: 7} improved ratio: {1: .2f} simulated return: {2: .4f} at n_update: {3: 2}".format(
-                    total_steps, improved_ratio, average_return, n_updates))
+                improve_ratios.append(improved_ratio)
                 if improved_ratio < 0.7:
                     break
                 returns_before_update = returns_after_update
 
+            self.logger.info(
+                "Training total steps: {0: 7} sim return: {1: .4f} n_update: {2:}, ratios: {3:}".format(
+                    total_steps, average_return, n_updates, improve_ratios))
             tf.summary.scalar(name="mpc/n_updates", data=n_updates)
 
-            # Evaluate policy
+            # Evaluate policy in a real environment
             if total_steps // self._n_collect_steps % 10 == 0:
                 avg_test_return = self.evaluate_policy(total_steps)
                 self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
@@ -129,7 +143,7 @@ class MeTrpoTrainer(MPCTrainer):
 
         for _ in range(self._policy.n_epoch):
             samples = self.replay_buffer._encode_sample(np.random.permutation(self._policy.horizon))
-            adv = (samples["adv"] - mean_adv) / (std_adv + 1e-8)
+            adv = (samples["adv"] - mean_adv) / (std_adv + 1e-8) if self._policy.normalize_adv else samples["adv"]
             for idx in range(int(self._policy.horizon / self._policy.batch_size)):
                 target = slice(idx * self._policy.batch_size,
                                (idx + 1) * self._policy.batch_size)
@@ -171,7 +185,7 @@ class MeTrpoTrainer(MPCTrainer):
             self._env.render()
             obs = next_obs
 
-    def collect_steps_real_env(self):
+    def collect_transitions_real_env(self):
         total_steps = 0
         episode_steps = 0
         obs = self._env.reset()
@@ -188,7 +202,7 @@ class MeTrpoTrainer(MPCTrainer):
                 episode_steps = 0
                 obs = self._env.reset()
 
-    def collect_steps_sim_env(self):
+    def collect_transitions_sim_env(self):
         """
         Generate transitions using dynamics model
         :return:

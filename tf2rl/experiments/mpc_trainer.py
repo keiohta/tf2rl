@@ -8,8 +8,7 @@ from tf2rl.misc.get_replay_buffer import get_space_size
 
 
 class DynamicsModel(tf.keras.Model):
-    def __init__(self, input_dim, output_dim, units=[32, 32],
-                 name="DymamicsModel", gpu=0):
+    def __init__(self, input_dim, output_dim, units=[32, 32], name="DymamicsModel", gpu=0):
         self.device = "/gpu:{}".format(gpu) if gpu >= 0 else "/cpu:0"
         super().__init__(name=name)
 
@@ -86,12 +85,9 @@ class MPCTrainer(Trainer):
             "size": buffer_size,
             "default_dtype": np.float32,
             "env_dict": {
-                "obs": {
-                    "shape": get_space_size(self._env.observation_space)},
-                "next_obs": {
-                    "shape": get_space_size(self._env.observation_space)},
-                "act": {
-                    "shape": get_space_size(self._env.action_space)}}}
+                "obs": {"shape": get_space_size(self._env.observation_space)},
+                "next_obs": {"shape": get_space_size(self._env.observation_space)},
+                "act": {"shape": get_space_size(self._env.action_space)}}}
         return rb_dict
 
     def _prepare_dynamics_model(self, gpu=0, lr=0.001):
