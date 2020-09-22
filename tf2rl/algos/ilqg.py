@@ -11,6 +11,7 @@ class ILQG:
     def __init__(
             self,
             make_env,
+            policy="ou",
             mu=1.5,
             min_mu=1e-8,
             max_mu=1e16,
@@ -27,6 +28,7 @@ class ILQG:
         """
         self._env = make_env()
         self._make_env = make_env
+        self._policy = policy
         self._logger = initialize_logger(save_log=False)
         self._tol_cost = tol_cost
         self._mu = mu
@@ -42,7 +44,7 @@ class ILQG:
             self._env.set_state_vector(initial_state)
         self._X, self._U, self._cost = self.rollout(initial_state, policy="ou")
 
-    def rollout(self, initial_state=None, policy="zeros"):
+    def rollout(self, initial_state=None):
         """Generate a trajectory by using the given policy.
 
         :param make_env: a function to make an environment
@@ -61,19 +63,21 @@ class ILQG:
         cost = 0.
 
         while True:
-            if policy == "zeros":
+            if self._policy == "zeros":
                 u = np.zeros(self._env.dim_control, dtype=NP_DTYPE)
-            elif policy == "ou" or policy == "random":
-                random_action = np.random.uniform(low=-self._env.action_space.high[0],
-                                                  high=self._env.action_space.high[0],
-                                                  size=self._env.dim_control)
-                if len(U) == 0 or policy == "random":
-                    u = np.copy(random_action)
+            elif self._policy == "random":
+                u = np.random.uniform(low=self._env.action_space.low, high=self._env.action_space.high,
+                                      size=self._env.dim_control)
+            elif self._policy == "ou":
+                random_u = np.random.uniform(low=-self._env.action_space.high[0], high=self._env.action_space.high[0],
+                                             size=self._env.dim_control)
+                if len(U) == 0:
+                    u = np.copy(random_u)
                 else:
-                    u += random_action
+                    u += random_u
                     u = np.clip(u, self._env.action_space.low, self._env.action_space.high)
             else:
-                raise ValueError("Unknown policy : {}".format(policy))
+                raise ValueError("Unknown policy : {}".format(self._policy))
 
             cur_cost = self._env.cost_state() + self._env.cost_control(u)
 
