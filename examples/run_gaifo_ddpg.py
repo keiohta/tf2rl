@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     if args.expert_path_dir is None:
         print("Plaese generate demonstrations first")
-        print("python examples/run_sac.py --env-name~Pendulum-v0 --save-test-path --test-interval=50000")
+        print("python examples/run_sac.py --env-name=Pendulum-v0 --save-test-path --test-interval=50000")
         exit()
 
     units = [400, 300]

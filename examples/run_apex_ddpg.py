@@ -7,11 +7,12 @@ from tf2rl.misc.target_update_ops import update_target_variables
 
 # Prepare env and policy function
 class env_fn:
-    def __init__(self,env_name):
+    def __init__(self, env_name):
         self.env_name = env_name
 
     def __call__(self):
         return gym.make(self.env_name)
+
 
 def policy_fn(env, name, memory_capacity=int(1e6),
               gpu=-1, noise_level=0.3):
@@ -29,6 +30,7 @@ def policy_fn(env, name, memory_capacity=int(1e6),
         critic_units=[400, 300],
         memory_capacity=memory_capacity)
 
+
 def get_weights_fn(policy):
     # TODO: Check if following needed
     import tensorflow as tf
@@ -36,6 +38,7 @@ def get_weights_fn(policy):
         return [policy.actor.weights,
                 policy.critic.weights,
                 policy.critic_target.weights]
+
 
 def set_weights_fn(policy, weights):
     actor_weights, critic_weights, critic_target_weights = weights

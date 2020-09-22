@@ -10,7 +10,7 @@ class TestDiagonalGaussian(CommonDist):
     def setUpClass(cls):
         super().setUpClass()
         cls.dist = DiagonalGaussian(dim=cls.dim)
-        cls.param = param = {
+        cls.param = {
             "mean": np.zeros(shape=(1, cls.dim), dtype=np.float32),
             "log_std": np.ones(shape=(1, cls.dim), dtype=np.float32)*np.log(1.)}
         cls.params = {

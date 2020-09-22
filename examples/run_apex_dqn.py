@@ -1,5 +1,3 @@
-import argparse
-import numpy as np
 import gym
 import tensorflow as tf
 
@@ -11,15 +9,16 @@ from tf2rl.networks.atari_model import AtariQFunc
 
 # Prepare env and policy function
 class env_fn:
-    def __init__(self,env_name):
+    def __init__(self, env_name):
         self.env_name = env_name
 
     def __call__(self):
         return gym.make(self.env_name)
 
+
 class policy_fn:
-    def __init__(self,args,n_warmup,target_replace_interval,batch_size,
-                 optimizer,epsilon_decay_rate,QFunc):
+    def __init__(self, args, n_warmup, target_replace_interval, batch_size,
+                 optimizer, epsilon_decay_rate, QFunc):
         self.args = args
         self.n_warmup = n_warmup
         self.target_replace_interval = target_replace_interval
@@ -28,7 +27,7 @@ class policy_fn:
         self.epsilon_decay_rate = epsilon_decay_rate
         self.QFunc = QFunc
 
-    def __call__(self,env, name, memory_capacity=int(1e6),
+    def __call__(self, env, name, memory_capacity=int(1e6),
                  gpu=-1, noise_level=0.3):
         return DQN(
             name=name,
@@ -51,9 +50,11 @@ class policy_fn:
             q_func=self.QFunc,
             gpu=gpu)
 
+
 def get_weights_fn(policy):
     return [policy.q_func.weights,
             policy.q_func_target.weights]
+
 
 def set_weights_fn(policy, weights):
     q_func_weights, qfunc_target_weights = weights
@@ -90,6 +91,6 @@ if __name__ == '__main__':
         QFunc = None
 
     run(args, env_fn(env_name),
-        policy_fn(args,n_warmup,target_replace_interval,batch_size,optimizer,
-                  epsilon_decay_rate,QFunc),
+        policy_fn(args, n_warmup, target_replace_interval, batch_size, optimizer,
+                  epsilon_decay_rate, QFunc),
         get_weights_fn, set_weights_fn)

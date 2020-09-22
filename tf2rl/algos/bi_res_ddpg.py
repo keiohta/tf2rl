@@ -23,8 +23,8 @@ class BiResDDPG(DDPG):
                 td_errors1, td_errors2 = self._compute_td_error_body(
                     states, actions, next_states, rewards, dones)
                 critic_loss = tf.reduce_mean(
-                    tf.square(td_errors1) * weights * 0.5 +
-                    tf.square(td_errors2) * weights * self.discount * self._eta * 0.5)
+                    tf.square(td_errors1) * weights +
+                    tf.square(td_errors2) * weights * self.discount * self._eta)
 
             critic_grad = tape.gradient(
                 critic_loss, self.critic.trainable_variables)
@@ -56,7 +56,7 @@ class BiResDDPG(DDPG):
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
-            not_dones = 1. - dones
+            not_dones = 1. - tf.cast(dones, dtype=tf.float32)
             # Compute standard TD error
             target_Q = self.critic_target(
                 [next_states, self.actor_target(next_states)])

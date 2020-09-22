@@ -72,7 +72,7 @@ class PPO(VPG):
                     raise NotImplementedError
                 # Train critic
                 td_errors = tf.squeeze(returns) - current_V
-                critic_loss = tf.reduce_mean(0.5 * tf.square(td_errors))
+                critic_loss = tf.reduce_mean(tf.square(td_errors))
                 total_loss = actor_loss + self.vfunc_coef * critic_loss
 
             grads = tape.gradient(

@@ -3,7 +3,7 @@ import numpy as np
 import argparse
 import logging
 import multiprocessing
-from multiprocessing import Process, Queue, Value, Event, Lock
+from multiprocessing import Process, Value, Event
 from multiprocessing.managers import SyncManager
 
 from cpprb import ReplayBuffer, PrioritizedReplayBuffer
@@ -83,7 +83,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
     if n_env > 1:
         kwargs["env_dict"]["priorities"] = {}
     local_rb = ReplayBuffer(**kwargs)
-    local_idx = np.arange(buffer_size)
+    local_idx = np.arange(buffer_size).astype(np.int)
 
     if n_env == 1:
         s = env.reset()

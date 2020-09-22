@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
-from tf2rl.algos.ddpg import DDPG, Actor
+from tf2rl.algos.ddpg import DDPG
 from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.misc.huber_loss import huber_loss
 
@@ -119,7 +119,7 @@ class TD3(DDPG):
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         with tf.device(self.device):
-            not_dones = 1. - dones
+            not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
             # Get noisy action
             next_action = self.actor_target(next_states)

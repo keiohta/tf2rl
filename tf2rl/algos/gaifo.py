@@ -23,7 +23,7 @@ class Discriminator(DiscriminatorGAIL):
         dummy_next_state = tf.constant(
             np.zeros(shape=(1,) + state_shape, dtype=np.float32))
         with tf.device("/cpu:0"):
-            self([dummy_state, dummy_next_state])
+            self(tf.concat((dummy_state, dummy_next_state), axis=1))
 
 
 class GAIfO(GAIL):
@@ -55,8 +55,8 @@ class GAIfO(GAIL):
         epsilon = 1e-8
         with tf.device(self.device):
             with tf.GradientTape() as tape:
-                real_logits = self.disc([expert_states, expert_next_states])
-                fake_logits = self.disc([agent_states, agent_next_states])
+                real_logits = self.disc(tf.concat((expert_states, expert_next_states), axis=1))
+                fake_logits = self.disc(tf.concat((agent_states, agent_next_states), axis=1))
                 loss = -(tf.reduce_mean(tf.math.log(real_logits + epsilon)) +
                          tf.reduce_mean(tf.math.log(1. - fake_logits + epsilon)))
             grads = tape.gradient(loss, self.disc.trainable_variables)
@@ -74,9 +74,5 @@ class GAIfO(GAIL):
         if states.ndim == 1:
             states = np.expand_dims(states, axis=0)
             next_states = np.expand_dims(next_states, axis=0)
-        return self._inference_body(states, next_states)
-
-    @tf.function
-    def _inference_body(self, states, next_states):
-        with tf.device(self.device):
-            return self.disc.compute_reward([states, next_states])
+        inputs = np.concatenate((states, next_states), axis=1)
+        return self._inference_body(inputs)

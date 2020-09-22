@@ -66,8 +66,6 @@ if __name__ == "__main__":
     import PIL
     import imageio
 
-    from IPython import display
-
     (train_images, _), (test_images, _) = tf.keras.datasets.fashion_mnist.load_data()
     train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype('float32')
     test_images = test_images.reshape(test_images.shape[0], 28, 28, 1).astype('float32')
@@ -134,7 +132,7 @@ if __name__ == "__main__":
     def generate_and_save_images(model, epoch, test_input):
         predictions = model.sample(test_input)
         plt.close()
-        fig = plt.figure(figsize=(4, 4))
+        plt.figure(figsize=(4, 4))
 
         for i in range(predictions.shape[0]):
             plt.subplot(4, 4, i + 1)
