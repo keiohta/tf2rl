@@ -12,6 +12,7 @@ class ILQG:
             self,
             make_env,
             policy="ou",
+            max_iter=30,
             mu=1.5,
             min_mu=1e-8,
             max_mu=1e16,
@@ -29,6 +30,7 @@ class ILQG:
         self._env = make_env()
         self._make_env = make_env
         self._policy = policy
+        self._max_iter = max_iter
         self._logger = initialize_logger(save_log=False)
         self._tol_cost = tol_cost
         self._mu = mu
@@ -95,7 +97,9 @@ class ILQG:
 
         return np.array(X, dtype=NP_DTYPE), np.array(U, dtype=NP_DTYPE), cost
 
-    def optimize(self, max_iter=1):
+    def optimize(self, max_iter=None):
+        if max_iter is None:
+            max_iter = self._max_iter
         dynamics = NumericalDiffDynamics(self._make_env)
         X, U, cost = self._X, self._U, self._cost
 

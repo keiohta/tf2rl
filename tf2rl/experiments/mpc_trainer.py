@@ -7,9 +7,9 @@ from tf2rl.experiments.trainer import Trainer
 from tf2rl.misc.get_replay_buffer import get_space_size
 
 
-class MLP(tf.keras.Model):
+class DynamicsModel(tf.keras.Model):
     def __init__(self, input_dim, output_dim, units=[32, 32],
-                 name="MLP", gpu=0):
+                 name="DynamicsModel", gpu=0):
         self.device = "/gpu:{}".format(gpu) if gpu >= 0 else "/cpu:0"
         super().__init__(name=name)
 
@@ -87,7 +87,7 @@ class MPCTrainer(Trainer):
         # Dynamics model
         obs_dim = self._env.observation_space.high.size
         act_dim = self._env.action_space.high.size
-        self._dynamics_model = MLP(
+        self._dynamics_model = DynamicsModel(
             input_dim=obs_dim + act_dim,
             output_dim=obs_dim,
             gpu=args.gpu)
