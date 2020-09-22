@@ -16,7 +16,8 @@ Following algorithms are supported:
 | [DQN](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf) (including [DDQN](https://arxiv.org/abs/1509.06461), [Prior. DQN](https://arxiv.org/abs/1511.05952), [Duel. DQN](https://arxiv.org/abs/1511.06581), [Distrib. DQN](<https://arxiv.org/abs/1707.06887>), [Noisy DQN](<https://arxiv.org/abs/1706.10295>)) |       ✓        |         -         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
 | [DDPG](https://arxiv.org/abs/1509.02971) (including [TD3](<https://arxiv.org/abs/1802.09477>), [BiResDDPG](<https://arxiv.org/abs/1905.01072>)) |       -        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
 |          [SAC](<https://arxiv.org/abs/1801.01290>)           |       ✓        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
-|           [MPC](https://arxiv.org/abs/1708.02596)            |       ✓        |         ✓         |                     -                      | Model-base RL            |
+|         [MPC (RS)](https://arxiv.org/abs/1708.02596)         |       ✓        |         ✓         |                     -                      | Model-based RL           |
+| [iLQG, MPC(iLQG)](https://homes.cs.washington.edu/~todorov/papers/TassaIROS12.pdf) |       -        |         ✓         |                     -                      | Model-based RL           |
 | [GAIL](<https://arxiv.org/abs/1606.03476>), [GAIfO](<https://arxiv.org/abs/1807.06158>), [VAIL](<https://arxiv.org/abs/1810.00821>) (including [Spectral Normalization](<https://arxiv.org/abs/1802.05957>)) |       ✓        |         ✓         |                     -                      | Imitation Learning       |
 
 Following papers have been implemented in tf2rl:
@@ -40,6 +41,7 @@ Following papers have been implemented in tf2rl:
   - [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/bi_res_ddpg.py>)
   - [Soft Actor-Critic for Discrete Action Settings](https://arxiv.org/abs/1910.07207v1), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac_discrete.py>)
 - Model-base RL
+  - [Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization](https://homes.cs.washington.edu/~todorov/papers/TassaIROS12.pdf), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/ilqg.py)
   - [Neural Network Dynamics for Model-Based Deep Reinforcement Learning with Model-Free Fine-Tuning](https://arxiv.org/abs/1708.02596), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/experiments/mpc_trainer.py)
 - Imitation Learning
   - [Generative Adversarial Imitation Learning](<https://arxiv.org/abs/1606.03476>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/gail.py>)

@@ -99,19 +99,19 @@ def main():
         args.horizon = 100
     elif args.env_name == "Reacher":
         make_env = ReacherILQGEnv
-        args.horizon = 50
+        args.horizon = 30
 
-    ilqg = ILQG(make_env)
+    ilqg = ILQG(make_env, horizon=args.horizon)
     ilqg.initialize()
 
-    logger.info("Initial trajectory: T = {} cost = {}".format(len(ilqg.U), ilqg.cost))
+    logger.info("Initial trajectory: T = {} cost = {:.5f}".format(len(ilqg.U), ilqg.cost))
     viewer_env = make_env()
     visualize_rollout(viewer_env=viewer_env, initial_state=ilqg.X[0], U=ilqg.U, save_movie=args.save_movie,
                       prefix="{}_{}".format(args.env_name, 0))
 
     for i in range(args.max_iter_optimization):
         ilqg.optimize(max_iter=args.max_iter_each_step)
-        logger.info("Step {} trajectory: cost = {}".format(i + 1, ilqg.cost))
+        logger.info("Iter {}: cost = {:.5f}".format(i + 1, ilqg.cost))
         if (i + 1) % args.visualize_interval == 0:
             visualize_rollout(viewer_env=viewer_env, initial_state=ilqg.X[0], U=ilqg.U, save_movie=args.save_movie,
                               prefix="{}_{}".format(args.env_name, i + 1))

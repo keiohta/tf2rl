@@ -16,7 +16,7 @@ class ILQG:
             min_mu=1e-8,
             max_mu=1e16,
             tol_cost=1e-7,
-            max_steps=100):
+            horizon=100):
         """Generate locally-optimal controls using iterative LQG.
         Variable names follow the symbols in
         "Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization".
@@ -34,7 +34,7 @@ class ILQG:
         self._mu = mu
         self._min_mu = min_mu
         self._max_mu = max_mu
-        self._max_steps = max_steps
+        self.horizon = horizon
         # Coefficients for improved line search in Eq.12
         self._alphas = np.power(10, np.linspace(0, -3, 21))
         self._X, self._U, self._cost = None, None, None
@@ -42,7 +42,7 @@ class ILQG:
     def initialize(self, initial_state=None):
         if initial_state is not None:
             self._env.set_state_vector(initial_state)
-        self._X, self._U, self._cost = self.rollout(initial_state, policy="ou")
+        self._X, self._U, self._cost = self.rollout(initial_state)
 
     def rollout(self, initial_state=None):
         """Generate a trajectory by using the given policy.
@@ -87,7 +87,7 @@ class ILQG:
             U.append(u)
             X.append(self._env.get_state_vector())
 
-            if self._max_steps is not None and len(U) == self._max_steps:
+            if self.horizon is not None and len(U) == self.horizon:
                 break
 
             if done:
@@ -100,6 +100,7 @@ class ILQG:
         X, U, cost = self._X, self._U, self._cost
 
         for _ in range(max_iter):
+            # Compute open-loop term k and feed-back gain term K
             k, K = self.backward(X, U, dynamics)
 
             # Compute a new trajectory with improved line search, Eq.8, 12
@@ -111,7 +112,7 @@ class ILQG:
                     new_X, new_U, min_cost = cur_X, cur_U, cur_cost
 
             if min_cost > cost:
-                self._logger.info("Cannot decrease cost : {} > {}".format(min_cost, cost))
+                self._logger.info("Cannot decrease cost : {:.4f} > {:.4f}".format(min_cost, cost))
                 break
 
             if (cost - min_cost) < self._tol_cost:
