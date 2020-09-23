@@ -29,10 +29,8 @@ class CommonOffPolAlgos(CommonAlgos):
         action_train = self.agent.get_action(state, test=False)
         action_test = self.agent.get_action(state, test=True)
         if self.is_discrete:
-            self.assertTrue(type(action_train) ==
-                            np.int64 or type(action_train) == int)
-            self.assertTrue(type(action_test) ==
-                            np.int64 or type(action_test) == int)
+            self.assertTrue(isinstance(action_train, (np.int32, np.int64, int)))
+            self.assertTrue(isinstance(action_test, (np.int32, np.int64, int)))
         else:
             self.assertEqual(action_train.shape[0], self.action_dim)
             self.assertEqual(action_test.shape[0], self.action_dim)
@@ -128,10 +126,8 @@ class CommonOnPolActorCritic(CommonAlgos):
         action_train, logp_train = self.agent.get_action(state, test=False)
         action_test, logp_test = self.agent.get_action(state, test=True)
         if self.is_discrete:
-            self.assertTrue(type(action_train) ==
-                            np.int64 or type(action_train) == int)
-            self.assertTrue(type(action_test) ==
-                            np.int64 or type(action_test) == int)
+            self.assertTrue(isinstance(action_train, (np.int32, np.int64, int)))
+            self.assertTrue(isinstance(action_test, (np.int32, np.int64, int)))
         else:
             self.assertEqual(action_train.shape[0], self.action_dim)
             self.assertEqual(action_test.shape[0], self.action_dim)

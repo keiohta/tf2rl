@@ -11,11 +11,11 @@ class CommonModel(CommonAlgos):
         """
         policy = policy if policy is not None else self.policy
         # Probabilistic sampling
-        actions, log_probs, param = policy(inputs, test=False)
+        actions, log_probs = policy(inputs, test=False)
         self.assertEqual(actions.shape, expected_action_shapes)
         self.assertEqual(log_probs.shape, expected_log_prob_shapes)
         # Greedy sampling
-        actions, log_probs, param = policy(inputs, test=True)
+        actions, log_probs = policy(inputs, test=True)
         self.assertEqual(actions.shape, expected_action_shapes)
         self.assertEqual(log_probs.shape, expected_log_prob_shapes)
 
