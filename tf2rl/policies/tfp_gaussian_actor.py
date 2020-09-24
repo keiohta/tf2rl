@@ -18,24 +18,21 @@ class GaussianActor(tf.keras.Model):
         self._state_independent_std = state_independent_std
         self._squash = squash
 
-        base_layers = []
-        for cur_layer_size in units:
-            cur_layer = tf.keras.layers.Dense(cur_layer_size, activation=hidden_activation)
-            base_layers.append(cur_layer)
-
-        self.base_layers = base_layers
+        self.base_layers = []
+        for unit in units:
+            self.base_layers.append(tf.keras.layers.Dense(unit, activation=hidden_activation))
 
         self.out_mean = layers.Dense(action_dim, name="L_mean")
         if self._state_independent_std:
             self.out_logstd = tf.Variable(
-                initial_value=-0.5*np.ones(action_dim, dtype=np.float32),
+                initial_value=-0.5 * np.ones(action_dim, dtype=np.float32),
                 dtype=tf.float32, name="L_logstd")
         else:
             self.out_logstd = layers.Dense(action_dim, name="L_logstd")
 
         self._max_action = max_action
 
-        dummy_state = tf.constant(np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_state = tf.constant(np.zeros(shape=(1,) + state_shape, dtype=np.float32))
         self(dummy_state)
 
     def _compute_dist(self, states):
@@ -61,9 +58,7 @@ class GaussianActor(tf.keras.Model):
             log_std = self.out_logstd(features)
             log_std = tf.clip_by_value(log_std, self.LOG_STD_CAP_MIN, self.LOG_STD_CAP_MAX)
 
-        dist = tfp.distributions.MultivariateNormalDiag(loc=mean, scale_diag=tf.exp(log_std))
-
-        return dist
+        return tfp.distributions.MultivariateNormalDiag(loc=mean, scale_diag=tf.exp(log_std))
 
     def call(self, states, test=False):
         """

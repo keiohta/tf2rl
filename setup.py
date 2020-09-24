@@ -6,7 +6,7 @@ install_requires = [
     "numpy>=1.16.0",
     "joblib",
     "scipy",
-    "tensorflow-probability==0.8.0-rc0"
+    "tensorflow-probability==0.8.0"
 ]
 
 extras_require = {
