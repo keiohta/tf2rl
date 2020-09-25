@@ -26,11 +26,10 @@ if __name__ == '__main__':
         max_action=None if is_discrete(
             env.action_space) else env.action_space.high[0],
         batch_size=args.batch_size,
-        actor_units=[32, 32],
-        critic_units=[32, 32],
+        actor_units=(32, 32),
+        critic_units=(32, 32),
         discount=0.9,
         horizon=args.horizon,
-        fix_std=True,
         normalize_adv=args.normalize_adv,
         enable_gae=args.enable_gae,
         gpu=args.gpu)
