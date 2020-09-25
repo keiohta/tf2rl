@@ -52,6 +52,18 @@ jobs:
         run: CC=gcc-9 CXX=g++-9 pip install cpprb
       - run: pip install tensorflow==${{ matrix.TF }}'.*'
       - run: pip install '.[test]'
+      - name: Install TensorFlow Probability
+        if: ${{ matrix.TF == '2.0' }}
+        run: pip install tensorflow-probability==0.8.0
+      - name: Install TensorFlow Probability for tf2.1
+        if: ${{ matrix.TF == '2.2' }}
+        run: pip install tensorflow-probability==0.9.0
+      - name: Install TensorFlow Probability for tf2.2
+        if: ${{ matrix.TF == '2.2' }}
+        run: pip install tensorflow-probability==0.10.1
+      - name: Install TensorFlow Probability for tf2.3
+        if: ${{ matrix.TF == '2.3' }}
+        run: pip install tensorflow-probability==0.11.0
       - run: python -m unittest discover .
         working-directory: './tests'
       - run: ./test_run_examples.sh
