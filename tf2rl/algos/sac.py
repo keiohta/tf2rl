@@ -16,8 +16,7 @@ class CriticV(tf.keras.Model):
             self.base_layers.append(Dense(unit, activation='relu'))
         self.out_layer = Dense(1, name="V", activation='linear')
 
-        dummy_state = tf.constant(
-            np.zeros(shape=(1,) + state_shape, dtype=np.float32))
+        dummy_state = tf.constant(np.zeros(shape=(1,) + state_shape, dtype=np.float32))
         self(dummy_state)
 
     def call(self, states):
@@ -37,15 +36,12 @@ class CriticQ(tf.keras.Model):
             self.base_layers.append(Dense(unit, activation='relu'))
         self.out_layer = Dense(1, name="Q", activation='linear')
 
-        dummy_state = tf.constant(
-            np.zeros(shape=(1,) + state_shape, dtype=np.float32))
-        dummy_action = tf.constant(
-            np.zeros(shape=[1, action_dim], dtype=np.float32))
-        self([dummy_state, dummy_action])
+        dummy_state = tf.constant(np.zeros(shape=(1,) + state_shape, dtype=np.float32))
+        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
+        self(dummy_state, dummy_action)
 
-    def call(self, inputs):
-        [states, actions] = inputs
-        features = tf.concat([states, actions], axis=1)
+    def call(self, states, actions):
+        features = tf.concat((states, actions), axis=1)
         for cur_layer in self.base_layers:
             features = cur_layer(features)
         values = self.out_layer(features)
@@ -118,7 +114,8 @@ class SAC(OffPolicyAgent):
 
     @tf.function
     def _get_action_body(self, state, test):
-        return self.actor(state, test)[0]
+        actions, log_pis = self.actor(state, test)
+        return actions
 
     def train(self, states, actions, next_states, rewards, dones, weights=None):
         if weights is None:
@@ -152,12 +149,12 @@ class SAC(OffPolicyAgent):
 
             with tf.GradientTape(persistent=True) as tape:
                 # Compute loss of critic Q
-                current_q1 = self.qf1([states, actions])
-                current_q2 = self.qf2([states, actions])
-                vf_next_target = self.vf_target(next_states)
+                current_q1 = self.qf1(states, actions)
+                current_q2 = self.qf2(states, actions)
+                next_v_target = self.vf_target(next_states)
 
                 target_q = tf.stop_gradient(
-                    rewards + not_dones * self.discount * vf_next_target)
+                    rewards + not_dones * self.discount * next_v_target)
 
                 td_loss_q1 = tf.reduce_mean((target_q - current_q1) ** 2)
                 td_loss_q2 = tf.reduce_mean((target_q - current_q2) ** 2)  # Eq.(7)
@@ -166,8 +163,8 @@ class SAC(OffPolicyAgent):
                 current_v = self.vf(states)
 
                 sample_actions, logp = self.actor(states)  # Resample actions to update V
-                current_q1 = self.qf1([states, sample_actions])
-                current_q2 = self.qf2([states, sample_actions])
+                current_q1 = self.qf1(states, sample_actions)
+                current_q2 = self.qf2(states, sample_actions)
                 current_min_q = tf.minimum(current_q1, current_q2)
 
                 target_v = tf.stop_gradient(current_min_q - self.alpha * logp)
@@ -225,7 +222,7 @@ class SAC(OffPolicyAgent):
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
             # Compute TD errors for Q-value func
-            current_q1 = self.qf1([states, actions])
+            current_q1 = self.qf1(states, actions)
             vf_next_target = self.vf_target(next_states)
 
             target_q = tf.stop_gradient(

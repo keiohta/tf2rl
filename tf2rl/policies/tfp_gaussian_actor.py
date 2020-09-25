@@ -20,7 +20,7 @@ class GaussianActor(tf.keras.Model):
 
         self.base_layers = []
         for unit in units:
-            self.base_layers.append(tf.keras.layers.Dense(unit, activation=hidden_activation))
+            self.base_layers.append(layers.Dense(unit, activation=hidden_activation))
 
         self.out_mean = layers.Dense(action_dim, name="L_mean")
         if self._state_independent_std:
