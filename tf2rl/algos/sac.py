@@ -143,8 +143,11 @@ class SAC(OffPolicyAgent):
     @tf.function
     def _train_body(self, states, actions, next_states, rewards, dones, weights):
         with tf.device(self.device):
-            if tf.rank(rewards) == 2:
-                rewards = tf.squeeze(rewards, axis=1)
+            assert len(dones.shape) == 2
+            assert len(rewards.shape) == 2
+            rewards = tf.squeeze(rewards, axis=1)
+            dones = tf.squeeze(dones, axis=1)
+
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
             with tf.GradientTape(persistent=True) as tape:

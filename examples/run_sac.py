@@ -8,7 +8,7 @@ if __name__ == '__main__':
     parser = Trainer.get_argument()
     parser = SAC.get_argument(parser)
     parser.add_argument('--env-name', type=str, default="Pendulum-v0")
-    parser.set_defaults(batch_size=100)
+    parser.set_defaults(batch_size=256)
     parser.set_defaults(n_warmup=10000)
     parser.set_defaults(max_steps=3e6)
     args = parser.parse_args()
