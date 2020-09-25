@@ -114,33 +114,19 @@ class AtariCategoricalActor(CategoricalActor, AtariBaseModel):
         return AtariBaseModel.call(self, states)
 
 
-class AtariCategoricalActorCritic(CategoricalActorCritic):
+class AtariCategoricalActorCritic(CategoricalActorCritic, AtariBaseModel):
     def __init__(self, state_shape, action_dim, units=None,
                  name="AtariCategoricalActorCritic"):
-        tf.keras.Model.__init__(self, name=name)
+        # tf.keras.Model.__init__(self, name=name)
+        AtariBaseModel.__init__(self, name="BaseModel")
         self.dist = Categorical(dim=action_dim)
         self.action_dim = action_dim
 
-        self.conv1 = Conv2D(32, kernel_size=(8, 8), strides=(4, 4),
-                            padding='valid', activation='relu')
-        self.conv2 = Conv2D(64, kernel_size=(4, 4), strides=(2, 2),
-                            padding='valid', activation='relu')
-        self.conv3 = Conv2D(64, kernel_size=(3, 3), strides=(1, 1),
-                            padding='valid', activation='relu')
-        self.flat = Flatten()
-        self.fc1 = Dense(512, activation='relu')
-        self.prob = Dense(action_dim, activation='softmax')
+        self.out_prob = Dense(action_dim, activation='softmax')
         self.v = Dense(1, activation="linear")
 
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
     def _compute_feature(self, states):
-        features = tf.divide(tf.cast(states, tf.float32),
-                             tf.constant(255.))
-        features = self.conv1(features)
-        features = self.conv2(features)
-        features = self.conv3(features)
-        features = self.flat(features)
-        features = self.fc1(features)
-        return features
+        return AtariBaseModel.call(self, states)

@@ -88,7 +88,7 @@ class CategoricalActorCritic(CategoricalActor):
 
     def call(self, states, test=False):
         features = self._compute_feature(states)
-        probs = self.prob(features)
+        probs = self.out_prob(features)
         param = {"prob": probs}
         if test:
             action = tf.math.argmax(param["prob"], axis=1)  # (size,)

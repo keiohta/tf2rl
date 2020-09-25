@@ -14,7 +14,7 @@ class CategoricalActor(tf.keras.Model):
 
         self.l1 = Dense(units[0], activation='relu')
         self.l2 = Dense(units[1], activation='relu')
-        self.prob = Dense(action_dim, activation='softmax')
+        self.out_prob = Dense(action_dim, activation='softmax')
 
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
@@ -32,7 +32,7 @@ class CategoricalActor(tf.keras.Model):
         :return: Categorical distribution
         """
         features = self._compute_feature(states)
-        probs = self.prob(features)
+        probs = self.out_prob(features)
         return {"prob": probs}
 
     def compute_prob(self, states):
@@ -90,7 +90,7 @@ class CategoricalActorCritic(CategoricalActor):
 
     def call(self, states, test=False):
         features = self._compute_feature(states)
-        probs = self.prob(features)
+        probs = self.out_prob(features)
         param = {"prob": probs}
         if test:
             action = tf.math.argmax(param["prob"], axis=1)  # (size,)
