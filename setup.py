@@ -5,7 +5,8 @@ install_requires = [
     "setuptools>=41.0.0",
     "numpy>=1.16.0",
     "joblib",
-    "scipy"
+    "scipy",
+    "tensorflow-probability==0.8.0"
 ]
 
 extras_require = {

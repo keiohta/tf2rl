@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from tf2rl.policies.gaussian_actor import GaussianActor
+from tf2rl.policies.tfp_gaussian_actor import GaussianActor
 from tests.policies.common import CommonModel
 
 

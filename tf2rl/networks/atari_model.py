@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.networks.noisy_dense import NoisyDense
-from tf2rl.policies.categorical_actor import CategoricalActorCritic, CategoricalActor
+from tf2rl.policies.tfp_categorical_actor import CategoricalActorCritic, CategoricalActor
 from tf2rl.distributions.categorical import Categorical
 
 
@@ -12,25 +12,26 @@ class AtariBaseModel(tf.keras.Model):
         super().__init__(name=name)
 
         DenseLayer = NoisyDense if enable_noisy_dqn else Dense
+        base_layers = []
 
-        self.conv1 = Conv2D(32, kernel_size=(8, 8), strides=(4, 4),
-                            padding='valid', activation='relu')
-        self.conv2 = Conv2D(64, kernel_size=(4, 4), strides=(2, 2),
-                            padding='valid', activation='relu')
-        self.conv3 = Conv2D(64, kernel_size=(3, 3), strides=(1, 1),
-                            padding='valid', activation='relu')
-        self.flat = Flatten()
-        self.fc1 = DenseLayer(512, activation='relu')
+        base_layers.append(Conv2D(32, kernel_size=(8, 8), strides=(4, 4),
+                                  padding='valid', activation='relu'))
+        base_layers.append(Conv2D(64, kernel_size=(4, 4), strides=(2, 2),
+                                  padding='valid', activation='relu'))
+        base_layers.append(Conv2D(64, kernel_size=(3, 3), strides=(1, 1),
+                                  padding='valid', activation='relu'))
+        base_layers.append(Flatten())
+        base_layers.append(DenseLayer(512, activation='relu'))
+        self.base_layers = base_layers
 
     def call(self, inputs):
         # TODO: This type conversion seems to be bottle neck
         features = tf.divide(tf.cast(inputs, tf.float32),
                              tf.constant(255.))
-        features = self.conv1(features)
-        features = self.conv2(features)
-        features = self.conv3(features)
-        features = self.flat(features)
-        features = self.fc1(features)
+
+        for cur_layer in self.base_layers:
+            features = cur_layer(features)
+
         return features
 
 
@@ -97,50 +98,35 @@ class AtariQFunc(AtariBaseModel):
 class AtariCategoricalActor(CategoricalActor, AtariBaseModel):
     def __init__(self, state_shape, action_dim, units=None,
                  name="AtariCategoricalActor"):
-        self.dist = Categorical(dim=action_dim)
         self.action_dim = action_dim
 
         # Build base layers
         AtariBaseModel.__init__(self, name, state_shape)
 
         # Build top layer
-        self.prob = Dense(action_dim, activation='softmax')
+        self.out_prob = Dense(action_dim, activation='softmax')
 
-        self(tf.constant(
+        CategoricalActor.call(self, tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.uint8)))
 
-    def _compute_feature(self, states):
+    def _compute_features(self, states):
         # Extract features on base layers
         return AtariBaseModel.call(self, states)
 
 
-class AtariCategoricalActorCritic(CategoricalActorCritic):
+class AtariCategoricalActorCritic(CategoricalActorCritic, AtariBaseModel):
     def __init__(self, state_shape, action_dim, units=None,
                  name="AtariCategoricalActorCritic"):
-        tf.keras.Model.__init__(self, name=name)
+        # tf.keras.Model.__init__(self, name=name)
+        AtariBaseModel.__init__(self, name="BaseModel")
         self.dist = Categorical(dim=action_dim)
         self.action_dim = action_dim
 
-        self.conv1 = Conv2D(32, kernel_size=(8, 8), strides=(4, 4),
-                            padding='valid', activation='relu')
-        self.conv2 = Conv2D(64, kernel_size=(4, 4), strides=(2, 2),
-                            padding='valid', activation='relu')
-        self.conv3 = Conv2D(64, kernel_size=(3, 3), strides=(1, 1),
-                            padding='valid', activation='relu')
-        self.flat = Flatten()
-        self.fc1 = Dense(512, activation='relu')
-        self.prob = Dense(action_dim, activation='softmax')
+        self.out_prob = Dense(action_dim, activation='softmax')
         self.v = Dense(1, activation="linear")
 
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
 
     def _compute_feature(self, states):
-        features = tf.divide(tf.cast(states, tf.float32),
-                             tf.constant(255.))
-        features = self.conv1(features)
-        features = self.conv2(features)
-        features = self.conv3(features)
-        features = self.flat(features)
-        features = self.fc1(features)
-        return features
+        return AtariBaseModel.call(self, states)

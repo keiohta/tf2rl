@@ -3,8 +3,9 @@ import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OnPolicyAgent
+# from tf2rl.policies.tfp_gaussian_actor import GaussianActor
 from tf2rl.policies.gaussian_actor import GaussianActor
-from tf2rl.policies.categorical_actor import CategoricalActor
+from tf2rl.policies.tfp_categorical_actor import CategoricalActor
 from tf2rl.envs.atari_wrapper import LazyFrames
 
 
@@ -42,8 +43,6 @@ class VPG(OnPolicyAgent):
             critic_units=[256, 256],
             lr_actor=1e-3,
             lr_critic=3e-3,
-            fix_std=False,
-            const_std=0.3,
             hidden_activation_actor="relu",
             hidden_activation_critic="relu",
             name="VPG",
@@ -68,7 +67,7 @@ class VPG(OnPolicyAgent):
                     self.actor = GaussianActor(
                         state_shape, action_dim, max_action, actor_units,
                         hidden_activation=hidden_activation_actor,
-                        fix_std=fix_std, const_std=const_std, state_independent_std=True)
+                        state_independent_std=True)
             else:
                 self.actor = actor
             if critic is None:
@@ -93,7 +92,7 @@ class VPG(OnPolicyAgent):
         is_single_input = state.ndim == self._state_ndim
         if is_single_input:
             state = np.expand_dims(state, axis=0).astype(np.float32)
-        action, logp, _ = self._get_action_body(state, test)
+        action, logp = self._get_action_body(state, test)
 
         if is_single_input:
             return action.numpy()[0], logp.numpy()
@@ -120,15 +119,15 @@ class VPG(OnPolicyAgent):
         if self.actor_critic:
             return self.actor_critic(state, test)
         else:
-            action, logp, _ = self.actor(state, test)
+            action, logp = self.actor(state, test)
             v = self.critic(state)
             return action, logp, v
 
     @tf.function
     def _get_action_body(self, state, test):
         if self.actor_critic is not None:
-            action, logp, param = self.actor_critic(state, test)
-            return action, logp, param
+            action, logp = self.actor_critic(state, test)
+            return action, logp
         else:
             return self.actor(state, test)
 
