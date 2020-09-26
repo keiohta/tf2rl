@@ -120,7 +120,8 @@ class MeTrpoTrainer(MPCTrainer):
             sim_obs = real_obs.copy()
             for _ in range(self._episode_max_steps):
                 act, _ = self._policy.get_action(real_obs)
-                env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+                if not is_discrete(env_act.action_space):
+                    env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
 
                 next_real_obs, rew, _, _ = self._env.step(env_act)
                 ret_real_env += rew
@@ -193,7 +194,8 @@ class MeTrpoTrainer(MPCTrainer):
             episode_steps += 1
             total_steps += 1
             act, _ = self._policy.get_action(obs)
-            env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+            if not is_discrete(env_act.action_space):
+                env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
             next_obs, _, done, _ = self._env.step(env_act)
             self.dynamics_buffer.add(
                 obs=obs, act=env_act, next_obs=next_obs)
