@@ -20,6 +20,22 @@ tf2rl.policies.gaussian\_actor module
    :undoc-members:
    :show-inheritance:
 
+tf2rl.policies.tfp\_categorical\_actor module
+---------------------------------------------
+
+.. automodule:: tf2rl.policies.tfp_categorical_actor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.policies.tfp\_gaussian\_actor module
+------------------------------------------
+
+.. automodule:: tf2rl.policies.tfp_gaussian_actor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

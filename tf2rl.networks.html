@@ -93,7 +93,7 @@
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.misc.html">tf2rl.misc package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.networks package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.networks.atari_model">tf2rl.networks.atari_model module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tf2rl-networks-atari-model-module">tf2rl.networks.atari_model module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.networks.noisy_dense">tf2rl.networks.noisy_dense module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.networks.spectral_norm_dense">tf2rl.networks.spectral_norm_dense module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.networks">Module contents</a></li>
@@ -178,80 +178,8 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-tf2rl.networks.atari_model">
-<span id="tf2rl-networks-atari-model-module"></span><h2>tf2rl.networks.atari_model module<a class="headerlink" href="#module-tf2rl.networks.atari_model" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="tf2rl.networks.atari_model.AtariBaseModel">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.networks.atari_model.</code><code class="sig-name descname">AtariBaseModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariBaseModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
-<dl class="py method">
-<dt id="tf2rl.networks.atari_model.AtariBaseModel.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariBaseModel.call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls the model on new inputs.</p>
-<p>In this case <cite>call</cite> just reapplies
-all ops in the graph to the new inputs
-(e.g. build a new computational graph from the provided inputs).</p>
-<dl>
-<dt>Arguments:</dt><dd><p>inputs: A tensor or list of tensors.
-training: Boolean or boolean scalar tensor, indicating whether to run</p>
-<blockquote>
-<div><p>the <cite>Network</cite> in training mode or inference mode.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>mask: A mask or list of masks. A mask can be</dt><dd><p>either a tensor or None (no mask).</p>
-</dd>
-</dl>
-</dd>
-<dt>Returns:</dt><dd><p>A tensor if there is a single output, or
-a list of tensors if there are more than one outputs.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="tf2rl.networks.atari_model.AtariCategoricalActor">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.networks.atari_model.</code><code class="sig-name descname">AtariCategoricalActor</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariCategoricalActor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="tf2rl.policies.html#tf2rl.policies.categorical_actor.CategoricalActor" title="tf2rl.policies.categorical_actor.CategoricalActor"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.policies.categorical_actor.CategoricalActor</span></code></a>, <a class="reference internal" href="#tf2rl.networks.atari_model.AtariBaseModel" title="tf2rl.networks.atari_model.AtariBaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.networks.atari_model.AtariBaseModel</span></code></a></p>
-</dd></dl>
-
-<dl class="py class">
-<dt id="tf2rl.networks.atari_model.AtariCategoricalActorCritic">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.networks.atari_model.</code><code class="sig-name descname">AtariCategoricalActorCritic</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariCategoricalActorCritic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="tf2rl.policies.html#tf2rl.policies.categorical_actor.CategoricalActorCritic" title="tf2rl.policies.categorical_actor.CategoricalActorCritic"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.policies.categorical_actor.CategoricalActorCritic</span></code></a></p>
-</dd></dl>
-
-<dl class="py class">
-<dt id="tf2rl.networks.atari_model.AtariQFunc">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.networks.atari_model.</code><code class="sig-name descname">AtariQFunc</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariQFunc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#tf2rl.networks.atari_model.AtariBaseModel" title="tf2rl.networks.atari_model.AtariBaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.networks.atari_model.AtariBaseModel</span></code></a></p>
-<dl class="py method">
-<dt id="tf2rl.networks.atari_model.AtariQFunc.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariQFunc.call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls the model on new inputs.</p>
-<p>In this case <cite>call</cite> just reapplies
-all ops in the graph to the new inputs
-(e.g. build a new computational graph from the provided inputs).</p>
-<dl>
-<dt>Arguments:</dt><dd><p>inputs: A tensor or list of tensors.
-training: Boolean or boolean scalar tensor, indicating whether to run</p>
-<blockquote>
-<div><p>the <cite>Network</cite> in training mode or inference mode.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>mask: A mask or list of masks. A mask can be</dt><dd><p>either a tensor or None (no mask).</p>
-</dd>
-</dl>
-</dd>
-<dt>Returns:</dt><dd><p>A tensor if there is a single output, or
-a list of tensors if there are more than one outputs.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="tf2rl-networks-atari-model-module">
+<h2>tf2rl.networks.atari_model module<a class="headerlink" href="#tf2rl-networks-atari-model-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-tf2rl.networks.noisy_dense">
 <span id="tf2rl-networks-noisy-dense-module"></span><h2>tf2rl.networks.noisy_dense module<a class="headerlink" href="#module-tf2rl.networks.noisy_dense" title="Permalink to this headline">¶</a></h2>
