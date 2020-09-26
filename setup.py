@@ -5,7 +5,8 @@ install_requires = [
     "setuptools>=41.0.0",
     "numpy>=1.16.0",
     "joblib",
-    "scipy"
+    "scipy",
+    "tensorflow-probability==0.8.0"
 ]
 
 extras_require = {
@@ -17,7 +18,7 @@ extras_require = {
 
 setup(
     name="tf2rl",
-    version="0.1.18",
+    version="0.1.19",
     description="Deep Reinforcement Learning for TensorFlow2",
     url="https://github.com/keiohta/tf2rl",
     author="Kei Ohta",
