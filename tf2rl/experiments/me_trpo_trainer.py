@@ -120,7 +120,7 @@ class MeTrpoTrainer(MPCTrainer):
             sim_obs = real_obs.copy()
             for _ in range(self._episode_max_steps):
                 act, _ = self._policy.get_action(real_obs)
-                if not is_discrete(env_act.action_space):
+                if not is_discrete(self._env.action_space):
                     env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
                 else:
                     env_act = act
@@ -169,7 +169,7 @@ class MeTrpoTrainer(MPCTrainer):
             acts, _ = self._policy.get_action(obses)
             for i in range(n_episodes):
                 model_idx = i // self._n_eval_episodes_per_model
-                if not is_discrete(env_act.action_space):
+                if not is_discrete(self._env.action_space):
                     env_act = np.clip(acts[i], self._env.action_space.low, self._env.action_space.high)
                 else:
                     env_act = acts[i]
@@ -183,7 +183,7 @@ class MeTrpoTrainer(MPCTrainer):
         obs = self._env.reset()
         for _ in range(self._episode_max_steps):
             act, _ = self._policy.get_action(obs)
-            if not is_discrete(env_act.action_space):
+            if not is_discrete(self._env.action_space):
                 env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
             else:
                 env_act = act
@@ -202,7 +202,7 @@ class MeTrpoTrainer(MPCTrainer):
             episode_steps += 1
             total_steps += 1
             act, _ = self._policy.get_action(obs)
-            if not is_discrete(env_act.action_space):
+            if not is_discrete(self._env.action_space):
                 env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
             else:
                 env_act = act
@@ -227,7 +227,7 @@ class MeTrpoTrainer(MPCTrainer):
             episode_return = 0.
             for _ in range(self._episode_max_steps):
                 act, logp, val = self._policy.get_action_and_val(obs)
-                if not is_discrete(env_act.action_space):
+                if not is_discrete(self._env.action_space):
                     env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
                 else:
                     env_act = act
