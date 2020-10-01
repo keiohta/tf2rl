@@ -12,6 +12,14 @@ tf2rl.experiments.irl\_trainer module
    :undoc-members:
    :show-inheritance:
 
+tf2rl.experiments.me\_trpo\_trainer module
+------------------------------------------
+
+.. automodule:: tf2rl.experiments.me_trpo_trainer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tf2rl.experiments.mpc\_trainer module
 -------------------------------------
 
