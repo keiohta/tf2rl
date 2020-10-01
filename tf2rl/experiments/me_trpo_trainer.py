@@ -8,7 +8,7 @@ from tf2rl.envs.utils import is_discrete
 from tf2rl.experiments.mpc_trainer import MPCTrainer
 from tf2rl.experiments.utils import save_path, frames_to_gif
 from tf2rl.misc.discount_cumsum import discount_cumsum
-from tf2rl.misc.get_replay_buffer import get_replay_buffer, get_default_rb_dict
+from tf2rl.misc.get_replay_buffer import get_replay_buffer
 
 
 class MeTrpoTrainer(MPCTrainer):
