@@ -45,6 +45,8 @@ class OnPolicyTrainer(Trainer):
                 act, logp, val = self._policy.get_action_and_val(obs)
                 if not is_discrete(self._env.action_space):
                     env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+                else:
+                    env_act = act
                 next_obs, reward, done, _ = self._env.step(env_act)
                 if self._show_progress:
                     self._env.render()

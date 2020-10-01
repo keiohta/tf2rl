@@ -122,6 +122,8 @@ class MeTrpoTrainer(MPCTrainer):
                 act, _ = self._policy.get_action(real_obs)
                 if not is_discrete(env_act.action_space):
                     env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+                else:
+                    env_act = act
 
                 next_real_obs, rew, _, _ = self._env.step(env_act)
                 ret_real_env += rew
@@ -167,7 +169,10 @@ class MeTrpoTrainer(MPCTrainer):
             acts, _ = self._policy.get_action(obses)
             for i in range(n_episodes):
                 model_idx = i // self._n_eval_episodes_per_model
-                env_act = np.clip(acts[i], self._env.action_space.low, self._env.action_space.high)
+                if not is_discrete(env_act.action_space):
+                    env_act = np.clip(acts[i], self._env.action_space.low, self._env.action_space.high)
+                else:
+                    env_act = acts[i]
                 next_obses[i] = self.predict_next_state(obses[i], env_act, idx=model_idx)
             returns += self._reward_fn(obses, acts)
             obses = next_obses
@@ -178,7 +183,10 @@ class MeTrpoTrainer(MPCTrainer):
         obs = self._env.reset()
         for _ in range(self._episode_max_steps):
             act, _ = self._policy.get_action(obs)
-            env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+            if not is_discrete(env_act.action_space):
+                env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+            else:
+                env_act = act
             next_obs = self.predict_next_state(obs, env_act)
 
             self._env.state = np.array([np.arctan2(next_obs[1], next_obs[0]), next_obs[2]], dtype=np.float32)
@@ -196,6 +204,8 @@ class MeTrpoTrainer(MPCTrainer):
             act, _ = self._policy.get_action(obs)
             if not is_discrete(env_act.action_space):
                 env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+            else:
+                env_act = act
             next_obs, _, done, _ = self._env.step(env_act)
             self.dynamics_buffer.add(
                 obs=obs, act=env_act, next_obs=next_obs)
@@ -217,7 +227,10 @@ class MeTrpoTrainer(MPCTrainer):
             episode_return = 0.
             for _ in range(self._episode_max_steps):
                 act, logp, val = self._policy.get_action_and_val(obs)
-                env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+                if not is_discrete(env_act.action_space):
+                    env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+                else:
+                    env_act = act
                 if self._debug:
                     next_obs, rew, _, _ = self._env.step(env_act)
                 else:
