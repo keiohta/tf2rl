@@ -92,8 +92,8 @@ class MeTrpoTrainer(MPCTrainer):
 
                 # Evaluate policy improvement
                 returns_after_update = self._evaluate_current_return(init_states_for_eval)
-                improved_ratio = np.sum(returns_after_update > returns_before_update) / (
-                        self._n_dynamics_model * self._n_eval_episodes_per_model)
+                n_improved = np.sum(returns_after_update > returns_before_update)
+                improved_ratio = n_improved / (self._n_dynamics_model * self._n_eval_episodes_per_model)
                 improve_ratios.append(improved_ratio)
                 if improved_ratio < 0.7:
                     break
