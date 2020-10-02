@@ -43,7 +43,11 @@ class OnPolicyTrainer(Trainer):
                 if self._normalize_obs:
                     obs = self._obs_normalizer(obs, update=False)
                 act, logp, val = self._policy.get_action_and_val(obs)
-                next_obs, reward, done, _ = self._env.step(act)
+                if not is_discrete(self._env.action_space):
+                    env_act = np.clip(act, self._env.action_space.low, self._env.action_space.high)
+                else:
+                    env_act = act
+                next_obs, reward, done, _ = self._env.step(env_act)
                 if self._show_progress:
                     self._env.render()
 
@@ -92,7 +96,7 @@ class OnPolicyTrainer(Trainer):
 
             # Train actor critic
             if self._policy.normalize_adv:
-                samples = self.replay_buffer._encode_sample(np.arange(self._policy.horizon))
+                samples = self.replay_buffer.get_all_transitions()
                 mean_adv = np.mean(samples["adv"])
                 std_adv = np.std(samples["adv"])
                 # Update normalizer
@@ -154,7 +158,7 @@ class OnPolicyTrainer(Trainer):
                 if self._normalize_obs:
                     obs = self._obs_normalizer(obs, update=False)
                 act, _ = self._policy.get_action(obs, test=True)
-                act = (act if not hasattr(self._env.action_space, "high") else
+                act = (act if not is_discrete(self._env.action_space) else
                        np.clip(act, self._env.action_space.low, self._env.action_space.high))
                 next_obs, reward, done, _ = self._test_env.step(act)
                 if self._save_test_path:

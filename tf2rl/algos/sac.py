@@ -2,53 +2,49 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
-from tf2rl.policies.gaussian_actor import GaussianActor
 from tf2rl.algos.policy_base import OffPolicyAgent
 from tf2rl.misc.target_update_ops import update_target_variables
-from tf2rl.misc.huber_loss import huber_loss
+from tf2rl.policies.tfp_gaussian_actor import GaussianActor
 
 
 class CriticV(tf.keras.Model):
-    def __init__(self, state_shape, critic_units=[256, 256], name='vf'):
+    def __init__(self, state_shape, critic_units=(256, 256), name='vf'):
         super().__init__(name=name)
 
-        self.l1 = Dense(critic_units[0], name="L1", activation='relu')
-        self.l2 = Dense(critic_units[1], name="L2", activation='relu')
-        self.l3 = Dense(1, name="L3", activation='linear')
+        self.base_layers = []
+        for unit in critic_units:
+            self.base_layers.append(Dense(unit, activation='relu'))
+        self.out_layer = Dense(1, name="V", activation='linear')
 
-        dummy_state = tf.constant(
-            np.zeros(shape=(1,)+state_shape, dtype=np.float32))
+        dummy_state = tf.constant(np.zeros(shape=(1,) + state_shape, dtype=np.float32))
         self(dummy_state)
 
     def call(self, states):
-        features = self.l1(states)
-        features = self.l2(features)
-        values = self.l3(features)
-
-        return tf.squeeze(values, axis=1, name="values")
+        features = states
+        for cur_layer in self.base_layers:
+            features = cur_layer(features)
+        values = self.out_layer(features)
+        return tf.squeeze(values, axis=1)
 
 
 class CriticQ(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, critic_units=[256, 256], name='qf'):
+    def __init__(self, state_shape, action_dim, critic_units=(256, 256), name='qf'):
         super().__init__(name=name)
 
-        self.l1 = Dense(critic_units[0], name="L1", activation='relu')
-        self.l2 = Dense(critic_units[1], name="L2", activation='relu')
-        self.l3 = Dense(1, name="L2", activation='linear')
+        self.base_layers = []
+        for unit in critic_units:
+            self.base_layers.append(Dense(unit, activation='relu'))
+        self.out_layer = Dense(1, name="Q", activation='linear')
 
-        dummy_state = tf.constant(
-            np.zeros(shape=(1,)+state_shape, dtype=np.float32))
-        dummy_action = tf.constant(
-            np.zeros(shape=[1, action_dim], dtype=np.float32))
-        self([dummy_state, dummy_action])
+        dummy_state = tf.constant(np.zeros(shape=(1,) + state_shape, dtype=np.float32))
+        dummy_action = tf.constant(np.zeros(shape=[1, action_dim], dtype=np.float32))
+        self(dummy_state, dummy_action)
 
-    def call(self, inputs):
-        [states, actions] = inputs
-        features = tf.concat([states, actions], axis=1)
-        features = self.l1(features)
-        features = self.l2(features)
-        values = self.l3(features)
-
+    def call(self, states, actions):
+        features = tf.concat((states, actions), axis=1)
+        for cur_layer in self.base_layers:
+            features = cur_layer(features)
+        values = self.out_layer(features)
         return tf.squeeze(values, axis=1)
 
 
@@ -60,17 +56,16 @@ class SAC(OffPolicyAgent):
             name="SAC",
             max_action=1.,
             lr=3e-4,
-            actor_units=[256, 256],
-            critic_units=[256, 256],
-            tau=0.005,
+            actor_units=(256, 256),
+            critic_units=(256, 256),
+            tau=5e-3,
             alpha=.2,
             auto_alpha=False,
             n_warmup=int(1e4),
             memory_capacity=int(1e6),
             **kwargs):
         super().__init__(
-            name=name, memory_capacity=memory_capacity,
-            n_warmup=n_warmup, **kwargs)
+            name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
         self._setup_actor(state_shape, action_dim, actor_units, lr, max_action)
         self._setup_critic_v(state_shape, critic_units, lr)
@@ -79,7 +74,6 @@ class SAC(OffPolicyAgent):
         # Set hyper-parameters
         self.tau = tau
         self.auto_alpha = auto_alpha
-        self.state_ndim = len(state_shape)
         if auto_alpha:
             self.log_alpha = tf.Variable(0., dtype=tf.float32)
             self.alpha = tf.Variable(0., dtype=tf.float32)
@@ -89,10 +83,11 @@ class SAC(OffPolicyAgent):
         else:
             self.alpha = alpha
 
+        self.state_ndim = len(state_shape)
+
     def _setup_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
         self.actor = GaussianActor(
-            state_shape, action_dim, max_action, squash=True,
-            units=actor_units)
+            state_shape, action_dim, max_action, squash=True, units=actor_units)
         self.actor_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
     def _setup_critic_q(self, state_shape, action_dim, critic_units, lr):
@@ -104,8 +99,7 @@ class SAC(OffPolicyAgent):
     def _setup_critic_v(self, state_shape, critic_units, lr):
         self.vf = CriticV(state_shape, critic_units)
         self.vf_target = CriticV(state_shape, critic_units)
-        update_target_variables(self.vf_target.weights,
-                                self.vf.weights, tau=1.)
+        update_target_variables(self.vf_target.weights, self.vf.weights, tau=1.)
         self.vf_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
     def get_action(self, state, test=False):
@@ -120,66 +114,65 @@ class SAC(OffPolicyAgent):
 
     @tf.function
     def _get_action_body(self, state, test):
-        return self.actor(state, test)[0]
+        actions, log_pis = self.actor(state, test)
+        return actions
 
     def train(self, states, actions, next_states, rewards, dones, weights=None):
-        # TODO: Replace `done` with `dones`
         if weights is None:
             weights = np.ones_like(rewards)
 
-        td_errors, actor_loss, vf_loss, qf_loss, logp_min, logp_max, logp_mean = self._train_body(states, actions, next_states, rewards, dones, weights)
+        td_errors, actor_loss, vf_loss, qf_loss, logp_min, logp_max, logp_mean = self._train_body(
+            states, actions, next_states, rewards, dones, weights)
 
-        tf.summary.scalar(name=self.policy_name+"/actor_loss", data=actor_loss)
-        tf.summary.scalar(name=self.policy_name+"/critic_V_loss", data=vf_loss)
-        tf.summary.scalar(name=self.policy_name+"/critic_Q_loss", data=qf_loss)
-        tf.summary.scalar(name=self.policy_name+"/logp_min", data=logp_min)
-        tf.summary.scalar(name=self.policy_name+"/logp_max", data=logp_max)
-        tf.summary.scalar(name=self.policy_name+"/logp_mean", data=logp_mean)
+        tf.summary.scalar(name=self.policy_name + "/actor_loss", data=actor_loss)
+        tf.summary.scalar(name=self.policy_name + "/critic_V_loss", data=vf_loss)
+        tf.summary.scalar(name=self.policy_name + "/critic_Q_loss", data=qf_loss)
+        tf.summary.scalar(name=self.policy_name + "/logp_min", data=logp_min)
+        tf.summary.scalar(name=self.policy_name + "/logp_max", data=logp_max)
+        tf.summary.scalar(name=self.policy_name + "/logp_mean", data=logp_mean)
         if self.auto_alpha:
             tf.summary.scalar(name=self.policy_name + "/log_ent", data=self.log_alpha)
-            tf.summary.scalar(name=self.policy_name+"/logp_mean+target", data=logp_mean+self.target_alpha)
-        tf.summary.scalar(name=self.policy_name+"/ent", data=self.alpha)
+            tf.summary.scalar(name=self.policy_name + "/logp_mean+target", data=logp_mean + self.target_alpha)
+        tf.summary.scalar(name=self.policy_name + "/ent", data=self.alpha)
 
         return td_errors
 
     @tf.function
     def _train_body(self, states, actions, next_states, rewards, dones, weights):
         with tf.device(self.device):
-            if tf.rank(rewards) == 2:
-                rewards = tf.squeeze(rewards, axis=1)
+            assert len(dones.shape) == 2
+            assert len(rewards.shape) == 2
+            rewards = tf.squeeze(rewards, axis=1)
+            dones = tf.squeeze(dones, axis=1)
+
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
             with tf.GradientTape(persistent=True) as tape:
                 # Compute loss of critic Q
-                current_q1 = self.qf1([states, actions])
-                current_q2 = self.qf2([states, actions])
-                vf_next_target = self.vf_target(next_states)
+                current_q1 = self.qf1(states, actions)
+                current_q2 = self.qf2(states, actions)
+                next_v_target = self.vf_target(next_states)
 
                 target_q = tf.stop_gradient(
-                    rewards + not_dones * self.discount * vf_next_target)
+                    rewards + not_dones * self.discount * next_v_target)
 
-                td_loss_q1 = tf.reduce_mean(huber_loss(
-                    target_q - current_q1, delta=self.max_grad) * weights)
-                td_loss_q2 = tf.reduce_mean(huber_loss(
-                    target_q - current_q2, delta=self.max_grad) * weights)  # Eq.(7)
+                td_loss_q1 = tf.reduce_mean((target_q - current_q1) ** 2)
+                td_loss_q2 = tf.reduce_mean((target_q - current_q2) ** 2)  # Eq.(7)
 
                 # Compute loss of critic V
                 current_v = self.vf(states)
 
-                sample_actions, logp, _ = self.actor(states)  # Resample actions to update V
-                current_q1 = self.qf1([states, sample_actions])
-                current_q2 = self.qf2([states, sample_actions])
+                sample_actions, logp = self.actor(states)  # Resample actions to update V
+                current_q1 = self.qf1(states, sample_actions)
+                current_q2 = self.qf2(states, sample_actions)
                 current_min_q = tf.minimum(current_q1, current_q2)
 
-                target_v = tf.stop_gradient(
-                    current_min_q - self.alpha * logp)
+                target_v = tf.stop_gradient(current_min_q - self.alpha * logp)
                 td_errors = target_v - current_v
-                td_loss_v = tf.reduce_mean(
-                    huber_loss(td_errors, delta=self.max_grad) * weights)  # Eq.(5)
+                td_loss_v = tf.reduce_mean(td_errors ** 2)  # Eq.(5)
 
                 # Compute loss of policy
-                policy_loss = tf.reduce_mean(
-                    (self.alpha * logp - current_min_q) * weights)  # Eq.(12)
+                policy_loss = tf.reduce_mean(self.alpha * logp - current_min_q)  # Eq.(12)
 
                 # Compute loss of temperature parameter for entropy
                 if self.auto_alpha:
@@ -212,7 +205,8 @@ class SAC(OffPolicyAgent):
 
             del tape
 
-        return td_errors, policy_loss, td_loss_v, td_loss_q1, tf.reduce_min(logp), tf.reduce_max(logp), tf.reduce_mean(logp)
+        return td_errors, policy_loss, td_loss_v, td_loss_q1, tf.reduce_min(logp), tf.reduce_max(logp), tf.reduce_mean(
+            logp)
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
         if isinstance(actions, tf.Tensor):
@@ -228,7 +222,7 @@ class SAC(OffPolicyAgent):
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
             # Compute TD errors for Q-value func
-            current_q1 = self.qf1([states, actions])
+            current_q1 = self.qf1(states, actions)
             vf_next_target = self.vf_target(next_states)
 
             target_q = tf.stop_gradient(
