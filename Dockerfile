@@ -9,9 +9,17 @@ RUN apt update \
 
 RUN --mount=type=cache,target=/root/.cache/pip \
 	pip install -U \
+	cpprb \
+	joblib \
 	matplotlib \
+	scipy \
 	tensorflow==2.2.* \
-	tensorflow_probability==0.10.* \
-	tf2rl
+	tensorflow_probability==0.10.*
+
+COPY setup.py /tf2rl/setup.py
+COPY tf2rl /tf2rl/tf2rl
+
+RUN pip install /tf2rl tensorflow_probability==0.10.* && rm -rf /tf2rl
+
 
 CMD ["/bin/bash"]
