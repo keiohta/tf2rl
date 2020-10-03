@@ -351,7 +351,7 @@ a list of tensors if there are more than one outputs.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
 <dt id="tf2rl.algos.ddpg.Critic.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.Critic.call" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em>, <em class="sig-param"><span class="n">actions</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.Critic.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -759,7 +759,7 @@ a list of tensors if there are more than one outputs.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
 <dt id="tf2rl.algos.td3.Critic.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.Critic.call" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em>, <em class="sig-param"><span class="n">actions</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.Critic.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
