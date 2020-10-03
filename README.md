@@ -68,6 +68,66 @@ $ cd tf2rl
 $ pip install .
 ```
 
+### Preinstalled Docker Container
+Instead of installing tf2rl on your (virtual) system, you can use
+preinstalled Docker containers.
+
+Only the first execution requires time to download the container image.
+
+At the following commands, you need to replace `<version>` with the
+version tag which you want to use.
+
+
+#### CPU Only
+
+The following simple command starts preinstalled container.
+
+```bash
+docker run -it ghcr.io/keiohta/tf2rl/cpu:<version> bash
+```
+
+
+If you also want to mount your local directory `/local/dir/path` at
+container `/mount/point`
+
+```bash
+docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
+```
+
+#### GPU Support (Linux Only, Experimental)
+
+WARNING: We encountered unsolved errors when running ApeX multiprocess learning.
+
+Requirements
+- Linux
+- NVIDIA GPU
+  - TF2.2 compatible driver
+- Docker 19.03 or later
+
+
+The following simple command starts preinstalled container.
+
+```bash
+docker run --gpus all -it ghcr.io/keiohta/tf2rl/nvidia:<version> bash
+```
+
+If you also want to mount your local directory `/local/dir/path` at
+container `/mount/point`
+
+
+```bash
+docker run --gpus all -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/nvidia:<version> bash
+```
+
+
+If your container can see GPU correctly, you can check inside
+container by the following comand;
+
+```bash
+nvidia-smi
+```
+
+
 ## Getting started
 Here is a quick example of how to train DDPG agent on a Pendulum environment:
 
