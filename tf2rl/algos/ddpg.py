@@ -107,8 +107,9 @@ class DDPG(OffPolicyAgent):
     def _get_action_body(self, state, sigma, max_action):
         with tf.device(self.device):
             action = self.actor(state)
-            action += tf.random.normal(shape=action.shape,
-                                       mean=0., stddev=sigma, dtype=tf.float32)
+            if sigma > 0.:
+                action += tf.random.normal(shape=action.shape,
+                                           mean=0., stddev=sigma, dtype=tf.float32)
             return tf.clip_by_value(action, -max_action, max_action)
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
