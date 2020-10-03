@@ -125,6 +125,7 @@ class OnPolicyTrainer(Trainer):
         tf.summary.flush()
 
     def finish_horizon(self, last_val=0):
+        self.local_buffer.on_episode_end()
         samples = self.local_buffer._encode_sample(
             np.arange(self.local_buffer.get_stored_size()))
         rews = np.append(samples["rew"], last_val)

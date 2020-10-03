@@ -8,7 +8,7 @@ from tf2rl.misc.huber_loss import huber_loss
 
 
 class Critic(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=[400, 300], name="Critic"):
+    def __init__(self, state_shape, action_dim, units=(400, 300), name="Critic"):
         super().__init__(name=name)
 
         self.l1 = Dense(units[0], name="L1")
@@ -24,11 +24,10 @@ class Critic(tf.keras.Model):
         dummy_action = tf.constant(
             np.zeros(shape=[1, action_dim], dtype=np.float32))
         with tf.device("/cpu:0"):
-            self([dummy_state, dummy_action])
+            self(dummy_state, dummy_action)
 
-    def call(self, inputs):
-        states, actions = inputs
-        xu = tf.concat([states, actions], axis=1)
+    def call(self, states, actions):
+        xu = tf.concat((states, actions), axis=1)
 
         x1 = tf.nn.relu(self.l1(xu))
         x1 = tf.nn.relu(self.l2(x1))
@@ -92,7 +91,7 @@ class TD3(DDPG):
             self._it.assign_add(1)
             with tf.GradientTape() as tape:
                 next_actions = self.actor(states)
-                actor_loss = - tf.reduce_mean(self.critic([states, next_actions]))
+                actor_loss = - tf.reduce_mean(self.critic(states, next_actions))
 
             remainder = tf.math.mod(self._it, self._actor_update_freq)
 
@@ -130,11 +129,9 @@ class TD3(DDPG):
             next_action = tf.clip_by_value(
                 next_action + noise, -self.actor_target.max_action, self.actor_target.max_action)
 
-            target_Q1, target_Q2 = self.critic_target(
-                [next_states, next_action])
-            target_Q = tf.minimum(target_Q1, target_Q2)
-            target_Q = rewards + (not_dones * self.discount * target_Q)
-            target_Q = tf.stop_gradient(target_Q)
-            current_Q1, current_Q2 = self.critic([states, actions])
+            next_q1_target, next_q2_target = self.critic_target(next_states, next_action)
+            next_q_target = tf.minimum(next_q1_target, next_q2_target)
+            q_target = tf.stop_gradient(rewards + not_dones * self.discount * next_q_target)
+            current_q1, current_q2 = self.critic(states, actions)
 
-        return target_Q - current_Q1, target_Q - current_Q2
+        return q_target - current_q1, q_target - current_q2

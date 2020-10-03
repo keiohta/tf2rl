@@ -111,6 +111,7 @@ class Trainer:
             obs = next_obs
 
             if done or episode_steps == self._episode_max_steps:
+                replay_buffer.on_episode_end()
                 obs = self._env.reset()
 
                 n_episode += 1

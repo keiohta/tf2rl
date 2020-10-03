@@ -10,7 +10,7 @@ from tf2rl.misc.huber_loss import huber_loss
 
 
 class QFunc(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=[32, 32],
+    def __init__(self, state_shape, action_dim, units=(32, 32),
                  name="QFunc", enable_dueling_dqn=False,
                  enable_noisy_dqn=False, enable_categorical_dqn=False,
                  n_atoms=51):
@@ -76,7 +76,7 @@ class DQN(OffPolicyAgent):
             q_func=None,
             name="DQN",
             lr=0.001,
-            units=[32, 32],
+            units=(32, 32),
             epsilon=0.1,
             epsilon_min=None,
             epsilon_decay_step=int(1e6),

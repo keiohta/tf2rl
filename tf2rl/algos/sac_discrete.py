@@ -15,7 +15,7 @@ class CriticQ(tf.keras.Model):
         to   Q: S -> R^|A|
     """
 
-    def __init__(self, state_shape, action_dim, critic_units=[256, 256], name='qf'):
+    def __init__(self, state_shape, action_dim, critic_units=(256, 256), name='qf'):
         super().__init__(name=name)
 
         self.l1 = Dense(critic_units[0], name="L1", activation='relu')
