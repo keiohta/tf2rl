@@ -22,10 +22,27 @@ class ILQG:
         Variable names follow the symbols in
         "Synthesis and Stabilization of Complex Behaviors through Online Trajectory Optimization".
 
-        :param mu: coefficient of diagonal regularization to make the Hessian positive-definite
-        :param min_mu: minimum coefficient for regularization
-        :param max_mu: maximum coefficient for regularization
-        :param tol_cost: tolerance cost to stop iLQG optimization
+        Parameters
+        ----------
+        make_env : function
+            Create an environment by calling 'make_env()'
+        policy : str
+            Strategy to initialize a control sequence.
+            "zeros" initializes with zero vectors.
+            "random" initializes with uniform sampling.
+            "ou" initializes with Ornstein-Uhlenbeck process
+        max_iter : int
+            Maximum optimization iterations
+        mu : float
+            Coefficient of diagonal regularization to make the Hessian positive-definite
+        min_mu : float
+            Minimum mu
+        max_mu : float
+            Maximum mu
+        tol_cost : float
+            tolerance cost to stop iLQG optimization
+        horizon : int
+            Optimization horizon
         """
         self._env = make_env()
         self._make_env = make_env
@@ -47,13 +64,21 @@ class ILQG:
         self._X, self._U, self._cost = self.rollout(initial_state)
 
     def rollout(self, initial_state=None):
-        """Generate a trajectory by using the given policy.
+        """Rollout an episode.
 
-        :param make_env: a function to make an environment
-        :param policy: "zeros" uses zero-vector control. "random" generates control from uniform distribution.
-        :param max_steps: if None, rollout while done is False.
-        :return:
-         (X, U, cost)
+        Parameters
+        ----------
+        initial_state : np.ndarray
+            Initial state to start an episode.
+
+        Returns
+        -------
+        X : np.ndarray
+            Optimized state sequence.
+        U : np.ndarray
+            Local optimal action sequences.
+        cost : float
+            Cost of the optimized episode.
         """
         if initial_state is not None:
             self._env.set_state_vector(initial_state)
@@ -128,15 +153,24 @@ class ILQG:
         self._X, self._U, self._cost = X, U, cost
 
     def backward(self, X, U, dynamics):
-        """
-        Perform backward pass using the previous states and controls.
+        """Perform backward pass using the previous states and controls.
         This step returns a local optimal controller gain k and K
 
-        :param np.ndarray X: initial state vectors [T+1, N]
-        :param np.ndarray U: initial control vectors [T, M]
-        :param NumericalDiffDynamics dynamics:
-        :return list k_list: open-loop term
-        :return list K_list: feedback gain term
+        Parameters
+        ----------
+        X : np.ndarray
+            Initial state sequence whose shape is [T+1, N]
+        U : np.ndarray
+            Initial control sequence whose shape is [T+1, N]
+        dynamics : NumericalDiffDynamics
+            Dynamics object to compute derivative of dynamics.
+
+        Returns
+        -------
+        k_list : list
+            Optimized open-loop term
+        K_list : list
+            Optimized local feedback gain terms
         """
         # Get planning horizon
         T = U.shape[0]
@@ -206,11 +240,30 @@ class ILQG:
         return k_list, K_list
 
     def forward(self, make_env, X, U, k, K, alpha):
-        """
-        Perform forward pass using computed gains in the backward process.
-        :param np.ndarray X: the previous state vectors [T+1, N]
-        :param np.ndarray U: the previous control vectors [T, M]
-        :return: updated states, controls, and cost
+        """Perform forward pass using computed gains in the backward process.
+
+        Parameters
+        ----------
+        make_env
+        X : np.ndarray
+            The previous state vectors whose shape is (T+1, N)
+        U : np.ndarray
+            The previous control vectors whose shape is (T, N)
+        k : list
+            Previously optimized open-loop term
+        K : list
+            Previously optimized local feedback gain terms
+        alpha : float
+            Line-search parameter
+
+        Returns
+        -------
+        nex_X : np.ndarray
+            The latest state vectors
+        new_U : np.ndarray
+            The latest control vectors
+        cost : float
+            The latest cost of an episode
         """
         # Get planning horizon
         T = U.shape[0]
