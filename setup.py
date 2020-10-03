@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-tf_version = "2.3" # Default Version
+tf_version = "2.3"  # Default Version
 compatible_tfp = {"2.3": ["tensorflow~=2.3.0",
                           "tensorflow-probability~=0.11.0"],
                   "2.2": ["tensorflow-probability~=0.10.0"],
@@ -9,7 +9,7 @@ compatible_tfp = {"2.3": ["tensorflow~=2.3.0",
 
 try:
     import tensorflow as tf
-    tf_version = tf.version.VERSION.rsplit('.',1)[0]
+    tf_version = tf.version.VERSION.rsplit('.', 1)[0]
 except ImportError:
     pass
 
