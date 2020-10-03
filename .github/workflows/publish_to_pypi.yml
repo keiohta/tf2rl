@@ -4,6 +4,11 @@
 
 name: Publish package
 
+on:
+  push:
+    tags:
+      - 'v*'
+
 jobs:
   build-n-publish:
     name: Build and publish tf2rl 🐍distributions 📦to PyPI
@@ -19,7 +24,6 @@ jobs:
     - name: Build package
       run: python setup.py sdist bdist_wheel
     - name: Publish package
-      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@master
       with:
         user: __token__
