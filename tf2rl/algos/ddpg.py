@@ -3,7 +3,6 @@ import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OffPolicyAgent
-from tf2rl.misc.huber_loss import huber_loss
 from tf2rl.misc.target_update_ops import update_target_variables
 
 
