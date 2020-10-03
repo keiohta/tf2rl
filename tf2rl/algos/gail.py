@@ -7,7 +7,7 @@ from tf2rl.networks.spectral_norm_dense import SNDense
 
 
 class Discriminator(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=[32, 32],
+    def __init__(self, state_shape, action_dim, units=(32, 32),
                  enable_sn=False, output_activation="sigmoid",
                  name="Discriminator"):
         super().__init__(name=name)

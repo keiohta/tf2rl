@@ -12,7 +12,7 @@ class Discriminator(tf.keras.Model):
     LOG_SIG_CAP_MIN = -20  # np.e**-10 = 4.540e-05
     EPS = 1e-6
 
-    def __init__(self, state_shape, action_dim, units=[32, 32],
+    def __init__(self, state_shape, action_dim, units=(32, 32),
                  n_latent_unit=32, enable_sn=False, name="Discriminator"):
         super().__init__(name=name)
 
@@ -57,7 +57,7 @@ class VAIL(GAIL):
             self,
             state_shape,
             action_dim,
-            units=[32, 32],
+            units=(32, 32),
             n_latent_unit=32,
             lr=5e-5,
             kl_target=0.5,
