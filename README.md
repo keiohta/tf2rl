@@ -172,3 +172,14 @@ You can see the training progress/results from TensorBoard as follows:
 $ tensorboard --logdir results
 ```
 
+## Citation
+```
+@misc{ota2020tf2rl,
+  author = {Kei Ota},
+  title = {TF2RL},
+  year = {2020},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/keiohta/tf2rl/}}
+}
+```
