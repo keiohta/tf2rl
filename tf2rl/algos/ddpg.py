@@ -126,11 +126,11 @@ class DDPG(OffPolicyAgent):
         return td_errors
 
     @tf.function
-    def _train_body(self, states, actions, next_states, rewards, done, weights):
+    def _train_body(self, states, actions, next_states, rewards, dones, weights):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
                 td_errors = self._compute_td_error_body(
-                    states, actions, next_states, rewards, done)
+                    states, actions, next_states, rewards, dones)
                 critic_loss = tf.reduce_mean(td_errors ** 2)
 
             critic_grad = tape.gradient(
@@ -139,8 +139,8 @@ class DDPG(OffPolicyAgent):
                 zip(critic_grad, self.critic.trainable_variables))
 
             with tf.GradientTape() as tape:
-                next_action = self.actor(states)
-                actor_loss = -tf.reduce_mean(self.critic(states, next_action))
+                sample_actions = self.actor(states)
+                actor_loss = -tf.reduce_mean(self.critic(states, sample_actions))
 
             actor_grad = tape.gradient(
                 actor_loss, self.actor.trainable_variables)

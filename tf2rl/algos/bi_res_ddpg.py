@@ -1,8 +1,3 @@
-"""
-This is an implementation of Bi-Res-DDPG
-https://arxiv.org/abs/1905.01072
-"""
-
 import numpy as np
 import tensorflow as tf
 
@@ -11,6 +6,11 @@ from tf2rl.misc.target_update_ops import update_target_variables
 
 
 class BiResDDPG(DDPG):
+    """
+    This is an implementation of Bi-Res-DDPG
+    https://arxiv.org/abs/1905.01072
+    """
+
     def __init__(self, eta=0.05, name="BiResDDPG", **kwargs):
         kwargs["name"] = name
         super().__init__(**kwargs)
