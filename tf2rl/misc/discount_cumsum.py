@@ -1,3 +1,4 @@
+import numpy as np
 from scipy.signal import lfilter
 
 
@@ -12,6 +13,7 @@ def discount_cumsum(x, discount):
          x1 + discount * x2,
          x2]
     """
+    assert isinstance(x, np.ndarray) and x.ndim == 1
     return lfilter(
         b=[1],
         a=[1, float(-discount)],
