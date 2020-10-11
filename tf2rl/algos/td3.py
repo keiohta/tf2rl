@@ -4,7 +4,6 @@ from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.misc.target_update_ops import update_target_variables
-from tf2rl.misc.huber_loss import huber_loss
 
 
 class Critic(tf.keras.Model):
@@ -37,7 +36,7 @@ class Critic(tf.keras.Model):
         x2 = tf.nn.relu(self.l5(x2))
         x2 = self.l6(x2)
 
-        return x1, x2
+        return tf.squeeze(x1, axis=1), tf.squeeze(x2, axis=1)
 
 
 class TD3(DDPG):
@@ -107,6 +106,11 @@ class TD3(DDPG):
 
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
+        assert len(dones.shape) == 2
+        assert len(rewards.shape) == 2
+        rewards = tf.squeeze(rewards, axis=1)
+        dones = tf.squeeze(dones, axis=1)
+
         with tf.device(self.device):
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 

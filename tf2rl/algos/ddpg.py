@@ -46,8 +46,8 @@ class Critic(tf.keras.Model):
         features = tf.concat((states, actions), axis=1)
         features = tf.nn.relu(self.l1(features))
         features = tf.nn.relu(self.l2(features))
-        features = self.l3(features)
-        return features
+        values = self.l3(features)
+        return tf.squeeze(values, axis=1)
 
 
 class DDPG(OffPolicyAgent):
@@ -165,6 +165,11 @@ class DDPG(OffPolicyAgent):
 
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
+        assert len(dones.shape) == 2
+        assert len(rewards.shape) == 2
+        rewards = tf.squeeze(rewards, axis=1)
+        dones = tf.squeeze(dones, axis=1)
+
         with tf.device(self.device):
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
             next_act_target = self.actor_target(next_states)
