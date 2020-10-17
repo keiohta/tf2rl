@@ -11,7 +11,7 @@ from tf2rl.misc.huber_loss import huber_loss
 
 class QFunc(tf.keras.Model):
     def __init__(self, state_shape, action_dim, units=(32, 32),
-                 name="QFunc", enable_dueling_dqn=False,
+                 name="CategoricalQFunc", enable_dueling_dqn=False,
                  enable_noisy_dqn=False, n_atoms=51):
         super().__init__(name=name)
         self._enable_dueling_dqn = enable_dueling_dqn
@@ -111,8 +111,7 @@ class CategoricalDQN(OffPolicyAgent):
         if epsilon_min is not None and not enable_noisy_dqn:
             assert epsilon > epsilon_min
             self.epsilon_min = epsilon_min
-            self.epsilon_decay_rate = (
-                                              epsilon - epsilon_min) / epsilon_decay_step
+            self.epsilon_decay_rate = (epsilon - epsilon_min) / epsilon_decay_step
             self.epsilon = max(epsilon - self.epsilon_decay_rate * self.n_warmup,
                                self.epsilon_min)
         else:
@@ -186,11 +185,11 @@ class CategoricalDQN(OffPolicyAgent):
 
         return td_errors
 
-    # @tf.function
+    @tf.function
     def _train_body(self, states, actions, next_states, rewards, done, weights):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
-                td_errors = self.compute_td_error(
+                td_errors = self._compute_td_error_body(
                     states, actions, next_states, rewards, done)
                 q_func_loss = tf.reduce_mean(
                     huber_loss(tf.negative(td_errors),
@@ -213,7 +212,7 @@ class CategoricalDQN(OffPolicyAgent):
         return self._compute_td_error_body(
             states, actions, next_states, rewards, dones)
 
-    # @tf.function
+    @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
         """
         Args:
