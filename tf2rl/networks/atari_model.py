@@ -4,7 +4,6 @@ from tensorflow.keras.layers import Conv2D, Dense, Flatten
 
 from tf2rl.networks.noisy_dense import NoisyDense
 from tf2rl.policies.tfp_categorical_actor import CategoricalActorCritic, CategoricalActor
-from tf2rl.distributions.categorical import Categorical
 
 
 class AtariBaseModel(tf.keras.Model):
@@ -70,7 +69,7 @@ class AtariQFunc(AtariBaseModel):
             features = self.fc2(features)
             if self._enable_dueling_dqn:
                 features = tf.reshape(
-                    features, (-1, self._action_dim+1, self._n_atoms))  # [batch_size, action_dim, n_atoms]
+                    features, (-1, self._action_dim + 1, self._n_atoms))  # [batch_size, action_dim, n_atoms]
                 v_values = tf.reshape(
                     features[:, 0], (-1, 1, self._n_atoms))
                 advantages = tf.reshape(
@@ -82,7 +81,7 @@ class AtariQFunc(AtariBaseModel):
                     features, (-1, self._action_dim, self._n_atoms))  # [batch_size, action_dim, n_atoms]
             # [batch_size, action_dim, n_atoms]
             q_dist = tf.keras.activations.softmax(features, axis=2)
-            return tf.clip_by_value(q_dist, 1e-8, 1.0-1e-8)
+            return tf.clip_by_value(q_dist, 1e-8, 1.0 - 1e-8)
         else:
             if self._enable_dueling_dqn:
                 advantages = self.fc2(features)
@@ -107,7 +106,7 @@ class AtariCategoricalActor(CategoricalActor, AtariBaseModel):
         self.out_prob = Dense(action_dim, activation='softmax')
 
         CategoricalActor.call(self, tf.constant(
-            np.zeros(shape=(1,)+state_shape, dtype=np.uint8)))
+            np.zeros(shape=(1,) + state_shape, dtype=np.uint8)))
 
     def _compute_features(self, states):
         # Extract features on base layers
@@ -117,16 +116,14 @@ class AtariCategoricalActor(CategoricalActor, AtariBaseModel):
 class AtariCategoricalActorCritic(CategoricalActorCritic, AtariBaseModel):
     def __init__(self, state_shape, action_dim, units=None,
                  name="AtariCategoricalActorCritic"):
-        # tf.keras.Model.__init__(self, name=name)
-        AtariBaseModel.__init__(self, name="BaseModel")
-        self.dist = Categorical(dim=action_dim)
+        AtariBaseModel.__init__(self, name=name)
         self.action_dim = action_dim
 
         self.out_prob = Dense(action_dim, activation='softmax')
         self.v = Dense(1, activation="linear")
 
         self(tf.constant(
-            np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
+            np.zeros(shape=(1,) + state_shape, dtype=np.float32)))
 
     def _compute_feature(self, states):
         return AtariBaseModel.call(self, states)

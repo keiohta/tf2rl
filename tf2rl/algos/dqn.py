@@ -142,8 +142,7 @@ class DQN(OffPolicyAgent):
         td_errors, q_func_loss = self._train_body(
             states, actions, next_states, rewards, done, weights)
 
-        tf.summary.scalar(name=self.policy_name +
-                               "/q_func_Loss", data=q_func_loss)
+        tf.summary.scalar(name=self.policy_name + "/q_func_Loss", data=q_func_loss)
 
         # TODO: Remove following by using tf.global_step
         self.n_update += 1
