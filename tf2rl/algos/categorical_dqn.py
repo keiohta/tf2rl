@@ -63,6 +63,7 @@ class CategoricalDQN(OffPolicyAgent):
             q_func=None,
             name="DQN",
             lr=0.001,
+            adam_eps=1e-07,
             units=(32, 32),
             epsilon=0.1,
             epsilon_min=None,
@@ -70,7 +71,6 @@ class CategoricalDQN(OffPolicyAgent):
             n_warmup=int(1e4),
             target_replace_interval=int(5e3),
             memory_capacity=int(1e6),
-            optimizer=None,
             enable_double_dqn=False,
             enable_dueling_dqn=False,
             enable_noisy_dqn=False,
@@ -87,8 +87,7 @@ class CategoricalDQN(OffPolicyAgent):
             "enable_noisy_dqn": enable_noisy_dqn}
         self.q_func = q_func(**kwargs_dqn)
         self.q_func_target = q_func(**kwargs_dqn)
-        self.q_func_optimizer = (optimizer if optimizer is not None else
-                                 tf.keras.optimizers.Adam(learning_rate=lr))
+        self.q_func_optimizer = tf.keras.optimizers.Adam(learning_rate=lr, epsilon=adam_eps)
         update_target_variables(self.q_func_target.weights,
                                 self.q_func.weights, tau=1.)
 

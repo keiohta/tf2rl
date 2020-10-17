@@ -28,7 +28,6 @@ if __name__ == '__main__':
         enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
         enable_noisy_dqn=args.enable_noisy_dqn,
-        enable_categorical_dqn=args.enable_categorical_dqn,
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.n,
         lr=0.0000625,  # This value is from Rainbow
@@ -41,7 +40,6 @@ if __name__ == '__main__':
         epsilon=1.,
         epsilon_min=0.1,
         epsilon_decay_step=int(1e6),
-        optimizer=optimizer,
         update_interval=4,
         q_func=QFunc,
         gpu=args.gpu)
