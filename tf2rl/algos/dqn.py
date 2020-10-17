@@ -87,8 +87,7 @@ class DQN(OffPolicyAgent):
         if epsilon_min is not None and not enable_noisy_dqn:
             assert epsilon > epsilon_min
             self.epsilon_min = epsilon_min
-            self.epsilon_decay_rate = (
-                                              epsilon - epsilon_min) / epsilon_decay_step
+            self.epsilon_decay_rate = (epsilon - epsilon_min) / epsilon_decay_step
             self.epsilon = max(epsilon - self.epsilon_decay_rate * self.n_warmup,
                                self.epsilon_min)
         else:
