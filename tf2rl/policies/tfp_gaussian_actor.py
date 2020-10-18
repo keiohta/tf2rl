@@ -37,11 +37,15 @@ class GaussianActor(tf.keras.Model):
 
     def _compute_dist(self, states):
         """
-        Compute multivariate normal distribution
 
-        :param states (np.ndarray or tf.Tensor): Inputs to neural network.
-            NN outputs mean and standard deviation to compute the distribution
-        :return : Multivariate normal distribution object
+        Args:
+            states: np.ndarray or tf.Tensor
+                Inputs to neural network.
+
+        Returns:
+            tfp.distributions.MultivariateNormalDiag
+                Multivariate normal distribution object whose mean and
+                standard deviation is output of a neural network
         """
         features = states
 

@@ -67,8 +67,21 @@ class VAIL(GAIL):
             name="VAIL",
             **kwargs):
         """
-        :param enable_sn (bool): If true, add spectral normalization in Dense layer
-        :param enable_gp (bool): If true, add gradient penalty to loss function
+
+        Args:
+            state_shape:
+            action_dim:
+            units:
+            n_latent_unit:
+            lr:
+            kl_target:
+            reg_param:
+            enable_sn: bool
+                If true, add spectral normalization in Dense layer
+            enable_gp: bool
+                If true, add gradient penalty to loss function
+            name:
+            **kwargs:
         """
         IRLPolicy.__init__(
             self, name=name, n_training=10, **kwargs)

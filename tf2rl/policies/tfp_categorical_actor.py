@@ -31,11 +31,15 @@ class CategoricalActor(tf.keras.Model):
 
     def _compute_dist(self, states):
         """
-        Compute categorical distribution
 
-        :param states (np.ndarray or tf.Tensor): Inputs to neural network.
-            NN outputs probabilities of K classes
-        :return: Categorical distribution
+        Args:
+            states: np.ndarray or tf.Tensor
+                Inputs to neural network.
+
+        Returns:
+            tfp.distributions.Categorical
+                Categorical distribution whose probabilities are
+                computed using softmax activation of a neural network
         """
         features = self._compute_features(states)
 
@@ -49,12 +53,6 @@ class CategoricalActor(tf.keras.Model):
         return dist.logits
 
     def call(self, states, test=False):
-        """
-        Compute actions and log probability of the selected action
-
-        :return action (tf.Tensors): Tensor of actions
-        :return log_probs (tf.Tensor): Tensors of log probabilities of selected actions
-        """
         dist = self._compute_dist(states)
 
         if test:
@@ -70,11 +68,17 @@ class CategoricalActor(tf.keras.Model):
         return dist.entropy()
 
     def compute_log_probs(self, states, actions):
-        """Compute log probabilities of inputted actions
+        """Compute log probabilities of state-action pairs
 
-        :param states (tf.Tensor): Tensors of inputs to NN
-        :param actions (tf.Tensor): Tensors of NOT one-hot vector.
-            They will be converted to one-hot vector inside this function.
+        Args:
+            states: tf.Tensor
+                Tensors of inputs to NN
+            actions: tf.Tensor
+                Tensors of NOT one-hot vector.
+                They will be converted to one-hot vector inside this function.
+
+        Returns:
+            Log probabilities
         """
         dist = self._compute_dist(states)
         return dist.log_prob(actions)

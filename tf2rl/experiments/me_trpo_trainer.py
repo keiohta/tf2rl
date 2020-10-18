@@ -217,7 +217,6 @@ class MeTrpoTrainer(MPCTrainer):
     def collect_transitions_sim_env(self):
         """
         Generate transitions using dynamics model
-        :return:
         """
         self.replay_buffer.clear()
         n_episodes = 0
