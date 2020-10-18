@@ -158,7 +158,7 @@ class OnPolicyTrainer(Trainer):
                 if self._normalize_obs:
                     obs = self._obs_normalizer(obs, update=False)
                 act, _ = self._policy.get_action(obs, test=True)
-                act = (act if not is_discrete(self._env.action_space) else
+                act = (act if is_discrete(self._env.action_space) else
                        np.clip(act, self._env.action_space.low, self._env.action_space.high))
                 next_obs, reward, done, _ = self._test_env.step(act)
                 if self._save_test_path:

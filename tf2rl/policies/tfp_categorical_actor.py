@@ -93,14 +93,14 @@ class CategoricalActorCritic(CategoricalActor):
     def call(self, states, test=False):
         features = self._compute_feature(states)
         probs = self.out_prob(features)
-        param = {"prob": probs}
-        if test:
-            action = tf.math.argmax(param["prob"], axis=1)  # (size,)
-        else:
-            action = tf.squeeze(self.dist.sample(param), axis=1)  # (size,)
+        dist = tfp.distributions.Categorical(probs)
 
-        log_prob = self.dist.log_likelihood(
-            tf.one_hot(indices=action, depth=self.action_dim), param)
+        if test:
+            action = tf.argmax(dist.logits, axis=1)  # (size,)
+        else:
+            action = dist.sample()  # (size,)
+        log_prob = dist.prob(action)
+
         v = self.v(features)
 
         return action, log_prob, v
