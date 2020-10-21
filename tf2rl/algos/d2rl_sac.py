@@ -8,22 +8,21 @@ from tf2rl.algos.sac import SAC, CriticQ, CriticV
 
 class DenseCriticV(CriticV):
     def call(self, states):
-        identity_map = states
         features = states
         for cur_layer in self.base_layers:
             features = cur_layer(features)
-            features = tf.concat((features, identity_map), axis=1)
+            features = tf.concat((features, states), axis=1)
         values = self.out_layer(features)
         return tf.squeeze(values, axis=1)
 
 
 class DenseCriticQ(CriticQ):
     def call(self, states, actions):
-        identity_map = tf.concat((states, actions), axis=1)
-        features = tf.concat((states, actions), axis=1)
+        state_action_pairs = tf.concat((states, actions), axis=1)
+        features = state_action_pairs
         for cur_layer in self.base_layers:
             features = cur_layer(features)
-            features = tf.concat((features, identity_map), axis=1)
+            features = tf.concat((features, state_action_pairs), axis=1)
         values = self.out_layer(features)
         return tf.squeeze(values, axis=1)
 
