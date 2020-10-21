@@ -87,7 +87,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="tf2rl.html">tf2rl package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="tf2rl.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.algos.html">tf2rl.algos package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tf2rl.distributions.html">tf2rl.distributions package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.envs.html">tf2rl.envs package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.experiments.html">tf2rl.experiments package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.misc package</a><ul>
@@ -190,13 +189,16 @@
 <code class="sig-prename descclassname">tf2rl.misc.discount_cumsum.</code><code class="sig-name descname">discount_cumsum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">discount</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.discount_cumsum.discount_cumsum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Forked from rllab for computing discounted cumulative sums of vectors.</p>
 <dl class="simple">
-<dt>:param x (np.ndarray or tf.Tensor)</dt><dd><p>vector of [x0, x1, x2]</p>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>x: np.ndarray or tf.Tensor</dt><dd><p>Vector of inputs</p>
+</dd>
+<dt>discount: float</dt><dd><p>Discount factor</p>
 </dd>
 </dl>
-<dl class="field-list simple">
-<dt class="field-odd">Return output</dt>
-<dd class="field-odd"><dl class="simple">
-<dt>[x0 + discount * x1 + discount^2 * x2,</dt><dd><p>x1 + discount * x2,
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>Discounted cumulative summation. If input is [x0, x1, x2], then the output is:</dt><dd><p>[x0 + discount * x1 + discount^2 * x2,
+x1 + discount * x2,
 x2]</p>
 </dd>
 </dl>
@@ -228,18 +230,16 @@ x2]</p>
 <dl class="py function">
 <dt id="tf2rl.misc.huber_loss.huber_loss">
 <code class="sig-prename descclassname">tf2rl.misc.huber_loss.</code><code class="sig-name descname">huber_loss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">delta</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.huber_loss.huber_loss" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the huber loss.
-<a class="reference external" href="https://en.wikipedia.org/wiki/Huber_loss">https://en.wikipedia.org/wiki/Huber_loss</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>(</strong><strong>np.ndarray</strong><strong> or </strong><strong>tf.Tensor</strong><strong>)</strong> (<em>x</em>) – Values to compute the huber loss.</p></li>
-<li><p><strong>(</strong><strong>float</strong><strong>)</strong> (<em>delta</em>) – Positive floating point value. Represents the
-maximum possible gradient magnitude.</p></li>
-</ul>
+<dd><dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>x: np.ndarray or tf.Tensor</dt><dd><p>Values to compute the huber loss.</p>
 </dd>
-<dt class="field-even">Return (tf.Tensor)</dt>
-<dd class="field-even"><p>The huber loss.</p>
+<dt>delta: float</dt><dd><p>Positive floating point value. Represents the
+maximum possible gradient magnitude.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns: tf.Tensor</dt><dd><p>The huber loss.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -270,9 +270,11 @@ maximum possible gradient magnitude.</p></li>
 <dt id="tf2rl.misc.normalizer.Normalizer.observe">
 <code class="sig-name descname">observe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.Normalizer.observe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute next mean and std</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>(</strong><strong>float</strong><strong>)</strong> (<em>x</em>) – Input data</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>x: float</dt><dd><p>Input data.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>

@@ -20,6 +20,14 @@ tf2rl.algos.bi\_res\_ddpg module
    :undoc-members:
    :show-inheritance:
 
+tf2rl.algos.categorical\_dqn module
+-----------------------------------
+
+.. automodule:: tf2rl.algos.categorical_dqn
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tf2rl.algos.ddpg module
 -----------------------
 

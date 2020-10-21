@@ -37,7 +37,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="tf2rl.experiments package" href="tf2rl.experiments.html" />
-    <link rel="prev" title="tf2rl.distributions package" href="tf2rl.distributions.html" /> 
+    <link rel="prev" title="tf2rl.algos package" href="tf2rl.algos.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,7 +87,6 @@
 <li class="toctree-l1 current"><a class="reference internal" href="tf2rl.html">tf2rl package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="tf2rl.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.algos.html">tf2rl.algos package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tf2rl.distributions.html">tf2rl.distributions package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.envs package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.atari_wrapper">tf2rl.envs.atari_wrapper module</a></li>
@@ -528,16 +527,15 @@ When step() is called, all of them forward one-step.</p>
 <dl class="py method">
 <dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv.py_step">
 <code class="sig-name descname">py_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">actions</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.py_step" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>actions</strong> (<em>np.array</em>) – np.float32 [batch_size, dim_action]</p>
+<dd><dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>actions: np.array</dt><dd><p>Actions whose shape is [batch_size, dim_action]</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>(obs, reward, done)</p>
-<p>obs = [batch_size, C, H, W]
-reward = [batch_size]
-done = [batch_size]</p>
-</p>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>obs: np.array
+reward: np.array
+done: np.array</p>
 </dd>
 </dl>
 </dd></dl>
@@ -550,26 +548,23 @@ done = [batch_size]</p>
 <dl class="py method">
 <dt id="tf2rl.envs.multi_thread_env.MultiThreadEnv.step">
 <code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">actions</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.step" title="Permalink to this definition">¶</a></dt>
-<dd><p>take 1-step in all environments.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>action</strong> (<em>tf.Tensor</em>) – float32[batch_size, dim_action]</p></li>
-<li><p><strong>name</strong> – Operator名</p></li>
-</ul>
+<dd><dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>actions: tf.Tensor</dt><dd><p>Actions whose shape is float32[batch_size, dim_action]</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>(tf.Tensor, tf.Tensor, tf.Tensor)</p>
+<dt>name: str</dt><dd><p>Operator name</p>
 </dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><blockquote>
-<div><p>(obs, reward, done)</p>
-</div></blockquote>
-<p>obs = [batch_size, dim_obs]
-reward = [batch_size]
-done = [batch_size]
-reach_limit = [batch_size] : whether each environment reached time limit or not.</p>
-</p>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>obs: tf.Tensor</dt><dd><p>[batch_size, dim_obs]</p>
+</dd>
+<dt>reward: tf.Tensor</dt><dd><p>[batch_size]</p>
+</dd>
+<dt>done: tf.Tensor</dt><dd><p>[batch_size]</p>
+</dd>
+</dl>
+<p>env_info: None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -675,7 +670,7 @@ until (int or None): If this arg is specified, the link learns input</p>
         <a href="tf2rl.experiments.html" class="btn btn-neutral float-right" title="tf2rl.experiments package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="tf2rl.distributions.html" class="btn btn-neutral float-left" title="tf2rl.distributions package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="tf2rl.algos.html" class="btn btn-neutral float-left" title="tf2rl.algos package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

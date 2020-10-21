@@ -87,15 +87,12 @@
 <li class="toctree-l1 current"><a class="reference internal" href="tf2rl.html">tf2rl package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="tf2rl.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.algos.html">tf2rl.algos package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tf2rl.distributions.html">tf2rl.distributions package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.envs.html">tf2rl.envs package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.experiments.html">tf2rl.experiments package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.misc.html">tf2rl.misc package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.networks.html">tf2rl.networks package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.policies package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.policies.categorical_actor">tf2rl.policies.categorical_actor module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.policies.gaussian_actor">tf2rl.policies.gaussian_actor module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.policies.tfp_categorical_actor">tf2rl.policies.tfp_categorical_actor module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.policies.tfp_gaussian_actor">tf2rl.policies.tfp_gaussian_actor module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.policies">Module contents</a></li>
@@ -179,114 +176,6 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-tf2rl.policies.categorical_actor">
-<span id="tf2rl-policies-categorical-actor-module"></span><h2>tf2rl.policies.categorical_actor module<a class="headerlink" href="#module-tf2rl.policies.categorical_actor" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="tf2rl.policies.categorical_actor.CategoricalActor">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.policies.categorical_actor.</code><code class="sig-name descname">CategoricalActor</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.categorical_actor.CategoricalActor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
-<dl class="py method">
-<dt id="tf2rl.policies.categorical_actor.CategoricalActor.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em>, <em class="sig-param"><span class="n">test</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.categorical_actor.CategoricalActor.call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute actions and log probability of the selected action</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return action (tf.Tensors)</dt>
-<dd class="field-odd"><p>Tensor of actions</p>
-</dd>
-<dt class="field-even">Return log_probs (tf.Tensor)</dt>
-<dd class="field-even"><p>Tensors of log probabilities of selected actions</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="tf2rl.policies.categorical_actor.CategoricalActor.compute_entropy">
-<code class="sig-name descname">compute_entropy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.categorical_actor.CategoricalActor.compute_entropy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="tf2rl.policies.categorical_actor.CategoricalActor.compute_log_probs">
-<code class="sig-name descname">compute_log_probs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em>, <em class="sig-param"><span class="n">actions</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.categorical_actor.CategoricalActor.compute_log_probs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute log probabilities of inputted actions</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>(</strong><strong>tf.Tensor</strong><strong>)</strong> (<em>actions</em>) – Tensors of inputs to NN</p></li>
-<li><p><strong>(</strong><strong>tf.Tensor</strong><strong>)</strong> – Tensors of NOT one-hot vector.
-They will be converted to one-hot vector inside this function.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="tf2rl.policies.categorical_actor.CategoricalActor.compute_prob">
-<code class="sig-name descname">compute_prob</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.categorical_actor.CategoricalActor.compute_prob" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="tf2rl.policies.categorical_actor.CategoricalActorCritic">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.policies.categorical_actor.</code><code class="sig-name descname">CategoricalActorCritic</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.categorical_actor.CategoricalActorCritic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#tf2rl.policies.categorical_actor.CategoricalActor" title="tf2rl.policies.categorical_actor.CategoricalActor"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.policies.categorical_actor.CategoricalActor</span></code></a></p>
-<dl class="py method">
-<dt id="tf2rl.policies.categorical_actor.CategoricalActorCritic.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em>, <em class="sig-param"><span class="n">test</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.categorical_actor.CategoricalActorCritic.call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute actions and log probability of the selected action</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return action (tf.Tensors)</dt>
-<dd class="field-odd"><p>Tensor of actions</p>
-</dd>
-<dt class="field-even">Return log_probs (tf.Tensor)</dt>
-<dd class="field-even"><p>Tensors of log probabilities of selected actions</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-tf2rl.policies.gaussian_actor">
-<span id="tf2rl-policies-gaussian-actor-module"></span><h2>tf2rl.policies.gaussian_actor module<a class="headerlink" href="#module-tf2rl.policies.gaussian_actor" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt id="tf2rl.policies.gaussian_actor.GaussianActor">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.policies.gaussian_actor.</code><code class="sig-name descname">GaussianActor</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.gaussian_actor.GaussianActor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
-<dl class="py attribute">
-<dt id="tf2rl.policies.gaussian_actor.GaussianActor.EPS">
-<code class="sig-name descname">EPS</code><em class="property"> = 1e-06</em><a class="headerlink" href="#tf2rl.policies.gaussian_actor.GaussianActor.EPS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="tf2rl.policies.gaussian_actor.GaussianActor.LOG_SIG_CAP_MAX">
-<code class="sig-name descname">LOG_SIG_CAP_MAX</code><em class="property"> = 2</em><a class="headerlink" href="#tf2rl.policies.gaussian_actor.GaussianActor.LOG_SIG_CAP_MAX" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt id="tf2rl.policies.gaussian_actor.GaussianActor.LOG_SIG_CAP_MIN">
-<code class="sig-name descname">LOG_SIG_CAP_MIN</code><em class="property"> = -20</em><a class="headerlink" href="#tf2rl.policies.gaussian_actor.GaussianActor.LOG_SIG_CAP_MIN" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="tf2rl.policies.gaussian_actor.GaussianActor.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em>, <em class="sig-param"><span class="n">test</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.gaussian_actor.GaussianActor.call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute actions and log probabilities of the selected action</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="tf2rl.policies.gaussian_actor.GaussianActor.compute_entropy">
-<code class="sig-name descname">compute_entropy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.gaussian_actor.GaussianActor.compute_entropy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt id="tf2rl.policies.gaussian_actor.GaussianActor.compute_log_probs">
-<code class="sig-name descname">compute_log_probs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em>, <em class="sig-param"><span class="n">actions</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.gaussian_actor.GaussianActor.compute_log_probs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-tf2rl.policies.tfp_categorical_actor">
 <span id="tf2rl-policies-tfp-categorical-actor-module"></span><h2>tf2rl.policies.tfp_categorical_actor module<a class="headerlink" href="#module-tf2rl.policies.tfp_categorical_actor" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -296,13 +185,23 @@ They will be converted to one-hot vector inside this function.</p></li>
 <dl class="py method">
 <dt id="tf2rl.policies.tfp_categorical_actor.CategoricalActor.call">
 <code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em>, <em class="sig-param"><span class="n">test</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActor.call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute actions and log probability of the selected action</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return action (tf.Tensors)</dt>
-<dd class="field-odd"><p>Tensor of actions</p>
+<dd><p>Calls the model on new inputs.</p>
+<p>In this case <cite>call</cite> just reapplies
+all ops in the graph to the new inputs
+(e.g. build a new computational graph from the provided inputs).</p>
+<dl>
+<dt>Arguments:</dt><dd><p>inputs: A tensor or list of tensors.
+training: Boolean or boolean scalar tensor, indicating whether to run</p>
+<blockquote>
+<div><p>the <cite>Network</cite> in training mode or inference mode.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>mask: A mask or list of masks. A mask can be</dt><dd><p>either a tensor or None (no mask).</p>
 </dd>
-<dt class="field-even">Return log_probs (tf.Tensor)</dt>
-<dd class="field-even"><p>Tensors of log probabilities of selected actions</p>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>A tensor if there is a single output, or
+a list of tensors if there are more than one outputs.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -315,14 +214,17 @@ They will be converted to one-hot vector inside this function.</p></li>
 <dl class="py method">
 <dt id="tf2rl.policies.tfp_categorical_actor.CategoricalActor.compute_log_probs">
 <code class="sig-name descname">compute_log_probs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em>, <em class="sig-param"><span class="n">actions</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActor.compute_log_probs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute log probabilities of inputted actions</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>(</strong><strong>tf.Tensor</strong><strong>)</strong> (<em>actions</em>) – Tensors of inputs to NN</p></li>
-<li><p><strong>(</strong><strong>tf.Tensor</strong><strong>)</strong> – Tensors of NOT one-hot vector.
-They will be converted to one-hot vector inside this function.</p></li>
-</ul>
+<dd><p>Compute log probabilities of state-action pairs</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>states: tf.Tensor</dt><dd><p>Tensors of inputs to NN</p>
+</dd>
+<dt>actions: tf.Tensor</dt><dd><p>Tensors of NOT one-hot vector.
+They will be converted to one-hot vector inside this function.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>Log probabilities</p>
 </dd>
 </dl>
 </dd></dl>
@@ -341,13 +243,23 @@ They will be converted to one-hot vector inside this function.</p></li>
 <dl class="py method">
 <dt id="tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic.call">
 <code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">states</span></em>, <em class="sig-param"><span class="n">test</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic.call" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute actions and log probability of the selected action</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return action (tf.Tensors)</dt>
-<dd class="field-odd"><p>Tensor of actions</p>
+<dd><p>Calls the model on new inputs.</p>
+<p>In this case <cite>call</cite> just reapplies
+all ops in the graph to the new inputs
+(e.g. build a new computational graph from the provided inputs).</p>
+<dl>
+<dt>Arguments:</dt><dd><p>inputs: A tensor or list of tensors.
+training: Boolean or boolean scalar tensor, indicating whether to run</p>
+<blockquote>
+<div><p>the <cite>Network</cite> in training mode or inference mode.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>mask: A mask or list of masks. A mask can be</dt><dd><p>either a tensor or None (no mask).</p>
 </dd>
-<dt class="field-even">Return log_probs (tf.Tensor)</dt>
-<dd class="field-even"><p>Tensors of log probabilities of selected actions</p>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>A tensor if there is a single output, or
+a list of tensors if there are more than one outputs.</p>
 </dd>
 </dl>
 </dd></dl>

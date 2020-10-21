@@ -8,7 +8,6 @@ Subpackages
    :maxdepth: 4
 
    tf2rl.algos
-   tf2rl.distributions
    tf2rl.envs
    tf2rl.experiments
    tf2rl.misc
