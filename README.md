@@ -51,6 +51,7 @@ Following papers have been implemented in tf2rl:
 Also, some useful techniques are implemented:
 
 - [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/tools/vae.py)
+- [D2RL](https://arxiv.org/abs/2010.09163), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/d2rl_sac.py>)
 
 ## Installation
 
