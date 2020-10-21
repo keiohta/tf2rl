@@ -28,6 +28,14 @@ tf2rl.algos.categorical\_dqn module
    :undoc-members:
    :show-inheritance:
 
+tf2rl.algos.d2rl\_sac module
+----------------------------
+
+.. automodule:: tf2rl.algos.d2rl_sac
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tf2rl.algos.ddpg module
 -----------------------
 
