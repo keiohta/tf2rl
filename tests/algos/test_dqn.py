@@ -57,32 +57,5 @@ class TestNoisyDQN(CommonOffPolDiscreteAlgos):
         self.assertEqual(np.prod(np.all(q_values == q_values[0, :], axis=0)), 0)
 
 
-class TestCategoricalDQN(CommonOffPolDiscreteAlgos):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.agent = DQN(
-            state_shape=cls.discrete_env.observation_space.shape,
-            action_dim=cls.discrete_env.action_space.n,
-            batch_size=cls.batch_size,
-            enable_categorical_dqn=True,
-            enable_dueling_dqn=True,
-            epsilon=1.,
-            gpu=-1)
-
-
-class TestCategoricalDuelingDQN(CommonOffPolDiscreteAlgos):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.agent = DQN(
-            state_shape=cls.discrete_env.observation_space.shape,
-            action_dim=cls.discrete_env.action_space.n,
-            batch_size=cls.batch_size,
-            enable_categorical_dqn=True,
-            epsilon=1.,
-            gpu=-1)
-
-
 if __name__ == '__main__':
     unittest.main()

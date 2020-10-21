@@ -18,10 +18,11 @@ class Normalizer:
 
     @tf.function
     def observe(self, x):
-        """
-        Compute next mean and std
+        """Compute next mean and std
 
-        :param x (float): Input data
+        Args:
+            x: float
+                Input data.
         """
         self._n.assign_add(1)
         numerator = x - self._mean

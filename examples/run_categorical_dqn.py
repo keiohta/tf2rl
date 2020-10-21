@@ -1,12 +1,12 @@
 import gym
 
-from tf2rl.algos.dqn import DQN
+from tf2rl.algos.categorical_dqn import CategoricalDQN
 from tf2rl.experiments.trainer import Trainer
 
 
 if __name__ == '__main__':
     parser = Trainer.get_argument()
-    parser = DQN.get_argument(parser)
+    parser = CategoricalDQN.get_argument(parser)
     parser.set_defaults(test_interval=2000)
     parser.set_defaults(max_steps=100000)
     parser.set_defaults(gpu=-1)
@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     env = gym.make(args.env_name)
     test_env = gym.make(args.env_name)
-    policy = DQN(
+    policy = CategoricalDQN(
         enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
         enable_noisy_dqn=args.enable_noisy_dqn,

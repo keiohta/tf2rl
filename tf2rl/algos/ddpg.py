@@ -46,8 +46,8 @@ class Critic(tf.keras.Model):
         features = tf.concat((states, actions), axis=1)
         features = tf.nn.relu(self.l1(features))
         features = tf.nn.relu(self.l2(features))
-        features = self.l3(features)
-        return features
+        values = self.l3(features)
+        return tf.squeeze(values, axis=1)
 
 
 class DDPG(OffPolicyAgent):
@@ -126,11 +126,11 @@ class DDPG(OffPolicyAgent):
         return td_errors
 
     @tf.function
-    def _train_body(self, states, actions, next_states, rewards, done, weights):
+    def _train_body(self, states, actions, next_states, rewards, dones, weights):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
                 td_errors = self._compute_td_error_body(
-                    states, actions, next_states, rewards, done)
+                    states, actions, next_states, rewards, dones)
                 critic_loss = tf.reduce_mean(td_errors ** 2)
 
             critic_grad = tape.gradient(
@@ -139,8 +139,8 @@ class DDPG(OffPolicyAgent):
                 zip(critic_grad, self.critic.trainable_variables))
 
             with tf.GradientTape() as tape:
-                next_action = self.actor(states)
-                actor_loss = -tf.reduce_mean(self.critic(states, next_action))
+                sample_actions = self.actor(states)
+                actor_loss = -tf.reduce_mean(self.critic(states, sample_actions))
 
             actor_grad = tape.gradient(
                 actor_loss, self.actor.trainable_variables)
@@ -165,6 +165,11 @@ class DDPG(OffPolicyAgent):
 
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
+        assert len(dones.shape) == 2
+        assert len(rewards.shape) == 2
+        rewards = tf.squeeze(rewards, axis=1)
+        dones = tf.squeeze(dones, axis=1)
+
         with tf.device(self.device):
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
             next_act_target = self.actor_target(next_states)

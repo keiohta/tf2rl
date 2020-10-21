@@ -75,7 +75,7 @@ class CommonOffPolAlgos(CommonAlgos):
         rewards = np.zeros(shape=(self.batch_size, 1), dtype=np.float32)
         dones = np.zeros(shape=(self.batch_size, 1), dtype=np.float32)
         obses = np.zeros(
-            shape=(self.batch_size,)+self.env.observation_space.shape,
+            shape=(self.batch_size,) + self.env.observation_space.shape,
             dtype=np.float32)
         acts = np.zeros(
             shape=(self.batch_size, self.action_dim,),
@@ -89,7 +89,7 @@ class CommonOffPolAlgos(CommonAlgos):
         rewards = np.zeros(shape=(self.batch_size, 1), dtype=np.float32)
         dones = np.zeros(shape=(self.batch_size, 1), dtype=np.float32)
         obses = np.zeros(
-            shape=(self.batch_size,)+self.env.observation_space.shape,
+            shape=(self.batch_size,) + self.env.observation_space.shape,
             dtype=np.float32)
         acts = np.zeros(
             shape=(self.batch_size, self.continuous_env.action_space.low.size,),
@@ -157,7 +157,7 @@ class CommonOnPolActorCritic(CommonAlgos):
             return
         state = self.env.reset().astype(np.float32)
         obses = np.zeros(
-            shape=(self.batch_size,)+state.shape,
+            shape=(self.batch_size,) + state.shape,
             dtype=np.float32)
         acts = np.zeros(
             shape=(self.batch_size, self.action_dim),
