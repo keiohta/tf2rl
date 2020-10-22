@@ -9,9 +9,11 @@ from tf2rl.algos.sac import SAC, CriticQ, CriticV
 class DenseCriticV(CriticV):
     def call(self, states):
         features = states
-        for cur_layer in self.base_layers:
+        for layer_idx, cur_layer in enumerate(self.base_layers):
             features = cur_layer(features)
-            features = tf.concat((features, states), axis=1)
+            # Do not concatenate for the last layer
+            if not layer_idx + 1 == len(self.base_layers):
+                features = tf.concat((features, states), axis=1)
         values = self.out_layer(features)
         return tf.squeeze(values, axis=1)
 
@@ -20,9 +22,11 @@ class DenseCriticQ(CriticQ):
     def call(self, states, actions):
         state_action_pairs = tf.concat((states, actions), axis=1)
         features = state_action_pairs
-        for cur_layer in self.base_layers:
+        for layer_idx, cur_layer in enumerate(self.base_layers):
             features = cur_layer(features)
-            features = tf.concat((features, state_action_pairs), axis=1)
+            # Do not concatenate for the last layer
+            if not layer_idx + 1 == len(self.base_layers):
+                features = tf.concat((features, state_action_pairs), axis=1)
         values = self.out_layer(features)
         return tf.squeeze(values, axis=1)
 
@@ -30,9 +34,11 @@ class DenseCriticQ(CriticQ):
 class DenseGaussianActor(GaussianActor):
     def _compute_dist(self, states):
         features = states
-        for cur_layer in self.base_layers:
+        for layer_idx, cur_layer in enumerate(self.base_layers):
             features = cur_layer(features)
-            features = tf.concat((features, states), axis=1)
+            # Do not concatenate for the last layer
+            if not layer_idx + 1 == len(self.base_layers):
+                features = tf.concat((features, states), axis=1)
         mean = self.out_mean(features)
 
         if self._state_independent_std:
