@@ -74,17 +74,20 @@ class OnPolicyTrainer(Trainer):
                         "Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
                             n_epoisode, int(total_steps), episode_steps, episode_return, fps))
                     tf.summary.scalar(name="Common/training_return", data=episode_return)
+                    tf.summary.scalar(name="Common/training_episode_length", data=episode_steps)
                     tf.summary.scalar(name="Common/fps", data=fps)
                     episode_steps = 0
                     episode_return = 0
                     episode_start_time = time.time()
 
                 if total_steps % self._test_interval == 0:
-                    avg_test_return = self.evaluate_policy(total_steps)
+                    avg_test_return, avg_test_steps = self.evaluate_policy(total_steps)
                     self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                         total_steps, avg_test_return, self._test_episodes))
                     tf.summary.scalar(
                         name="Common/average_test_return", data=avg_test_return)
+                    tf.summary.scalar(
+                        name="Common/average_test_episode_length", data=avg_test_steps)
                     self.writer.flush()
 
                 if total_steps % self._save_model_interval == 0:
@@ -147,6 +150,7 @@ class OnPolicyTrainer(Trainer):
 
     def evaluate_policy(self, total_steps):
         avg_test_return = 0.
+        avg_test_steps = 0
         if self._save_test_path:
             replay_buffer = get_replay_buffer(
                 self._policy, self._test_env, size=self._episode_max_steps)
@@ -154,6 +158,7 @@ class OnPolicyTrainer(Trainer):
             episode_return = 0.
             frames = []
             obs = self._test_env.reset()
+            avg_test_steps += 1
             for _ in range(self._episode_max_steps):
                 if self._normalize_obs:
                     obs = self._obs_normalizer(obs, update=False)
@@ -161,6 +166,7 @@ class OnPolicyTrainer(Trainer):
                 act = (act if is_discrete(self._env.action_space) else
                        np.clip(act, self._env.action_space.low, self._env.action_space.high))
                 next_obs, reward, done, _ = self._test_env.step(act)
+                avg_test_steps += 1
                 if self._save_test_path:
                     replay_buffer.add(
                         obs=obs, act=act, next_obs=next_obs,
@@ -188,4 +194,4 @@ class OnPolicyTrainer(Trainer):
                 tf.expand_dims(np.array(obs).transpose(2, 0, 1), axis=3),
                 tf.uint8)
             tf.summary.image('train/input_img', images, )
-        return avg_test_return / self._test_episodes
+        return avg_test_return / self._test_episodes, avg_test_steps / self._test_episodes

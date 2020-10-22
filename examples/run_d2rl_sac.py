@@ -18,6 +18,8 @@ if __name__ == '__main__':
     policy = D2RLSAC(
         state_shape=env.observation_space.shape,
         action_dim=env.action_space.high.size,
+        actor_units=(256, 256, 256, 256),
+        critic_units=(256, 256, 256, 256),
         gpu=args.gpu,
         memory_capacity=args.memory_capacity,
         max_action=env.action_space.high[0],
