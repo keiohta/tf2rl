@@ -47,8 +47,7 @@ class PPO(VPG):
         return actor_loss, critic_loss
 
     @tf.function
-    def _train_actor_critic_body(
-            self, states, actions, advantages, logp_olds, returns):
+    def _train_actor_critic_body(self, states, actions, advantages, logp_olds, returns):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
                 _, _, current_V = self.actor_critic(states)

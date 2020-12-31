@@ -1,6 +1,6 @@
 import unittest
 
-from tf2rl.algos.sac import SAC
+from tf2rl.algos.d2rl_sac import D2RLSAC
 from tests.algos.common import CommonOffPolContinuousAlgos
 
 
@@ -8,7 +8,7 @@ class TestSAC(CommonOffPolContinuousAlgos):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.agent = SAC(
+        cls.agent = D2RLSAC(
             state_shape=cls.continuous_env.observation_space.shape,
             action_dim=cls.continuous_env.action_space.low.size,
             batch_size=cls.batch_size,
@@ -20,7 +20,7 @@ class TestSACAutoAlpha(CommonOffPolContinuousAlgos):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.agent = SAC(
+        cls.agent = D2RLSAC(
             state_shape=cls.continuous_env.observation_space.shape,
             action_dim=cls.continuous_env.action_space.low.size,
             batch_size=cls.batch_size,

@@ -5,9 +5,22 @@ install_requires = [
     "setuptools>=41.0.0",
     "numpy>=1.16.0",
     "joblib",
-    "scipy",
-    "tensorflow-probability==0.8.0"
-]
+    "scipy"]
+
+tf_version = "2.3"  # Default Version
+try:
+    import tensorflow as tf
+
+    tf_version = tf.version.VERSION.rsplit('.', 1)[0]
+except ImportError:
+    install_requires.append(f"tensorflow=={tf_version}")
+    pass
+
+compatible_tfp = {"2.3": ["tensorflow-probability~=0.11.0"],
+                  "2.2": ["tensorflow-probability~=0.10.0"],
+                  "2.1": ["tensorflow-probability~=0.8.0"],
+                  "2.0": ["tensorflow-probability~=0.8.0"]}
+install_requires.append(*compatible_tfp[tf_version])
 
 extras_require = {
     "tf": ["tensorflow>=2.0.0"],
@@ -18,7 +31,7 @@ extras_require = {
 
 setup(
     name="tf2rl",
-    version="0.1.20",
+    version="1.1.1",
     description="Deep Reinforcement Learning for TensorFlow2",
     url="https://github.com/keiohta/tf2rl",
     author="Kei Ohta",

@@ -12,7 +12,7 @@ class TestDDPG(CommonOffPolContinuousAlgos):
             state_shape=cls.continuous_env.observation_space.shape,
             action_dim=cls.continuous_env.action_space.low.size,
             batch_size=cls.batch_size,
-            sigma=0.5,  # Make noise bigger to easier to test
+            sigma=0.5,  # Make noise bigger for easier to test
             gpu=-1)
 
 

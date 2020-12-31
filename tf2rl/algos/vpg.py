@@ -3,8 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OnPolicyAgent
-# from tf2rl.policies.tfp_gaussian_actor import GaussianActor
-from tf2rl.policies.gaussian_actor import GaussianActor
+from tf2rl.policies.tfp_gaussian_actor import GaussianActor
 from tf2rl.policies.tfp_categorical_actor import CategoricalActor
 from tf2rl.envs.atari_wrapper import LazyFrames
 
@@ -39,8 +38,8 @@ class VPG(OnPolicyAgent):
             critic=None,
             actor_critic=None,
             max_action=1.,
-            actor_units=[256, 256],
-            critic_units=[256, 256],
+            actor_units=(256, 256),
+            critic_units=(256, 256),
             lr_actor=1e-3,
             lr_critic=3e-3,
             hidden_activation_actor="relu",

@@ -14,9 +14,16 @@ class MultiThreadEnv(object):
 
     def __init__(self, env_fn, batch_size, thread_pool=4, max_episode_steps=1000):
         """
-        :param env_fn (function): function to make environments.
-        :param batch_size (int): batch_size
-        ;param thread_pool (int): thread pool size
+
+        Args:
+            env_fn: function
+                Function to make an environment
+            batch_size: int
+                Batch size
+            thread_pool: int
+                Thread pool size
+            max_episode_steps: int
+                Maximum step of an episode
         """
         assert batch_size % thread_pool == 0
 
@@ -49,17 +56,22 @@ class MultiThreadEnv(object):
         return self._sample_env
 
     def step(self, actions, name=None):
-        """take 1-step in all environments.
+        """
 
-        :param tf.Tensor action: float32[batch_size, dim_action]
-        :param name: Operator名
-        :rtype: (tf.Tensor, tf.Tensor, tf.Tensor)
-        :return:
-           (obs, reward, done)
-          obs = [batch_size, dim_obs]
-          reward = [batch_size]
-          done = [batch_size]
-          reach_limit = [batch_size] : whether each environment reached time limit or not.
+        Args:
+            actions: tf.Tensor
+                Actions whose shape is float32[batch_size, dim_action]
+            name: str
+                Operator name
+
+        Returns:
+            obs: tf.Tensor
+                [batch_size, dim_obs]
+            reward: tf.Tensor
+                [batch_size]
+            done: tf.Tensor
+                [batch_size]
+            env_info: None
         """
         assert isinstance(actions, tf.Tensor)
         # with tf.variable_scope(name, default_name="MultiStep"):
@@ -76,13 +88,15 @@ class MultiThreadEnv(object):
 
     def py_step(self, actions):
         """
-        :param np.array actions: np.float32 [batch_size, dim_action]
-        :return:
-          (obs, reward, done)
 
-          obs = [batch_size, C, H, W]
-          reward = [batch_size]
-          done = [batch_size]
+        Args:
+            actions: np.array
+                Actions whose shape is [batch_size, dim_action]
+
+        Returns:
+            obs: np.array
+            reward: np.array
+            done: np.array
         """
         def _process(offset):
             for idx_env in range(offset, offset+self.batch_thread):

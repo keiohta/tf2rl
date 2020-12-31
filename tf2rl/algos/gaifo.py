@@ -8,7 +8,7 @@ from tf2rl.networks.spectral_norm_dense import SNDense
 
 
 class Discriminator(DiscriminatorGAIL):
-    def __init__(self, state_shape, units=[32, 32],
+    def __init__(self, state_shape, units=(32, 32),
                  enable_sn=False, output_activation="sigmoid",
                  name="Discriminator"):
         tf.keras.Model.__init__(self, name=name)
@@ -30,7 +30,7 @@ class GAIfO(GAIL):
     def __init__(
             self,
             state_shape,
-            units=[32, 32],
+            units=(32, 32),
             lr=0.001,
             enable_sn=False,
             name="GAIfO",

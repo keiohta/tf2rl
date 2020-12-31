@@ -1,8 +1,3 @@
-"""
-This is an implementation of Bi-Res-DDPG
-https://arxiv.org/abs/1905.01072
-"""
-
 import numpy as np
 import tensorflow as tf
 
@@ -11,6 +6,11 @@ from tf2rl.misc.target_update_ops import update_target_variables
 
 
 class BiResDDPG(DDPG):
+    """
+    This is an implementation of Bi-Res-DDPG
+    https://arxiv.org/abs/1905.01072
+    """
+
     def __init__(self, eta=0.05, name="BiResDDPG", **kwargs):
         kwargs["name"] = name
         super().__init__(**kwargs)
@@ -33,7 +33,7 @@ class BiResDDPG(DDPG):
 
             with tf.GradientTape() as tape:
                 next_action = self.actor(states)
-                actor_loss = -tf.reduce_mean(self.critic([states, next_action]))
+                actor_loss = -tf.reduce_mean(self.critic(states, next_action))
 
             actor_grad = tape.gradient(
                 actor_loss, self.actor.trainable_variables)
@@ -58,17 +58,16 @@ class BiResDDPG(DDPG):
         with tf.device(self.device):
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
             # Compute standard TD error
-            target_Q = self.critic_target(
-                [next_states, self.actor_target(next_states)])
+            target_Q = self.critic_target(next_states, self.actor_target(next_states))
             target_Q = rewards + (not_dones * self.discount * target_Q)
             target_Q = tf.stop_gradient(target_Q)
-            current_Q = self.critic([states, actions])
+            current_Q = self.critic(states, actions)
             td_errors1 = target_Q - current_Q
             # Compute residual TD error
             next_actions = tf.stop_gradient(self.actor(next_states))
-            target_Q = self.critic([next_states, next_actions])
+            target_Q = self.critic(next_states, next_actions)
             target_Q = rewards + (not_dones * self.discount * target_Q)
-            current_Q = tf.stop_gradient(self.critic_target([states, actions]))
+            current_Q = tf.stop_gradient(self.critic_target(states, actions))
             td_errors2 = target_Q - current_Q
         return td_errors1, td_errors2
 
