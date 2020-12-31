@@ -75,6 +75,9 @@ class Trainer:
             self.logger.info("Restored {}".format(self._latest_path_ckpt))
 
     def __call__(self):
+        if self._evaluate:
+            self.evaluate_policy_continuously()
+
         total_steps = 0
         tf.summary.experimental.set_step(total_steps)
         episode_steps = 0
@@ -240,6 +243,7 @@ class Trainer:
         self._use_nstep_rb = args.use_nstep_rb
         self._n_step = args.n_step
         # test settings
+        self._evaluate = args.evaluate
         self._test_interval = args.test_interval
         self._show_test_progress = args.show_test_progress
         self._test_episodes = args.test_episodes

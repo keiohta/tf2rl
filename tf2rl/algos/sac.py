@@ -56,6 +56,7 @@ class SAC(OffPolicyAgent):
             name="SAC",
             max_action=1.,
             lr=3e-4,
+            lr_alpha=3e-4,
             actor_units=(256, 256),
             critic_units=(256, 256),
             tau=5e-3,
@@ -79,7 +80,7 @@ class SAC(OffPolicyAgent):
             self.alpha = tf.Variable(0., dtype=tf.float32)
             self.alpha.assign(tf.exp(self.log_alpha))
             self.target_alpha = -action_dim
-            self.alpha_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
+            self.alpha_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_alpha)
         else:
             self.alpha = alpha
 
