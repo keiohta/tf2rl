@@ -1,7 +1,7 @@
 import dmc2gym
 
 from tf2rl.algos.curl_sac import CURLSAC
-from tf2rl.envs.frame_stack_wrapper import FrameStack
+from tf2rl.envs.dmc_wrapper import DMCWrapper
 from tf2rl.experiments.trainer import Trainer
 
 
@@ -34,7 +34,7 @@ def main():
     input_obs_shape = (84, 84, 9)
 
     def make_env():
-        return FrameStack(
+        return DMCWrapper(
             dmc2gym.make(
                 domain_name=domain_name,
                 task_name=task_name,
@@ -65,18 +65,6 @@ def main():
 
     trainer = Trainer(policy, env, args, test_env=test_env)
     trainer()
-
-    # import cv2
-    # done = False
-    # obs = env.reset()
-    #
-    # while not done:
-    #     action = env.action_space.sample()
-    #     obs, reward, done, info = env.step(action)
-    #     cv2.imshow("temp1", cv2.cvtColor(obs[:, :, :3], cv2.COLOR_BGR2RGB))
-    #     cv2.imshow("temp2", cv2.cvtColor(obs[:, :, 3:6], cv2.COLOR_BGR2RGB))
-    #     cv2.imshow("temp3", cv2.cvtColor(obs[:, :, 6:9], cv2.COLOR_BGR2RGB))
-    #     cv2.waitKey(100)
 
 
 if __name__ == "__main__":
