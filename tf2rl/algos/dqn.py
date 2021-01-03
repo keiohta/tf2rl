@@ -62,6 +62,7 @@ class DQN(OffPolicyAgent):
             enable_double_dqn=False,
             enable_dueling_dqn=False,
             enable_noisy_dqn=False,
+            optimizer = None,
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
@@ -75,7 +76,7 @@ class DQN(OffPolicyAgent):
             "enable_noisy_dqn": enable_noisy_dqn}
         self.q_func = q_func(**kwargs_dqn)
         self.q_func_target = q_func(**kwargs_dqn)
-        self.q_func_optimizer = tf.keras.optimizers.Adam(learning_rate=lr, epsilon=adam_eps)
+        self.q_func_optimizer = optimizer or tf.keras.optimizers.Adam(learning_rate=lr, epsilon=adam_eps)
         update_target_variables(self.q_func_target.weights,
                                 self.q_func.weights, tau=1.)
 
