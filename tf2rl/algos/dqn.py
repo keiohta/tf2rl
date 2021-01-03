@@ -62,7 +62,7 @@ class DQN(OffPolicyAgent):
             enable_double_dqn=False,
             enable_dueling_dqn=False,
             enable_noisy_dqn=False,
-            optimizer = None,
+            optimizer=None,
             **kwargs):
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
