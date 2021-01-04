@@ -210,7 +210,8 @@ def learner(global_rb, trained_steps, is_training_done,
     while not is_training_done.is_set():
         with trained_steps.get_lock():
             trained_steps.value += 1
-        tf.summary.experimental.set_step(trained_steps.value)
+        n_trained_steps = trained_steps.value
+        tf.summary.experimental.set_step(n_trained_steps)
         samples = global_rb.sample(policy.batch_size)
         td_errors = policy.train(
             samples["obs"], samples["act"], samples["next_obs"],
@@ -218,22 +219,22 @@ def learner(global_rb, trained_steps, is_training_done,
         global_rb.update_priorities(samples["indexes"], np.abs(td_errors)+1e-6)
 
         # Put updated weights to queue
-        if trained_steps.value % update_freq == 0:
+        if n_trained_steps % update_freq == 0:
             weights = get_weights_fn(policy)
             for i in range(len(queues) - 1):
                 queues[i].put(weights)
             fps = update_freq / (time.time() - start_time)
             tf.summary.scalar(name="apex/fps", data=fps)
             logger.info("Update weights. {0:.2f} FPS for GRAD. Learned {1:.2f} steps".format(
-                fps, trained_steps.value))
+                fps, n_trained_steps))
             start_time = time.time()
 
         # Periodically do evaluation
-        if trained_steps.value % evaluation_freq == 0:
+        if n_trained_steps % evaluation_freq == 0:
             queues[-1].put(get_weights_fn(policy))
-            queues[-1].put(trained_steps.value)
+            queues[-1].put(n_trained_steps)
 
-        if trained_steps.value >= n_training:
+        if n_trained_steps >= n_training:
             is_training_done.set()
 
 
