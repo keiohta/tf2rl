@@ -284,39 +284,36 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
     while not is_training_done.is_set():
         n_evaluated_episode = 0
         # Wait until a new weights comes
-        if queue.empty():
-            continue
-        else:
-            set_weights_fn(policy, queue.get())
-            trained_steps = queue.get()
-            tf.summary.experimental.set_step(trained_steps)
-            avg_test_return = 0.
-            for _ in range(n_evaluation):
-                n_evaluated_episode += 1
-                episode_return = 0.
-                obs = env.reset()
-                done = False
-                for _ in range(episode_max_steps):
-                    action = policy.get_action(obs, test=True)
-                    next_obs, reward, done, _ = env.step(action)
-                    if show_test_progress:
-                        env.render()
-                    episode_return += reward
-                    obs = next_obs
-                    if done:
-                        break
-                avg_test_return += episode_return
-                # Break if a new weights comes
-                if not queue.empty():
+        set_weights_fn(policy, queue.get())
+        trained_steps = queue.get()
+        tf.summary.experimental.set_step(trained_steps)
+        avg_test_return = 0.
+        for _ in range(n_evaluation):
+            n_evaluated_episode += 1
+            episode_return = 0.
+            obs = env.reset()
+            done = False
+            for _ in range(episode_max_steps):
+                action = policy.get_action(obs, test=True)
+                next_obs, reward, done, _ = env.step(action)
+                if show_test_progress:
+                    env.render()
+                episode_return += reward
+                obs = next_obs
+                if done:
                     break
-            avg_test_return /= n_evaluated_episode
-            logger.info("Evaluation: {} over {} run".format(
-                avg_test_return, n_evaluated_episode))
-            tf.summary.scalar(
-                name="apex/average_test_return", data=avg_test_return)
-            if trained_steps > model_save_threshold:
-                model_save_threshold += save_model_interval
-                checkpoint_manager.save()
+            avg_test_return += episode_return
+            # Break if a new weights comes
+            if not queue.empty():
+                break
+        avg_test_return /= n_evaluated_episode
+        logger.info("Evaluation: {} over {} run".format(
+            avg_test_return, n_evaluated_episode))
+        tf.summary.scalar(
+            name="apex/average_test_return", data=avg_test_return)
+        if trained_steps > model_save_threshold:
+            model_save_threshold += save_model_interval
+            checkpoint_manager.save()
     checkpoint_manager.save()
 
 
