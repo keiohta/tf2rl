@@ -6,7 +6,7 @@ import multiprocessing
 from multiprocessing import Process, Value, Event
 from multiprocessing.managers import SyncManager
 
-from cpprb import ReplayBuffer, PrioritizedReplayBuffer
+from cpprb import ReplayBuffer, MPPrioritizedReplayBuffer
 
 from tf2rl.envs.multi_thread_env import MultiThreadEnv
 from tf2rl.misc.prepare_output_dir import prepare_output_dir
@@ -24,15 +24,13 @@ def import_tf():
 
 
 def explorer(global_rb, queue, trained_steps, is_training_done,
-             lock, env_fn, policy_fn, set_weights_fn, noise_level,
+             env_fn, policy_fn, set_weights_fn, noise_level,
              n_env=64, n_thread=4, buffer_size=1024, episode_max_steps=1000, gpu=0):
     """Collect transitions and store them to prioritized replay buffer.
 
     Args:
-        global_rb: multiprocessing.managers.AutoProxy[PrioritizedReplayBuffer]
+        global_rb: MPPrioritizedReplayBuffer
             Prioritized replay buffer sharing with multiple explorers and only one learner.
-            This object is shared over processes, so it must be locked when trying to
-            operate something with `lock` object.
         queue: multiprocessing.Queue
             A FIFO shared with the `learner` and `evaluator` to get the latest network weights.
             This is process safe, so you don't need to lock process when use this.
@@ -40,8 +38,6 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
             Number of steps to apply gradients.
         is_training_done: multiprocessing.Event
             multiprocessing.Event object to share the status of training.
-        lock: multiprocessing.Lock
-            Lock other processes.
         env_fn: function
             Method object to generate an environment.
         policy_fn: function
@@ -142,12 +138,10 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
                     next_states=samples["next_obs"], rewards=samples["rew"],
                     dones=samples["done"])
                 priorities = np.abs(np.squeeze(td_errors)) + 1e-6
-            lock.acquire()
             global_rb.add(
                 obs=samples["obs"], act=samples["act"], rew=samples["rew"],
                 next_obs=samples["next_obs"], done=samples["done"],
                 priorities=priorities)
-            lock.release()
             local_rb.clear()
 
             msg = "Grad: {0: 6d}\t".format(trained_steps.value)
@@ -167,21 +161,17 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
 
 
 def learner(global_rb, trained_steps, is_training_done,
-            lock, env, policy_fn, get_weights_fn,
+            env, policy_fn, get_weights_fn,
             n_training, update_freq, evaluation_freq, gpu, queues):
     """Update network weights using samples collected by explorers.
 
     Args:
-        global_rb: multiprocessing.managers.AutoProxy[PrioritizedReplayBuffer]
+        global_rb: MPPrioritizedReplayBuffer
             Prioritized replay buffer sharing with multiple explorers and only one learner.
-            This object is shared over processes, so it must be locked when trying to
-            operate something with `lock` object.
         trained_steps: multiprocessing.Value
             Number of steps to apply gradients.
         is_training_done: multiprocessing.Event
             multiprocessing.Event object to share the status of training.
-        lock: multiprocessing.Lock
-            multiprocessing.Lock to lock other processes.
         env: OpenAI-gym compatible environment object
         policy_fn: function
             Method object to generate an explorer.
@@ -218,19 +208,14 @@ def learner(global_rb, trained_steps, is_training_done,
 
     start_time = time.time()
     while not is_training_done.is_set():
-        trained_steps.value += 1
+        with trained_steps.get_lock():
+            trained_steps.value += 1
         tf.summary.experimental.set_step(trained_steps.value)
-        lock.acquire()
         samples = global_rb.sample(policy.batch_size)
-        lock.release()
         td_errors = policy.train(
             samples["obs"], samples["act"], samples["next_obs"],
             samples["rew"], samples["done"], samples["weights"])
-        writer.flush()
-        lock.acquire()
-        global_rb.update_priorities(
-            samples["indexes"], np.abs(td_errors)+1e-6)
-        lock.release()
+        global_rb.update_priorities(samples["indexes"], np.abs(td_errors)+1e-6)
 
         # Put updated weights to queue
         if trained_steps.value % update_freq == 0:
@@ -329,7 +314,6 @@ def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
                 avg_test_return, n_evaluated_episode))
             tf.summary.scalar(
                 name="apex/average_test_return", data=avg_test_return)
-            writer.flush()
             if trained_steps > model_save_threshold:
                 model_save_threshold += save_model_interval
                 checkpoint_manager.save()
@@ -371,31 +355,22 @@ def apex_argument(parser=None):
 
 
 def prepare_experiment(env, args):
-    # Manager to share PER between a learner and explorers
-    SyncManager.register('PrioritizedReplayBuffer',
-                         PrioritizedReplayBuffer)
-    manager = SyncManager()
-    manager.start()
-
     kwargs = get_default_rb_dict(args.replay_buffer_size, env)
     kwargs["check_for_update"] = True
-    global_rb = manager.PrioritizedReplayBuffer(**kwargs)
+    global_rb = MPPrioritizedReplayBuffer(**kwargs)
 
     # queues to share network parameters between a learner and explorers
     n_queue = 1 if args.n_env > 1 else args.n_explorer
     n_queue += 1  # for evaluation
-    queues = [manager.Queue() for _ in range(n_queue)]
+    queues = [multiprocessing.SimpleQueue() for _ in range(n_queue)]
 
     # Event object to share training status. if event is set True, all exolorers stop sampling transitions
     is_training_done = Event()
 
-    # Lock
-    lock = manager.Lock()
-
     # Shared memory objects to count number of samples and applied gradients
     trained_steps = Value('i', 0)
 
-    return global_rb, queues, is_training_done, lock, trained_steps
+    return global_rb, queues, is_training_done, trained_steps
 
 
 def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
@@ -410,7 +385,7 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
 
     env = env_fn()
 
-    global_rb, queues, is_training_done, lock, trained_steps = prepare_experiment(env, args)
+    global_rb, queues, is_training_done, trained_steps = prepare_experiment(env, args)
 
     noise = 0.3
     tasks = []
@@ -420,7 +395,7 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
         tasks.append(Process(
             target=explorer,
             args=[global_rb, queues[0], trained_steps, is_training_done,
-                  lock, env_fn, policy_fn, set_weights_fn, noise,
+                  env_fn, policy_fn, set_weights_fn, noise,
                   args.n_env, args.n_thread, args.local_buffer_size,
                   args.episode_max_steps, args.gpu_explorer]))
     else:
@@ -428,7 +403,7 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
             tasks.append(Process(
                 target=explorer,
                 args=[global_rb, queues[i], trained_steps, is_training_done,
-                      lock, env_fn, policy_fn, set_weights_fn, noise,
+                      env_fn, policy_fn, set_weights_fn, noise,
                       args.n_env, args.n_thread, args.local_buffer_size,
                       args.episode_max_steps, args.gpu_explorer]))
 
@@ -436,7 +411,7 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
     tasks.append(Process(
         target=learner,
         args=[global_rb, trained_steps, is_training_done,
-              lock, env_fn(), policy_fn, get_weights_fn,
+              env_fn(), policy_fn, get_weights_fn,
               args.n_training, args.param_update_freq,
               args.test_freq, args.gpu_learner, queues]))
 
