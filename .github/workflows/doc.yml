@@ -21,7 +21,7 @@ jobs:
           restore-keys: |
             sphinx
       - run: pip install wheel
-      - run: pip install sphinx sphinx-rtd-theme recommonmark tensorflow
+      - run: pip install sphinx sphinx-rtd-theme recommonmark
       - run: pip install ".[test]"
       - run: sphinx-apidoc -F -o doc tf2rl/
       - run: rm doc/index.rst
