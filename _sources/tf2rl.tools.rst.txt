@@ -4,6 +4,14 @@ tf2rl.tools package
 Submodules
 ----------
 
+tf2rl.tools.img\_tools module
+-----------------------------
+
+.. automodule:: tf2rl.tools.img_tools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tf2rl.tools.vae module
 ----------------------
 

@@ -12,10 +12,26 @@ tf2rl.envs.atari\_wrapper module
    :undoc-members:
    :show-inheritance:
 
+tf2rl.envs.dmc\_wrapper module
+------------------------------
+
+.. automodule:: tf2rl.envs.dmc_wrapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tf2rl.envs.env\_utils module
 ----------------------------
 
 .. automodule:: tf2rl.envs.env_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+tf2rl.envs.frame\_stack\_wrapper module
+---------------------------------------
+
+.. automodule:: tf2rl.envs.frame_stack_wrapper
    :members:
    :undoc-members:
    :show-inheritance:

@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>tf2rl.envs package &mdash; TF2RL  documentation</title>
   
@@ -16,7 +16,10 @@
 
   
   
+
   
+  
+
   
 
   
@@ -29,7 +32,6 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -51,7 +53,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> TF2RL
+            <a href="index.html" class="icon icon-home"> TF2RL
           
 
           
@@ -90,7 +92,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.envs package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.atari_wrapper">tf2rl.envs.atari_wrapper module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.dmc_wrapper">tf2rl.envs.dmc_wrapper module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.env_utils">tf2rl.envs.env_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.frame_stack_wrapper">tf2rl.envs.frame_stack_wrapper module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.multi_thread_env">tf2rl.envs.multi_thread_env module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.normalizer">tf2rl.envs.normalizer module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.envs.utils">tf2rl.envs.utils module</a></li>
@@ -147,6 +151,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -160,7 +166,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/tf2rl.envs.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -482,12 +488,110 @@ info (dict): contains auxiliary diagnostic information (helpful for debugging, a
 </dd></dl>
 
 </div>
+<div class="section" id="module-tf2rl.envs.dmc_wrapper">
+<span id="tf2rl-envs-dmc-wrapper-module"></span><h2>tf2rl.envs.dmc_wrapper module<a class="headerlink" href="#module-tf2rl.envs.dmc_wrapper" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tf2rl.envs.dmc_wrapper.DMCWrapper">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.dmc_wrapper.</code><code class="sig-name descname">DMCWrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">k</span></em>, <em class="sig-param"><span class="n">obs_shape</span></em>, <em class="sig-param"><span class="n">wait_ms</span><span class="o">=</span><span class="default_value">33.333333333333336</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.dmc_wrapper.DMCWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tf2rl.envs.frame_stack_wrapper.FrameStack" title="tf2rl.envs.frame_stack_wrapper.FrameStack"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.envs.frame_stack_wrapper.FrameStack</span></code></a></p>
+<p>Wrapper class to visualize DMC environments.</p>
+<dl class="py method">
+<dt id="tf2rl.envs.dmc_wrapper.DMCWrapper.render">
+<code class="sig-name descname">render</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.dmc_wrapper.DMCWrapper.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renders the environment.</p>
+<p>The set of supported modes varies per environment. (And some
+environments do not support rendering at all.) By convention,
+if mode is:</p>
+<ul class="simple">
+<li><p>human: render to the current display or terminal and
+return nothing. Usually for human consumption.</p></li>
+<li><p>rgb_array: Return an numpy.ndarray with shape (x, y, 3),
+representing RGB values for an x-by-y pixel image, suitable
+for turning into a video.</p></li>
+<li><p>ansi: Return a string (str) or StringIO.StringIO containing a
+terminal-style text representation. The text can include newlines
+and ANSI escape sequences (e.g. for colors).</p></li>
+</ul>
+<dl class="simple">
+<dt>Note:</dt><dd><dl class="simple">
+<dt>Make sure that your class’s metadata ‘render.modes’ key includes</dt><dd><p>the list of supported modes. It’s recommended to call super()
+in implementations to use the functionality of this method.</p>
+</dd>
+</dl>
+</dd>
+<dt>Args:</dt><dd><p>mode (str): the mode to render with</p>
+</dd>
+</dl>
+<p>Example:</p>
+<dl>
+<dt>class MyEnv(Env):</dt><dd><p>metadata = {‘render.modes’: [‘human’, ‘rgb_array’]}</p>
+<dl class="simple">
+<dt>def render(self, mode=’human’):</dt><dd><dl class="simple">
+<dt>if mode == ‘rgb_array’:</dt><dd><p>return np.array(…) # return RGB frame suitable for video</p>
+</dd>
+<dt>elif mode == ‘human’:</dt><dd><p>… # pop up a window and render</p>
+</dd>
+<dt>else:</dt><dd><p>super(MyEnv, self).render(mode=mode) # just raise an exception</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-tf2rl.envs.env_utils">
 <span id="tf2rl-envs-env-utils-module"></span><h2>tf2rl.envs.env_utils module<a class="headerlink" href="#module-tf2rl.envs.env_utils" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="tf2rl.envs.env_utils.get_act_dim">
 <code class="sig-prename descclassname">tf2rl.envs.env_utils.</code><code class="sig-name descname">get_act_dim</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.env_utils.get_act_dim" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</div>
+<div class="section" id="module-tf2rl.envs.frame_stack_wrapper">
+<span id="tf2rl-envs-frame-stack-wrapper-module"></span><h2>tf2rl.envs.frame_stack_wrapper module<a class="headerlink" href="#module-tf2rl.envs.frame_stack_wrapper" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="tf2rl.envs.frame_stack_wrapper.FrameStack">
+<em class="property">class </em><code class="sig-prename descclassname">tf2rl.envs.frame_stack_wrapper.</code><code class="sig-name descname">FrameStack</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">k</span></em>, <em class="sig-param"><span class="n">obs_shape</span></em>, <em class="sig-param"><span class="n">channel_first</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.frame_stack_wrapper.FrameStack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt id="tf2rl.envs.frame_stack_wrapper.FrameStack.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.frame_stack_wrapper.FrameStack.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the environment to an initial state and returns an initial
+observation.</p>
+<p>Note that this function should not reset the environment’s random
+number generator(s); random variables in the environment’s state should
+be sampled independently between multiple calls to <cite>reset()</cite>. In other
+words, each call of <cite>reset()</cite> should yield an environment suitable for
+a new episode, independent of previous episodes.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>observation (object): the initial observation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf2rl.envs.frame_stack_wrapper.FrameStack.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.frame_stack_wrapper.FrameStack.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run one timestep of the environment’s dynamics. When end of
+episode is reached, you are responsible for calling <cite>reset()</cite>
+to reset this environment’s state.</p>
+<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
+</dd>
+<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
+reward (float) : amount of reward returned after previous action
+done (bool): whether the episode has ended, in which case further step() calls will return undefined results
+info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
 
 </div>
 <div class="section" id="module-tf2rl.envs.multi_thread_env">
@@ -664,37 +768,29 @@ until (int or None): If this arg is specified, the link learns input</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="tf2rl.experiments.html" class="btn btn-neutral float-right" title="tf2rl.experiments package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="tf2rl.algos.html" class="btn btn-neutral float-left" title="tf2rl.algos package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="tf2rl.experiments.html" class="btn btn-neutral float-right" title="tf2rl.experiments package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tf2rl.algos.html" class="btn btn-neutral float-left" title="tf2rl.algos package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020, Kei Ohta
+        &#169; Copyright 2020, Kei Ohta.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
