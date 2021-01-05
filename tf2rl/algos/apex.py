@@ -216,7 +216,7 @@ def learner(global_rb, trained_steps, is_training_done,
         td_errors = policy.train(
             samples["obs"], samples["act"], samples["next_obs"],
             samples["rew"], samples["done"], samples["weights"])
-        global_rb.update_priorities(samples["indexes"], np.abs(td_errors)+1e-6)
+        global_rb.update_priorities(samples["indexes"], np.abs(td_errors))
 
         # Put updated weights to queue
         if n_trained_steps % update_freq == 0:
