@@ -404,13 +404,6 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
                       args.n_env, args.n_thread, args.local_buffer_size,
                       args.episode_max_steps, args.gpu_explorer]))
 
-    # Add learner
-    tasks.append(Process(
-        target=learner,
-        args=[global_rb, trained_steps, is_training_done,
-              env_fn(), policy_fn, get_weights_fn,
-              args.n_training, args.param_update_freq,
-              args.test_freq, args.gpu_learner, queues]))
 
     # Add evaluator
     tasks.append(Process(
@@ -420,5 +413,11 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
 
     for task in tasks:
         task.start()
+
+    learner(global_rb, trained_steps, is_training_done,
+            env_fn(), policy_fn, get_weights_fn,
+            args.n_training, args.param_update_freq,
+            args.test_freq, args.gpu_learner, queues)
+
     for task in tasks:
         task.join()
