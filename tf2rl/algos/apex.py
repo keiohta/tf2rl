@@ -4,7 +4,6 @@ import argparse
 import logging
 import multiprocessing
 from multiprocessing import Process, Value, Event
-from multiprocessing.managers import SyncManager
 
 from cpprb import ReplayBuffer, MPPrioritizedReplayBuffer
 
