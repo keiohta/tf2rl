@@ -230,7 +230,7 @@ def learner(global_rb, trained_steps, is_training_done,
 
         # Periodically do evaluation
         if n_trained_steps % evaluation_freq == 0:
-            queues[-1].put((get_weights_fn(policy),n_trained_steps))
+            queues[-1].put((get_weights_fn(policy), n_trained_steps))
 
         if n_trained_steps >= n_training:
             is_training_done.set()
