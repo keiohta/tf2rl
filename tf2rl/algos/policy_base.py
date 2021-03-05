@@ -1,4 +1,3 @@
-import numpy as np
 import tensorflow as tf
 
 
@@ -35,6 +34,8 @@ class Policy(tf.keras.Model):
             parser = argparse.ArgumentParser(conflict_handler='resolve')
         parser.add_argument('--n-warmup', type=int, default=int(1e4))
         parser.add_argument('--batch-size', type=int, default=32)
+        parser.add_argument('--gpu', type=int, default=0,
+                            help='GPU id')
         return parser
 
 
@@ -49,7 +50,6 @@ class OnPolicyAgent(Policy):
             lam=0.95,
             enable_gae=True,
             normalize_adv=True,
-            n_epoch_critic=1,
             entropy_coef=0.01,
             vfunc_coef=1.,
             **kwargs):
@@ -57,14 +57,13 @@ class OnPolicyAgent(Policy):
         self.lam = lam
         self.enable_gae = enable_gae
         self.normalize_adv = normalize_adv
-        self.n_epoch_critic = n_epoch_critic
         self.entropy_coef = entropy_coef
         self.vfunc_coef = vfunc_coef
         kwargs["n_warmup"] = 0
         kwargs["memory_capacity"] = self.horizon
         super().__init__(**kwargs)
-        assert self.horizon % self.batch_size == 0, \
-            "Horizon should be divisible by batch size"
+        msg = "Horizon should be divisible by batch size"
+        assert self.horizon % self.batch_size == 0, msg
 
     @staticmethod
     def get_argument(parser=None):

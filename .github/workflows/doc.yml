@@ -1,0 +1,37 @@
+name: Document
+
+on: [push, pull_request]
+
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Get pip cache dir
+        id: pip-cache
+        run: echo "::set-output name=dir::$(pip cache dir)"
+      - name: pip cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: sphinx
+          restore-keys: |
+            sphinx
+      - run: pip install wheel
+      - run: pip install sphinx sphinx-rtd-theme recommonmark
+      - run: pip install ".[test]"
+      - run: sphinx-apidoc -F -o doc tf2rl/
+      - run: rm doc/index.rst
+      - run: sphinx-build -b html doc public
+      - uses: actions/upload-artifact@v2
+        with:
+          name: doc
+          path: public
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+        if: (github.ref == 'refs/heads/master') && (github.repository == 'keiohta/tf2rl')

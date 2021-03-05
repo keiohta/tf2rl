@@ -2,13 +2,12 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
-from tf2rl.algos.ddpg import DDPG, Actor
+from tf2rl.algos.ddpg import DDPG
 from tf2rl.misc.target_update_ops import update_target_variables
-from tf2rl.misc.huber_loss import huber_loss
 
 
 class Critic(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=[400, 300], name="Critic"):
+    def __init__(self, state_shape, action_dim, units=(400, 300), name="Critic"):
         super().__init__(name=name)
 
         self.l1 = Dense(units[0], name="L1")
@@ -22,13 +21,12 @@ class Critic(tf.keras.Model):
         dummy_state = tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32))
         dummy_action = tf.constant(
-            np.zeros(shape=[1, action_dim], dtype=np.float32))
+            np.zeros(shape=(1, action_dim), dtype=np.float32))
         with tf.device("/cpu:0"):
-            self([dummy_state, dummy_action])
+            self(dummy_state, dummy_action)
 
-    def call(self, inputs):
-        states, actions = inputs
-        xu = tf.concat([states, actions], axis=1)
+    def call(self, states, actions):
+        xu = tf.concat((states, actions), axis=1)
 
         x1 = tf.nn.relu(self.l1(xu))
         x1 = tf.nn.relu(self.l2(x1))
@@ -38,7 +36,7 @@ class Critic(tf.keras.Model):
         x2 = tf.nn.relu(self.l5(x2))
         x2 = self.l6(x2)
 
-        return x1, x2
+        return tf.squeeze(x1, axis=1), tf.squeeze(x2, axis=1)
 
 
 class TD3(DDPG):
@@ -50,20 +48,14 @@ class TD3(DDPG):
             actor_update_freq=2,
             policy_noise=0.2,
             noise_clip=0.5,
-            actor_units=[400, 300],
-            critic_units=[400, 300],
-            lr_critic=0.001,
+            critic_units=(400, 300),
             **kwargs):
-        super().__init__(name=name, state_shape=state_shape, action_dim=action_dim,
-                         actor_units=actor_units, critic_units=critic_units,
-                         lr_critic=lr_critic, **kwargs)
+        super().__init__(name=name, state_shape=state_shape, action_dim=action_dim, **kwargs)
 
         self.critic = Critic(state_shape, action_dim, critic_units)
         self.critic_target = Critic(state_shape, action_dim, critic_units)
         update_target_variables(
             self.critic_target.weights, self.critic.weights, tau=1.)
-        self.critic_optimizer = tf.keras.optimizers.Adam(
-            learning_rate=lr_critic)
 
         self._policy_noise = policy_noise
         self._noise_clip = noise_clip
@@ -72,13 +64,13 @@ class TD3(DDPG):
         self._it = tf.Variable(0, dtype=tf.int32)
 
     @tf.function
-    def _train_body(self, states, actions, next_states, rewards, done, weights):
+    def _train_body(self, states, actions, next_states, rewards, dones, weights):
         with tf.device(self.device):
             with tf.GradientTape() as tape:
-                td_error1, td_error2 = self._compute_td_error_body(
-                    states, actions, next_states, rewards, done)
-                critic_loss = tf.reduce_mean(huber_loss(td_error1, delta=self.max_grad) * weights) + \
-                              tf.reduce_mean(huber_loss(td_error2, delta=self.max_grad) * weights)
+                td_errors1, td_errors2 = self._compute_td_error_body(
+                    states, actions, next_states, rewards, dones)
+                critic_loss = (tf.reduce_mean(td_errors1 ** 2 * weights) +
+                               tf.reduce_mean(td_errors2 ** 2 * weights))
 
             critic_grad = tape.gradient(
                 critic_loss, self.critic.trainable_variables)
@@ -87,23 +79,25 @@ class TD3(DDPG):
 
             self._it.assign_add(1)
             with tf.GradientTape() as tape:
-                next_actions = self.actor(states)
-                actor_loss = - \
-                    tf.reduce_mean(self.critic([states, next_actions]))
+                sample_actions = self.actor(states)
+                actor_loss = - tf.reduce_mean(self.critic(states, sample_actions))
 
-            if tf.math.equal(self._it % self._actor_update_freq, 0):
+            remainder = tf.math.mod(self._it, self._actor_update_freq)
+
+            def optimize_actor():
                 actor_grad = tape.gradient(
                     actor_loss, self.actor.trainable_variables)
-                self.actor_optimizer.apply_gradients(
+                return self.actor_optimizer.apply_gradients(
                     zip(actor_grad, self.actor.trainable_variables))
 
+            tf.cond(pred=tf.equal(remainder, 0), true_fn=optimize_actor, false_fn=tf.no_op)
             # Update target networks
             update_target_variables(
                 self.critic_target.weights, self.critic.weights, self.tau)
             update_target_variables(
                 self.actor_target.weights, self.actor.weights, self.tau)
 
-            return actor_loss, critic_loss, tf.abs(td_error1) + tf.abs(td_error2)
+            return actor_loss, critic_loss, tf.abs(td_errors1) + tf.abs(td_errors2)
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
         td_errors1, td_errors2 = self._compute_td_error_body(
@@ -112,8 +106,13 @@ class TD3(DDPG):
 
     @tf.function
     def _compute_td_error_body(self, states, actions, next_states, rewards, dones):
+        assert len(dones.shape) == 2
+        assert len(rewards.shape) == 2
+        rewards = tf.squeeze(rewards, axis=1)
+        dones = tf.squeeze(dones, axis=1)
+
         with tf.device(self.device):
-            not_dones = 1. - dones
+            not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
             # Get noisy action
             next_action = self.actor_target(next_states)
@@ -124,11 +123,9 @@ class TD3(DDPG):
             next_action = tf.clip_by_value(
                 next_action + noise, -self.actor_target.max_action, self.actor_target.max_action)
 
-            target_Q1, target_Q2 = self.critic_target(
-                [next_states, next_action])
-            target_Q = tf.minimum(target_Q1, target_Q2)
-            target_Q = rewards + (not_dones * self.discount * target_Q)
-            target_Q = tf.stop_gradient(target_Q)
-            current_Q1, current_Q2 = self.critic([states, actions])
+            next_q1_target, next_q2_target = self.critic_target(next_states, next_action)
+            next_q_target = tf.minimum(next_q1_target, next_q2_target)
+            q_target = tf.stop_gradient(rewards + not_dones * self.discount * next_q_target)
+            current_q1, current_q2 = self.critic(states, actions)
 
-        return target_Q - current_Q1, target_Q - current_Q2
+        return q_target - current_q1, q_target - current_q2

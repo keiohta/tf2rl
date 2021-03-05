@@ -3,17 +3,17 @@ import tensorflow as tf
 from tensorflow.keras.layers import Dense
 
 from tf2rl.algos.policy_base import OnPolicyAgent
-from tf2rl.policies.gaussian_actor import GaussianActor
-from tf2rl.policies.categorical_actor import CategoricalActor
+from tf2rl.policies.tfp_gaussian_actor import GaussianActor
+from tf2rl.policies.tfp_categorical_actor import CategoricalActor
 from tf2rl.envs.atari_wrapper import LazyFrames
 
 
 class CriticV(tf.keras.Model):
-    def __init__(self, state_shape, units, name='qf'):
+    def __init__(self, state_shape, units, name='critic_v', hidden_activation='relu'):
         super().__init__(name=name)
 
-        self.l1 = Dense(units[0], name="L1", activation='relu')
-        self.l2 = Dense(units[1], name="L2", activation='relu')
+        self.l1 = Dense(units[0], name="L1", activation=hidden_activation)
+        self.l2 = Dense(units[1], name="L2", activation=hidden_activation)
         self.l3 = Dense(1, name="L2", activation='linear')
 
         with tf.device('/cpu:0'):
@@ -38,14 +38,12 @@ class VPG(OnPolicyAgent):
             critic=None,
             actor_critic=None,
             max_action=1.,
-            actor_units=[256, 256],
-            critic_units=[256, 256],
+            actor_units=(256, 256),
+            critic_units=(256, 256),
             lr_actor=1e-3,
             lr_critic=3e-3,
-            tanh_std=False,
-            fix_std=False,
-            const_std=0.3,
-            hidden_activation="relu",
+            hidden_activation_actor="relu",
+            hidden_activation_critic="relu",
             name="VPG",
             **kwargs):
         super().__init__(name=name, **kwargs)
@@ -67,13 +65,13 @@ class VPG(OnPolicyAgent):
                 else:
                     self.actor = GaussianActor(
                         state_shape, action_dim, max_action, actor_units,
-                        hidden_activation=hidden_activation,
-                        fix_std=fix_std, tanh_std=tanh_std,
-                        const_std=const_std, state_independent_std=True)
+                        hidden_activation=hidden_activation_actor,
+                        state_independent_std=True)
             else:
                 self.actor = actor
             if critic is None:
-                self.critic = CriticV(state_shape, critic_units)
+                self.critic = CriticV(state_shape, critic_units,
+                                      hidden_activation=hidden_activation_critic)
             else:
                 self.critic = critic
             self.actor_optimizer = tf.keras.optimizers.Adam(
@@ -87,13 +85,13 @@ class VPG(OnPolicyAgent):
     def get_action(self, state, test=False):
         if isinstance(state, LazyFrames):
             state = np.array(state)
-        assert isinstance(state, np.ndarray), \
-            "Input instance should be np.ndarray, not {}".format(type(state))
+        msg = "Input instance should be np.ndarray, not {}".format(type(state))
+        assert isinstance(state, np.ndarray), msg
 
         is_single_input = state.ndim == self._state_ndim
         if is_single_input:
             state = np.expand_dims(state, axis=0).astype(np.float32)
-        action, logp, _ = self._get_action_body(state, test)
+        action, logp = self._get_action_body(state, test)
 
         if is_single_input:
             return action.numpy()[0], logp.numpy()
@@ -120,15 +118,15 @@ class VPG(OnPolicyAgent):
         if self.actor_critic:
             return self.actor_critic(state, test)
         else:
-            action, logp, _ = self.actor(state, test)
+            action, logp = self.actor(state, test)
             v = self.critic(state)
             return action, logp, v
 
     @tf.function
     def _get_action_body(self, state, test):
         if self.actor_critic is not None:
-            action, logp, param = self.actor_critic(state, test)
-            return action, logp, param
+            action, logp = self.actor_critic(state, test)
+            return action, logp
         else:
             return self.actor(state, test)
 
@@ -178,7 +176,7 @@ class VPG(OnPolicyAgent):
             with tf.GradientTape() as tape:
                 current_V = self.critic(states)
                 td_errors = tf.squeeze(returns) - current_V
-                critic_loss = tf.reduce_mean(0.5 * tf.square(td_errors))
+                critic_loss = tf.reduce_mean(tf.square(td_errors))
             critic_grad = tape.gradient(
                 critic_loss, self.critic.trainable_variables)
             self.critic_optimizer.apply_gradients(

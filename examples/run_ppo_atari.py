@@ -1,7 +1,5 @@
 import gym
 
-import numpy as np
-import tensorflow as tf
 
 from tf2rl.algos.ppo import PPO
 from tf2rl.envs.atari_wrapper import wrap_dqn
@@ -39,7 +37,6 @@ if __name__ == '__main__':
         actor_critic=actor_critic,
         batch_size=args.batch_size,
         n_epoch=3,
-        n_epoch_critic=3,
         lr_actor=2.5e-4,
         lr_critic=2.5e-4,
         discount=0.99,

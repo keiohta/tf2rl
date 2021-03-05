@@ -12,7 +12,7 @@ class Discriminator(tf.keras.Model):
     LOG_SIG_CAP_MIN = -20  # np.e**-10 = 4.540e-05
     EPS = 1e-6
 
-    def __init__(self, state_shape, action_dim, units=[32, 32],
+    def __init__(self, state_shape, action_dim, units=(32, 32),
                  n_latent_unit=32, enable_sn=False, name="Discriminator"):
         super().__init__(name=name)
 
@@ -57,7 +57,7 @@ class VAIL(GAIL):
             self,
             state_shape,
             action_dim,
-            units=[32, 32],
+            units=(32, 32),
             n_latent_unit=32,
             lr=5e-5,
             kl_target=0.5,
@@ -67,8 +67,21 @@ class VAIL(GAIL):
             name="VAIL",
             **kwargs):
         """
-        :param enable_sn (bool): If true, add spectral normalization in Dense layer
-        :param enable_gp (bool): If true, add gradient penalty to loss function
+
+        Args:
+            state_shape:
+            action_dim:
+            units:
+            n_latent_unit:
+            lr:
+            kl_target:
+            reg_param:
+            enable_sn: bool
+                If true, add spectral normalization in Dense layer
+            enable_gp: bool
+                If true, add gradient penalty to loss function
+            name:
+            **kwargs:
         """
         IRLPolicy.__init__(
             self, name=name, n_training=10, **kwargs)
@@ -95,7 +108,7 @@ class VAIL(GAIL):
 
     @tf.function
     def _compute_kl_latent(self, means, log_stds):
-        """
+        r"""
         Compute KL divergence of latent spaces over standard Normal
         distribution to compute loss in eq.5.  The formulation of
         KL divergence between two normal distributions is as follows:
@@ -105,9 +118,8 @@ class VAIL(GAIL):
         So, the resulting equation can be computed as:
             ln(1 / \sigma_1) + (\mu_1^2 + \sigma_1^2 - 1) / 2
         """
-        return tf.reduce_sum(
-            -log_stds + (tf.square(means) + tf.square(tf.exp(log_stds)) - 1.) / 2.,
-                axis=-1)
+        return tf.reduce_sum(-log_stds +
+                             (tf.square(means) + tf.square(tf.exp(log_stds)) - 1.) / 2., axis=-1)
 
     @tf.function
     def _train_body(self, agent_states, agent_acts, expert_states, expert_acts):
@@ -142,9 +154,8 @@ class VAIL(GAIL):
             tf.constant(0., dtype=tf.float32),
             self._reg_param + self._step_reg_param * (kl_loss - self._kl_target)))
 
-        accuracy = \
-            tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. + \
-            tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.
+        accuracy = (tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. +
+                    tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.)
         js_divergence = self._compute_js_divergence(
             fake_logits, real_logits)
         return loss, accuracy, real_kl, fake_kl, js_divergence

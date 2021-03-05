@@ -5,20 +5,22 @@
 [![PyPI version](https://badge.fury.io/py/tf2rl.svg)](https://badge.fury.io/py/tf2rl)
 
 # TF2RL
-TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using TensorFlow 2.0.
+TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using TensorFlow 2.x.
 
 ## Algorithms
 Following algorithms are supported:
 
-|                          Algorithm                           | Dicrete action | Continuous action |                       Support                        | Category                 |
-| :----------------------------------------------------------: | :------------: | :---------------: | :--------------------------------------------------: | ------------------------ |
-| [VPG](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [PPO](<https://arxiv.org/abs/1707.06347>) |       ✓        |         ✓         |       [GAE](https://arxiv.org/abs/1506.02438)        | Model-free On-policy RL  |
-| [DQN](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf) (including [DDQN](https://arxiv.org/abs/1509.06461), [Prior. DQN](https://arxiv.org/abs/1511.05952), [Duel. DQN](https://arxiv.org/abs/1511.06581), [Distrib. DQN](<https://arxiv.org/abs/1707.06887>), [Noisy DQN](<https://arxiv.org/abs/1706.10295>)) |       ✓        |         -         |      [ApeX](<https://arxiv.org/abs/1803.00933>)      | Model-free Off-policy RL |
-| [DDPG](https://arxiv.org/abs/1509.02971) (including [TD3](<https://arxiv.org/abs/1802.09477>), [BiResDDPG](<https://arxiv.org/abs/1905.01072>)) |       -        |         ✓         |      [ApeX](<https://arxiv.org/abs/1803.00933>)      | Model-free Off-policy RL |
-|          [SAC](<https://arxiv.org/abs/1801.01290>)           |       ✓        |         ✓         |      [ApeX](<https://arxiv.org/abs/1803.00933>)      | Model-free Off-policy RL |
-| [GAIL](<https://arxiv.org/abs/1606.03476>), [AIRL](<https://arxiv.org/abs/1710.11248>), [GAIfO](<https://arxiv.org/abs/1807.06158>), [VAIL](<https://arxiv.org/abs/1810.00821>) |       ✓        |         ✓         | [Spectral Norm.](<https://arxiv.org/abs/1802.05957>) | Imitation Learning       |
+|                          Algorithm                           | Dicrete action | Continuous action |                  Support                   | Category                 |
+| :----------------------------------------------------------: | :------------: | :---------------: | :----------------------------------------: | ------------------------ |
+| [VPG](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [PPO](<https://arxiv.org/abs/1707.06347>) |       ✓        |         ✓         |  [GAE](https://arxiv.org/abs/1506.02438)   | Model-free On-policy RL  |
+| [DQN](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf) (including [DDQN](https://arxiv.org/abs/1509.06461), [Prior. DQN](https://arxiv.org/abs/1511.05952), [Duel. DQN](https://arxiv.org/abs/1511.06581), [Distrib. DQN](<https://arxiv.org/abs/1707.06887>), [Noisy DQN](<https://arxiv.org/abs/1706.10295>)) |       ✓        |         -         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
+| [DDPG](https://arxiv.org/abs/1509.02971) (including [TD3](<https://arxiv.org/abs/1802.09477>), [BiResDDPG](<https://arxiv.org/abs/1905.01072>)) |       -        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
+|          [SAC](<https://arxiv.org/abs/1801.01290>)           |       ✓        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
+|           [CURL](https://arxiv.org/abs/2004.04136)           |       -        |         ✓         |                     -                      | Model-free Off-policy RL |
+| [MPC](https://arxiv.org/abs/1708.02596), [ME-TRPO](https://arxiv.org/abs/1802.10592) |       ✓        |         ✓         |                     -                      | Model-base RL            |
+| [GAIL](<https://arxiv.org/abs/1606.03476>), [GAIfO](<https://arxiv.org/abs/1807.06158>), [VAIL](<https://arxiv.org/abs/1810.00821>) (including [Spectral Normalization](<https://arxiv.org/abs/1802.05957>)) |       ✓        |         ✓         |                     -                      | Imitation Learning       |
 
-Following papers have been implementd in tf2rl:
+Following papers have been implemented in tf2rl:
 
 - Model-free On-policy RL
   - [Policy Gradient Methods for Reinforcement Learning with Function Approximation](https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/vpg.py>)
@@ -38,6 +40,10 @@ Following papers have been implementd in tf2rl:
   - [Addressing Function Approximation Error in Actor-Critic Methods](<https://arxiv.org/abs/1802.09477>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/td3.py>)
   - [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/bi_res_ddpg.py>)
   - [Soft Actor-Critic for Discrete Action Settings](https://arxiv.org/abs/1910.07207v1), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac_discrete.py>)
+  - [CURL: Contrastive Unsupervised Representations for Reinforcement Learning](https://arxiv.org/abs/2004.04136), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/curl_sac.py>)
+- Model-base RL
+  - [Neural Network Dynamics for Model-Based Deep Reinforcement Learning with Model-Free Fine-Tuning](https://arxiv.org/abs/1708.02596), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/experiments/mpc_trainer.py)
+  - [Model-Ensemble Trust-Region Policy Optimization](https://arxiv.org/abs/1802.10592), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/experiments/me_trpo_trainer.py)
 - Imitation Learning
   - [Generative Adversarial Imitation Learning](<https://arxiv.org/abs/1606.03476>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/gail.py>)
   - [Learning Robust Rewards with Adversarial Inverse Reinforcement Learning](<https://arxiv.org/abs/1710.11248>), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/airl.py)
@@ -45,7 +51,13 @@ Following papers have been implementd in tf2rl:
   - [Generative Adversarial Imitation from Observation](<https://arxiv.org/abs/1807.06158>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/gail.py>)
   - [Variational Discriminator Bottleneck: Improving Imitation Learning, Inverse RL, and GANs by Constraining Information Flow](<https://arxiv.org/abs/1810.00821>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/vail.py>)
 
+Also, some useful techniques are implemented:
+
+- [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/tools/vae.py)
+- [D2RL](https://arxiv.org/abs/2010.09163), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/d2rl_sac.py>)
+
 ## Installation
+
 You can install `tf2rl` from PyPI:
 
 ```bash
@@ -59,6 +71,66 @@ $ git clone https://github.com/keiohta/tf2rl.git tf2rl
 $ cd tf2rl
 $ pip install .
 ```
+
+### Preinstalled Docker Container
+Instead of installing tf2rl on your (virtual) system, you can use
+preinstalled Docker containers.
+
+Only the first execution requires time to download the container image.
+
+At the following commands, you need to replace `<version>` with the
+version tag which you want to use.
+
+
+#### CPU Only
+
+The following simple command starts preinstalled container.
+
+```bash
+docker run -it ghcr.io/keiohta/tf2rl/cpu:<version> bash
+```
+
+
+If you also want to mount your local directory `/local/dir/path` at
+container `/mount/point`
+
+```bash
+docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
+```
+
+#### GPU Support (Linux Only, Experimental)
+
+WARNING: We encountered unsolved errors when running ApeX multiprocess learning.
+
+Requirements
+- Linux
+- NVIDIA GPU
+  - TF2.2 compatible driver
+- Docker 19.03 or later
+
+
+The following simple command starts preinstalled container.
+
+```bash
+docker run --gpus all -it ghcr.io/keiohta/tf2rl/nvidia:<version> bash
+```
+
+If you also want to mount your local directory `/local/dir/path` at
+container `/mount/point`
+
+
+```bash
+docker run --gpus all -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/nvidia:<version> bash
+```
+
+
+If your container can see GPU correctly, you can check inside
+container by the following comand;
+
+```bash
+nvidia-smi
+```
+
 
 ## Getting started
 Here is a quick example of how to train DDPG agent on a Pendulum environment:
@@ -104,3 +176,14 @@ You can see the training progress/results from TensorBoard as follows:
 $ tensorboard --logdir results
 ```
 
+## Citation
+```
+@misc{ota2020tf2rl,
+  author = {Kei Ota},
+  title = {TF2RL},
+  year = {2020},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/keiohta/tf2rl/}}
+}
+```

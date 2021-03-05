@@ -1,0 +1,14 @@
+name: Lint Code
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker://github/super-linter:v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_PYTHON_FLAKE8: true
+          PYTHON_FLAKE8_CONFIG_FILE: ".flake8"

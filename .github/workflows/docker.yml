@@ -1,0 +1,32 @@
+name: docker
+
+on:
+  push:
+    tags:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/build-push-action@v1
+        with:
+          registry: ghcr.io
+          repository: ${{ github.repository_owner }}/tf2rl/cpu
+          tag_with_ref: true
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}
+          dockerfile: Dockerfile
+          always_pull: true
+      - uses: docker/build-push-action@v1
+        with:
+          registry: ghcr.io
+          repository: ${{ github.repository_owner }}/tf2rl/nvidia
+          tag_with_ref: true
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}
+          dockerfile: Dockerfile.nvidia
+          always_pull: true

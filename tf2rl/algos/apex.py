@@ -3,7 +3,7 @@ import numpy as np
 import argparse
 import logging
 import multiprocessing
-from multiprocessing import Process, Queue, Value, Event, Lock
+from multiprocessing import Process, Value, Event
 from multiprocessing.managers import SyncManager
 
 from cpprb import ReplayBuffer, PrioritizedReplayBuffer
@@ -26,42 +26,45 @@ def import_tf():
 def explorer(global_rb, queue, trained_steps, is_training_done,
              lock, env_fn, policy_fn, set_weights_fn, noise_level,
              n_env=64, n_thread=4, buffer_size=1024, episode_max_steps=1000, gpu=0):
-    """
-    Collect transitions and store them to prioritized replay buffer.
+    """Collect transitions and store them to prioritized replay buffer.
 
-    :param global_rb (multiprocessing.managers.AutoProxy[PrioritizedReplayBuffer]):
-        Prioritized replay buffer sharing with multiple explorers and only one learner.
-        This object is shared over processes, so it must be locked when trying to
-        operate something with `lock` object.
-    :param queue (multiprocessing.Queue):
-        A FIFO shared with the `learner` and `evaluator` to get the latest network weights.
-        This is process safe, so you don't need to lock process when use this.
-    :param trained_steps (multiprocessing.Value):
-        Number of steps to apply gradients.
-    :param is_training_done (multiprocessing.Event):
-        multiprocessing.Event object to share the status of training.
-    :param lock (multiprocessing.Lock):
-        multiprocessing.Lock to lock other processes.
-    :param env_fn (function):
-        Method object to generate an environment.
-    :param policy_fn (function):
-        Method object to generate an explorer.
-    :param set_weights_fn (function):
-        Method object to set network weights gotten from queue.
-    :param noise_level (float):
-        Noise level for exploration. For epsilon-greedy policy like DQN variants,
-        this will be epsilon, and if DDPG variants this will be variance for Normal distribution.
-    :param n_env (int):
-        Number of environments to distribute. If this is set to be more than 1,
-        `MultiThreadEnv` will be used.
-    :param n_thread (int):
-        Number of thread used in `MultiThreadEnv`.
-    :param buffer_size (int):
-        Size of local buffer. If this is filled with transitions, add them to `global_rb`
-    :param episode_max_steps (int):
-        Maximum number of steps of an episode.
-    :param gpu (int):
-        GPU id. If this is set to -1, then this process uses only CPU.
+    Args:
+        global_rb: multiprocessing.managers.AutoProxy[PrioritizedReplayBuffer]
+            Prioritized replay buffer sharing with multiple explorers and only one learner.
+            This object is shared over processes, so it must be locked when trying to
+            operate something with `lock` object.
+        queue: multiprocessing.Queue
+            A FIFO shared with the `learner` and `evaluator` to get the latest network weights.
+            This is process safe, so you don't need to lock process when use this.
+        trained_steps: multiprocessing.Value
+            Number of steps to apply gradients.
+        is_training_done: multiprocessing.Event
+            multiprocessing.Event object to share the status of training.
+        lock: multiprocessing.Lock
+            Lock other processes.
+        env_fn: function
+            Method object to generate an environment.
+        policy_fn: function
+            Method object to generate an explorer.
+        set_weights_fn: function
+            Method object to set network weights gotten from queue.
+        noise_level: float
+            Noise level for exploration. For epsilon-greedy policy like DQN variants,
+            this will be epsilon, and if DDPG variants this will be variance for Normal distribution.
+        n_env: int
+            Number of environments to distribute. If this is set to be more than 1,
+            `MultiThreadEnv` will be used.
+        n_thread: int
+            Number of thread used in `MultiThreadEnv`.
+        buffer_size: int
+            Size of local buffer. If this is filled with transitions, add them to `global_rb`
+        episode_max_steps: int
+            Maximum number of steps of an episode.
+        gpu: int
+            GPU id. If this is set to -1, then this process uses only CPU.
+
+    Returns:
+        None
     """
     import_tf()
     logger = logging.getLogger("tf2rl")
@@ -83,7 +86,7 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
     if n_env > 1:
         kwargs["env_dict"]["priorities"] = {}
     local_rb = ReplayBuffer(**kwargs)
-    local_idx = np.arange(buffer_size)
+    local_idx = np.arange(buffer_size).astype(np.int)
 
     if n_env == 1:
         s = env.reset()
@@ -151,8 +154,8 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
             msg += "Samples: {0: 7d}\t".format(n_sample)
             msg += "TDErr: {0:.5f}\t".format(np.average(priorities))
             if n_env == 1:
-                ave_rew = 0 if len(total_rewards) == 0 else \
-                    sum(total_rewards) / len(total_rewards)
+                ave_rew = (0 if len(total_rewards) == 0 else
+                           sum(total_rewards) / len(total_rewards))
                 msg += "AveEpiRew: {0:.3f}\t".format(ave_rew)
                 total_rewards = []
             msg += "FPS: {0:.2f}".format(
@@ -166,36 +169,38 @@ def explorer(global_rb, queue, trained_steps, is_training_done,
 def learner(global_rb, trained_steps, is_training_done,
             lock, env, policy_fn, get_weights_fn,
             n_training, update_freq, evaluation_freq, gpu, queues):
-    """
-    Update network weights using samples collected by explorers.
+    """Update network weights using samples collected by explorers.
 
-    :param global_rb (multiprocessing.managers.AutoProxy[PrioritizedReplayBuffer]):
-        Prioritized replay buffer sharing with multiple explorers and only one learner.
-        This object is shared over processes, so it must be locked when trying to
-        operate something with `lock` object.
-    :param trained_steps (multiprocessing.Value):
-        Number of steps to apply gradients.
-    :param is_training_done (multiprocessing.Event):
-        multiprocessing.Event object to share the status of training.
-    :param lock (multiprocessing.Lock):
-        multiprocessing.Lock to lock other processes.
-    :param env (Gym environment):
-        Environment object.
-    :param policy_fn (function):
-        Method object to generate an explorer.
-    :param get_weights_fn (function):
-        Method object to get network weights and put them to queue.
-    :param n_training (int):
-        Maximum number of times to apply gradients. If number of applying gradients
-        is over this value, training will be done by setting `is_training_done` to `True`
-    :param update_freq (int):
-        Frequency to update parameters, i.e., put network parameters to `queues`
-    :param evaluation_freq (int):
-        Frequency to call `evaluator`.
-    :param gpu (int):
-        GPU id. If this is set to -1, then this process uses only CPU.
-    :param queues (List):
-        List of Queues shared with explorers to send latest network parameters.
+    Args:
+        global_rb: multiprocessing.managers.AutoProxy[PrioritizedReplayBuffer]
+            Prioritized replay buffer sharing with multiple explorers and only one learner.
+            This object is shared over processes, so it must be locked when trying to
+            operate something with `lock` object.
+        trained_steps: multiprocessing.Value
+            Number of steps to apply gradients.
+        is_training_done: multiprocessing.Event
+            multiprocessing.Event object to share the status of training.
+        lock: multiprocessing.Lock
+            multiprocessing.Lock to lock other processes.
+        env: OpenAI-gym compatible environment object
+        policy_fn: function
+            Method object to generate an explorer.
+        get_weights_fn: function
+            Method object to get network weights and put them to queue.
+        n_training: int
+            Maximum number of times to apply gradients. If number of applying gradients
+            is over this value, training will be done by setting `is_training_done` to `True`
+        update_freq: int
+            Frequency to update parameters, i.e., put network parameters to `queues`
+        evaluation_freq: int
+            Frequency to call `evaluator`.
+        gpu: int
+            GPU id. If this is set to -1, then this process uses only CPU.
+        queues: List
+            List of Queues shared with explorers to send latest network parameters.
+
+    Returns:
+        None
     """
     tf = import_tf()
     logger = logging.getLogger("tf2rl")
@@ -250,30 +255,30 @@ def learner(global_rb, trained_steps, is_training_done,
 def evaluator(is_training_done, env, policy_fn, set_weights_fn, queue, gpu,
               save_model_interval=int(1e6), n_evaluation=10, episode_max_steps=1000,
               show_test_progress=False):
-    """
-    Evaluate trained network weights periodically.
+    """Evaluate trained network weights periodically.
 
-    :param is_training_done (multiprocessing.Event):
-        multiprocessing.Event object to share the status of training.
-    :param env (Gym environment):
-        Environment object.
-    :param policy_fn (function):
-        Method object to generate an explorer.
-    :param set_weights_fn (function):
-        Method object to set network weights gotten from queue.
-    :param queue (multiprocessing.Queue):
-        A FIFO shared with the learner to get the latest network weights.
-        This is process safe, so you don't need to lock process when use this.
-    :param gpu (int):
-        GPU id. If this is set to -1, then this process uses only CPU.
-    :param save_model_interval (int):
-        Interval to save model.
-    :param n_evaluation (int):
-        Number of episodes to evaluate.
-    :param episode_max_steps (int):
-        Maximum number of steps of an episode.
-    :param show_test_progress (bool):
-        If true, `render` will be called to visualize evaluation process.
+    Args:
+        is_training_done: multiprocessing.Event
+            multiprocessing.Event object to share the status of training.
+        env: Open-AI gym compatible environment
+            Environment object.
+        policy_fn: function
+            Method object to generate an explorer.
+        set_weights_fn: function
+            Method object to set network weights gotten from queue.
+        queue: multiprocessing.Queue
+            A FIFO shared with the learner to get the latest network weights.
+            This is process safe, so you don't need to lock process when use this.
+        gpu: int
+            GPU id. If this is set to -1, then this process uses only CPU.
+        save_model_interval: int
+            Interval to save model.
+        n_evaluation: int
+            Number of episodes to evaluate.
+        episode_max_steps: int
+            Maximum number of steps of an episode.
+        show_test_progress: bool
+            If true, `render` will be called to visualize evaluation process.
     """
     tf = import_tf()
     logger = logging.getLogger("tf2rl")
@@ -404,8 +409,7 @@ def run(args, env_fn, policy_fn, get_weights_fn, set_weights_fn):
 
     env = env_fn()
 
-    global_rb, queues, is_training_done, lock, trained_steps = \
-        prepare_experiment(env, args)
+    global_rb, queues, is_training_done, lock, trained_steps = prepare_experiment(env, args)
 
     noise = 0.3
     tasks = []

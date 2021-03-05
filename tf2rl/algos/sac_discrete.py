@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Dense
 from tf2rl.algos.sac import SAC
 from tf2rl.misc.huber_loss import huber_loss
 from tf2rl.misc.target_update_ops import update_target_variables
-from tf2rl.policies.categorical_actor import CategoricalActor
+from tf2rl.policies.tfp_categorical_actor import CategoricalActor
 
 
 class CriticQ(tf.keras.Model):
@@ -15,7 +15,7 @@ class CriticQ(tf.keras.Model):
         to   Q: S -> R^|A|
     """
 
-    def __init__(self, state_shape, action_dim, critic_units=[256, 256], name='qf'):
+    def __init__(self, state_shape, action_dim, critic_units=(256, 256), name='qf'):
         super().__init__(name=name)
 
         self.l1 = Dense(critic_units[0], name="L1", activation='relu')
@@ -85,15 +85,13 @@ class SACDiscrete(SAC):
         if weights is None:
             weights = np.ones_like(rewards)
 
-        td_errors, actor_loss, mean_ent, logp_min, logp_max, logp_mean = \
-            self._train_body(states, actions, next_states,
-                             rewards, dones, weights)
+        td_errors, actor_loss, mean_ent, logp_min, logp_max, logp_mean = self._train_body(
+            states, actions, next_states, rewards, dones, weights)
 
         tf.summary.scalar(name=self.policy_name + "/actor_loss", data=actor_loss)
         tf.summary.scalar(name=self.policy_name + "/critic_loss", data=td_errors)
         tf.summary.scalar(name=self.policy_name + "/mean_ent", data=mean_ent)
-        tf.summary.scalar(name=self.policy_name + "/logp_min", data=logp_min)
-        tf.summary.scalar(name=self.policy_name + "/logp_max", data=logp_max)
+        tf.summary.scalar(name=self.policy_name + "/logp_meab", data=logp_mean)
         if self.auto_alpha:
             tf.summary.scalar(name=self.policy_name + "/log_ent", data=self.log_alpha)
             tf.summary.scalar(name=self.policy_name+"/logp_mean+target", data=logp_mean+self.target_alpha)
@@ -112,8 +110,7 @@ class SACDiscrete(SAC):
 
             with tf.GradientTape(persistent=True) as tape:
                 # Compute critic loss
-                _, _, next_action_param = self.actor(next_states)
-                next_action_prob = next_action_param["prob"]
+                next_action_prob = self.actor.compute_prob(next_states)
                 next_action_logp = tf.math.log(next_action_prob + 1e-8)
                 next_q = tf.minimum(
                     self.qf1_target(next_states), self.qf2_target(next_states))
@@ -135,8 +132,7 @@ class SACDiscrete(SAC):
                     delta=self.max_grad) * weights)  # Eq.(7)
 
                 # Compute actor loss
-                _, _, current_action_param = self.actor(states)
-                current_action_prob = current_action_param["prob"]
+                current_action_prob = self.actor.compute_prob(states)
                 current_action_logp = tf.math.log(current_action_prob + 1e-8)
 
                 policy_loss = tf.reduce_mean(
@@ -180,9 +176,11 @@ class SACDiscrete(SAC):
                     zip(alpha_grad, [self.log_alpha]))
                 self.alpha.assign(tf.exp(self.log_alpha))
 
-        return (td_loss1 + td_loss2) / 2., policy_loss, mean_ent, \
-            tf.reduce_min(current_action_logp), tf.reduce_max(current_action_logp), \
-            tf.reduce_mean(current_action_logp)
+        return ((td_loss1 + td_loss2) / 2.,
+                policy_loss, mean_ent,
+                tf.reduce_min(current_action_logp),
+                tf.reduce_max(current_action_logp),
+                tf.reduce_mean(current_action_logp))
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
         td_errors_q1, td_errors_q2 = self._compute_td_error_body(
@@ -202,8 +200,7 @@ class SACDiscrete(SAC):
                 values=[tf.expand_dims(tf.range(batch_size), axis=1),
                         actions], axis=1)
 
-            _, _, next_action_param = self.actor(next_states)
-            next_action_prob = next_action_param["prob"]
+            next_action_prob = self.actor.compute_prob(next_states)
             next_action_logp = tf.math.log(next_action_prob + 1e-8)
             next_q = tf.minimum(
                 self.qf1_target(next_states), self.qf2_target(next_states))

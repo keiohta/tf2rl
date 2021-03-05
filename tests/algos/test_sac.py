@@ -28,6 +28,5 @@ class TestSACAutoAlpha(CommonOffPolContinuousAlgos):
             gpu=-1)
 
 
-
 if __name__ == '__main__':
     unittest.main()

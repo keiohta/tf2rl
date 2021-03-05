@@ -8,7 +8,7 @@ from tf2rl.networks.spectral_norm_dense import SNDense
 
 
 class Discriminator(DiscriminatorGAIL):
-    def __init__(self, state_shape, units=[32, 32],
+    def __init__(self, state_shape, units=(32, 32),
                  enable_sn=False, output_activation="sigmoid",
                  name="Discriminator"):
         tf.keras.Model.__init__(self, name=name)
@@ -23,14 +23,14 @@ class Discriminator(DiscriminatorGAIL):
         dummy_next_state = tf.constant(
             np.zeros(shape=(1,) + state_shape, dtype=np.float32))
         with tf.device("/cpu:0"):
-            self([dummy_state, dummy_next_state])
+            self(tf.concat((dummy_state, dummy_next_state), axis=1))
 
 
 class GAIfO(GAIL):
     def __init__(
             self,
             state_shape,
-            units=[32, 32],
+            units=(32, 32),
             lr=0.001,
             enable_sn=False,
             name="GAIfO",
@@ -55,17 +55,16 @@ class GAIfO(GAIL):
         epsilon = 1e-8
         with tf.device(self.device):
             with tf.GradientTape() as tape:
-                real_logits = self.disc([expert_states, expert_next_states])
-                fake_logits = self.disc([agent_states, agent_next_states])
+                real_logits = self.disc(tf.concat((expert_states, expert_next_states), axis=1))
+                fake_logits = self.disc(tf.concat((agent_states, agent_next_states), axis=1))
                 loss = -(tf.reduce_mean(tf.math.log(real_logits + epsilon)) +
                          tf.reduce_mean(tf.math.log(1. - fake_logits + epsilon)))
             grads = tape.gradient(loss, self.disc.trainable_variables)
             self.optimizer.apply_gradients(
                 zip(grads, self.disc.trainable_variables))
 
-        accuracy = \
-            tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. + \
-            tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.
+        accuracy = (tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. +
+                    tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.)
         js_divergence = self._compute_js_divergence(
             fake_logits, real_logits)
         return loss, accuracy, js_divergence
@@ -75,9 +74,5 @@ class GAIfO(GAIL):
         if states.ndim == 1:
             states = np.expand_dims(states, axis=0)
             next_states = np.expand_dims(next_states, axis=0)
-        return self._inference_body(states, next_states)
-
-    @tf.function
-    def _inference_body(self, states, next_states):
-        with tf.device(self.device):
-            return self.disc.compute_reward([states, next_states])
+        inputs = np.concatenate((states, next_states), axis=1)
+        return self._inference_body(inputs)

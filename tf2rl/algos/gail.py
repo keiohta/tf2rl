@@ -7,7 +7,7 @@ from tf2rl.networks.spectral_norm_dense import SNDense
 
 
 class Discriminator(tf.keras.Model):
-    def __init__(self, state_shape, action_dim, units=[32, 32],
+    def __init__(self, state_shape, action_dim, units=(32, 32),
                  enable_sn=False, output_activation="sigmoid",
                  name="Discriminator"):
         super().__init__(name=name)
@@ -20,13 +20,12 @@ class Discriminator(tf.keras.Model):
         dummy_state = tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32))
         dummy_action = tf.constant(
-            np.zeros(shape=[1, action_dim], dtype=np.float32))
+            np.zeros(shape=(1, action_dim), dtype=np.float32))
         with tf.device("/cpu:0"):
-            self([dummy_state, dummy_action])
+            self(tf.concat((dummy_state, dummy_action), axis=1))
 
     def call(self, inputs):
-        features = tf.concat(inputs, axis=1)
-        features = self.l1(features)
+        features = self.l1(inputs)
         features = self.l2(features)
         return self.l3(features)
 
@@ -69,17 +68,16 @@ class GAIL(IRLPolicy):
         epsilon = 1e-8
         with tf.device(self.device):
             with tf.GradientTape() as tape:
-                real_logits = self.disc([expert_states, expert_acts])
-                fake_logits = self.disc([agent_states, agent_acts])
+                real_logits = self.disc(tf.concat((expert_states, expert_acts), axis=1))
+                fake_logits = self.disc(tf.concat((agent_states, agent_acts), axis=1))
                 loss = -(tf.reduce_mean(tf.math.log(real_logits + epsilon)) +
                          tf.reduce_mean(tf.math.log(1. - fake_logits + epsilon)))
             grads = tape.gradient(loss, self.disc.trainable_variables)
             self.optimizer.apply_gradients(
                 zip(grads, self.disc.trainable_variables))
 
-        accuracy = \
-            tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. + \
-            tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.
+        accuracy = (tf.reduce_mean(tf.cast(real_logits >= 0.5, tf.float32)) / 2. +
+                    tf.reduce_mean(tf.cast(fake_logits < 0.5, tf.float32)) / 2.)
         js_divergence = self._compute_js_divergence(
             fake_logits, real_logits)
         return loss, accuracy, js_divergence
@@ -88,17 +86,16 @@ class GAIL(IRLPolicy):
         if states.ndim == actions.ndim == 1:
             states = np.expand_dims(states, axis=0)
             actions = np.expand_dims(actions, axis=0)
-        return self._inference_body(states, actions)
+        inputs = np.concatenate((states, actions), axis=1)
+        return self._inference_body(inputs)
 
     @tf.function
-    def _inference_body(self, states, actions):
+    def _inference_body(self, inputs):
         with tf.device(self.device):
-            return self.disc.compute_reward([states, actions])
+            return self.disc.compute_reward(inputs)
 
     @staticmethod
     def get_argument(parser=None):
-        import argparse
-        if parser is None:
-            parser = argparse.ArgumentParser(conflict_handler='resolve')
+        parser = IRLPolicy.get_argument(parser)
         parser.add_argument('--enable-sn', action='store_true')
         return parser
