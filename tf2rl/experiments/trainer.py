@@ -13,7 +13,6 @@ from tf2rl.misc.prepare_output_dir import prepare_output_dir
 from tf2rl.misc.initialize_logger import initialize_logger
 from tf2rl.envs.normalizer import EmpiricalNormalizer
 
-
 if tf.config.experimental.list_physical_devices('GPU'):
     for cur_device in tf.config.experimental.list_physical_devices("GPU"):
         print(cur_device)
@@ -108,7 +107,7 @@ class Trainer:
 
             done_flag = done
             if (hasattr(self._env, "_max_episode_steps") and
-                episode_steps == self._env._max_episode_steps):
+                    episode_steps == self._env._max_episode_steps):
                 done_flag = False
             replay_buffer.add(obs=obs, act=action,
                               next_obs=next_obs, rew=reward, done=done_flag)
@@ -120,8 +119,9 @@ class Trainer:
 
                 n_episode += 1
                 fps = episode_steps / (time.perf_counter() - episode_start_time)
-                self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
-                    n_episode, total_steps, episode_steps, episode_return, fps))
+                self.logger.info(
+                    "Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
+                        n_episode, total_steps, episode_steps, episode_return, fps))
                 tf.summary.scalar(name="Common/training_return", data=episode_return)
                 tf.summary.scalar(name="Common/training_episode_length", data=episode_steps)
 
@@ -200,7 +200,7 @@ class Trainer:
                 avg_test_steps += 1
                 if self._save_test_path:
                     data = {"obs": obs, "act": action, "next_obs": next_obs,
-                              "rew": reward, "done": done}
+                            "rew": reward, "done": done}
                     if hasattr(self._policy, "get_logp"):
                         data["logp"] = self._policy.get_logp(obs)
                     else:
@@ -228,7 +228,7 @@ class Trainer:
             images = tf.cast(
                 tf.expand_dims(np.array(obs).transpose(2, 0, 1), axis=3),
                 tf.uint8)
-            tf.summary.image('train/input_img', images,)
+            tf.summary.image('train/input_img', images, )
         return avg_test_return / self._test_episodes, avg_test_steps / self._test_episodes
 
     def _set_from_args(self, args):

@@ -65,7 +65,7 @@ class IRLTrainer(Trainer):
 
             done_flag = done
             if (hasattr(self._env, "_max_episode_steps") and
-                episode_steps == self._env._max_episode_steps):
+                    episode_steps == self._env._max_episode_steps):
                 done_flag = False
                 data = {"obs": obs, "act": action, "next_obs": next_obs,
                         "rew": reward, "done": done_flag}
@@ -80,8 +80,9 @@ class IRLTrainer(Trainer):
 
                 n_episode += 1
                 fps = episode_steps / (time.perf_counter() - episode_start_time)
-                self.logger.info("Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
-                    n_episode, int(total_steps), episode_steps, episode_return, fps))
+                self.logger.info(
+                    "Total Epi: {0: 5} Steps: {1: 7} Episode Steps: {2: 5} Return: {3: 5.4f} FPS: {4:5.2f}".format(
+                        n_episode, int(total_steps), episode_steps, episode_return, fps))
                 tf.summary.scalar(
                     name="Common/training_return", data=episode_return)
 
@@ -95,56 +96,56 @@ class IRLTrainer(Trainer):
             if total_steps % self._policy.update_interval == 0:
                 samples = replay_buffer.sample(self._policy.batch_size)
                 # Train policy
-                    rew = self._irl.inference(
-                        states=samples["obs"],
-                        actions=samples["act"],
-                        next_states=samples["next_obs"])
-                    with tf.summary.record_if(total_steps % self._save_summary_interval == 0):
-                        self._policy.train(
-                            samples["obs"], samples["act"], samples["next_obs"],
-                            rew, samples["done"])
-                        replay_buffer.update_priorities(
-                            samples["indexes"], np.abs(td_error) + 1e-6)
+                rew = self._irl.inference(
+                    states=samples["obs"],
+                    actions=samples["act"],
+                    next_states=samples["next_obs"])
+                with tf.summary.record_if(total_steps % self._save_summary_interval == 0):
+                    self._policy.train(
+                        samples["obs"], samples["act"], samples["next_obs"],
+                        rew, samples["done"])
 
-                        # Train IRL
-                        for _ in range(self._irl.n_training):
-                            samples = replay_buffer.sample(self._irl.batch_size)
-                            self._irl.train(**self._get_train_kwargs(samples))
+                    # Train IRL
+                    for _ in range(self._irl.n_training):
+                        samples = replay_buffer.sample(self._irl.batch_size)
+                        self._irl.train(**self._get_train_kwargs(samples))
 
-            if total_steps % self._test_interval == 0:
-                avg_test_return = self.evaluate_policy(total_steps)
-                self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
-                    total_steps, avg_test_return, self._test_episodes))
-                tf.summary.scalar(
-                    name="Common/average_test_return", data=avg_test_return)
-                tf.summary.scalar(
-                    name="Common/fps", data=fps)
-                self.writer.flush()
+        if total_steps % self._test_interval == 0:
+            avg_test_return = self.evaluate_policy(total_steps)
+            self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
+                total_steps, avg_test_return, self._test_episodes))
+            tf.summary.scalar(
+                name="Common/average_test_return", data=avg_test_return)
+            tf.summary.scalar(
+                name="Common/fps", data=fps)
+            self.writer.flush()
 
-            if total_steps % self._save_model_interval == 0:
-                self.checkpoint_manager.save()
+        if total_steps % self._save_model_interval == 0:
+            self.checkpoint_manager.save()
 
-        tf.summary.flush()
+    tf.summary.flush()
 
-    def _get_train_kwargs(self, samples):
-        # Do not allow duplication!!!
-        indices = np.random.choice(
-            self._random_range, self._irl.batch_size, replace=False)
-        kwargs = {
-            "agent_states": samples["obs"],
-            "agent_acts": samples["act"],
-            "agent_next_states": samples["next_obs"],
-            "expert_states": self._expert_obs[indices],
-            "expert_acts": self._expert_act[indices],
-            "expert_next_states": self._expert_next_obs[indices]}
-        if isinstance(self._irl, AIRL):
-            kwargs["agent_logps"] = samples["logp"]
-            kwargs["expert_logps"] = self._expert_logp[indices]
-        return kwargs
 
-    @staticmethod
-    def get_argument(parser=None):
-        parser = Trainer.get_argument(parser)
-        parser.add_argument('--expert-path-dir', default=None,
-                            help='Path to directory that contains expert trajectories')
-        return parser
+def _get_train_kwargs(self, samples):
+    # Do not allow duplication!!!
+    indices = np.random.choice(
+        self._random_range, self._irl.batch_size, replace=False)
+    kwargs = {
+        "agent_states": samples["obs"],
+        "agent_acts": samples["act"],
+        "agent_next_states": samples["next_obs"],
+        "expert_states": self._expert_obs[indices],
+        "expert_acts": self._expert_act[indices],
+        "expert_next_states": self._expert_next_obs[indices]}
+    if isinstance(self._irl, AIRL):
+        kwargs["agent_logps"] = samples["logp"]
+        kwargs["expert_logps"] = self._expert_logp[indices]
+    return kwargs
+
+
+@staticmethod
+def get_argument(parser=None):
+    parser = Trainer.get_argument(parser)
+    parser.add_argument('--expert-path-dir', default=None,
+                        help='Path to directory that contains expert trajectories')
+    return parser
