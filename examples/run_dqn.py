@@ -31,4 +31,7 @@ if __name__ == '__main__':
         batch_size=args.batch_size,
         n_warmup=args.n_warmup)
     trainer = Trainer(policy, env, args, test_env=test_env)
-    trainer()
+    if args.evaluate:
+        trainer.evaluate_policy_continuously()
+    else:
+        trainer()

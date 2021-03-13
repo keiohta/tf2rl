@@ -64,4 +64,7 @@ if __name__ == '__main__':
             auto_alpha=args.auto_alpha,
             gpu=args.gpu)
     trainer = Trainer(policy, env, args, test_env=test_env)
-    trainer()
+    if args.evaluate:
+        trainer.evaluate_policy_continuously()
+    else:
+        trainer()
