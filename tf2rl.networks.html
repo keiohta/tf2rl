@@ -185,11 +185,11 @@
 <span id="tf2rl-networks-atari-model-module"></span><h2>tf2rl.networks.atari_model module<a class="headerlink" href="#module-tf2rl.networks.atari_model" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="tf2rl.networks.atari_model.AtariBaseModel">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.networks.atari_model.</code><code class="sig-name descname">AtariBaseModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariBaseModel" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.networks.atari_model.</span></code><code class="sig-name descname"><span class="pre">AtariBaseModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariBaseModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
 <dt id="tf2rl.networks.atari_model.AtariBaseModel.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariBaseModel.call" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariBaseModel.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -215,23 +215,23 @@ a list of tensors if there are more than one outputs.</p>
 
 <dl class="py class">
 <dt id="tf2rl.networks.atari_model.AtariCategoricalActor">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.networks.atari_model.</code><code class="sig-name descname">AtariCategoricalActor</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariCategoricalActor" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.networks.atari_model.</span></code><code class="sig-name descname"><span class="pre">AtariCategoricalActor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariCategoricalActor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="tf2rl.policies.html#tf2rl.policies.tfp_categorical_actor.CategoricalActor" title="tf2rl.policies.tfp_categorical_actor.CategoricalActor"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.policies.tfp_categorical_actor.CategoricalActor</span></code></a>, <a class="reference internal" href="#tf2rl.networks.atari_model.AtariBaseModel" title="tf2rl.networks.atari_model.AtariBaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.networks.atari_model.AtariBaseModel</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt id="tf2rl.networks.atari_model.AtariCategoricalActorCritic">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.networks.atari_model.</code><code class="sig-name descname">AtariCategoricalActorCritic</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariCategoricalActorCritic" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.networks.atari_model.</span></code><code class="sig-name descname"><span class="pre">AtariCategoricalActorCritic</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariCategoricalActorCritic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="tf2rl.policies.html#tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic" title="tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic</span></code></a>, <a class="reference internal" href="#tf2rl.networks.atari_model.AtariBaseModel" title="tf2rl.networks.atari_model.AtariBaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.networks.atari_model.AtariBaseModel</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
 <dt id="tf2rl.networks.atari_model.AtariQFunc">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.networks.atari_model.</code><code class="sig-name descname">AtariQFunc</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariQFunc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.networks.atari_model.</span></code><code class="sig-name descname"><span class="pre">AtariQFunc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariQFunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.networks.atari_model.AtariBaseModel" title="tf2rl.networks.atari_model.AtariBaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.networks.atari_model.AtariBaseModel</span></code></a></p>
 <dl class="py method">
 <dt id="tf2rl.networks.atari_model.AtariQFunc.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariQFunc.call" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.atari_model.AtariQFunc.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -260,11 +260,11 @@ a list of tensors if there are more than one outputs.</p>
 <span id="tf2rl-networks-noisy-dense-module"></span><h2>tf2rl.networks.noisy_dense module<a class="headerlink" href="#module-tf2rl.networks.noisy_dense" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="tf2rl.networks.noisy_dense.NoisyDense">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.networks.noisy_dense.</code><code class="sig-name descname">NoisyDense</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.noisy_dense.NoisyDense" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.networks.noisy_dense.</span></code><code class="sig-name descname"><span class="pre">NoisyDense</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.noisy_dense.NoisyDense" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.base_layer.Layer</span></code></p>
 <dl class="py method">
 <dt id="tf2rl.networks.noisy_dense.NoisyDense.build">
-<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.noisy_dense.NoisyDense.build" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">build</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.noisy_dense.NoisyDense.build" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the variables of the layer (optional, for subclass implementers).</p>
 <p>This is a method that implementers of subclasses of <cite>Layer</cite> or <cite>Model</cite>
 can override if they need a state-creation step in-between
@@ -282,7 +282,7 @@ layer instantiation and layer call.</p>
 
 <dl class="py method">
 <dt id="tf2rl.networks.noisy_dense.NoisyDense.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.noisy_dense.NoisyDense.call" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.noisy_dense.NoisyDense.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is where the layer’s logic lives.</p>
 <p>Note here that <cite>call()</cite> method in <cite>tf.keras</cite> is little bit different
 from <cite>keras</cite> API. In <cite>keras</cite> API, you can pass support masking for
@@ -299,7 +299,7 @@ method to support masking.</p>
 
 <dl class="py method">
 <dt id="tf2rl.networks.noisy_dense.NoisyDense.compute_output_shape">
-<code class="sig-name descname">compute_output_shape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.noisy_dense.NoisyDense.compute_output_shape" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_output_shape</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.noisy_dense.NoisyDense.compute_output_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the output shape of the layer.</p>
 <p>If the layer has not been built, this method will call <cite>build</cite> on the
 layer. This assumes that the layer will later be used with inputs that
@@ -324,11 +324,11 @@ instead of an integer.</p>
 <span id="tf2rl-networks-spectral-norm-dense-module"></span><h2>tf2rl.networks.spectral_norm_dense module<a class="headerlink" href="#module-tf2rl.networks.spectral_norm_dense" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="tf2rl.networks.spectral_norm_dense.SNDense">
-<em class="property">class </em><code class="sig-prename descclassname">tf2rl.networks.spectral_norm_dense.</code><code class="sig-name descname">SNDense</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.spectral_norm_dense.SNDense" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.networks.spectral_norm_dense.</span></code><code class="sig-name descname"><span class="pre">SNDense</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.spectral_norm_dense.SNDense" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.layers.core.Dense</span></code></p>
 <dl class="py method">
 <dt id="tf2rl.networks.spectral_norm_dense.SNDense.build">
-<code class="sig-name descname">build</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_shape</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.spectral_norm_dense.SNDense.build" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">build</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.spectral_norm_dense.SNDense.build" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates the variables of the layer (optional, for subclass implementers).</p>
 <p>This is a method that implementers of subclasses of <cite>Layer</cite> or <cite>Model</cite>
 can override if they need a state-creation step in-between
@@ -346,7 +346,7 @@ layer instantiation and layer call.</p>
 
 <dl class="py method">
 <dt id="tf2rl.networks.spectral_norm_dense.SNDense.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.spectral_norm_dense.SNDense.call" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.spectral_norm_dense.SNDense.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is where the layer’s logic lives.</p>
 <p>Note here that <cite>call()</cite> method in <cite>tf.keras</cite> is little bit different
 from <cite>keras</cite> API. In <cite>keras</cite> API, you can pass support masking for
@@ -363,12 +363,12 @@ method to support masking.</p>
 
 <dl class="py method">
 <dt id="tf2rl.networks.spectral_norm_dense.SNDense.compute_spectral_norm">
-<code class="sig-name descname">compute_spectral_norm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.spectral_norm_dense.SNDense.compute_spectral_norm" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">compute_spectral_norm</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.spectral_norm_dense.SNDense.compute_spectral_norm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt id="tf2rl.networks.spectral_norm_dense.SNDense.get_config">
-<code class="sig-name descname">get_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.spectral_norm_dense.SNDense.get_config" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_config</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.networks.spectral_norm_dense.SNDense.get_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the config of the layer.</p>
 <p>A layer config is a Python dictionary (serializable)
 containing the configuration of a layer.
