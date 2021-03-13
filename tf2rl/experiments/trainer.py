@@ -154,7 +154,6 @@ class Trainer:
                 tf.summary.scalar(
                     name="Common/average_test_episode_length", data=avg_test_steps)
                 tf.summary.scalar(name="Common/fps", data=fps)
-                self.writer.flush()
 
             if total_steps % self._save_model_interval == 0:
                 self.checkpoint_manager.save()
