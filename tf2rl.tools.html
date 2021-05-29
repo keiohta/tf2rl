@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -185,44 +188,44 @@
 <div class="section" id="module-tf2rl.tools.vae">
 <span id="tf2rl-tools-vae-module"></span><h2>tf2rl.tools.vae module<a class="headerlink" href="#module-tf2rl.tools.vae" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.tools.vae.VAE">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.tools.vae.</span></code><code class="sig-name descname"><span class="pre">VAE</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.tools.vae.</span></span><span class="sig-name descname"><span class="pre">VAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.tools.vae.VAE.compute_apply_gradients">
-<code class="sig-name descname"><span class="pre">compute_apply_gradients</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.compute_apply_gradients" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.compute_apply_gradients">
+<span class="sig-name descname"><span class="pre">compute_apply_gradients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.compute_apply_gradients" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.tools.vae.VAE.compute_loss">
-<code class="sig-name descname"><span class="pre">compute_loss</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.compute_loss" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.compute_loss">
+<span class="sig-name descname"><span class="pre">compute_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.compute_loss" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.tools.vae.VAE.decode">
-<code class="sig-name descname"><span class="pre">decode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_sigmoid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.decode" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_sigmoid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.decode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.tools.vae.VAE.encode">
-<code class="sig-name descname"><span class="pre">encode</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.encode" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.encode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.tools.vae.VAE.reparameterize">
-<code class="sig-name descname"><span class="pre">reparameterize</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.reparameterize" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.reparameterize">
+<span class="sig-name descname"><span class="pre">reparameterize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.reparameterize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.tools.vae.VAE.sample">
-<code class="sig-name descname"><span class="pre">sample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.sample" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.sample" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="tf2rl.tools.vae.log_normal_pdf">
-<code class="sig-prename descclassname"><span class="pre">tf2rl.tools.vae.</span></code><code class="sig-name descname"><span class="pre">log_normal_pdf</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raxis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.log_normal_pdf" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.log_normal_pdf">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.tools.vae.</span></span><span class="sig-name descname"><span class="pre">log_normal_pdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raxis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.log_normal_pdf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

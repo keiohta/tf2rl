@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -90,7 +93,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="tf2rl.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.algos package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.algos.apex">tf2rl.algos.apex module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tf2rl-algos-apex-module">tf2rl.algos.apex module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.algos.bi_res_ddpg">tf2rl.algos.bi_res_ddpg module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.algos.categorical_dqn">tf2rl.algos.categorical_dqn module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tf2rl-algos-curl-sac-module">tf2rl.algos.curl_sac module</a></li>
@@ -194,166 +197,25 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-tf2rl.algos.apex">
-<span id="tf2rl-algos-apex-module"></span><h2>tf2rl.algos.apex module<a class="headerlink" href="#module-tf2rl.algos.apex" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="tf2rl.algos.apex.apex_argument">
-<code class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></code><code class="sig-name descname"><span class="pre">apex_argument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.apex_argument" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="tf2rl.algos.apex.evaluator">
-<code class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></code><code class="sig-name descname"><span class="pre">evaluator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_training_done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_weights_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_model_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_evaluation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">episode_max_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_test_progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.evaluator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate trained network weights periodically.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>is_training_done: multiprocessing.Event</dt><dd><p>multiprocessing.Event object to share the status of training.</p>
-</dd>
-<dt>env: Open-AI gym compatible environment</dt><dd><p>Environment object.</p>
-</dd>
-<dt>policy_fn: function</dt><dd><p>Method object to generate an explorer.</p>
-</dd>
-<dt>set_weights_fn: function</dt><dd><p>Method object to set network weights gotten from queue.</p>
-</dd>
-<dt>queue: multiprocessing.Queue</dt><dd><p>A FIFO shared with the learner to get the latest network weights.
-This is process safe, so you don’t need to lock process when use this.</p>
-</dd>
-<dt>gpu: int</dt><dd><p>GPU id. If this is set to -1, then this process uses only CPU.</p>
-</dd>
-<dt>save_model_interval: int</dt><dd><p>Interval to save model.</p>
-</dd>
-<dt>n_evaluation: int</dt><dd><p>Number of episodes to evaluate.</p>
-</dd>
-<dt>episode_max_steps: int</dt><dd><p>Maximum number of steps of an episode.</p>
-</dd>
-<dt>show_test_progress: bool</dt><dd><p>If true, <cite>render</cite> will be called to visualize evaluation process.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tf2rl.algos.apex.explorer">
-<code class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></code><code class="sig-name descname"><span class="pre">explorer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_rb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trained_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_training_done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_weights_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_thread</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">episode_max_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.explorer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Collect transitions and store them to prioritized replay buffer.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>global_rb: multiprocessing.managers.AutoProxy[PrioritizedReplayBuffer]</dt><dd><p>Prioritized replay buffer sharing with multiple explorers and only one learner.
-This object is shared over processes, so it must be locked when trying to
-operate something with <cite>lock</cite> object.</p>
-</dd>
-<dt>queue: multiprocessing.Queue</dt><dd><p>A FIFO shared with the <cite>learner</cite> and <cite>evaluator</cite> to get the latest network weights.
-This is process safe, so you don’t need to lock process when use this.</p>
-</dd>
-<dt>trained_steps: multiprocessing.Value</dt><dd><p>Number of steps to apply gradients.</p>
-</dd>
-<dt>is_training_done: multiprocessing.Event</dt><dd><p>multiprocessing.Event object to share the status of training.</p>
-</dd>
-<dt>lock: multiprocessing.Lock</dt><dd><p>Lock other processes.</p>
-</dd>
-<dt>env_fn: function</dt><dd><p>Method object to generate an environment.</p>
-</dd>
-<dt>policy_fn: function</dt><dd><p>Method object to generate an explorer.</p>
-</dd>
-<dt>set_weights_fn: function</dt><dd><p>Method object to set network weights gotten from queue.</p>
-</dd>
-<dt>noise_level: float</dt><dd><p>Noise level for exploration. For epsilon-greedy policy like DQN variants,
-this will be epsilon, and if DDPG variants this will be variance for Normal distribution.</p>
-</dd>
-<dt>n_env: int</dt><dd><p>Number of environments to distribute. If this is set to be more than 1,
-<cite>MultiThreadEnv</cite> will be used.</p>
-</dd>
-<dt>n_thread: int</dt><dd><p>Number of thread used in <cite>MultiThreadEnv</cite>.</p>
-</dd>
-<dt>buffer_size: int</dt><dd><p>Size of local buffer. If this is filled with transitions, add them to <cite>global_rb</cite></p>
-</dd>
-<dt>episode_max_steps: int</dt><dd><p>Maximum number of steps of an episode.</p>
-</dd>
-<dt>gpu: int</dt><dd><p>GPU id. If this is set to -1, then this process uses only CPU.</p>
-</dd>
-</dl>
-</dd>
-<dt>Returns:</dt><dd><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tf2rl.algos.apex.import_tf">
-<code class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></code><code class="sig-name descname"><span class="pre">import_tf</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.import_tf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="tf2rl.algos.apex.learner">
-<code class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></code><code class="sig-name descname"><span class="pre">learner</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_rb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trained_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_training_done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_weights_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_training</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queues</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.learner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update network weights using samples collected by explorers.</p>
-<dl>
-<dt>Args:</dt><dd><dl class="simple">
-<dt>global_rb: multiprocessing.managers.AutoProxy[PrioritizedReplayBuffer]</dt><dd><p>Prioritized replay buffer sharing with multiple explorers and only one learner.
-This object is shared over processes, so it must be locked when trying to
-operate something with <cite>lock</cite> object.</p>
-</dd>
-<dt>trained_steps: multiprocessing.Value</dt><dd><p>Number of steps to apply gradients.</p>
-</dd>
-<dt>is_training_done: multiprocessing.Event</dt><dd><p>multiprocessing.Event object to share the status of training.</p>
-</dd>
-<dt>lock: multiprocessing.Lock</dt><dd><p>multiprocessing.Lock to lock other processes.</p>
-</dd>
-</dl>
-<p>env: OpenAI-gym compatible environment object
-policy_fn: function</p>
-<blockquote>
-<div><p>Method object to generate an explorer.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>get_weights_fn: function</dt><dd><p>Method object to get network weights and put them to queue.</p>
-</dd>
-<dt>n_training: int</dt><dd><p>Maximum number of times to apply gradients. If number of applying gradients
-is over this value, training will be done by setting <cite>is_training_done</cite> to <cite>True</cite></p>
-</dd>
-<dt>update_freq: int</dt><dd><p>Frequency to update parameters, i.e., put network parameters to <cite>queues</cite></p>
-</dd>
-<dt>evaluation_freq: int</dt><dd><p>Frequency to call <cite>evaluator</cite>.</p>
-</dd>
-<dt>gpu: int</dt><dd><p>GPU id. If this is set to -1, then this process uses only CPU.</p>
-</dd>
-<dt>queues: List</dt><dd><p>List of Queues shared with explorers to send latest network parameters.</p>
-</dd>
-</dl>
-</dd>
-<dt>Returns:</dt><dd><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tf2rl.algos.apex.prepare_experiment">
-<code class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></code><code class="sig-name descname"><span class="pre">prepare_experiment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.prepare_experiment" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="tf2rl.algos.apex.run">
-<code class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></code><code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_weights_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_weights_fn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="tf2rl-algos-apex-module">
+<h2>tf2rl.algos.apex module<a class="headerlink" href="#tf2rl-algos-apex-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-tf2rl.algos.bi_res_ddpg">
 <span id="tf2rl-algos-bi-res-ddpg-module"></span><h2>tf2rl.algos.bi_res_ddpg module<a class="headerlink" href="#module-tf2rl.algos.bi_res_ddpg" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.bi_res_ddpg.BiResDDPG">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.bi_res_ddpg.</span></code><code class="sig-name descname"><span class="pre">BiResDDPG</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.bi_res_ddpg.BiResDDPG" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.bi_res_ddpg.BiResDDPG">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.bi_res_ddpg.</span></span><span class="sig-name descname"><span class="pre">BiResDDPG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.bi_res_ddpg.BiResDDPG" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.ddpg.DDPG" title="tf2rl.algos.ddpg.DDPG"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.ddpg.DDPG</span></code></a></p>
 <p>This is an implementation of Bi-Res-DDPG
 <a class="reference external" href="https://arxiv.org/abs/1905.01072">https://arxiv.org/abs/1905.01072</a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.bi_res_ddpg.BiResDDPG.compute_td_error">
-<code class="sig-name descname"><span class="pre">compute_td_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.bi_res_ddpg.BiResDDPG.compute_td_error" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.bi_res_ddpg.BiResDDPG.compute_td_error">
+<span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.bi_res_ddpg.BiResDDPG.compute_td_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.bi_res_ddpg.BiResDDPG.get_argument">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_argument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.bi_res_ddpg.BiResDDPG.get_argument" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.bi_res_ddpg.BiResDDPG.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.bi_res_ddpg.BiResDDPG.get_argument" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -362,38 +224,38 @@ is over this value, training will be done by setting <cite>is_training_done</cit
 <div class="section" id="module-tf2rl.algos.categorical_dqn">
 <span id="tf2rl-algos-categorical-dqn-module"></span><h2>tf2rl.algos.categorical_dqn module<a class="headerlink" href="#module-tf2rl.algos.categorical_dqn" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.categorical_dqn.CategoricalDQN">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.categorical_dqn.</span></code><code class="sig-name descname"><span class="pre">CategoricalDQN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.categorical_dqn.</span></span><span class="sig-name descname"><span class="pre">CategoricalDQN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.OffPolicyAgent" title="tf2rl.algos.policy_base.OffPolicyAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.OffPolicyAgent</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.categorical_dqn.CategoricalDQN.compute_td_error">
-<code class="sig-name descname"><span class="pre">compute_td_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.compute_td_error" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN.compute_td_error">
+<span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.compute_td_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.categorical_dqn.CategoricalDQN.get_action">
-<code class="sig-name descname"><span class="pre">get_action</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.get_action" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN.get_action">
+<span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.get_action" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.categorical_dqn.CategoricalDQN.get_argument">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_argument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.get_argument" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.get_argument" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.categorical_dqn.CategoricalDQN.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.train" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.categorical_dqn.QFunc">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.categorical_dqn.</span></code><code class="sig-name descname"><span class="pre">QFunc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.QFunc" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.QFunc">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.categorical_dqn.</span></span><span class="sig-name descname"><span class="pre">QFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.QFunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.algos.categorical_dqn.QFunc.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.QFunc.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.QFunc.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.QFunc.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -415,9 +277,9 @@ a list of tensors if there are more than one outputs.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="tf2rl.algos.categorical_dqn.QFunc.n_atoms">
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">n_atoms</span></code><a class="headerlink" href="#tf2rl.algos.categorical_dqn.QFunc.n_atoms" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.QFunc.n_atoms">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_atoms</span></span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.QFunc.n_atoms" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -429,18 +291,18 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.d2rl_sac">
 <span id="tf2rl-algos-d2rl-sac-module"></span><h2>tf2rl.algos.d2rl_sac module<a class="headerlink" href="#module-tf2rl.algos.d2rl_sac" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.d2rl_sac.D2RLSAC">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.d2rl_sac.</span></code><code class="sig-name descname"><span class="pre">D2RLSAC</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.D2RLSAC" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.d2rl_sac.D2RLSAC">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.d2rl_sac.</span></span><span class="sig-name descname"><span class="pre">D2RLSAC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.D2RLSAC" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.sac.SAC" title="tf2rl.algos.sac.SAC"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.sac.SAC</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.d2rl_sac.DenseCriticQ">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.d2rl_sac.</span></code><code class="sig-name descname"><span class="pre">DenseCriticQ</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.DenseCriticQ" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.d2rl_sac.DenseCriticQ">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.d2rl_sac.</span></span><span class="sig-name descname"><span class="pre">DenseCriticQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.DenseCriticQ" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.sac.CriticQ" title="tf2rl.algos.sac.CriticQ"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.sac.CriticQ</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.d2rl_sac.DenseCriticQ.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.DenseCriticQ.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.d2rl_sac.DenseCriticQ.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.DenseCriticQ.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -465,12 +327,12 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.d2rl_sac.DenseCriticV">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.d2rl_sac.</span></code><code class="sig-name descname"><span class="pre">DenseCriticV</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.DenseCriticV" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.d2rl_sac.DenseCriticV">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.d2rl_sac.</span></span><span class="sig-name descname"><span class="pre">DenseCriticV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.DenseCriticV" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.sac.CriticV" title="tf2rl.algos.sac.CriticV"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.sac.CriticV</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.d2rl_sac.DenseCriticV.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.DenseCriticV.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.d2rl_sac.DenseCriticV.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.DenseCriticV.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -495,8 +357,8 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.d2rl_sac.DenseGaussianActor">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.d2rl_sac.</span></code><code class="sig-name descname"><span class="pre">DenseGaussianActor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.DenseGaussianActor" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.d2rl_sac.DenseGaussianActor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.d2rl_sac.</span></span><span class="sig-name descname"><span class="pre">DenseGaussianActor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.DenseGaussianActor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="tf2rl.policies.html#tf2rl.policies.tfp_gaussian_actor.GaussianActor" title="tf2rl.policies.tfp_gaussian_actor.GaussianActor"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.policies.tfp_gaussian_actor.GaussianActor</span></code></a></p>
 </dd></dl>
 
@@ -504,12 +366,12 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.ddpg">
 <span id="tf2rl-algos-ddpg-module"></span><h2>tf2rl.algos.ddpg module<a class="headerlink" href="#module-tf2rl.algos.ddpg" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.ddpg.Actor">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.ddpg.</span></code><code class="sig-name descname"><span class="pre">Actor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.Actor" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.ddpg.Actor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.ddpg.</span></span><span class="sig-name descname"><span class="pre">Actor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.Actor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.algos.ddpg.Actor.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.Actor.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.ddpg.Actor.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.Actor.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -534,12 +396,12 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.ddpg.Critic">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.ddpg.</span></code><code class="sig-name descname"><span class="pre">Critic</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.Critic" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.ddpg.Critic">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.ddpg.</span></span><span class="sig-name descname"><span class="pre">Critic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.Critic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.algos.ddpg.Critic.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.Critic.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.ddpg.Critic.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.Critic.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -564,22 +426,22 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.ddpg.DDPG">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.ddpg.</span></code><code class="sig-name descname"><span class="pre">DDPG</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.DDPG" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.ddpg.DDPG">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.ddpg.</span></span><span class="sig-name descname"><span class="pre">DDPG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.DDPG" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.OffPolicyAgent" title="tf2rl.algos.policy_base.OffPolicyAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.OffPolicyAgent</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.ddpg.DDPG.compute_td_error">
-<code class="sig-name descname"><span class="pre">compute_td_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.DDPG.compute_td_error" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.ddpg.DDPG.compute_td_error">
+<span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.DDPG.compute_td_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.ddpg.DDPG.get_action">
-<code class="sig-name descname"><span class="pre">get_action</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.DDPG.get_action" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.ddpg.DDPG.get_action">
+<span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.DDPG.get_action" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.ddpg.DDPG.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.DDPG.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.ddpg.DDPG.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ddpg.DDPG.train" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -588,38 +450,38 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.dqn">
 <span id="tf2rl-algos-dqn-module"></span><h2>tf2rl.algos.dqn module<a class="headerlink" href="#module-tf2rl.algos.dqn" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.dqn.DQN">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.dqn.</span></code><code class="sig-name descname"><span class="pre">DQN</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.DQN" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.dqn.DQN">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.dqn.</span></span><span class="sig-name descname"><span class="pre">DQN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.DQN" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.OffPolicyAgent" title="tf2rl.algos.policy_base.OffPolicyAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.OffPolicyAgent</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.dqn.DQN.compute_td_error">
-<code class="sig-name descname"><span class="pre">compute_td_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.DQN.compute_td_error" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.dqn.DQN.compute_td_error">
+<span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.DQN.compute_td_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.dqn.DQN.get_action">
-<code class="sig-name descname"><span class="pre">get_action</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.DQN.get_action" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.dqn.DQN.get_action">
+<span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.DQN.get_action" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.dqn.DQN.get_argument">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_argument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.DQN.get_argument" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.dqn.DQN.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.DQN.get_argument" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.dqn.DQN.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.DQN.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.dqn.DQN.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.DQN.train" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.dqn.QFunc">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.dqn.</span></code><code class="sig-name descname"><span class="pre">QFunc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.QFunc" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.dqn.QFunc">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.dqn.</span></span><span class="sig-name descname"><span class="pre">QFunc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.QFunc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.algos.dqn.QFunc.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.QFunc.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.dqn.QFunc.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.dqn.QFunc.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -647,23 +509,23 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.gaifo">
 <span id="tf2rl-algos-gaifo-module"></span><h2>tf2rl.algos.gaifo module<a class="headerlink" href="#module-tf2rl.algos.gaifo" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.gaifo.Discriminator">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.gaifo.</span></code><code class="sig-name descname"><span class="pre">Discriminator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gaifo.Discriminator" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gaifo.Discriminator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.gaifo.</span></span><span class="sig-name descname"><span class="pre">Discriminator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gaifo.Discriminator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.gail.Discriminator" title="tf2rl.algos.gail.Discriminator"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.gail.Discriminator</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.gaifo.GAIfO">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.gaifo.</span></code><code class="sig-name descname"><span class="pre">GAIfO</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gaifo.GAIfO" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gaifo.GAIfO">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.gaifo.</span></span><span class="sig-name descname"><span class="pre">GAIfO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gaifo.GAIfO" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.gail.GAIL" title="tf2rl.algos.gail.GAIL"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.gail.GAIL</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.gaifo.GAIfO.inference">
-<code class="sig-name descname"><span class="pre">inference</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gaifo.GAIfO.inference" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gaifo.GAIfO.inference">
+<span class="sig-name descname"><span class="pre">inference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gaifo.GAIfO.inference" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.gaifo.GAIfO.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_next_states</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gaifo.GAIfO.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gaifo.GAIfO.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_next_states</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gaifo.GAIfO.train" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -672,12 +534,12 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.gail">
 <span id="tf2rl-algos-gail-module"></span><h2>tf2rl.algos.gail module<a class="headerlink" href="#module-tf2rl.algos.gail" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.gail.Discriminator">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.gail.</span></code><code class="sig-name descname"><span class="pre">Discriminator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.Discriminator" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gail.Discriminator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.gail.</span></span><span class="sig-name descname"><span class="pre">Discriminator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.Discriminator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.algos.gail.Discriminator.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.Discriminator.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gail.Discriminator.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.Discriminator.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -700,29 +562,29 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.gail.Discriminator.compute_reward">
-<code class="sig-name descname"><span class="pre">compute_reward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.Discriminator.compute_reward" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gail.Discriminator.compute_reward">
+<span class="sig-name descname"><span class="pre">compute_reward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.Discriminator.compute_reward" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.gail.GAIL">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.gail.</span></code><code class="sig-name descname"><span class="pre">GAIL</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.GAIL" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gail.GAIL">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.gail.</span></span><span class="sig-name descname"><span class="pre">GAIL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.GAIL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.IRLPolicy" title="tf2rl.algos.policy_base.IRLPolicy"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.IRLPolicy</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.gail.GAIL.get_argument">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_argument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.GAIL.get_argument" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gail.GAIL.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.GAIL.get_argument" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.gail.GAIL.inference">
-<code class="sig-name descname"><span class="pre">inference</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.GAIL.inference" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gail.GAIL.inference">
+<span class="sig-name descname"><span class="pre">inference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.GAIL.inference" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.gail.GAIL.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_acts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_acts</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.GAIL.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.gail.GAIL.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_acts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_acts</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.gail.GAIL.train" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -731,47 +593,47 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.policy_base">
 <span id="tf2rl-algos-policy-base-module"></span><h2>tf2rl.algos.policy_base module<a class="headerlink" href="#module-tf2rl.algos.policy_base" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.policy_base.IRLPolicy">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.policy_base.</span></code><code class="sig-name descname"><span class="pre">IRLPolicy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.IRLPolicy" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.policy_base.IRLPolicy">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.policy_base.</span></span><span class="sig-name descname"><span class="pre">IRLPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.IRLPolicy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.Policy" title="tf2rl.algos.policy_base.Policy"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.Policy</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.policy_base.OffPolicyAgent">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.policy_base.</span></code><code class="sig-name descname"><span class="pre">OffPolicyAgent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.OffPolicyAgent" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.policy_base.OffPolicyAgent">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.policy_base.</span></span><span class="sig-name descname"><span class="pre">OffPolicyAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.OffPolicyAgent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.Policy" title="tf2rl.algos.policy_base.Policy"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.Policy</span></code></a></p>
 <p>Base class for off-policy agents</p>
 <dl class="py method">
-<dt id="tf2rl.algos.policy_base.OffPolicyAgent.get_argument">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_argument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.OffPolicyAgent.get_argument" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.policy_base.OffPolicyAgent.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.OffPolicyAgent.get_argument" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.policy_base.OnPolicyAgent">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.policy_base.</span></code><code class="sig-name descname"><span class="pre">OnPolicyAgent</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.OnPolicyAgent" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.policy_base.OnPolicyAgent">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.policy_base.</span></span><span class="sig-name descname"><span class="pre">OnPolicyAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.OnPolicyAgent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.Policy" title="tf2rl.algos.policy_base.Policy"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.Policy</span></code></a></p>
 <p>Base class for on-policy agents</p>
 <dl class="py method">
-<dt id="tf2rl.algos.policy_base.OnPolicyAgent.get_argument">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_argument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.OnPolicyAgent.get_argument" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.policy_base.OnPolicyAgent.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.OnPolicyAgent.get_argument" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.policy_base.Policy">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.policy_base.</span></code><code class="sig-name descname"><span class="pre">Policy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.Policy" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.policy_base.Policy">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.policy_base.</span></span><span class="sig-name descname"><span class="pre">Policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.Policy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.algos.policy_base.Policy.get_action">
-<code class="sig-name descname"><span class="pre">get_action</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.Policy.get_action" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.policy_base.Policy.get_action">
+<span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.Policy.get_action" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.policy_base.Policy.get_argument">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_argument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.Policy.get_argument" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.policy_base.Policy.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.policy_base.Policy.get_argument" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -780,12 +642,12 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.ppo">
 <span id="tf2rl-algos-ppo-module"></span><h2>tf2rl.algos.ppo module<a class="headerlink" href="#module-tf2rl.algos.ppo" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.ppo.PPO">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.ppo.</span></code><code class="sig-name descname"><span class="pre">PPO</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ppo.PPO" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.ppo.PPO">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.ppo.</span></span><span class="sig-name descname"><span class="pre">PPO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ppo.PPO" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.vpg.VPG" title="tf2rl.algos.vpg.VPG"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.vpg.VPG</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.ppo.PPO.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">advantages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logp_olds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ppo.PPO.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.ppo.PPO.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">advantages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logp_olds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ppo.PPO.train" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -794,12 +656,12 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.sac">
 <span id="tf2rl-algos-sac-module"></span><h2>tf2rl.algos.sac module<a class="headerlink" href="#module-tf2rl.algos.sac" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.sac.CriticQ">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac.</span></code><code class="sig-name descname"><span class="pre">CriticQ</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.CriticQ" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac.CriticQ">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac.</span></span><span class="sig-name descname"><span class="pre">CriticQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.CriticQ" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.algos.sac.CriticQ.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.CriticQ.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac.CriticQ.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.CriticQ.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -824,12 +686,12 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.sac.CriticV">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac.</span></code><code class="sig-name descname"><span class="pre">CriticV</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.CriticV" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac.CriticV">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac.</span></span><span class="sig-name descname"><span class="pre">CriticV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.CriticV" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.algos.sac.CriticV.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.CriticV.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac.CriticV.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.CriticV.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -854,27 +716,27 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.sac.SAC">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac.</span></code><code class="sig-name descname"><span class="pre">SAC</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac.SAC">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac.</span></span><span class="sig-name descname"><span class="pre">SAC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.OffPolicyAgent" title="tf2rl.algos.policy_base.OffPolicyAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.OffPolicyAgent</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.sac.SAC.compute_td_error">
-<code class="sig-name descname"><span class="pre">compute_td_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.compute_td_error" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac.SAC.compute_td_error">
+<span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.compute_td_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.sac.SAC.get_action">
-<code class="sig-name descname"><span class="pre">get_action</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.get_action" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac.SAC.get_action">
+<span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.get_action" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.sac.SAC.get_argument">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_argument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.get_argument" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac.SAC.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.get_argument" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.sac.SAC.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac.SAC.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.train" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -883,8 +745,8 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.sac_discrete">
 <span id="tf2rl-algos-sac-discrete-module"></span><h2>tf2rl.algos.sac_discrete module<a class="headerlink" href="#module-tf2rl.algos.sac_discrete" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.sac_discrete.CriticQ">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac_discrete.</span></code><code class="sig-name descname"><span class="pre">CriticQ</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.CriticQ" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac_discrete.CriticQ">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac_discrete.</span></span><span class="sig-name descname"><span class="pre">CriticQ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.CriticQ" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="simple">
 <dt>Compared with original (continuous) version of SAC, the output of Q-function moves</dt><dd><p>from Q: S x A -&gt; R
@@ -892,8 +754,8 @@ to   Q: S -&gt; R^|A|</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="tf2rl.algos.sac_discrete.CriticQ.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.CriticQ.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac_discrete.CriticQ.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.CriticQ.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -918,22 +780,22 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.sac_discrete.SACDiscrete">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac_discrete.</span></code><code class="sig-name descname"><span class="pre">SACDiscrete</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac_discrete.SACDiscrete">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac_discrete.</span></span><span class="sig-name descname"><span class="pre">SACDiscrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.sac.SAC" title="tf2rl.algos.sac.SAC"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.sac.SAC</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.sac_discrete.SACDiscrete.compute_td_error">
-<code class="sig-name descname"><span class="pre">compute_td_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete.compute_td_error" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac_discrete.SACDiscrete.compute_td_error">
+<span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete.compute_td_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.sac_discrete.SACDiscrete.get_argument">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_argument</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete.get_argument" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac_discrete.SACDiscrete.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete.get_argument" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.sac_discrete.SACDiscrete.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.sac_discrete.SACDiscrete.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete.train" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -942,12 +804,12 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.td3">
 <span id="tf2rl-algos-td3-module"></span><h2>tf2rl.algos.td3 module<a class="headerlink" href="#module-tf2rl.algos.td3" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.td3.Critic">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.td3.</span></code><code class="sig-name descname"><span class="pre">Critic</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.Critic" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.td3.Critic">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.td3.</span></span><span class="sig-name descname"><span class="pre">Critic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.Critic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.algos.td3.Critic.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.Critic.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.td3.Critic.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.Critic.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -972,12 +834,12 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.td3.TD3">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.td3.</span></code><code class="sig-name descname"><span class="pre">TD3</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.TD3" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.td3.TD3">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.td3.</span></span><span class="sig-name descname"><span class="pre">TD3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.TD3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.ddpg.DDPG" title="tf2rl.algos.ddpg.DDPG"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.ddpg.DDPG</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.td3.TD3.compute_td_error">
-<code class="sig-name descname"><span class="pre">compute_td_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.TD3.compute_td_error" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.td3.TD3.compute_td_error">
+<span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.TD3.compute_td_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -986,27 +848,27 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.vail">
 <span id="tf2rl-algos-vail-module"></span><h2>tf2rl.algos.vail module<a class="headerlink" href="#module-tf2rl.algos.vail" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.vail.Discriminator">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.vail.</span></code><code class="sig-name descname"><span class="pre">Discriminator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vail.Discriminator" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vail.Discriminator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.vail.</span></span><span class="sig-name descname"><span class="pre">Discriminator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vail.Discriminator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py attribute">
-<dt id="tf2rl.algos.vail.Discriminator.EPS">
-<code class="sig-name descname"><span class="pre">EPS</span></code><em class="property"> <span class="pre">=</span> <span class="pre">1e-06</span></em><a class="headerlink" href="#tf2rl.algos.vail.Discriminator.EPS" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vail.Discriminator.EPS">
+<span class="sig-name descname"><span class="pre">EPS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1e-06</span></em><a class="headerlink" href="#tf2rl.algos.vail.Discriminator.EPS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="tf2rl.algos.vail.Discriminator.LOG_SIG_CAP_MAX">
-<code class="sig-name descname"><span class="pre">LOG_SIG_CAP_MAX</span></code><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#tf2rl.algos.vail.Discriminator.LOG_SIG_CAP_MAX" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vail.Discriminator.LOG_SIG_CAP_MAX">
+<span class="sig-name descname"><span class="pre">LOG_SIG_CAP_MAX</span></span><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#tf2rl.algos.vail.Discriminator.LOG_SIG_CAP_MAX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="tf2rl.algos.vail.Discriminator.LOG_SIG_CAP_MIN">
-<code class="sig-name descname"><span class="pre">LOG_SIG_CAP_MIN</span></code><em class="property"> <span class="pre">=</span> <span class="pre">-20</span></em><a class="headerlink" href="#tf2rl.algos.vail.Discriminator.LOG_SIG_CAP_MIN" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vail.Discriminator.LOG_SIG_CAP_MIN">
+<span class="sig-name descname"><span class="pre">LOG_SIG_CAP_MIN</span></span><em class="property"> <span class="pre">=</span> <span class="pre">-20</span></em><a class="headerlink" href="#tf2rl.algos.vail.Discriminator.LOG_SIG_CAP_MIN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.vail.Discriminator.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vail.Discriminator.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vail.Discriminator.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vail.Discriminator.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -1029,19 +891,19 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.vail.Discriminator.compute_reward">
-<code class="sig-name descname"><span class="pre">compute_reward</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vail.Discriminator.compute_reward" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vail.Discriminator.compute_reward">
+<span class="sig-name descname"><span class="pre">compute_reward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vail.Discriminator.compute_reward" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.vail.VAIL">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.vail.</span></code><code class="sig-name descname"><span class="pre">VAIL</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vail.VAIL" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vail.VAIL">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.vail.</span></span><span class="sig-name descname"><span class="pre">VAIL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vail.VAIL" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.gail.GAIL" title="tf2rl.algos.gail.GAIL"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.gail.GAIL</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.vail.VAIL.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_acts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_acts</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vail.VAIL.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vail.VAIL.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_acts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_acts</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vail.VAIL.train" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1050,12 +912,12 @@ a list of tensors if there are more than one outputs.</p>
 <div class="section" id="module-tf2rl.algos.vpg">
 <span id="tf2rl-algos-vpg-module"></span><h2>tf2rl.algos.vpg module<a class="headerlink" href="#module-tf2rl.algos.vpg" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="tf2rl.algos.vpg.CriticV">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.vpg.</span></code><code class="sig-name descname"><span class="pre">CriticV</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.CriticV" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vpg.CriticV">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.vpg.</span></span><span class="sig-name descname"><span class="pre">CriticV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.CriticV" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt id="tf2rl.algos.vpg.CriticV.call">
-<code class="sig-name descname"><span class="pre">call</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.CriticV.call" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vpg.CriticV.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.CriticV.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
@@ -1080,22 +942,22 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="tf2rl.algos.vpg.VPG">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">tf2rl.algos.vpg.</span></code><code class="sig-name descname"><span class="pre">VPG</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vpg.VPG">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.vpg.</span></span><span class="sig-name descname"><span class="pre">VPG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.OnPolicyAgent" title="tf2rl.algos.policy_base.OnPolicyAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.OnPolicyAgent</span></code></a></p>
 <dl class="py method">
-<dt id="tf2rl.algos.vpg.VPG.get_action">
-<code class="sig-name descname"><span class="pre">get_action</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG.get_action" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vpg.VPG.get_action">
+<span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG.get_action" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.vpg.VPG.get_action_and_val">
-<code class="sig-name descname"><span class="pre">get_action_and_val</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG.get_action_and_val" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vpg.VPG.get_action_and_val">
+<span class="sig-name descname"><span class="pre">get_action_and_val</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG.get_action_and_val" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf2rl.algos.vpg.VPG.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">advantages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logp_olds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="tf2rl.algos.vpg.VPG.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">advantages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logp_olds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG.train" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
