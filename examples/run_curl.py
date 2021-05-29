@@ -52,6 +52,9 @@ def main():
     env = make_env()
     test_env = make_env()
 
+    # see Table 3 of CURL paper
+    lr_sac = lr_curl = 2e-4 if args.env_name == "cheetah" else 1e-3
+
     policy = CURLSAC(
         obs_shape=input_obs_shape,
         action_dim=env.action_space.high.size,
@@ -59,9 +62,16 @@ def main():
         memory_capacity=int(1e5),
         n_warmup=int(1e3),
         max_action=env.action_space.high[0],
-        batch_size=10,
-        alpha=args.alpha,
-        auto_alpha=args.auto_alpha)
+        batch_size=512,
+        actor_units=(1024, 1024),
+        critic_units=(1024, 1024),
+        lr_sac=lr_sac,
+        lr_curl=lr_curl,
+        lr_alpha=1e-4,
+        tau=0.01,
+        init_temperature=0.1,
+        auto_alpha=True,
+        stop_q_grad=args.stop_q_grad)
 
     trainer = Trainer(policy, env, args, test_env=test_env)
     if args.evaluate:

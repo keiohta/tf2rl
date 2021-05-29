@@ -14,7 +14,7 @@ def random_crop(input_imgs, output_size):
     Returns:
 
     """
-    assert input_imgs.ndim == 4, f"The length of input images must be 4, not {len(input_imgs)}"
+    assert input_imgs.ndim == 4, f"The dimension of input images must be 4, not {len(input_imgs)}"
 
     batch_size = input_imgs.shape[0]
     img_size = input_imgs.shape[1]
