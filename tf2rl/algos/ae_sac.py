@@ -1,13 +1,14 @@
 import numpy as np
 import tensorflow as tf
+import tensorflow_addons as tfa
 
 from tf2rl.algos.sac import SAC
 from tf2rl.misc.target_update_ops import update_target_variables
-from tf2rl.tools.img_tools import random_crop, center_crop
-from tf2rl.networks.dmc_model import Encoder
+from tf2rl.networks.dmc_model import Encoder, Decoder
+from tf2rl.tools.img_tools import center_crop, preprocess_img
 
 
-class CURLSAC(SAC):
+class AESAC(SAC):
     def __init__(self,
                  action_dim,
                  obs_shape=(84, 84, 9),
@@ -17,18 +18,20 @@ class CURLSAC(SAC):
                  tau_encoder=0.05,
                  tau_critic=0.01,
                  lr_sac=1e-3,
-                 lr_curl=1e-3,
+                 lr_encoder=1e-3,
+                 lr_decoder=1e-3,
                  lr_alpha=1e-4,
                  stop_q_grad=False,
+                 lambda_latent_val=1e-06,
+                 decoder_weight_lambda=1e-07,
                  **kwargs):
         super().__init__(state_shape=(feature_dim,),
                          action_dim=action_dim,
-                         name="CURLSAC",
+                         name="AESAC",
                          lr=lr_sac,
                          lr_alpha=lr_alpha,
                          tau=tau_critic,
                          **kwargs)
-        self._tau_encoder = tau_encoder
         self._encoder = Encoder(obs_shape=obs_shape,
                                 feature_dim=feature_dim,
                                 n_conv_layers=n_conv_layers,
@@ -41,42 +44,19 @@ class CURLSAC(SAC):
                                        name="curl_encoder_target")
         update_target_variables(self._encoder_target.weights, self._encoder.weights, tau=1.)
 
-        self._curl_optimizer = tf.keras.optimizers.Adam(lr=lr_curl)
-        self._curl_w = tf.Variable(initial_value=tf.random.normal(shape=(feature_dim, feature_dim)),
-                                   name='curl_w', dtype=tf.float32, trainable=True)
+        self._decoder = Decoder()
+        self._lambda_latent_val = lambda_latent_val
+        self._encoder_optimizer = tf.keras.optimizers.Adam(lr=lr_encoder)
+        self._decoder_optimizer = tfa.optimizers.AdamW(learning_rate=lr_decoder, weight_decay=decoder_weight_lambda)
+
         self._stop_q_grad = stop_q_grad
         self._input_img_size = obs_shape[0]
+        self._tau_encoder = tau_encoder
         self.state_ndim = 3
 
-    def train(self, states, actions, next_states, rewards, dones, weights=None):
-        if weights is None:
-            weights = np.ones_like(rewards)
-
-        obses_anchor = random_crop(states, self._input_img_size)
-        next_obses_anchor = random_crop(next_states, self._input_img_size)
-        obses_negative = random_crop(states, self._input_img_size)
-
-        td_errors, actor_loss, qf_loss, logp_min, logp_max, logp_mean, curl_loss, z_anchor, z_negatives, logits = self._train_body(
-            obses_anchor, obses_negative, actions, next_obses_anchor, rewards, dones, weights)
-
-        tf.summary.scalar(name=self.policy_name + "/actor_loss", data=actor_loss)
-        tf.summary.scalar(name=self.policy_name + "/critic_Q_loss", data=qf_loss)
-        tf.summary.scalar(name=self.policy_name + "/logp_min", data=logp_min)
-        tf.summary.scalar(name=self.policy_name + "/logp_max", data=logp_max)
-        tf.summary.scalar(name=self.policy_name + "/logp_mean", data=logp_mean)
-        if self.auto_alpha:
-            tf.summary.scalar(name=self.policy_name + "/log_ent", data=self.log_alpha)
-            tf.summary.scalar(name=self.policy_name + "/logp_mean+target", data=logp_mean + self.target_alpha)
-        tf.summary.scalar(name=self.policy_name + "/ent", data=self.alpha)
-        tf.summary.scalar(name=self.policy_name + "/curl_loss", data=curl_loss)
-        tf.summary.scalar(name=self.policy_name + "/z_anchor", data=z_anchor)
-        tf.summary.scalar(name=self.policy_name + "/z_negatives", data=z_negatives)
-        tf.summary.scalar(name=self.policy_name + "/logits", data=logits)
-
-        return td_errors
-
     def get_action(self, state, test=False):
-        state = center_crop(state, self._input_img_size)
+        if state.shape[:-3] != self._input_img_size:
+            state = center_crop(state, self._input_img_size)
         return super().get_action(state, test)
 
     @tf.function
@@ -85,8 +65,29 @@ class CURLSAC(SAC):
         actions, log_pis = self.actor(encoded_state, test)
         return actions
 
+    def train(self, states, actions, next_states, rewards, dones, weights=None):
+        if weights is None:
+            weights = np.ones_like(rewards)
+
+        qf_loss, policy_loss, td_loss_q1, logp_min, logp_max, logp_mean, ae_loss, latent_vals = self._train_body(
+            states, actions, next_states, rewards, dones, weights)
+
+        tf.summary.scalar(name=self.policy_name + "/actor_loss", data=policy_loss)
+        tf.summary.scalar(name=self.policy_name + "/critic_Q_loss", data=qf_loss)
+        tf.summary.scalar(name=self.policy_name + "/logp_min", data=logp_min)
+        tf.summary.scalar(name=self.policy_name + "/logp_max", data=logp_max)
+        tf.summary.scalar(name=self.policy_name + "/logp_mean", data=logp_mean)
+        if self.auto_alpha:
+            tf.summary.scalar(name=self.policy_name + "/log_ent", data=self.log_alpha)
+            tf.summary.scalar(name=self.policy_name + "/logp_mean+target", data=logp_mean + self.target_alpha)
+        tf.summary.scalar(name=self.policy_name + "/ent", data=self.alpha)
+        tf.summary.scalar(name=self.policy_name + "/ae_loss", data=ae_loss)
+        tf.summary.scalar(name=self.policy_name + "/latent_vals", data=latent_vals)
+
+        return qf_loss
+
     @tf.function
-    def _train_body(self, obses_anchor, obses_negative, actions, next_obses_anchor, rewards, dones, weights):
+    def _train_body(self, obses, actions, next_obses, rewards, dones, weights):
         with tf.device(self.device):
             assert len(dones.shape) == 2
             assert len(rewards.shape) == 2
@@ -96,11 +97,10 @@ class CURLSAC(SAC):
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
             with tf.GradientTape(persistent=True) as tape:
-                obs_features = self._encoder(obses_anchor)
-                next_obs_features = self._encoder(next_obses_anchor)
+                next_obs_features = self._encoder(next_obses)
                 next_actions, next_logps = self.actor(next_obs_features)
 
-                next_obs_features_target = self._encoder_target(next_obses_anchor)
+                next_obs_features_target = self._encoder_target(next_obses)
                 next_target_q1 = tf.stop_gradient(self.qf1_target(next_obs_features_target, next_actions))
                 next_target_q2 = tf.stop_gradient(self.qf2_target(next_obs_features_target, next_actions))
                 min_next_target_q = tf.minimum(next_target_q1, next_target_q2)
@@ -109,6 +109,7 @@ class CURLSAC(SAC):
                     rewards + not_dones * self.discount * (min_next_target_q - self.alpha * next_logps))
 
                 # Compute loss of critic Q
+                obs_features = self._encoder(obses, stop_q_grad=self._stop_q_grad)
                 current_q1 = self.qf1(obs_features, actions)
                 current_q2 = self.qf2(obs_features, actions)
                 td_loss_q1 = tf.reduce_mean((target_q - current_q1) ** 2)
@@ -126,22 +127,15 @@ class CURLSAC(SAC):
                     alpha_loss = -tf.reduce_mean(
                         (self.alpha * tf.stop_gradient(logp + self.target_alpha)))
 
-                # Compute loss of CURL
-                z_anchor = obs_features
-                z_negatives = self._encoder_target(obses_negative)
-                # Compute similarities with bilinear products
-                logits = tf.matmul(z_anchor, tf.matmul(self._curl_w, tf.transpose(z_negatives, [1, 0])))
-                logits -= tf.reduce_max(logits, axis=-1, keepdims=True)  # (batch_size, batch_size)
-                curl_loss = tf.reduce_mean(
-                    tf.keras.losses.sparse_categorical_crossentropy(tf.range(self.batch_size), logits,
-                                                                    from_logits=True))  # Eq.4
+                # Compute loss of AE
+                rec_obses = self._decoder(obs_features)
+                true_obses = preprocess_img(obses)
+                rec_loss = tf.reduce_mean(tf.keras.losses.MSE(true_obses, rec_obses))
+                latent_loss = tf.reduce_mean(0.5 * tf.reduce_sum(tf.math.pow(obs_features, 2)))
+                ae_loss = rec_loss + self._lambda_latent_val * latent_loss
 
-            if self._stop_q_grad:
-                q1_variables = self.qf1.trainable_variables
-                q2_variables = self.qf2.trainable_variables
-            else:
-                q1_variables = self.qf1.trainable_variables + self._encoder.trainable_variables
-                q2_variables = self.qf2.trainable_variables + self._encoder.trainable_variables
+            q1_variables = self.qf1.trainable_variables + self._encoder.trainable_variables
+            q2_variables = self.qf2.trainable_variables + self._encoder.trainable_variables
             q1_grad = tape.gradient(td_loss_q1, q1_variables)
             self.qf1_optimizer.apply_gradients(zip(q1_grad, q1_variables))
             q2_grad = tape.gradient(td_loss_q2, q2_variables)
@@ -159,25 +153,14 @@ class CURLSAC(SAC):
                 self.alpha_optimizer.apply_gradients(
                     zip(alpha_grad, [self.log_alpha]))
 
-            curl_grads = tape.gradient(curl_loss, [self._curl_w] + self._encoder.trainable_variables)
-            self._curl_optimizer.apply_gradients(
-                zip(curl_grads, [self._curl_w] + self._encoder.trainable_variables))
+            encoder_grads = tape.gradient(ae_loss, self._encoder.trainable_variables)
+            self._encoder_optimizer.apply_gradients(zip(encoder_grads, self._encoder.trainable_variables))
+            decoder_grads = tape.gradient(ae_loss, self._decoder.trainable_variables)
+            self._encoder_optimizer.apply_gradients(zip(decoder_grads, self._decoder.trainable_variables))
             update_target_variables(
                 self._encoder_target.weights, self._encoder.weights, self._tau_encoder)
 
             del tape
 
-        return td_loss_q1 + td_loss_q2, policy_loss, td_loss_q1, tf.reduce_min(logp), tf.reduce_max(
-            logp), tf.reduce_mean(
-            logp), curl_loss, tf.reduce_mean(z_anchor), tf.reduce_mean(z_negatives), tf.reduce_mean(logits)
-
-    @staticmethod
-    def get_argument(parser=None):
-        parser = SAC.get_argument(parser)
-        parser.add_argument('--stop-q-grad', action="store_true")
-        return parser
-
-
-if __name__ == "__main__":
-    CURLSAC(action_dim=10)
-    CURLSAC(np.zeros(shape=(32, 84, 84, 9)))
+        logp_min, logp_max, logp_mean = tf.reduce_min(logp), tf.reduce_max(logp), tf.reduce_mean(logp)
+        return td_loss_q1 + td_loss_q2, policy_loss, td_loss_q1, logp_min, logp_max, logp_mean, ae_loss, tf.reduce_mean(obs_features)
