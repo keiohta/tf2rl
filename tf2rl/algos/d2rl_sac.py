@@ -2,6 +2,7 @@ import tensorflow as tf
 import tensorflow_probability as tfp
 
 from tf2rl.policies.tfp_gaussian_actor import GaussianActor
+from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.algos.sac import SAC, CriticQ
 
 
@@ -47,6 +48,10 @@ class D2RLSAC(SAC):
     def _setup_critic_q(self, state_shape, action_dim, critic_units, lr):
         self.qf1 = DenseCriticQ(state_shape, action_dim, critic_units, name="qf1")
         self.qf2 = DenseCriticQ(state_shape, action_dim, critic_units, name="qf2")
+        self.qf1_target = DenseCriticQ(state_shape, action_dim, critic_units, name="qf1_target")
+        self.qf2_target = DenseCriticQ(state_shape, action_dim, critic_units, name="qf2_target")
+        update_target_variables(self.qf1_target.weights, self.qf1.weights, tau=1.)
+        update_target_variables(self.qf2_target.weights, self.qf2.weights, tau=1.)
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
