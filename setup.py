@@ -5,6 +5,7 @@ install_requires = [
     "setuptools>=41.0.0",
     "numpy>=1.16.0",
     "joblib",
+    "future",
     "scipy"]
 
 tf_version = "2.3"  # Default Version

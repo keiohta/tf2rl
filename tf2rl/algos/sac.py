@@ -62,7 +62,7 @@ class SAC(OffPolicyAgent):
                 self.log_alpha = tf.Variable(init_log_alpha, dtype=tf.float32)
             else:
                 self.log_alpha = tf.Variable(0., dtype=tf.float32)
-            self.alpha = tfp.util.DeferredTensor(self.log_alpha, tf.exp)
+            self.alpha = tfp.util.DeferredTensor(pretransformed_input=self.log_alpha, transform_fn=tf.exp)
             self.target_alpha = -action_dim
             self.alpha_optimizer = tf.keras.optimizers.Adam(learning_rate=lr_alpha, beta_1=0.5)
         else:
