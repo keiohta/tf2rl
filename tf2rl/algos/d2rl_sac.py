@@ -1,21 +1,8 @@
 import tensorflow as tf
 import tensorflow_probability as tfp
 
-from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.policies.tfp_gaussian_actor import GaussianActor
-from tf2rl.algos.sac import SAC, CriticQ, CriticV
-
-
-class DenseCriticV(CriticV):
-    def call(self, states):
-        features = states
-        for layer_idx, cur_layer in enumerate(self.base_layers):
-            features = cur_layer(features)
-            # Do not concatenate for the last layer
-            if not layer_idx + 1 == len(self.base_layers):
-                features = tf.concat((features, states), axis=1)
-        values = self.out_layer(features)
-        return tf.squeeze(values, axis=1)
+from tf2rl.algos.sac import SAC, CriticQ
 
 
 class DenseCriticQ(CriticQ):
@@ -62,12 +49,6 @@ class D2RLSAC(SAC):
         self.qf2 = DenseCriticQ(state_shape, action_dim, critic_units, name="qf2")
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
-
-    def _setup_critic_v(self, state_shape, critic_units, lr):
-        self.vf = DenseCriticV(state_shape, critic_units)
-        self.vf_target = DenseCriticV(state_shape, critic_units)
-        update_target_variables(self.vf_target.weights, self.vf.weights, tau=1.)
-        self.vf_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
     def _setup_actor(self, state_shape, action_dim, actor_units, lr, max_action=1.):
         self.actor = DenseGaussianActor(

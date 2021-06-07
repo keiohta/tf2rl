@@ -160,7 +160,5 @@ class AESAC(SAC):
             update_target_variables(
                 self._encoder_target.weights, self._encoder.weights, self._tau_encoder)
 
-            del tape
-
         logp_min, logp_max, logp_mean = tf.reduce_min(logp), tf.reduce_max(logp), tf.reduce_mean(logp)
         return td_loss_q1 + td_loss_q2, policy_loss, td_loss_q1, logp_min, logp_max, logp_mean, ae_loss, tf.reduce_mean(obs_features)

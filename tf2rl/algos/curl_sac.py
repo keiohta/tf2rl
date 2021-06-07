@@ -165,8 +165,6 @@ class CURLSAC(SAC):
             update_target_variables(
                 self._encoder_target.weights, self._encoder.weights, self._tau_encoder)
 
-            del tape
-
         return td_loss_q1 + td_loss_q2, policy_loss, td_loss_q1, tf.reduce_min(logp), tf.reduce_max(
             logp), tf.reduce_mean(
             logp), curl_loss, tf.reduce_mean(z_anchor), tf.reduce_mean(z_negatives), tf.reduce_mean(logits)

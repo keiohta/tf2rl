@@ -69,9 +69,6 @@ def main():
         init_temperature=0.1,
         auto_alpha=True)
 
-    import numpy as np
-    policy.get_action(state=np.zeros(shape=(84, 84, 9)))
-
     trainer = Trainer(policy, env, args, test_env=test_env)
     if args.evaluate:
         trainer.evaluate_policy_continuously()

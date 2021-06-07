@@ -8,26 +8,6 @@ from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.policies.tfp_gaussian_actor import GaussianActor
 
 
-class CriticV(tf.keras.Model):
-    def __init__(self, state_shape, critic_units=(256, 256), name='vf'):
-        super().__init__(name=name)
-
-        self.base_layers = []
-        for unit in critic_units:
-            self.base_layers.append(Dense(unit, activation='relu'))
-        self.out_layer = Dense(1, name="V", activation='linear')
-
-        dummy_state = tf.constant(np.zeros(shape=(1,) + state_shape, dtype=np.float32))
-        self(dummy_state)
-
-    def call(self, states):
-        features = states
-        for cur_layer in self.base_layers:
-            features = cur_layer(features)
-        values = self.out_layer(features)
-        return tf.squeeze(values, axis=1)
-
-
 class CriticQ(tf.keras.Model):
     def __init__(self, state_shape, action_dim, critic_units=(256, 256), name='qf'):
         super().__init__(name=name)
@@ -196,8 +176,6 @@ class SAC(OffPolicyAgent):
                 self.alpha_optimizer.apply_gradients(
                     zip(alpha_grad, [self.log_alpha]))
 
-            del tape
-
         return td_loss_q1 + td_loss_q2, policy_loss, td_loss_q1, tf.reduce_min(logp), tf.reduce_max(
             logp), tf.reduce_mean(logp)
 
@@ -215,12 +193,15 @@ class SAC(OffPolicyAgent):
             not_dones = 1. - tf.cast(dones, dtype=tf.float32)
 
             # Compute TD errors for Q-value func
-            current_q1 = self.qf1(states, actions)
-            vf_next_target = self.vf_target(next_states)
+            next_actions, next_logps = self.actor(next_states)
+            next_target_q1 = tf.stop_gradient(self.qf1_target(next_states, next_actions))
+            next_target_q2 = tf.stop_gradient(self.qf2_target(next_states, next_actions))
+            min_next_target_q = tf.minimum(next_target_q1, next_target_q2)
 
             target_q = tf.stop_gradient(
-                rewards + not_dones * self.discount * vf_next_target)
+                rewards + not_dones * self.discount * (min_next_target_q - self.alpha * next_logps))
 
+            current_q1 = self.qf1(states, actions)
             td_errors_q1 = target_q - current_q1
 
         return td_errors_q1
