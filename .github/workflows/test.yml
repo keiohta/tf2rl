@@ -7,9 +7,9 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [macos-latest]
         python: ['3.7', '3.8']
-        TF: ['2.2', '2.3']
+        TF: ['2.2', '2.3', '2.4']
         include:
           - os: ubuntu-latest
             python: '3.7'
@@ -47,6 +47,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip${{ matrix.python }}-
       - run: pip install wheel
+      - name: Install numpy<1.20.0 for MacOS
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: pip install 'numpy<1.20.0'
       - name: Install cpprb for macOS
         if: startsWith(runner.os, 'macOS')
         run: CC=gcc-9 CXX=g++-9 pip install cpprb
@@ -64,8 +67,18 @@ jobs:
       - name: Install TensorFlow Probability for tf2.3
         if: ${{ matrix.TF == '2.3' }}
         run: pip install tensorflow-probability==0.11.0 gast==0.3.3
-      - run: python -m unittest discover .
-        working-directory: './tests'
+      - name: Install TensorFlow Probability for tf2.4
+        if: ${{ matrix.TF == '2.4' }}
+        run: pip install tensorflow-probability==0.12.0 gast==0.3.3
+      - name: Install ROM of atari games for Ubuntu
+        if: ${{ matrix.TF >= '2.2' && matrix.os == 'ubuntu-latest' }}
+        run: wget http://www.atarimania.com/roms/Roms.rar && 7z x Roms.rar && unzip ROMS.zip && python -m atari_py.import_roms ROMS
+      - name: Install ROM of atari games for MacOS
+        if: ${{ matrix.TF >= '2.2' && matrix.os == 'macos-latest' }}
+        run: brew install rar && wget http://www.atarimania.com/roms/Roms.rar && unrar x Roms.rar && ditto -V -x -k --sequesterRsrc ROMS.zip . && python -m atari_py.import_roms ROMS
+      - name: Install ROM of atari games for Windows
+        if: ${{ matrix.TF >= '2.2' && matrix.os == 'windows-latest' }}
+        run: C:\msys64\usr\bin\wget.exe http://www.atarimania.com/roms/Roms.rar && 7z x Roms.rar && unzip ROMS.zip && python -m atari_py.import_roms ROMS
       - run: ./test_run_examples.sh
         shell: bash
         if: ((startsWith(runner.os, 'Windows') != true) || (matrix.python == '3.7'))
