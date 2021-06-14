@@ -7,7 +7,7 @@ install_requires = [
     "joblib",
     "scipy"]
 
-tf_version = "2.3"  # Default Version
+tf_version = "2.4"  # Default Version
 try:
     import tensorflow as tf
 
@@ -16,7 +16,8 @@ except ImportError:
     install_requires.append(f"tensorflow=={tf_version}")
     pass
 
-compatible_tfp = {"2.3": ["tensorflow-probability~=0.11.0"],
+compatible_tfp = {"2.4": ["tensorflow-probability~=0.12.0"],
+                  "2.3": ["tensorflow-probability~=0.11.0"],
                   "2.2": ["tensorflow-probability~=0.10.0"],
                   "2.1": ["tensorflow-probability~=0.8.0"],
                   "2.0": ["tensorflow-probability~=0.8.0"]}
@@ -26,7 +27,7 @@ extras_require = {
     "tf": ["tensorflow>=2.0.0"],
     "tf_gpu": ["tensorflow-gpu>=2.0.0"],
     "examples": ["gym[atari]", "opencv-python"],
-    "test": ["coveralls", "gym[atari]", "matplotlib", "opencv-python"]
+    "test": ["coveralls", "gym[atari]", "matplotlib", "opencv-python", "future"]
 }
 
 setup(
