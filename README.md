@@ -87,15 +87,14 @@ version tag which you want to use.
 The following simple command starts preinstalled container.
 
 ```bash
-docker run -it ghcr.io/keiohta/tf2rl/cpu:<version> bash
+$ docker run -it ghcr.io/keiohta/tf2rl/cpu:<version> bash
 ```
-
 
 If you also want to mount your local directory `/local/dir/path` at
 container `/mount/point`
 
 ```bash
-docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
+$ docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
 ```
 
 #### GPU Support (Linux Only, Experimental)
@@ -112,7 +111,7 @@ Requirements
 The following simple command starts preinstalled container.
 
 ```bash
-docker run --gpus all -it ghcr.io/keiohta/tf2rl/nvidia:<version> bash
+$ docker run --gpus all -it ghcr.io/keiohta/tf2rl/nvidia:<version> bash
 ```
 
 If you also want to mount your local directory `/local/dir/path` at
@@ -120,7 +119,7 @@ container `/mount/point`
 
 
 ```bash
-docker run --gpus all -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/nvidia:<version> bash
+$ docker run --gpus all -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/nvidia:<version> bash
 ```
 
 
@@ -128,7 +127,7 @@ If your container can see GPU correctly, you can check inside
 container by the following comand;
 
 ```bash
-nvidia-smi
+$ nvidia-smi
 ```
 
 
