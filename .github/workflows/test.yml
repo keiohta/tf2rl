@@ -79,6 +79,8 @@ jobs:
       - name: Install ROM of atari games for Windows
         if: ${{ matrix.TF >= '2.2' && matrix.os == 'windows-latest' }}
         run: C:\msys64\usr\bin\wget.exe http://www.atarimania.com/roms/Roms.rar && 7z x Roms.rar && unzip ROMS.zip && python -m atari_py.import_roms ROMS
+      - run: python -m unittest discover .
+        working-directory: './tests'
       - run: ./test_run_examples.sh
         shell: bash
         if: ((startsWith(runner.os, 'Windows') != true) || (matrix.python == '3.7'))
