@@ -1,6 +1,6 @@
 import dmc2gym
 
-from tf2rl.algos.ae_sac import AESAC
+from tf2rl.algos.sac_ae import SACAE
 from tf2rl.envs.dmc_wrapper import DMCWrapper
 from tf2rl.experiments.trainer import Trainer
 
@@ -20,7 +20,7 @@ def main():
         'insert_peg': ['manipulator', 'insert_peg', 4]}
 
     parser = Trainer.get_argument()
-    parser = AESAC.get_argument(parser)
+    parser = SACAE.get_argument(parser)
     parser.add_argument('--env-name', type=str, default="cartpole", choices=dm_envs.keys())
     parser.add_argument('--seed', type=int, default=1)
     parser.set_defaults(save_summary_interval=50)
@@ -51,7 +51,7 @@ def main():
     # see Table 3 of CURL paper
     lr_sac = lr_ae = 2e-4 if args.env_name == "cheetah" else 1e-3
 
-    policy = AESAC(
+    policy = SACAE(
         obs_shape=input_obs_shape,
         action_dim=env.action_space.high.size,
         gpu=args.gpu,
