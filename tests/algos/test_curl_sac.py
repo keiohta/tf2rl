@@ -2,7 +2,6 @@ import platform
 import unittest
 import tensorflow as tf
 
-from tf2rl.algos.curl_sac import CURL
 from tests.algos.common import CommonOffPolImgContinuousAlgos
 
 
@@ -11,6 +10,7 @@ from tests.algos.common import CommonOffPolImgContinuousAlgos
 class TestSAC(CommonOffPolImgContinuousAlgos):
     @classmethod
     def setUpClass(cls):
+        from tf2rl.algos.curl_sac import CURL
         super().setUpClass(img_dim=100)
         cls.agent = CURL(
             action_dim=cls.continuous_env.action_space.low.size,
