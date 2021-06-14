@@ -18,20 +18,20 @@ run "${prefix} examples/run_ddpg.py ${common_arg} ${off_pol_arg}"
 run "${prefix} examples/run_bi_res_ddpg.py ${common_arg} ${off_pol_arg}"
 run "${prefix} examples/run_td3.py ${common_arg} ${off_pol_arg}"
 run "${prefix} examples/run_sac.py ${common_arg} ${off_pol_arg}"
-#run "${prefix} examples/run_sac_discrete.py ${common_arg} ${off_pol_arg}"
+run "${prefix} examples/run_sac_discrete.py ${common_arg} ${off_pol_arg}"
 
 # DQN variants
-#run "${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg}"
-#run "${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-double-dqn --enable-dueling-dqn"
-#run "${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-noisy-dqn"
-#run "${prefix} examples/run_categorical_dqn.py ${common_arg} ${off_pol_arg}"
-#run "${prefix} examples/run_categorical_dqn.py ${common_arg} ${off_pol_arg} --enable-dueling-dqn"
+run "${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg}"
+run "${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-double-dqn --enable-dueling-dqn"
+run "${prefix} examples/run_dqn.py ${common_arg} ${off_pol_arg} --enable-noisy-dqn"
+run "${prefix} examples/run_categorical_dqn.py ${common_arg} ${off_pol_arg}"
+run "${prefix} examples/run_categorical_dqn.py ${common_arg} ${off_pol_arg} --enable-dueling-dqn"
 # DQN variants for Atari
-#run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg}"
-#run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-double-dqn --enable-dueling-dqn"
-#run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-noisy-dqn"
-#run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn"
-#run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn --enable-dueling-dqn"
+run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg}"
+run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-double-dqn --enable-dueling-dqn"
+run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-noisy-dqn"
+run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn"
+run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn --enable-dueling-dqn"
 
 # ApeX
 apex_arg="--gpu-explorer -1 --gpu-learner -1 --gpu-evaluator -1 --logging-level WARNING --n-training 4 --batch-size 32 --param-update-freq 1 --local-buffer-size 64 --test-freq 1"
@@ -47,7 +47,7 @@ run "${prefix} examples/run_apex_dqn.py ${apex_arg} --n-env 8"
 on_pol_arg="--horizon 64"
 run "${prefix} examples/run_vpg.py ${common_arg} ${on_pol_arg}"
 run "${prefix} examples/run_ppo.py ${common_arg} ${on_pol_arg}"
-#run "${prefix} examples/run_ppo_atari.py ${common_arg} ${on_pol_arg}"
+run "${prefix} examples/run_ppo_atari.py ${common_arg} ${on_pol_arg}"
 
 # Clean generated files
 rm -rf results/*TEST*
