@@ -1,3 +1,4 @@
+import platform
 from setuptools import setup, find_packages
 
 install_requires = [
@@ -27,7 +28,9 @@ compatible_tfa = {"2.3": ["tensorflow_addons~=0.13.0"],
                   "2.1": ["tensorflow_addons~=0.9.1"],
                   "2.0": ["tensorflow_addons~=0.6.0"]}
 install_requires.append(*compatible_tfp[tf_version])
-install_requires.append(*compatible_tfa[tf_version])
+if not (platform.system() == 'Windows') and (tf.version.VERSION.rsplit('.', 1)[0] == "2.0"):
+    # tensorflow-addons does not support tf2.0 on Windows
+    install_requires.append(*compatible_tfa[tf_version])
 
 extras_require = {
     "tf": ["tensorflow>=2.0.0"],
