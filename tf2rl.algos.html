@@ -93,7 +93,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="tf2rl.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.algos package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tf2rl-algos-apex-module">tf2rl.algos.apex module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.algos.apex">tf2rl.algos.apex module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.algos.bi_res_ddpg">tf2rl.algos.bi_res_ddpg module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.algos.categorical_dqn">tf2rl.algos.categorical_dqn module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tf2rl-algos-curl-sac-module">tf2rl.algos.curl_sac module</a></li>
@@ -197,8 +197,149 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="tf2rl-algos-apex-module">
-<h2>tf2rl.algos.apex module<a class="headerlink" href="#tf2rl-algos-apex-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tf2rl.algos.apex">
+<span id="tf2rl-algos-apex-module"></span><h2>tf2rl.algos.apex module<a class="headerlink" href="#module-tf2rl.algos.apex" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.algos.apex.apex_argument">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></span><span class="sig-name descname"><span class="pre">apex_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.apex_argument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.algos.apex.evaluator">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></span><span class="sig-name descname"><span class="pre">evaluator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_training_done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_weights_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_model_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_evaluation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">episode_max_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_test_progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.evaluator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate trained network weights periodically.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>is_training_done: multiprocessing.Event</dt><dd><p>multiprocessing.Event object to share the status of training.</p>
+</dd>
+<dt>env: Open-AI gym compatible environment</dt><dd><p>Environment object.</p>
+</dd>
+<dt>policy_fn: function</dt><dd><p>Method object to generate an explorer.</p>
+</dd>
+<dt>set_weights_fn: function</dt><dd><p>Method object to set network weights gotten from queue.</p>
+</dd>
+<dt>queue: multiprocessing.Queue</dt><dd><p>A FIFO shared with the learner to get the latest network weights.
+This is process safe, so you don’t need to lock process when use this.</p>
+</dd>
+<dt>gpu: int</dt><dd><p>GPU id. If this is set to -1, then this process uses only CPU.</p>
+</dd>
+<dt>save_model_interval: int</dt><dd><p>Interval to save model.</p>
+</dd>
+<dt>n_evaluation: int</dt><dd><p>Number of episodes to evaluate.</p>
+</dd>
+<dt>episode_max_steps: int</dt><dd><p>Maximum number of steps of an episode.</p>
+</dd>
+<dt>show_test_progress: bool</dt><dd><p>If true, <cite>render</cite> will be called to visualize evaluation process.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.algos.apex.explorer">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></span><span class="sig-name descname"><span class="pre">explorer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_rb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trained_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_training_done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_weights_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_thread</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">episode_max_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.explorer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Collect transitions and store them to prioritized replay buffer.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>global_rb: multiprocessing.managers.AutoProxy[PrioritizedReplayBuffer]</dt><dd><p>Prioritized replay buffer sharing with multiple explorers and only one learner.
+This object is shared over processes, so it must be locked when trying to
+operate something with <cite>lock</cite> object.</p>
+</dd>
+<dt>queue: multiprocessing.Queue</dt><dd><p>A FIFO shared with the <cite>learner</cite> and <cite>evaluator</cite> to get the latest network weights.
+This is process safe, so you don’t need to lock process when use this.</p>
+</dd>
+<dt>trained_steps: multiprocessing.Value</dt><dd><p>Number of steps to apply gradients.</p>
+</dd>
+<dt>is_training_done: multiprocessing.Event</dt><dd><p>multiprocessing.Event object to share the status of training.</p>
+</dd>
+<dt>lock: multiprocessing.Lock</dt><dd><p>Lock other processes.</p>
+</dd>
+<dt>env_fn: function</dt><dd><p>Method object to generate an environment.</p>
+</dd>
+<dt>policy_fn: function</dt><dd><p>Method object to generate an explorer.</p>
+</dd>
+<dt>set_weights_fn: function</dt><dd><p>Method object to set network weights gotten from queue.</p>
+</dd>
+<dt>noise_level: float</dt><dd><p>Noise level for exploration. For epsilon-greedy policy like DQN variants,
+this will be epsilon, and if DDPG variants this will be variance for Normal distribution.</p>
+</dd>
+<dt>n_env: int</dt><dd><p>Number of environments to distribute. If this is set to be more than 1,
+<cite>MultiThreadEnv</cite> will be used.</p>
+</dd>
+<dt>n_thread: int</dt><dd><p>Number of thread used in <cite>MultiThreadEnv</cite>.</p>
+</dd>
+<dt>buffer_size: int</dt><dd><p>Size of local buffer. If this is filled with transitions, add them to <cite>global_rb</cite></p>
+</dd>
+<dt>episode_max_steps: int</dt><dd><p>Maximum number of steps of an episode.</p>
+</dd>
+<dt>gpu: int</dt><dd><p>GPU id. If this is set to -1, then this process uses only CPU.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.algos.apex.import_tf">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></span><span class="sig-name descname"><span class="pre">import_tf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.import_tf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.algos.apex.learner">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></span><span class="sig-name descname"><span class="pre">learner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">global_rb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trained_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_training_done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_weights_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_training</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queues</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.learner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update network weights using samples collected by explorers.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>global_rb: multiprocessing.managers.AutoProxy[PrioritizedReplayBuffer]</dt><dd><p>Prioritized replay buffer sharing with multiple explorers and only one learner.
+This object is shared over processes, so it must be locked when trying to
+operate something with <cite>lock</cite> object.</p>
+</dd>
+<dt>trained_steps: multiprocessing.Value</dt><dd><p>Number of steps to apply gradients.</p>
+</dd>
+<dt>is_training_done: multiprocessing.Event</dt><dd><p>multiprocessing.Event object to share the status of training.</p>
+</dd>
+<dt>lock: multiprocessing.Lock</dt><dd><p>multiprocessing.Lock to lock other processes.</p>
+</dd>
+</dl>
+<p>env: OpenAI-gym compatible environment object
+policy_fn: function</p>
+<blockquote>
+<div><p>Method object to generate an explorer.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>get_weights_fn: function</dt><dd><p>Method object to get network weights and put them to queue.</p>
+</dd>
+<dt>n_training: int</dt><dd><p>Maximum number of times to apply gradients. If number of applying gradients
+is over this value, training will be done by setting <cite>is_training_done</cite> to <cite>True</cite></p>
+</dd>
+<dt>update_freq: int</dt><dd><p>Frequency to update parameters, i.e., put network parameters to <cite>queues</cite></p>
+</dd>
+<dt>evaluation_freq: int</dt><dd><p>Frequency to call <cite>evaluator</cite>.</p>
+</dd>
+<dt>gpu: int</dt><dd><p>GPU id. If this is set to -1, then this process uses only CPU.</p>
+</dd>
+<dt>queues: List</dt><dd><p>List of Queues shared with explorers to send latest network parameters.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.algos.apex.prepare_experiment">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></span><span class="sig-name descname"><span class="pre">prepare_experiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.prepare_experiment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.algos.apex.run">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.algos.apex.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_weights_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_weights_fn</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.apex.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-tf2rl.algos.bi_res_ddpg">
 <span id="tf2rl-algos-bi-res-ddpg-module"></span><h2>tf2rl.algos.bi_res_ddpg module<a class="headerlink" href="#module-tf2rl.algos.bi_res_ddpg" title="Permalink to this headline">¶</a></h2>

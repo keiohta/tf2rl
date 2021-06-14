@@ -185,6 +185,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tf2rl.algos.html#tf2rl.algos.ddpg.Actor">Actor (class in tf2rl.algos.ddpg)</a>
 </li>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.apex.apex_argument">apex_argument() (in module tf2rl.algos.apex)</a>
+</li>
       <li><a href="tf2rl.networks.html#tf2rl.networks.atari_model.AtariBaseModel">AtariBaseModel (class in tf2rl.networks.atari_model)</a>
 </li>
   </ul></td>
@@ -244,6 +246,8 @@
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.vpg.CriticV.call">(tf2rl.algos.vpg.CriticV method)</a>
 </li>
+        <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.DynamicsModel.call">(tf2rl.experiments.mpc_trainer.DynamicsModel method)</a>
+</li>
         <li><a href="tf2rl.networks.html#tf2rl.networks.atari_model.AtariBaseModel.call">(tf2rl.networks.atari_model.AtariBaseModel method)</a>
 </li>
         <li><a href="tf2rl.networks.html#tf2rl.networks.atari_model.AtariQFunc.call">(tf2rl.networks.atari_model.AtariQFunc method)</a>
@@ -267,8 +271,14 @@
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.ClipRewardEnv">ClipRewardEnv (class in tf2rl.envs.atari_wrapper)</a>
 </li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.MPCTrainer.collect_episodes">collect_episodes() (tf2rl.experiments.mpc_trainer.MPCTrainer method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.collect_transitions_real_env">collect_transitions_real_env() (tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer method)</a>
+</li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.collect_transitions_sim_env">collect_transitions_sim_env() (tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer method)</a>
+</li>
       <li><a href="tf2rl.tools.html#tf2rl.tools.vae.VAE.compute_apply_gradients">compute_apply_gradients() (tf2rl.tools.vae.VAE method)</a>
 </li>
       <li><a href="tf2rl.policies.html#tf2rl.policies.tfp_categorical_actor.CategoricalActor.compute_entropy">compute_entropy() (tf2rl.policies.tfp_categorical_actor.CategoricalActor method)</a>
@@ -365,6 +375,8 @@
 </li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.dqn.DQN">DQN (class in tf2rl.algos.dqn)</a>
 </li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.DynamicsModel">DynamicsModel (class in tf2rl.experiments.mpc_trainer)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -377,15 +389,29 @@
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.EpisodicLifeEnv">EpisodicLifeEnv (class in tf2rl.envs.atari_wrapper)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tf2rl.algos.html#tf2rl.algos.vail.Discriminator.EPS">EPS (tf2rl.algos.vail.Discriminator attribute)</a>
 
       <ul>
         <li><a href="tf2rl.policies.html#tf2rl.policies.tfp_gaussian_actor.GaussianActor.EPS">(tf2rl.policies.tfp_gaussian_actor.GaussianActor attribute)</a>
 </li>
       </ul></li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.evaluate_policy">evaluate_policy() (tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer method)</a>
+
+      <ul>
+        <li><a href="tf2rl.experiments.html#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.evaluate_policy">(tf2rl.experiments.on_policy_trainer.OnPolicyTrainer method)</a>
+</li>
+        <li><a href="tf2rl.experiments.html#tf2rl.experiments.trainer.Trainer.evaluate_policy">(tf2rl.experiments.trainer.Trainer method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.trainer.Trainer.evaluate_policy_continuously">evaluate_policy_continuously() (tf2rl.experiments.trainer.Trainer method)</a>
+</li>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.apex.evaluator">evaluator() (in module tf2rl.algos.apex)</a>
+</li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.normalizer.EmpiricalNormalizer.experience">experience() (tf2rl.envs.normalizer.EmpiricalNormalizer method)</a>
+</li>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.apex.explorer">explorer() (in module tf2rl.algos.apex)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -393,12 +419,20 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.FireResetEnv">FireResetEnv (class in tf2rl.envs.atari_wrapper)</a>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.finish_horizon">finish_horizon() (tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer method)</a>
+
+      <ul>
+        <li><a href="tf2rl.experiments.html#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.finish_horizon">(tf2rl.experiments.on_policy_trainer.OnPolicyTrainer method)</a>
 </li>
-      <li><a href="tf2rl.experiments.html#tf2rl.experiments.utils.frames_to_gif">frames_to_gif() (in module tf2rl.experiments.utils)</a>
+      </ul></li>
+      <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.FireResetEnv">FireResetEnv (class in tf2rl.envs.atari_wrapper)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.MPCTrainer.fit_dynamics">fit_dynamics() (tf2rl.experiments.mpc_trainer.MPCTrainer method)</a>
+</li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.utils.frames_to_gif">frames_to_gif() (in module tf2rl.experiments.utils)</a>
+</li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.FrameStack">FrameStack (class in tf2rl.envs.atari_wrapper)</a>
 
       <ul>
@@ -436,8 +470,12 @@
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.vpg.VPG.get_action">(tf2rl.algos.vpg.VPG method)</a>
 </li>
+        <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.RandomPolicy.get_action">(tf2rl.experiments.mpc_trainer.RandomPolicy method)</a>
+</li>
       </ul></li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.vpg.VPG.get_action_and_val">get_action_and_val() (tf2rl.algos.vpg.VPG method)</a>
+</li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.RandomPolicy.get_actions">get_actions() (tf2rl.experiments.mpc_trainer.RandomPolicy method)</a>
 </li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.bi_res_ddpg.BiResDDPG.get_argument">get_argument() (tf2rl.algos.bi_res_ddpg.BiResDDPG static method)</a>
 
@@ -457,6 +495,14 @@
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac.SAC.get_argument">(tf2rl.algos.sac.SAC static method)</a>
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac_discrete.SACDiscrete.get_argument">(tf2rl.algos.sac_discrete.SACDiscrete static method)</a>
+</li>
+        <li><a href="tf2rl.experiments.html#tf2rl.experiments.irl_trainer.IRLTrainer.get_argument">(tf2rl.experiments.irl_trainer.IRLTrainer static method)</a>
+</li>
+        <li><a href="tf2rl.experiments.html#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.get_argument">(tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer static method)</a>
+</li>
+        <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.MPCTrainer.get_argument">(tf2rl.experiments.mpc_trainer.MPCTrainer static method)</a>
+</li>
+        <li><a href="tf2rl.experiments.html#tf2rl.experiments.trainer.Trainer.get_argument">(tf2rl.experiments.trainer.Trainer static method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -487,6 +533,8 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.apex.import_tf">import_tf() (in module tf2rl.algos.apex)</a>
+</li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.gaifo.GAIfO.inference">inference() (tf2rl.algos.gaifo.GAIfO method)</a>
 
       <ul>
@@ -497,15 +545,21 @@
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.normalizer.EmpiricalNormalizer.inverse">inverse() (tf2rl.envs.normalizer.EmpiricalNormalizer method)</a>
 </li>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.policy_base.IRLPolicy">IRLPolicy (class in tf2rl.algos.policy_base)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="tf2rl.algos.html#tf2rl.algos.policy_base.IRLPolicy">IRLPolicy (class in tf2rl.algos.policy_base)</a>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.irl_trainer.IRLTrainer">IRLTrainer (class in tf2rl.experiments.irl_trainer)</a>
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.utils.is_atari_env">is_atari_env() (in module tf2rl.envs.utils)</a>
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.utils.is_discrete">is_discrete() (in module tf2rl.envs.utils)</a>
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.utils.is_mujoco_env">is_mujoco_env() (in module tf2rl.envs.utils)</a>
+</li>
+      <li><a href="tf2rl.misc.html#tf2rl.misc.prepare_output_dir.is_return_code_zero">is_return_code_zero() (in module tf2rl.misc.prepare_output_dir)</a>
+</li>
+      <li><a href="tf2rl.misc.html#tf2rl.misc.prepare_output_dir.is_under_git_control">is_under_git_control() (in module tf2rl.misc.prepare_output_dir)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -514,6 +568,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.LazyFrames">LazyFrames (class in tf2rl.envs.atari_wrapper)</a>
+</li>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.apex.learner">learner() (in module tf2rl.algos.apex)</a>
 </li>
       <li><a href="tf2rl.experiments.html#tf2rl.experiments.utils.load_trajectories">load_trajectories() (in module tf2rl.experiments.utils)</a>
 </li>
@@ -543,6 +599,8 @@
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.normalizer.EmpiricalNormalizer.mean">mean (tf2rl.envs.normalizer.EmpiricalNormalizer property)</a>
 </li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer">MeTrpoTrainer (class in tf2rl.experiments.me_trpo_trainer)</a>
+</li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.multi_thread_env.MultiThreadEnv.min_action">min_action (tf2rl.envs.multi_thread_env.MultiThreadEnv property)</a>
 </li>
       <li>
@@ -552,6 +610,8 @@
         <li><a href="tf2rl.html#module-tf2rl">tf2rl</a>
 </li>
         <li><a href="tf2rl.algos.html#module-tf2rl.algos">tf2rl.algos</a>
+</li>
+        <li><a href="tf2rl.algos.html#module-tf2rl.algos.apex">tf2rl.algos.apex</a>
 </li>
         <li><a href="tf2rl.algos.html#module-tf2rl.algos.bi_res_ddpg">tf2rl.algos.bi_res_ddpg</a>
 </li>
@@ -599,6 +659,16 @@
 </li>
         <li><a href="tf2rl.experiments.html#module-tf2rl.experiments">tf2rl.experiments</a>
 </li>
+        <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.irl_trainer">tf2rl.experiments.irl_trainer</a>
+</li>
+        <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.me_trpo_trainer">tf2rl.experiments.me_trpo_trainer</a>
+</li>
+        <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.mpc_trainer">tf2rl.experiments.mpc_trainer</a>
+</li>
+        <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.on_policy_trainer">tf2rl.experiments.on_policy_trainer</a>
+</li>
+        <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.trainer">tf2rl.experiments.trainer</a>
+</li>
         <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.utils">tf2rl.experiments.utils</a>
 </li>
         <li><a href="tf2rl.misc.html#module-tf2rl.misc">tf2rl.misc</a>
@@ -614,6 +684,8 @@
         <li><a href="tf2rl.misc.html#module-tf2rl.misc.normalizer">tf2rl.misc.normalizer</a>
 </li>
         <li><a href="tf2rl.misc.html#module-tf2rl.misc.periodic_ops">tf2rl.misc.periodic_ops</a>
+</li>
+        <li><a href="tf2rl.misc.html#module-tf2rl.misc.prepare_output_dir">tf2rl.misc.prepare_output_dir</a>
 </li>
         <li><a href="tf2rl.misc.html#module-tf2rl.misc.target_update_ops">tf2rl.misc.target_update_ops</a>
 </li>
@@ -638,6 +710,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.MPCTrainer">MPCTrainer (class in tf2rl.experiments.mpc_trainer)</a>
+</li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.multi_thread_env.MultiThreadEnv">MultiThreadEnv (class in tf2rl.envs.multi_thread_env)</a>
 </li>
   </ul></td>
@@ -692,6 +766,8 @@
 </li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.policy_base.OnPolicyAgent">OnPolicyAgent (class in tf2rl.algos.policy_base)</a>
 </li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer">OnPolicyTrainer (class in tf2rl.experiments.on_policy_trainer)</a>
+</li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.multi_thread_env.MultiThreadEnv.original_env">original_env (tf2rl.envs.multi_thread_env.MultiThreadEnv property)</a>
 </li>
   </ul></td>
@@ -708,8 +784,20 @@
 </li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.ppo.PPO">PPO (class in tf2rl.algos.ppo)</a>
 </li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.DynamicsModel.predict">predict() (tf2rl.experiments.mpc_trainer.DynamicsModel method)</a>
+</li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.predict_next_state">predict_next_state() (tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer method)</a>
+
+      <ul>
+        <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.MPCTrainer.predict_next_state">(tf2rl.experiments.mpc_trainer.MPCTrainer method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.apex.prepare_experiment">prepare_experiment() (in module tf2rl.algos.apex)</a>
+</li>
+      <li><a href="tf2rl.misc.html#tf2rl.misc.prepare_output_dir.prepare_output_dir">prepare_output_dir() (in module tf2rl.misc.prepare_output_dir)</a>
+</li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.ProcessFrame84.process">process() (tf2rl.envs.atari_wrapper.ProcessFrame84 static method)</a>
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.ProcessFrame84">ProcessFrame84 (class in tf2rl.envs.atari_wrapper)</a>
@@ -738,6 +826,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.RandomPolicy">RandomPolicy (class in tf2rl.experiments.mpc_trainer)</a>
+</li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.dmc_wrapper.DMCWrapper.render">render() (tf2rl.envs.dmc_wrapper.DMCWrapper method)</a>
 </li>
       <li><a href="tf2rl.tools.html#tf2rl.tools.vae.VAE.reparameterize">reparameterize() (tf2rl.tools.vae.VAE method)</a>
@@ -763,6 +853,8 @@
       <li><a href="tf2rl.experiments.html#tf2rl.experiments.utils.restore_latest_n_traj">restore_latest_n_traj() (in module tf2rl.experiments.utils)</a>
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.ClipRewardEnv.reward">reward() (tf2rl.envs.atari_wrapper.ClipRewardEnv method)</a>
+</li>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.apex.run">run() (in module tf2rl.algos.apex)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -828,6 +920,13 @@
 
       <ul>
         <li><a href="tf2rl.algos.html#module-tf2rl.algos">module</a>
+</li>
+      </ul></li>
+      <li>
+    tf2rl.algos.apex
+
+      <ul>
+        <li><a href="tf2rl.algos.html#module-tf2rl.algos.apex">module</a>
 </li>
       </ul></li>
       <li>
@@ -984,13 +1083,48 @@
         <li><a href="tf2rl.envs.html#module-tf2rl.envs.utils">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     tf2rl.experiments
 
       <ul>
         <li><a href="tf2rl.experiments.html#module-tf2rl.experiments">module</a>
+</li>
+      </ul></li>
+      <li>
+    tf2rl.experiments.irl_trainer
+
+      <ul>
+        <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.irl_trainer">module</a>
+</li>
+      </ul></li>
+      <li>
+    tf2rl.experiments.me_trpo_trainer
+
+      <ul>
+        <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.me_trpo_trainer">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    tf2rl.experiments.mpc_trainer
+
+      <ul>
+        <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.mpc_trainer">module</a>
+</li>
+      </ul></li>
+      <li>
+    tf2rl.experiments.on_policy_trainer
+
+      <ul>
+        <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.on_policy_trainer">module</a>
+</li>
+      </ul></li>
+      <li>
+    tf2rl.experiments.trainer
+
+      <ul>
+        <li><a href="tf2rl.experiments.html#module-tf2rl.experiments.trainer">module</a>
 </li>
       </ul></li>
       <li>
@@ -1047,6 +1181,13 @@
 
       <ul>
         <li><a href="tf2rl.misc.html#module-tf2rl.misc.periodic_ops">module</a>
+</li>
+      </ul></li>
+      <li>
+    tf2rl.misc.prepare_output_dir
+
+      <ul>
+        <li><a href="tf2rl.misc.html#module-tf2rl.misc.prepare_output_dir">module</a>
 </li>
       </ul></li>
       <li>
@@ -1141,11 +1282,17 @@
         <li><a href="tf2rl.algos.html#tf2rl.algos.vpg.VPG.train">(tf2rl.algos.vpg.VPG method)</a>
 </li>
       </ul></li>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.trainer.Trainer">Trainer (class in tf2rl.experiments.trainer)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tf2rl.experiments.html#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.update_policy">update_policy() (tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer method)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tf2rl.misc.html#tf2rl.misc.target_update_ops.update_target_variables">update_target_variables() (in module tf2rl.misc.target_update_ops)</a>
 </li>

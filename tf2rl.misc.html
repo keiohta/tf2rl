@@ -102,7 +102,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.initialize_logger">tf2rl.misc.initialize_logger module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.normalizer">tf2rl.misc.normalizer module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.periodic_ops">tf2rl.misc.periodic_ops module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tf2rl-misc-prepare-output-dir-module">tf2rl.misc.prepare_output_dir module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.prepare_output_dir">tf2rl.misc.prepare_output_dir module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc.target_update_ops">tf2rl.misc.target_update_ops module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.misc">Module contents</a></li>
 </ul>
@@ -357,8 +357,75 @@ output (for example, a tf.group()).</p></li>
 </dd></dl>
 
 </div>
-<div class="section" id="tf2rl-misc-prepare-output-dir-module">
-<h2>tf2rl.misc.prepare_output_dir module<a class="headerlink" href="#tf2rl-misc-prepare-output-dir-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tf2rl.misc.prepare_output_dir">
+<span id="tf2rl-misc-prepare-output-dir-module"></span><h2>tf2rl.misc.prepare_output_dir module<a class="headerlink" href="#module-tf2rl.misc.prepare_output_dir" title="Permalink to this headline">¶</a></h2>
+<p>MIT License</p>
+<p>Copyright (c) 2017 Preferred Networks, Inc.</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.misc.prepare_output_dir.is_return_code_zero">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.misc.prepare_output_dir.</span></span><span class="sig-name descname"><span class="pre">is_return_code_zero</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.prepare_output_dir.is_return_code_zero" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if the given command’s return code is zero.
+All the messages to stdout or stderr are suppressed.
+forked from <a class="reference external" href="https://github.com/chainer/chainerrl/blob/master/chainerrl/misc/is_return_code_zero.py">https://github.com/chainer/chainerrl/blob/master/chainerrl/misc/is_return_code_zero.py</a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.misc.prepare_output_dir.is_under_git_control">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.misc.prepare_output_dir.</span></span><span class="sig-name descname"><span class="pre">is_under_git_control</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.prepare_output_dir.is_under_git_control" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true iff the current directory is under git control.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.misc.prepare_output_dir.prepare_output_dir">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.misc.prepare_output_dir.</span></span><span class="sig-name descname"><span class="pre">prepare_output_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_specified_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'%Y%m%dT%H%M%S.%f'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.prepare_output_dir.prepare_output_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare a directory for outputting training results.
+An output directory, which ends with the current datetime string,
+is created. Then the following infomation is saved into the directory:</p>
+<blockquote>
+<div><p>args.txt: command line arguments
+command.txt: command itself
+environ.txt: environmental variables</p>
+</div></blockquote>
+<p>Additionally, if the current directory is under git control, the following
+information is saved:</p>
+<blockquote>
+<div><p>git-head.txt: result of <cite>git rev-parse HEAD</cite>
+git-status.txt: result of <cite>git status</cite>
+git-log.txt: result of <cite>git log</cite>
+git-diff.txt: result of <cite>git diff</cite></p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>(</strong><strong>dict</strong><strong> or </strong><strong>argparse.Namespace</strong><strong>)</strong> (<em>args</em>) – Arguments to save</p></li>
+<li><p><strong>(</strong><strong>str</strong><strong> or </strong><strong>None</strong><strong>)</strong> (<em>user_specified_dir</em>) – If str is specified, the output
+directory is created under that path. If not specified, it is
+created as a new temporary directory instead.</p></li>
+<li><p><strong>(</strong><strong>list</strong><strong> or </strong><strong>None</strong><strong>)</strong> (<em>argv</em>) – The list of command line arguments passed to a
+script. If not specified, sys.argv is used instead.</p></li>
+<li><p><strong>(</strong><strong>str</strong><strong>)</strong> (<em>time_format</em>) – Format used to represent the current datetime. The</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param default format is the basic format of ISO 8601.
+:return: Path of the output directory created by this function (str).</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-tf2rl.misc.target_update_ops">
 <span id="tf2rl-misc-target-update-ops-module"></span><h2>tf2rl.misc.target_update_ops module<a class="headerlink" href="#module-tf2rl.misc.target_update_ops" title="Permalink to this headline">¶</a></h2>

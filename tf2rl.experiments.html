@@ -95,11 +95,11 @@
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.envs.html">tf2rl.envs package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.experiments package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tf2rl-experiments-irl-trainer-module">tf2rl.experiments.irl_trainer module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tf2rl-experiments-me-trpo-trainer-module">tf2rl.experiments.me_trpo_trainer module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tf2rl-experiments-mpc-trainer-module">tf2rl.experiments.mpc_trainer module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tf2rl-experiments-on-policy-trainer-module">tf2rl.experiments.on_policy_trainer module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tf2rl-experiments-trainer-module">tf2rl.experiments.trainer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.experiments.irl_trainer">tf2rl.experiments.irl_trainer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.experiments.me_trpo_trainer">tf2rl.experiments.me_trpo_trainer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.experiments.mpc_trainer">tf2rl.experiments.mpc_trainer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.experiments.on_policy_trainer">tf2rl.experiments.on_policy_trainer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.experiments.trainer">tf2rl.experiments.trainer module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.experiments.utils">tf2rl.experiments.utils module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.experiments">Module contents</a></li>
 </ul>
@@ -187,20 +187,243 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="tf2rl-experiments-irl-trainer-module">
-<h2>tf2rl.experiments.irl_trainer module<a class="headerlink" href="#tf2rl-experiments-irl-trainer-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tf2rl.experiments.irl_trainer">
+<span id="tf2rl-experiments-irl-trainer-module"></span><h2>tf2rl.experiments.irl_trainer module<a class="headerlink" href="#module-tf2rl.experiments.irl_trainer" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.experiments.irl_trainer.IRLTrainer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.irl_trainer.</span></span><span class="sig-name descname"><span class="pre">IRLTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">irl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_next_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_act</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.irl_trainer.IRLTrainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tf2rl.experiments.trainer.Trainer" title="tf2rl.experiments.trainer.Trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.experiments.trainer.Trainer</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.irl_trainer.IRLTrainer.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.irl_trainer.IRLTrainer.get_argument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="tf2rl-experiments-me-trpo-trainer-module">
-<h2>tf2rl.experiments.me_trpo_trainer module<a class="headerlink" href="#tf2rl-experiments-me-trpo-trainer-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tf2rl.experiments.me_trpo_trainer">
+<span id="tf2rl-experiments-me-trpo-trainer-module"></span><h2>tf2rl.experiments.me_trpo_trainer module<a class="headerlink" href="#module-tf2rl.experiments.me_trpo_trainer" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.me_trpo_trainer.</span></span><span class="sig-name descname"><span class="pre">MeTrpoTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_eval_episodes_per_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tf2rl.experiments.mpc_trainer.MPCTrainer" title="tf2rl.experiments.mpc_trainer.MPCTrainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.experiments.mpc_trainer.MPCTrainer</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.collect_transitions_real_env">
+<span class="sig-name descname"><span class="pre">collect_transitions_real_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.collect_transitions_real_env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.collect_transitions_sim_env">
+<span class="sig-name descname"><span class="pre">collect_transitions_sim_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.collect_transitions_sim_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate transitions using dynamics model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.evaluate_policy">
+<span class="sig-name descname"><span class="pre">evaluate_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.evaluate_policy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.finish_horizon">
+<span class="sig-name descname"><span class="pre">finish_horizon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">last_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.finish_horizon" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: These codes are completly identical to the ones defined in on_policy_trainer.py. Use it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.get_argument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.predict_next_state">
+<span class="sig-name descname"><span class="pre">predict_next_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.predict_next_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.update_policy">
+<span class="sig-name descname"><span class="pre">update_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.update_policy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="tf2rl-experiments-mpc-trainer-module">
-<h2>tf2rl.experiments.mpc_trainer module<a class="headerlink" href="#tf2rl-experiments-mpc-trainer-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tf2rl.experiments.mpc_trainer">
+<span id="tf2rl-experiments-mpc-trainer-module"></span><h2>tf2rl.experiments.mpc_trainer module<a class="headerlink" href="#module-tf2rl.experiments.mpc_trainer" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.DynamicsModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.mpc_trainer.</span></span><span class="sig-name descname"><span class="pre">DynamicsModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.DynamicsModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.DynamicsModel.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.DynamicsModel.call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.DynamicsModel.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.DynamicsModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates output predictions for the input samples.</p>
+<p>Computation is done in batches. This method is designed for performance in
+large scale inputs. For small amount of inputs that fit in one batch,
+directly using <cite>__call__</cite> is recommended for faster execution, e.g.,
+<cite>model(x)</cite>, or <cite>model(x, training=False)</cite> if you have layers such as
+<cite>tf.keras.layers.BatchNormalization</cite> that behaves differently during
+inference. Also, note the fact that test loss is not affected by
+regularization layers like noise and dropout.</p>
+<dl>
+<dt>Arguments:</dt><dd><dl>
+<dt>x: Input samples. It could be:</dt><dd><ul class="simple">
+<li><p>A Numpy array (or array-like), or a list of arrays
+(in case the model has multiple inputs).</p></li>
+<li><p>A TensorFlow tensor, or a list of tensors
+(in case the model has multiple inputs).</p></li>
+<li><p>A <cite>tf.data</cite> dataset.</p></li>
+<li><p>A generator or <cite>keras.utils.Sequence</cite> instance.</p></li>
+</ul>
+<p>A more detailed description of unpacking behavior for iterator types
+(Dataset, generator, Sequence) is given in the <cite>Unpacking behavior
+for iterator-like inputs</cite> section of <cite>Model.fit</cite>.</p>
+</dd>
+<dt>batch_size: Integer or <cite>None</cite>.</dt><dd><p>Number of samples per batch.
+If unspecified, <cite>batch_size</cite> will default to 32.
+Do not specify the <cite>batch_size</cite> if your data is in the
+form of dataset, generators, or <cite>keras.utils.Sequence</cite> instances
+(since they generate batches).</p>
+</dd>
+</dl>
+<p>verbose: Verbosity mode, 0 or 1.
+steps: Total number of steps (batches of samples)</p>
+<blockquote>
+<div><p>before declaring the prediction round finished.
+Ignored with the default value of <cite>None</cite>. If x is a <cite>tf.data</cite>
+dataset and <cite>steps</cite> is None, <cite>predict</cite> will
+run until the input dataset is exhausted.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>callbacks: List of <cite>keras.callbacks.Callback</cite> instances.</dt><dd><p>List of callbacks to apply during prediction.
+See [callbacks](/api_docs/python/tf/keras/callbacks).</p>
+</dd>
+<dt>max_queue_size: Integer. Used for generator or <cite>keras.utils.Sequence</cite></dt><dd><p>input only. Maximum size for the generator queue.
+If unspecified, <cite>max_queue_size</cite> will default to 10.</p>
+</dd>
+<dt>workers: Integer. Used for generator or <cite>keras.utils.Sequence</cite> input</dt><dd><p>only. Maximum number of processes to spin up when using
+process-based threading. If unspecified, <cite>workers</cite> will default
+to 1. If 0, will execute the generator on the main thread.</p>
+</dd>
+<dt>use_multiprocessing: Boolean. Used for generator or</dt><dd><p><cite>keras.utils.Sequence</cite> input only. If <cite>True</cite>, use process-based
+threading. If unspecified, <cite>use_multiprocessing</cite> will default to
+<cite>False</cite>. Note that because this implementation relies on
+multiprocessing, you should not pass non-picklable arguments to
+the generator as they can’t be passed easily to children processes.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>See the discussion of <cite>Unpacking behavior for iterator-like inputs</cite> for
+<cite>Model.fit</cite>. Note that Model.predict uses the same interpretation rules as
+<cite>Model.fit</cite> and <cite>Model.evaluate</cite>, so inputs must be unambiguous for all
+three methods.</p>
+<dl>
+<dt>Returns:</dt><dd><p>Numpy array(s) of predictions.</p>
+</dd>
+<dt>Raises:</dt><dd><p>RuntimeError: If <cite>model.predict</cite> is wrapped in <cite>tf.function</cite>.
+ValueError: In case of mismatch between the provided</p>
+<blockquote>
+<div><p>input data and the model’s expectations,
+or in case a stateful model receives a number of samples
+that is not a multiple of the batch size.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.mpc_trainer.</span></span><span class="sig-name descname"><span class="pre">MPCTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_dynamics_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tf2rl.experiments.trainer.Trainer" title="tf2rl.experiments.trainer.Trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.experiments.trainer.Trainer</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer.collect_episodes">
+<span class="sig-name descname"><span class="pre">collect_episodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_rollout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer.collect_episodes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer.fit_dynamics">
+<span class="sig-name descname"><span class="pre">fit_dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer.fit_dynamics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer.get_argument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer.predict_next_state">
+<span class="sig-name descname"><span class="pre">predict_next_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer.predict_next_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.RandomPolicy">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.mpc_trainer.</span></span><span class="sig-name descname"><span class="pre">RandomPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_dim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.RandomPolicy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.RandomPolicy.get_action">
+<span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.RandomPolicy.get_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.RandomPolicy.get_actions">
+<span class="sig-name descname"><span class="pre">get_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obses</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.RandomPolicy.get_actions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="tf2rl-experiments-on-policy-trainer-module">
-<h2>tf2rl.experiments.on_policy_trainer module<a class="headerlink" href="#tf2rl-experiments-on-policy-trainer-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tf2rl.experiments.on_policy_trainer">
+<span id="tf2rl-experiments-on-policy-trainer-module"></span><h2>tf2rl.experiments.on_policy_trainer module<a class="headerlink" href="#module-tf2rl.experiments.on_policy_trainer" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.experiments.on_policy_trainer.OnPolicyTrainer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.on_policy_trainer.</span></span><span class="sig-name descname"><span class="pre">OnPolicyTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tf2rl.experiments.trainer.Trainer" title="tf2rl.experiments.trainer.Trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.experiments.trainer.Trainer</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.evaluate_policy">
+<span class="sig-name descname"><span class="pre">evaluate_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.evaluate_policy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.finish_horizon">
+<span class="sig-name descname"><span class="pre">finish_horizon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">last_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.finish_horizon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="tf2rl-experiments-trainer-module">
-<h2>tf2rl.experiments.trainer module<a class="headerlink" href="#tf2rl-experiments-trainer-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tf2rl.experiments.trainer">
+<span id="tf2rl-experiments-trainer-module"></span><h2>tf2rl.experiments.trainer module<a class="headerlink" href="#module-tf2rl.experiments.trainer" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.experiments.trainer.Trainer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.trainer.</span></span><span class="sig-name descname"><span class="pre">Trainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.trainer.Trainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.trainer.Trainer.evaluate_policy">
+<span class="sig-name descname"><span class="pre">evaluate_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.trainer.Trainer.evaluate_policy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.trainer.Trainer.evaluate_policy_continuously">
+<span class="sig-name descname"><span class="pre">evaluate_policy_continuously</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.trainer.Trainer.evaluate_policy_continuously" title="Permalink to this definition">¶</a></dt>
+<dd><p>Periodically search the latest checkpoint, and keep evaluating with the latest model until user kills process.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.experiments.trainer.Trainer.get_argument">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.trainer.Trainer.get_argument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-tf2rl.experiments.utils">
 <span id="tf2rl-experiments-utils-module"></span><h2>tf2rl.experiments.utils module<a class="headerlink" href="#module-tf2rl.experiments.utils" title="Permalink to this headline">¶</a></h2>
