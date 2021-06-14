@@ -27,7 +27,7 @@ extras_require = {
     "tf": ["tensorflow>=2.0.0"],
     "tf_gpu": ["tensorflow-gpu>=2.0.0"],
     "examples": ["gym[atari]", "opencv-python"],
-    "test": ["coveralls", "gym[atari]", "matplotlib", "opencv-python"]
+    "test": ["coveralls", "gym[atari]", "matplotlib", "opencv-python", "future"]
 }
 
 setup(
