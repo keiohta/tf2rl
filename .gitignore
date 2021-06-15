@@ -18,3 +18,5 @@ dist/*
 
 *.out
 .eggs/*
+
+venv/*

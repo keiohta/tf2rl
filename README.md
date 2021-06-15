@@ -16,7 +16,7 @@ Following algorithms are supported:
 | [DQN](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf) (including [DDQN](https://arxiv.org/abs/1509.06461), [Prior. DQN](https://arxiv.org/abs/1511.05952), [Duel. DQN](https://arxiv.org/abs/1511.06581), [Distrib. DQN](<https://arxiv.org/abs/1707.06887>), [Noisy DQN](<https://arxiv.org/abs/1706.10295>)) |       ✓        |         -         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
 | [DDPG](https://arxiv.org/abs/1509.02971) (including [TD3](<https://arxiv.org/abs/1802.09477>), [BiResDDPG](<https://arxiv.org/abs/1905.01072>)) |       -        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
 |          [SAC](<https://arxiv.org/abs/1801.01290>)           |       ✓        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
-|           [CURL](https://arxiv.org/abs/2004.04136)           |       -        |         ✓         |                     -                      | Model-free Off-policy RL |
+| [CURL](https://arxiv.org/abs/2004.04136), [SAC-AE](https://arxiv.org/abs/1910.01741) |       -        |         ✓         |                     -                      | Model-free Off-policy RL |
 | [MPC](https://arxiv.org/abs/1708.02596), [ME-TRPO](https://arxiv.org/abs/1802.10592) |       ✓        |         ✓         |                     -                      | Model-base RL            |
 | [GAIL](<https://arxiv.org/abs/1606.03476>), [GAIfO](<https://arxiv.org/abs/1807.06158>), [VAIL](<https://arxiv.org/abs/1810.00821>) (including [Spectral Normalization](<https://arxiv.org/abs/1802.05957>)) |       ✓        |         ✓         |                     -                      | Imitation Learning       |
 
@@ -40,6 +40,7 @@ Following papers have been implemented in tf2rl:
   - [Addressing Function Approximation Error in Actor-Critic Methods](<https://arxiv.org/abs/1802.09477>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/td3.py>)
   - [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/bi_res_ddpg.py>)
   - [Soft Actor-Critic for Discrete Action Settings](https://arxiv.org/abs/1910.07207v1), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac_discrete.py>)
+  - [Improving Sample Efficiency in Model-Free Reinforcement Learning from Images](https://arxiv.org/abs/1910.01741), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/ae_sac.py)
   - [CURL: Contrastive Unsupervised Representations for Reinforcement Learning](https://arxiv.org/abs/2004.04136), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/curl_sac.py>)
 - Model-base RL
   - [Neural Network Dynamics for Model-Based Deep Reinforcement Learning with Model-Free Fine-Tuning](https://arxiv.org/abs/1708.02596), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/experiments/mpc_trainer.py)
@@ -86,15 +87,14 @@ version tag which you want to use.
 The following simple command starts preinstalled container.
 
 ```bash
-docker run -it ghcr.io/keiohta/tf2rl/cpu:<version> bash
+$ docker run -it ghcr.io/keiohta/tf2rl/cpu:<version> bash
 ```
-
 
 If you also want to mount your local directory `/local/dir/path` at
 container `/mount/point`
 
 ```bash
-docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
+$ docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
 ```
 
 #### GPU Support (Linux Only, Experimental)
@@ -111,7 +111,7 @@ Requirements
 The following simple command starts preinstalled container.
 
 ```bash
-docker run --gpus all -it ghcr.io/keiohta/tf2rl/nvidia:<version> bash
+$ docker run --gpus all -it ghcr.io/keiohta/tf2rl/nvidia:<version> bash
 ```
 
 If you also want to mount your local directory `/local/dir/path` at
@@ -119,7 +119,7 @@ container `/mount/point`
 
 
 ```bash
-docker run --gpus all -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/nvidia:<version> bash
+$ docker run --gpus all -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/nvidia:<version> bash
 ```
 
 
@@ -127,7 +127,7 @@ If your container can see GPU correctly, you can check inside
 container by the following comand;
 
 ```bash
-nvidia-smi
+$ nvidia-smi
 ```
 
 

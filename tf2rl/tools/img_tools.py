@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 from skimage.util.shape import view_as_windows
 
 
@@ -58,6 +59,17 @@ def center_crop(img, output_size):
         return img[:, top:top + new_h, left:left + new_w, :]
 
 
+def preprocess_img(img, bits=5):
+    """Preprocessing image, see https://arxiv.org/abs/1807.03039."""
+    bins = 2 ** bits
+    if bits < 8:
+        obs = tf.cast(tf.floor(img / 2 ** (8 - bits)), dtype=tf.float32)
+    obs = obs / bins
+    obs = obs + tf.random.uniform(shape=obs.shape) / bins
+    obs = obs - 0.5
+    return obs
+
+
 if __name__ == "__main__":
     batch_size = 64
     channels = 9
@@ -66,3 +78,11 @@ if __name__ == "__main__":
     imgs = np.zeros(shape=(64, w, h, channels), dtype=np.float32)
     randomly_cropped_imgs = random_crop(imgs, output_size)
     print(imgs.shape, randomly_cropped_imgs.shape)
+
+    if tf.config.experimental.list_physical_devices('GPU'):
+        for cur_device in tf.config.experimental.list_physical_devices("GPU"):
+            print(cur_device)
+            tf.config.experimental.set_memory_growth(cur_device, enable=True)
+
+    img = np.zeros(shape=(64, 84, 84, 9), dtype=np.uint8)
+    preprocess_img(img)

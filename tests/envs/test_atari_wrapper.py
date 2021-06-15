@@ -1,5 +1,5 @@
-import platform
 import sys
+import platform
 import unittest
 
 import numpy as np

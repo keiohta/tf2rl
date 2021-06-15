@@ -30,8 +30,6 @@ run "${prefix} examples/run_categorical_dqn.py ${common_arg} ${off_pol_arg} --en
 run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg}"
 run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-double-dqn --enable-dueling-dqn"
 run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-noisy-dqn"
-#run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn"
-#run "${prefix} examples/run_dqn_atari.py ${common_arg} ${off_pol_arg} --enable-categorical-dqn --enable-dueling-dqn"
 
 # ApeX
 apex_arg="--gpu-explorer -1 --gpu-learner -1 --gpu-evaluator -1 --logging-level WARNING --n-training 4 --batch-size 32 --param-update-freq 1 --local-buffer-size 64 --test-freq 1"

@@ -1,3 +1,4 @@
+import platform
 from setuptools import setup, find_packages
 
 install_requires = [
@@ -5,7 +6,9 @@ install_requires = [
     "setuptools>=41.0.0",
     "numpy>=1.16.0",
     "joblib",
-    "scipy"]
+    "future",
+    "scipy",
+    "scikit-image"]
 
 tf_version = "2.4"  # Default Version
 try:
@@ -21,7 +24,15 @@ compatible_tfp = {"2.4": ["tensorflow-probability~=0.12.0"],
                   "2.2": ["tensorflow-probability~=0.10.0"],
                   "2.1": ["tensorflow-probability~=0.8.0"],
                   "2.0": ["tensorflow-probability~=0.8.0"]}
+compatible_tfa = {"2.4": ["tensorflow_addons~=0.13.0"],
+                  "2.3": ["tensorflow_addons~=0.13.0"],
+                  "2.2": ["tensorflow_addons==0.11.2"],
+                  "2.1": ["tensorflow_addons~=0.9.1"],
+                  "2.0": ["tensorflow_addons~=0.6.0"]}
 install_requires.append(*compatible_tfp[tf_version])
+if not (platform.system() == 'Windows' and tf_version == "2.0"):
+    # tensorflow-addons does not support tf2.0 on Windows
+    install_requires.append(*compatible_tfa[tf_version])
 
 extras_require = {
     "tf": ["tensorflow>=2.0.0"],
@@ -32,7 +43,7 @@ extras_require = {
 
 setup(
     name="tf2rl",
-    version="1.1.3",
+    version="1.1.4",
     description="Deep Reinforcement Learning for TensorFlow2",
     url="https://github.com/keiohta/tf2rl",
     author="Kei Ohta",
