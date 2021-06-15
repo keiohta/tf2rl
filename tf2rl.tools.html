@@ -98,7 +98,7 @@
 <li class="toctree-l3"><a class="reference internal" href="tf2rl.policies.html">tf2rl.policies package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">tf2rl.tools package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#tf2rl-tools-img-tools-module">tf2rl.tools.img_tools module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.tools.img_tools">tf2rl.tools.img_tools module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.tools.vae">tf2rl.tools.vae module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-tf2rl.tools">Module contents</a></li>
 </ul>
@@ -182,8 +182,44 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="tf2rl-tools-img-tools-module">
-<h2>tf2rl.tools.img_tools module<a class="headerlink" href="#tf2rl-tools-img-tools-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tf2rl.tools.img_tools">
+<span id="tf2rl-tools-img-tools-module"></span><h2>tf2rl.tools.img_tools module<a class="headerlink" href="#module-tf2rl.tools.img_tools" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.tools.img_tools.center_crop">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.tools.img_tools.</span></span><span class="sig-name descname"><span class="pre">center_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.img_tools.center_crop" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>img: np.ndarray</dt><dd><p>Input image array. The shape is (width, height, channel)</p>
+</dd>
+<dt>output_size: int</dt><dd><p>Width and height size for output image</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.tools.img_tools.preprocess_img">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.tools.img_tools.</span></span><span class="sig-name descname"><span class="pre">preprocess_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.img_tools.preprocess_img" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preprocessing image, see <a class="reference external" href="https://arxiv.org/abs/1807.03039">https://arxiv.org/abs/1807.03039</a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.tools.img_tools.random_crop">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.tools.img_tools.</span></span><span class="sig-name descname"><span class="pre">random_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.img_tools.random_crop" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>input_imgs: np.ndarray</dt><dd><p>Images whose shape is (batch_size, width, height, channels)</p>
+</dd>
+<dt>output_size: Int</dt><dd><p>Output width and height size.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Returns:</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-tf2rl.tools.vae">
 <span id="tf2rl-tools-vae-module"></span><h2>tf2rl.tools.vae module<a class="headerlink" href="#module-tf2rl.tools.vae" title="Permalink to this headline">¶</a></h2>

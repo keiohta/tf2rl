@@ -12,6 +12,14 @@ tf2rl.networks.atari\_model module
    :undoc-members:
    :show-inheritance:
 
+tf2rl.networks.dmc\_model module
+--------------------------------
+
+.. automodule:: tf2rl.networks.dmc_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tf2rl.networks.noisy\_dense module
 ----------------------------------
 

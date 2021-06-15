@@ -100,6 +100,14 @@ tf2rl.algos.sac module
    :undoc-members:
    :show-inheritance:
 
+tf2rl.algos.sac\_ae module
+--------------------------
+
+.. automodule:: tf2rl.algos.sac_ae
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 tf2rl.algos.sac\_discrete module
 --------------------------------
 

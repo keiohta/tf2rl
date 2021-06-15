@@ -224,8 +224,6 @@
       <ul>
         <li><a href="tf2rl.algos.html#tf2rl.algos.d2rl_sac.DenseCriticQ.call">(tf2rl.algos.d2rl_sac.DenseCriticQ method)</a>
 </li>
-        <li><a href="tf2rl.algos.html#tf2rl.algos.d2rl_sac.DenseCriticV.call">(tf2rl.algos.d2rl_sac.DenseCriticV method)</a>
-</li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.ddpg.Actor.call">(tf2rl.algos.ddpg.Actor method)</a>
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.ddpg.Critic.call">(tf2rl.algos.ddpg.Critic method)</a>
@@ -235,8 +233,6 @@
         <li><a href="tf2rl.algos.html#tf2rl.algos.gail.Discriminator.call">(tf2rl.algos.gail.Discriminator method)</a>
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac.CriticQ.call">(tf2rl.algos.sac.CriticQ method)</a>
-</li>
-        <li><a href="tf2rl.algos.html#tf2rl.algos.sac.CriticV.call">(tf2rl.algos.sac.CriticV method)</a>
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac_discrete.CriticQ.call">(tf2rl.algos.sac_discrete.CriticQ method)</a>
 </li>
@@ -251,6 +247,10 @@
         <li><a href="tf2rl.networks.html#tf2rl.networks.atari_model.AtariBaseModel.call">(tf2rl.networks.atari_model.AtariBaseModel method)</a>
 </li>
         <li><a href="tf2rl.networks.html#tf2rl.networks.atari_model.AtariQFunc.call">(tf2rl.networks.atari_model.AtariQFunc method)</a>
+</li>
+        <li><a href="tf2rl.networks.html#tf2rl.networks.dmc_model.Decoder.call">(tf2rl.networks.dmc_model.Decoder method)</a>
+</li>
+        <li><a href="tf2rl.networks.html#tf2rl.networks.dmc_model.Encoder.call">(tf2rl.networks.dmc_model.Encoder method)</a>
 </li>
         <li><a href="tf2rl.networks.html#tf2rl.networks.noisy_dense.NoisyDense.call">(tf2rl.networks.noisy_dense.NoisyDense method)</a>
 </li>
@@ -268,6 +268,8 @@
       <li><a href="tf2rl.policies.html#tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic">CategoricalActorCritic (class in tf2rl.policies.tfp_categorical_actor)</a>
 </li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.categorical_dqn.CategoricalDQN">CategoricalDQN (class in tf2rl.algos.categorical_dqn)</a>
+</li>
+      <li><a href="tf2rl.tools.html#tf2rl.tools.img_tools.center_crop">center_crop() (in module tf2rl.tools.img_tools)</a>
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.ClipRewardEnv">ClipRewardEnv (class in tf2rl.envs.atari_wrapper)</a>
 </li>
@@ -318,6 +320,8 @@
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac.SAC.compute_td_error">(tf2rl.algos.sac.SAC method)</a>
 </li>
+        <li><a href="tf2rl.algos.html#tf2rl.algos.sac_ae.SACAE.compute_td_error">(tf2rl.algos.sac_ae.SACAE method)</a>
+</li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac_discrete.SACDiscrete.compute_td_error">(tf2rl.algos.sac_discrete.SACDiscrete method)</a>
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.td3.TD3.compute_td_error">(tf2rl.algos.td3.TD3 method)</a>
@@ -335,12 +339,10 @@
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac_discrete.CriticQ">(class in tf2rl.algos.sac_discrete)</a>
 </li>
       </ul></li>
-      <li><a href="tf2rl.algos.html#tf2rl.algos.sac.CriticV">CriticV (class in tf2rl.algos.sac)</a>
-
-      <ul>
-        <li><a href="tf2rl.algos.html#tf2rl.algos.vpg.CriticV">(class in tf2rl.algos.vpg)</a>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.vpg.CriticV">CriticV (class in tf2rl.algos.vpg)</a>
 </li>
-      </ul></li>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.curl_sac.CURL">CURL (class in tf2rl.algos.curl_sac)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -353,9 +355,9 @@
 </li>
       <li><a href="tf2rl.tools.html#tf2rl.tools.vae.VAE.decode">decode() (tf2rl.tools.vae.VAE method)</a>
 </li>
-      <li><a href="tf2rl.algos.html#tf2rl.algos.d2rl_sac.DenseCriticQ">DenseCriticQ (class in tf2rl.algos.d2rl_sac)</a>
+      <li><a href="tf2rl.networks.html#tf2rl.networks.dmc_model.Decoder">Decoder (class in tf2rl.networks.dmc_model)</a>
 </li>
-      <li><a href="tf2rl.algos.html#tf2rl.algos.d2rl_sac.DenseCriticV">DenseCriticV (class in tf2rl.algos.d2rl_sac)</a>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.d2rl_sac.DenseCriticQ">DenseCriticQ (class in tf2rl.algos.d2rl_sac)</a>
 </li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.d2rl_sac.DenseGaussianActor">DenseGaussianActor (class in tf2rl.algos.d2rl_sac)</a>
 </li>
@@ -387,6 +389,8 @@
 </li>
       <li><a href="tf2rl.tools.html#tf2rl.tools.vae.VAE.encode">encode() (tf2rl.tools.vae.VAE method)</a>
 </li>
+      <li><a href="tf2rl.networks.html#tf2rl.networks.dmc_model.Encoder">Encoder (class in tf2rl.networks.dmc_model)</a>
+</li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.EpisodicLifeEnv">EpisodicLifeEnv (class in tf2rl.envs.atari_wrapper)</a>
 </li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.vail.Discriminator.EPS">EPS (tf2rl.algos.vail.Discriminator attribute)</a>
@@ -395,6 +399,8 @@
         <li><a href="tf2rl.policies.html#tf2rl.policies.tfp_gaussian_actor.GaussianActor.EPS">(tf2rl.policies.tfp_gaussian_actor.GaussianActor attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tf2rl.experiments.html#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.evaluate_policy">evaluate_policy() (tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer method)</a>
 
       <ul>
@@ -403,8 +409,6 @@
         <li><a href="tf2rl.experiments.html#tf2rl.experiments.trainer.Trainer.evaluate_policy">(tf2rl.experiments.trainer.Trainer method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tf2rl.experiments.html#tf2rl.experiments.trainer.Trainer.evaluate_policy_continuously">evaluate_policy_continuously() (tf2rl.experiments.trainer.Trainer method)</a>
 </li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.apex.evaluator">evaluator() (in module tf2rl.algos.apex)</a>
@@ -468,6 +472,8 @@
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac.SAC.get_action">(tf2rl.algos.sac.SAC method)</a>
 </li>
+        <li><a href="tf2rl.algos.html#tf2rl.algos.sac_ae.SACAE.get_action">(tf2rl.algos.sac_ae.SACAE method)</a>
+</li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.vpg.VPG.get_action">(tf2rl.algos.vpg.VPG method)</a>
 </li>
         <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.RandomPolicy.get_action">(tf2rl.experiments.mpc_trainer.RandomPolicy method)</a>
@@ -493,6 +499,8 @@
         <li><a href="tf2rl.algos.html#tf2rl.algos.policy_base.Policy.get_argument">(tf2rl.algos.policy_base.Policy static method)</a>
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac.SAC.get_argument">(tf2rl.algos.sac.SAC static method)</a>
+</li>
+        <li><a href="tf2rl.algos.html#tf2rl.algos.sac_ae.SACAE.get_argument">(tf2rl.algos.sac_ae.SACAE static method)</a>
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac_discrete.SACDiscrete.get_argument">(tf2rl.algos.sac_discrete.SACDiscrete static method)</a>
 </li>
@@ -617,6 +625,8 @@
 </li>
         <li><a href="tf2rl.algos.html#module-tf2rl.algos.categorical_dqn">tf2rl.algos.categorical_dqn</a>
 </li>
+        <li><a href="tf2rl.algos.html#module-tf2rl.algos.curl_sac">tf2rl.algos.curl_sac</a>
+</li>
         <li><a href="tf2rl.algos.html#module-tf2rl.algos.d2rl_sac">tf2rl.algos.d2rl_sac</a>
 </li>
         <li><a href="tf2rl.algos.html#module-tf2rl.algos.ddpg">tf2rl.algos.ddpg</a>
@@ -632,6 +642,8 @@
         <li><a href="tf2rl.algos.html#module-tf2rl.algos.ppo">tf2rl.algos.ppo</a>
 </li>
         <li><a href="tf2rl.algos.html#module-tf2rl.algos.sac">tf2rl.algos.sac</a>
+</li>
+        <li><a href="tf2rl.algos.html#module-tf2rl.algos.sac_ae">tf2rl.algos.sac_ae</a>
 </li>
         <li><a href="tf2rl.algos.html#module-tf2rl.algos.sac_discrete">tf2rl.algos.sac_discrete</a>
 </li>
@@ -693,6 +705,8 @@
 </li>
         <li><a href="tf2rl.networks.html#module-tf2rl.networks.atari_model">tf2rl.networks.atari_model</a>
 </li>
+        <li><a href="tf2rl.networks.html#module-tf2rl.networks.dmc_model">tf2rl.networks.dmc_model</a>
+</li>
         <li><a href="tf2rl.networks.html#module-tf2rl.networks.noisy_dense">tf2rl.networks.noisy_dense</a>
 </li>
         <li><a href="tf2rl.networks.html#module-tf2rl.networks.spectral_norm_dense">tf2rl.networks.spectral_norm_dense</a>
@@ -704,6 +718,8 @@
         <li><a href="tf2rl.policies.html#module-tf2rl.policies.tfp_gaussian_actor">tf2rl.policies.tfp_gaussian_actor</a>
 </li>
         <li><a href="tf2rl.tools.html#module-tf2rl.tools">tf2rl.tools</a>
+</li>
+        <li><a href="tf2rl.tools.html#module-tf2rl.tools.img_tools">tf2rl.tools.img_tools</a>
 </li>
         <li><a href="tf2rl.tools.html#module-tf2rl.tools.vae">tf2rl.tools.vae</a>
 </li>
@@ -798,6 +814,8 @@
 </li>
       <li><a href="tf2rl.misc.html#tf2rl.misc.prepare_output_dir.prepare_output_dir">prepare_output_dir() (in module tf2rl.misc.prepare_output_dir)</a>
 </li>
+      <li><a href="tf2rl.tools.html#tf2rl.tools.img_tools.preprocess_img">preprocess_img() (in module tf2rl.tools.img_tools)</a>
+</li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.ProcessFrame84.process">process() (tf2rl.envs.atari_wrapper.ProcessFrame84 static method)</a>
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.atari_wrapper.ProcessFrame84">ProcessFrame84 (class in tf2rl.envs.atari_wrapper)</a>
@@ -826,6 +844,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tf2rl.tools.html#tf2rl.tools.img_tools.random_crop">random_crop() (in module tf2rl.tools.img_tools)</a>
+</li>
       <li><a href="tf2rl.experiments.html#tf2rl.experiments.mpc_trainer.RandomPolicy">RandomPolicy (class in tf2rl.experiments.mpc_trainer)</a>
 </li>
       <li><a href="tf2rl.envs.html#tf2rl.envs.dmc_wrapper.DMCWrapper.render">render() (tf2rl.envs.dmc_wrapper.DMCWrapper method)</a>
@@ -863,6 +883,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tf2rl.algos.html#tf2rl.algos.sac.SAC">SAC (class in tf2rl.algos.sac)</a>
+</li>
+      <li><a href="tf2rl.algos.html#tf2rl.algos.sac_ae.SACAE">SACAE (class in tf2rl.algos.sac_ae)</a>
 </li>
       <li><a href="tf2rl.algos.html#tf2rl.algos.sac_discrete.SACDiscrete">SACDiscrete (class in tf2rl.algos.sac_discrete)</a>
 </li>
@@ -944,6 +966,13 @@
 </li>
       </ul></li>
       <li>
+    tf2rl.algos.curl_sac
+
+      <ul>
+        <li><a href="tf2rl.algos.html#module-tf2rl.algos.curl_sac">module</a>
+</li>
+      </ul></li>
+      <li>
     tf2rl.algos.d2rl_sac
 
       <ul>
@@ -997,6 +1026,13 @@
 
       <ul>
         <li><a href="tf2rl.algos.html#module-tf2rl.algos.sac">module</a>
+</li>
+      </ul></li>
+      <li>
+    tf2rl.algos.sac_ae
+
+      <ul>
+        <li><a href="tf2rl.algos.html#module-tf2rl.algos.sac_ae">module</a>
 </li>
       </ul></li>
       <li>
@@ -1212,6 +1248,13 @@
 </li>
       </ul></li>
       <li>
+    tf2rl.networks.dmc_model
+
+      <ul>
+        <li><a href="tf2rl.networks.html#module-tf2rl.networks.dmc_model">module</a>
+</li>
+      </ul></li>
+      <li>
     tf2rl.networks.noisy_dense
 
       <ul>
@@ -1254,6 +1297,13 @@
 </li>
       </ul></li>
       <li>
+    tf2rl.tools.img_tools
+
+      <ul>
+        <li><a href="tf2rl.tools.html#module-tf2rl.tools.img_tools">module</a>
+</li>
+      </ul></li>
+      <li>
     tf2rl.tools.vae
 
       <ul>
@@ -1263,6 +1313,8 @@
       <li><a href="tf2rl.algos.html#tf2rl.algos.categorical_dqn.CategoricalDQN.train">train() (tf2rl.algos.categorical_dqn.CategoricalDQN method)</a>
 
       <ul>
+        <li><a href="tf2rl.algos.html#tf2rl.algos.curl_sac.CURL.train">(tf2rl.algos.curl_sac.CURL method)</a>
+</li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.ddpg.DDPG.train">(tf2rl.algos.ddpg.DDPG method)</a>
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.dqn.DQN.train">(tf2rl.algos.dqn.DQN method)</a>
@@ -1274,6 +1326,8 @@
         <li><a href="tf2rl.algos.html#tf2rl.algos.ppo.PPO.train">(tf2rl.algos.ppo.PPO method)</a>
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac.SAC.train">(tf2rl.algos.sac.SAC method)</a>
+</li>
+        <li><a href="tf2rl.algos.html#tf2rl.algos.sac_ae.SACAE.train">(tf2rl.algos.sac_ae.SACAE method)</a>
 </li>
         <li><a href="tf2rl.algos.html#tf2rl.algos.sac_discrete.SACDiscrete.train">(tf2rl.algos.sac_discrete.SACDiscrete method)</a>
 </li>
