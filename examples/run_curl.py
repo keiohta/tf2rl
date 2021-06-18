@@ -51,7 +51,7 @@ def main():
     test_env = make_env()
 
     # see Table 3 of CURL paper
-    lr_sac = lr_curl = 2e-4 if args.env_name == "cheetah" else 1e-3
+    lr_sac = lr_encoder = 2e-4 if args.env_name == "cheetah" else 1e-3
 
     policy = CURL(
         obs_shape=input_obs_shape,
@@ -64,7 +64,7 @@ def main():
         actor_units=(1024, 1024),
         critic_units=(1024, 1024),
         lr_sac=lr_sac,
-        lr_decoder=lr_curl,
+        lr_encoder=lr_encoder,
         lr_alpha=1e-4,
         tau_critic=0.01,
         init_temperature=0.1,

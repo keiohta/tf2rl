@@ -48,12 +48,13 @@ class CURL(SACAE):
             tf.summary.scalar(name=self.policy_name + "/alpha_loss", data=alpha_loss)
 
         # Update encoder
-        curl_loss, w, z_anchor, z_negatives, logits = self._update_encoder(obses_anchor, obses_negative)
+        curl_loss, w, z_anchor, logits = self._update_encoder(obses_anchor, obses_negative)
         tf.summary.scalar(name="encoder/curl_loss", data=curl_loss)
-        tf.summary.scalar(name="encoder/z_anchor", data=z_anchor)
+        tf.summary.scalar(name="encoder/latent_vars", data=z_anchor)
         tf.summary.scalar(name="encoder/w", data=w)
-        tf.summary.scalar(name="encoder/z_negatives", data=z_negatives)
         tf.summary.scalar(name="encoder/logits", data=logits)
+
+        self._n_update += 1
 
         return td_errors
 
@@ -78,7 +79,7 @@ class CURL(SACAE):
                 self._encoder_target.weights, self._encoder.weights, self._tau_encoder)
 
         return curl_loss, tf.reduce_mean(tf.abs(self._curl_w)), tf.reduce_mean(
-            tf.abs(z_anchor)), tf.reduce_mean(tf.abs(z_negatives)), tf.reduce_mean(logits)
+            tf.abs(z_anchor)), tf.reduce_mean(logits)
 
 
 if __name__ == "__main__":

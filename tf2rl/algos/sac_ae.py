@@ -141,12 +141,12 @@ class SACAE(SAC):
                 td_loss_q1 = tf.reduce_mean((target_q - current_q1) ** 2)
                 td_loss_q2 = tf.reduce_mean((target_q - current_q2) ** 2)  # Eq.(6)
 
-            q1_grad = tape.gradient(td_loss_q1, self.qf1.trainable_variables)
+            q1_grad = tape.gradient(td_loss_q1, self._encoder.trainable_variables + self.qf1.trainable_variables)
             self.qf1_optimizer.apply_gradients(
-                zip(q1_grad, self.qf1.trainable_variables))
-            q2_grad = tape.gradient(td_loss_q2, self.qf2.trainable_variables)
+                zip(q1_grad, self._encoder.trainable_variables + self.qf1.trainable_variables))
+            q2_grad = tape.gradient(td_loss_q2, self._encoder.trainable_variables + self.qf2.trainable_variables)
             self.qf2_optimizer.apply_gradients(
-                zip(q2_grad, self.qf2.trainable_variables))
+                zip(q2_grad, self._encoder.trainable_variables + self.qf2.trainable_variables))
 
         return td_loss_q1 + td_loss_q2, td_loss_q1
 
