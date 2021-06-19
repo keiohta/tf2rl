@@ -9,10 +9,11 @@ from tf2rl.tools.img_tools import random_crop
 class CURL(SACAE):
     def __init__(self,
                  *args,
+                 name="CURL",
                  **kwargs):
         super().__init__(*args,
                          skip_making_decoder=True,
-                         name="CURL",
+                         name=name,
                          **kwargs)
         self._curl_w = tf.Variable(initial_value=tf.random.normal(shape=(self._feature_dim, self._feature_dim)),
                                    name='curl_w', dtype=tf.float32, trainable=True)
