@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-from skimage.util.shape import view_as_windows
 
 
 def random_crop(input_imgs, output_size):
@@ -19,18 +18,19 @@ def random_crop(input_imgs, output_size):
 
     batch_size = input_imgs.shape[0]
     img_size = input_imgs.shape[1]
+    channels = input_imgs.shape[3]
 
     assert img_size > output_size
-    crop_max = img_size - output_size
+    crop_max = img_size - output_size + 1
 
-    topleft_x = np.random.randint(0, crop_max, batch_size)
-    topleft_y = np.random.randint(0, crop_max, batch_size)
-    # creates all sliding windows combinations of size (output_size)
-    windows = view_as_windows(
-        input_imgs, (1, output_size, output_size, 1))[..., 0, :, :, 0]
-    # selects a random window for each batch element
-    cropped_imgs = windows[np.arange(batch_size), topleft_x, topleft_y]
-    return np.transpose(cropped_imgs, (0, 2, 3, 1))
+    topleft_xs = np.random.randint(0, crop_max, batch_size)
+    topleft_ys = np.random.randint(0, crop_max, batch_size)
+
+    cropped_imgs = np.empty((batch_size, output_size, output_size, channels), dtype=input_imgs.dtype)
+
+    for i, (cur_img, topleft_x, topleft_y) in enumerate(zip(input_imgs, topleft_xs, topleft_ys)):
+        cropped_imgs[i] = cur_img[topleft_x:topleft_x + output_size, topleft_y:topleft_y + output_size, :]
+    return cropped_imgs
 
 
 def center_crop(img, output_size):
@@ -38,7 +38,8 @@ def center_crop(img, output_size):
 
     Args:
         img: np.ndarray
-            Input image array. The shape is (width, height, channel)
+            Input image array. The shape is (batch_size, width, height, channel)
+            It also accepts single image, i.e., (width, height, channel) image
         output_size: int
             Width and height size for output image
 
