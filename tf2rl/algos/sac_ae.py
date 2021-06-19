@@ -26,6 +26,7 @@ class SACAE(SAC):
                  lr_alpha=1e-4,
                  init_temperature=0.1,
                  stop_q_grad=False,
+                 normalize_input=True,
                  lambda_latent_val=1e-06,
                  decoder_weight_lambda=1e-07,
                  skip_making_decoder=False,
@@ -44,11 +45,13 @@ class SACAE(SAC):
                                 feature_dim=feature_dim,
                                 n_conv_layers=n_conv_layers,
                                 n_conv_filters=n_conv_filters,
+                                normalize_input=normalize_input,
                                 name="encoder")
         self._encoder_target = Encoder(obs_shape=obs_shape,
                                        feature_dim=feature_dim,
                                        n_conv_layers=n_conv_layers,
                                        n_conv_filters=n_conv_filters,
+                                       normalize_input=normalize_input,
                                        name="encoder_target")
         update_target_variables(self._encoder_target.weights, self._encoder.weights, tau=1.)
 

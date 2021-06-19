@@ -10,6 +10,7 @@ class Encoder(tf.keras.Model):
                  feature_dim=50,
                  n_conv_layers=4,
                  n_conv_filters=32,
+                 normalize_input=True,
                  name="curl_encoder"):
         super().__init__(name=name)
 
@@ -28,14 +29,18 @@ class Encoder(tf.keras.Model):
         self.fc = Dense(feature_dim)
         self.layer_norm = LayerNormalization()
         self.feature_dim = feature_dim
+        self._normalize_input = normalize_input
 
         dummy_obs = np.zeros(shape=(1,) + obs_shape, dtype=np.int)
         with tf.device("/cpu:0"):
             self(tf.constant(dummy_obs))
 
     def call(self, inputs, stop_q_grad=False):
-        features = tf.divide(tf.cast(inputs, tf.float32),
-                             tf.constant(255.))
+        if self._normalize_input:
+            features = tf.divide(tf.cast(inputs, tf.float32),
+                                 tf.constant(255.))
+        else:
+            features = tf.cast(inputs, tf.float32)
 
         for conv in self.convs:
             features = conv(features)
