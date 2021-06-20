@@ -32,7 +32,7 @@ class RAD(CURL):
         self._aug_types = aug_types
         self._aug_funcs = {}
 
-        if self._aug_funcs:
+        if self._aug_types:
             for aug_type in self._aug_types.split('-'):
                 assert aug_type in aug_type_to_func, f'Augmentation type {aug_type} is invalid.'
                 self._aug_funcs[aug_type] = aug_type_to_func[aug_type]
@@ -62,8 +62,8 @@ class RAD(CURL):
                     states, rnd_indexes = func(cropped_states, self._input_img_size, return_rand_indexes=True)
                     next_states = func(cropped_next_states, self._input_img_size, **rnd_indexes)
 
-        states = states.astype(np.float32) / 255.
-        next_states = next_states.astype(np.float32) / 255.
+        states = tf.divide(tf.cast(states, tf.float32), tf.constant(255.))
+        next_states = tf.divide(tf.cast(next_states, tf.float32), tf.constant(255.))
 
         if self._aug_funcs:
             for aug_type, func in self._aug_funcs.items():

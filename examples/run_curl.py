@@ -1,7 +1,4 @@
-import dmc2gym
-
 from tf2rl.algos.curl_sac import CURL
-from tf2rl.envs.dmc_wrapper import DMCWrapper
 from tf2rl.experiments.trainer import Trainer
 
 

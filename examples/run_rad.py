@@ -15,7 +15,6 @@ def main():
 
     original_obs_shape = (100, 100, 9)
     input_obs_shape = (84, 84, 9)
-    original_obs_shape = input_obs_shape
 
     env = make_env(args, original_obs_shape[0], original_obs_shape[1], original_obs_shape)
     test_env = make_env(args, original_obs_shape[0], original_obs_shape[1], original_obs_shape)
@@ -24,7 +23,7 @@ def main():
 
     policy = RAD(
         obs_shape=input_obs_shape,
-        aug_types="",
+        aug_types="crop",
         **dmc_kwargs)
 
     trainer = Trainer(policy, env, args, test_env=test_env)
