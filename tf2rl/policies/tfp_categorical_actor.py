@@ -16,7 +16,7 @@ class CategoricalActor(tf.keras.Model):
             base_layers.append(cur_layer)
 
         self.base_layers = base_layers
-        self.out_prob = Dense(action_dim, activation='softmax')
+        self.out_logit = Dense(action_dim)
 
         self(tf.constant(
             np.zeros(shape=(1,)+state_shape, dtype=np.float32)))
@@ -43,8 +43,8 @@ class CategoricalActor(tf.keras.Model):
         """
         features = self._compute_features(states)
 
-        probs = self.out_prob(features)
-        dist = tfp.distributions.Categorical(probs)
+        logits = self.out_logit(features)
+        dist = tfp.distributions.Categorical(logits=logits)
 
         return dist
 
@@ -59,7 +59,7 @@ class CategoricalActor(tf.keras.Model):
             action = tf.argmax(dist.logits, axis=1)  # (size,)
         else:
             action = dist.sample()  # (size,)
-        log_prob = dist.prob(action)
+        log_prob = dist.log_prob(action)
 
         return action, log_prob
 
@@ -92,7 +92,7 @@ class CategoricalActorCritic(CategoricalActor):
 
     def call(self, states, test=False):
         features = self._compute_feature(states)
-        probs = self.out_prob(features)
+        probs = self.out_logit(features)
         dist = tfp.distributions.Categorical(probs)
 
         if test:
