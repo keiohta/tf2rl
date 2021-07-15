@@ -103,7 +103,7 @@ class AtariCategoricalActor(CategoricalActor, AtariBaseModel):
         AtariBaseModel.__init__(self, name, state_shape)
 
         # Build top layer
-        self.out_prob = Dense(action_dim, activation='softmax')
+        self.out_logit = Dense(action_dim)
 
         CategoricalActor.call(self, tf.constant(
             np.zeros(shape=(1,) + state_shape, dtype=np.uint8)))
@@ -119,7 +119,7 @@ class AtariCategoricalActorCritic(CategoricalActorCritic, AtariBaseModel):
         AtariBaseModel.__init__(self, name=name)
         self.action_dim = action_dim
 
-        self.out_prob = Dense(action_dim, activation='softmax')
+        self.out_logit = Dense(action_dim)
         self.v = Dense(1, activation="linear")
 
         self(tf.constant(
