@@ -48,7 +48,7 @@ def load_trajectories(filenames, max_steps=None):
         next_obses = path['obs'][1:]
         actions = path['act'][:-1]
         if max_steps is not None:
-            return obses[:max_steps], next_obses[:max_steps], actions[:max_steps-1]
+            return obses[:max_steps], next_obses[:max_steps], actions[:max_steps]
         else:
             return obses, next_obses, actions
 
