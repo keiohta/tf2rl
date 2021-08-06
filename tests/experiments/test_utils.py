@@ -44,6 +44,8 @@ class TestUtils(unittest.TestCase):
         max_steps = 10
         data = restore_latest_n_traj(self.output_dir, 1, max_steps)
         self.assertEqual(data["obses"].shape[0], max_steps)
+        self.assertEqual(data["acts"].shape[0], max_steps)
+        self.assertEqual(data["next_obses"].shape[0], max_steps)
 
 
 if __name__ == '__main__':
