@@ -41,6 +41,9 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(data["obses"].shape[0],
                          (self.replay_buffer.get_buffer_size() - 1) * n_store_episodes)
 
+        max_steps = 10
+        data = restore_latest_n_traj(self.output_dir, 1, max_steps)
+        self.assertEqual(data["obses"].shape[0], max_steps)
 
 if __name__ == '__main__':
     unittest.main()
