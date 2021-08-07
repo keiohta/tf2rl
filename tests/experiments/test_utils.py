@@ -39,7 +39,13 @@ class TestUtils(unittest.TestCase):
                              "step_0_epi_{}_return_0.0.pkl").format(epi))
         data = restore_latest_n_traj(self.output_dir)
         self.assertEqual(data["obses"].shape[0],
-                         (self.replay_buffer.get_buffer_size() - 1) * n_store_episodes)
+                         self.replay_buffer.get_buffer_size() * n_store_episodes)
+
+        max_steps = 10
+        data = restore_latest_n_traj(self.output_dir, 1, max_steps)
+        self.assertEqual(data["obses"].shape[0], max_steps)
+        self.assertEqual(data["acts"].shape[0], max_steps)
+        self.assertEqual(data["next_obses"].shape[0], max_steps)
 
 
 if __name__ == '__main__':
