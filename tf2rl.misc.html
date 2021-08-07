@@ -87,7 +87,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="tf2rl.html">tf2rl package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="tf2rl.html#subpackages">Subpackages</a><ul class="current">
@@ -412,11 +412,11 @@ git-diff.txt: result of <cite>git diff</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>(</strong><strong>dict</strong><strong> or </strong><strong>argparse.Namespace</strong><strong>)</strong> (<em>args</em>) – Arguments to save</p></li>
-<li><p><strong>(</strong><strong>str</strong><strong> or </strong><strong>None</strong><strong>)</strong> (<em>user_specified_dir</em>) – If str is specified, the output
+<li><p><strong>argparse.Namespace</strong><strong>)</strong> (<em>args</em><em> (</em><em>dict or</em>) – Arguments to save</p></li>
+<li><p><strong>None</strong><strong>)</strong> (<em>argv</em><em> (</em><em>list or</em>) – If str is specified, the output
 directory is created under that path. If not specified, it is
 created as a new temporary directory instead.</p></li>
-<li><p><strong>(</strong><strong>list</strong><strong> or </strong><strong>None</strong><strong>)</strong> (<em>argv</em>) – The list of command line arguments passed to a
+<li><p><strong>None</strong><strong>)</strong> – The list of command line arguments passed to a
 script. If not specified, sys.argv is used instead.</p></li>
 <li><p><strong>(</strong><strong>str</strong><strong>)</strong> (<em>time_format</em>) – Format used to represent the current datetime. The</p></li>
 </ul>
