@@ -44,9 +44,9 @@ def load_trajectories(filenames, max_steps=None):
         paths.append(joblib.load(filename))
 
     def get_obs_and_act(path):
-        obses = path['obs'][:-1]
-        next_obses = path['obs'][1:]
-        actions = path['act'][:-1]
+        obses = path['obs']
+        next_obses = path['next_obs']
+        actions = path['act']
         if max_steps is not None:
             return obses[:max_steps], next_obses[:max_steps], actions[:max_steps]
         else:
