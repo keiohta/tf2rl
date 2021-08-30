@@ -1,3 +1,4 @@
+import random
 import time
 
 import numpy as np
@@ -102,8 +103,8 @@ class IRLTrainer(Trainer):
                     for _ in range(self._irl.n_training):
                         samples = replay_buffer.sample(self._irl.batch_size)
                         # Do not allow duplication!!!
-                        indices = np.random.choice(
-                            self._random_range, self._irl.batch_size, replace=False)
+                        indices = random.sample(
+                            range(self._random_range), self._irl.batch_size)
                         self._irl.train(
                             agent_states=samples["obs"],
                             agent_acts=samples["act"],
