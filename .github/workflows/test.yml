@@ -53,7 +53,7 @@ jobs:
       - name: Install cpprb for macOS
         if: startsWith(runner.os, 'macOS')
         run: CC=gcc-9 CXX=g++-9 pip install cpprb
-      - run: pip install tensorflow==${{ matrix.TF }}'.*'
+      - run: pip install tensorflow==${{ matrix.TF }}'.*' atari-py
       - run: pip install '.[test]'
       - name: Install TensorFlow Probability
         if: ${{ matrix.TF == '2.0' }}
