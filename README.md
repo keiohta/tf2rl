@@ -7,7 +7,7 @@
 # TF2RL
 TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using TensorFlow 2.x.
 
-## Algorithms
+## 1. Algorithms
 Following algorithms are supported:
 
 |                          Algorithm                           | Dicrete action | Continuous action |                  Support                   | Category                 |
@@ -56,7 +56,8 @@ Also, some useful techniques are implemented:
 - [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/tools/vae.py)
 - [D2RL](https://arxiv.org/abs/2010.09163), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/d2rl_sac.py>)
 
-## Installation
+## 2. Installation
+### 2.1 Install from PyPI
 
 You can install `tf2rl` from PyPI:
 
@@ -72,7 +73,7 @@ $ cd tf2rl
 $ pip install .
 ```
 
-### Preinstalled Docker Container
+### 2.2 Preinstalled Docker Container
 Instead of installing tf2rl on your (virtual) system, you can use
 preinstalled Docker containers.
 
@@ -82,7 +83,7 @@ At the following commands, you need to replace `<version>` with the
 version tag which you want to use.
 
 
-#### CPU Only
+#### 2.2.1 CPU Only
 
 The following simple command starts preinstalled container.
 
@@ -97,7 +98,7 @@ container `/mount/point`
 $ docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
 ```
 
-#### GPU Support (Linux Only, Experimental)
+#### 2.2.2 GPU Support (Linux Only, Experimental)
 
 WARNING: We encountered unsolved errors when running ApeX multiprocess learning.
 
@@ -131,7 +132,7 @@ $ nvidia-smi
 ```
 
 
-## Getting started
+## 3. Getting started
 Here is a quick example of how to train DDPG agent on a Pendulum environment:
 
 ```python
@@ -175,7 +176,7 @@ You can see the training progress/results from TensorBoard as follows:
 $ tensorboard --logdir results
 ```
 
-## Citation
+## 4. Citation
 ```
 @misc{ota2020tf2rl,
   author = {Kei Ota},
