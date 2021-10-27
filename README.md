@@ -57,15 +57,23 @@ Also, some useful techniques are implemented:
 - [D2RL](https://arxiv.org/abs/2010.09163), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/d2rl_sac.py>)
 
 ## 2. Installation
+
+There are several ways to install tf2rl.
+The recommended way is "2.1 Install from PyPI".
+
+If TensorFlow is already installed, we try to identify the best
+version of [TensorFlow Probability](https://www.tensorflow.org/probability).
+
 ### 2.1 Install from PyPI
 
-You can install `tf2rl` from PyPI:
+You can install `tf2rl` from [PyPI](https://pypi.org/project/tf2rl/):
 
 ```bash
 $ pip install tf2rl
 ```
 
-or, you can also install from source:
+### 2.2 Install from Source Code
+You can also install from source:
 
 ```bash
 $ git clone https://github.com/keiohta/tf2rl.git tf2rl
@@ -73,7 +81,7 @@ $ cd tf2rl
 $ pip install .
 ```
 
-### 2.2 Preinstalled Docker Container
+### 2.3 Preinstalled Docker Container
 Instead of installing tf2rl on your (virtual) system, you can use
 preinstalled Docker containers.
 
@@ -83,7 +91,7 @@ At the following commands, you need to replace `<version>` with the
 version tag which you want to use.
 
 
-#### 2.2.1 CPU Only
+#### 2.3.1 CPU Only
 
 The following simple command starts preinstalled container.
 
@@ -98,7 +106,7 @@ container `/mount/point`
 $ docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
 ```
 
-#### 2.2.2 GPU Support (Linux Only, Experimental)
+#### 2.3.2 GPU Support (Linux Only, Experimental)
 
 WARNING: We encountered unsolved errors when running ApeX multiprocess learning.
 
