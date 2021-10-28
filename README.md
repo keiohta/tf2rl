@@ -184,7 +184,66 @@ You can see the training progress/results from TensorBoard as follows:
 $ tensorboard --logdir results
 ```
 
-## 4. Citation
+## 4. Usage
+In basic usage, what you need is initializing one of the policy
+classes and `Trainer` class.
+
+As a option, tf2rl supports command line program style, so that you
+can also pass configuration parameters from command line arguments.
+
+
+### 4.1 Command Line Program Style
+
+`Trainer` class and policy classes have class method `get_argument`,
+which creates or updates
+[ArgParser](https://docs.python.org/3/library/argparse.html) object.
+
+You can parse the command line arguments with the
+`ArgParser.parse_args` method, which returns `Namespace` object.
+
+Policy's constructor option can be extracted from the `Namespace`
+object explicitly. `Trainer` constructor accepts the `Namespace`
+object.
+
+```python
+from tf2rl.algos import DQN
+from tf2rl.experiments import Trainer
+
+env = ... # Create gym.env like environment.
+
+parser = DQN.get_argument(Trainer.get_argument())
+args = parser.parse_args()
+
+policy = DQN( ... )
+trainer = Trainer(policy, env, args)
+trainer()
+```
+
+
+### 4.2 Non Command Line Program Style (e.g. on Jupyter Notebook)
+
+`ArgParser` doesn't fit the usage on Jupyter Notebook like
+envrionment. `Trainer` constructor can accept `dict` as `args`
+argument instead of `Namespace` object.
+
+```python
+from tf2rl.algos import DQN
+from tf2rl.experiments import Trainer
+
+env = ... # Create gym.env like environment.
+
+policy = DQN( ... )
+trainer = Trainer(policy, env, {"max_steps": int(1e+6), ... })
+trainer()
+```
+
+### 4.3 Results
+The `Trainer` class saves logs and models under
+`<logdir>/%Y%m%dT%H%M%S.%f`. The default `logdir` is `"results"`, and
+it can be changed by `--logdir` command argument or `"logdir"` key in
+constructor `args`.
+
+## 5. Citation
 ```
 @misc{ota2020tf2rl,
   author = {Kei Ota},
