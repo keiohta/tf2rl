@@ -1,11 +1,8 @@
-import gym
-
-
 from tf2rl.algos.ppo import PPO
 from tf2rl.envs.atari_wrapper import wrap_dqn
 from tf2rl.experiments.on_policy_trainer import OnPolicyTrainer
 from tf2rl.networks.atari_model import AtariCategoricalActorCritic
-
+from tf2rl.envs.utils import make
 
 if __name__ == '__main__':
     parser = OnPolicyTrainer.get_argument()
@@ -21,8 +18,8 @@ if __name__ == '__main__':
     parser.set_defaults(show_test_images=True)
     args = parser.parse_args()
 
-    env = wrap_dqn(gym.make(args.env_name))
-    test_env = wrap_dqn(gym.make(args.env_name), reward_clipping=False)
+    env = wrap_dqn(make(args.env_name))
+    test_env = wrap_dqn(make(args.env_name), reward_clipping=False)
 
     state_shape = env.observation_space.shape
     action_dim = env.action_space.n

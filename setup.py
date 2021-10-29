@@ -34,11 +34,18 @@ if not (platform.system() == 'Windows' and tf_version == "2.0"):
     # tensorflow-addons does not support tf2.0 on Windows
     install_requires.append(*compatible_tfa[tf_version])
 
+
+compatible_gym = {
+    "2.0": "gym[atari]<0.21.0",
+    "2.1": "gym[atari]<0.21.0"
+}
+gym_version = compatible_gym.get(tf_version, "gym[atari]>=0.21.0")
+
 extras_require = {
     "tf": ["tensorflow>=2.0.0"],
     "tf_gpu": ["tensorflow-gpu>=2.0.0"],
-    "examples": ["gym[atari]", "opencv-python"],
-    "test": ["coveralls", "gym[atari]", "matplotlib", "opencv-python", "future"]
+    "examples": [gym_version, "opencv-python"],
+    "test": ["coveralls", gym_version, "matplotlib", "opencv-python", "future"]
 }
 
 setup(

@@ -2,17 +2,17 @@ import unittest
 
 import os
 import numpy as np
-import gym
 
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.experiments.utils import save_path, restore_latest_n_traj
 from tf2rl.algos.dqn import DQN
+from tf2rl.envs.utils import make
 
 
 class TestUtils(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.env = gym.make("CartPole-v0")
+        cls.env = make("CartPole-v0")
         policy = DQN(
             state_shape=cls.env.observation_space.shape,
             action_dim=cls.env.action_space.n,

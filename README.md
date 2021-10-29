@@ -153,8 +153,8 @@ parser = Trainer.get_argument()
 parser = DDPG.get_argument(parser)
 args = parser.parse_args()
 
-env = gym.make("Pendulum-v0")
-test_env = gym.make("Pendulum-v0")
+env = gym.make("Pendulum-v1")
+test_env = gym.make("Pendulum-v1")
 policy = DDPG(
     state_shape=env.observation_space.shape,
     action_dim=env.action_space.high.size,

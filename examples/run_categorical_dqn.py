@@ -1,8 +1,6 @@
-import gym
-
 from tf2rl.algos.categorical_dqn import CategoricalDQN
 from tf2rl.experiments.trainer import Trainer
-
+from tf2rl.envs.utils import make
 
 if __name__ == '__main__':
     parser = Trainer.get_argument()
@@ -16,8 +14,8 @@ if __name__ == '__main__':
     parser.add_argument('--env-name', type=str, default="CartPole-v0")
     args = parser.parse_args()
 
-    env = gym.make(args.env_name)
-    test_env = gym.make(args.env_name)
+    env = make(args.env_name)
+    test_env = make(args.env_name)
     policy = CategoricalDQN(
         enable_double_dqn=args.enable_double_dqn,
         enable_dueling_dqn=args.enable_dueling_dqn,
