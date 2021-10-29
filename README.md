@@ -5,9 +5,9 @@
 [![PyPI version](https://badge.fury.io/py/tf2rl.svg)](https://badge.fury.io/py/tf2rl)
 
 # TF2RL
-TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using TensorFlow 2.x.
+TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using [TensorFlow 2.x](https://www.tensorflow.org/).
 
-## Algorithms
+## 1. Algorithms
 Following algorithms are supported:
 
 |                          Algorithm                           | Dicrete action | Continuous action |                  Support                   | Category                 |
@@ -56,15 +56,24 @@ Also, some useful techniques are implemented:
 - [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/tools/vae.py)
 - [D2RL](https://arxiv.org/abs/2010.09163), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/d2rl_sac.py>)
 
-## Installation
+## 2. Installation
 
-You can install `tf2rl` from PyPI:
+There are several ways to install tf2rl.
+The recommended way is "2.1 Install from PyPI".
+
+If TensorFlow is already installed, we try to identify the best
+version of [TensorFlow Probability](https://www.tensorflow.org/probability).
+
+### 2.1 Install from PyPI
+
+You can install `tf2rl` from [PyPI](https://pypi.org/project/tf2rl/):
 
 ```bash
 $ pip install tf2rl
 ```
 
-or, you can also install from source:
+### 2.2 Install from Source Code
+You can also install from source:
 
 ```bash
 $ git clone https://github.com/keiohta/tf2rl.git tf2rl
@@ -72,7 +81,7 @@ $ cd tf2rl
 $ pip install .
 ```
 
-### Preinstalled Docker Container
+### 2.3 Preinstalled Docker Container
 Instead of installing tf2rl on your (virtual) system, you can use
 preinstalled Docker containers.
 
@@ -82,7 +91,7 @@ At the following commands, you need to replace `<version>` with the
 version tag which you want to use.
 
 
-#### CPU Only
+#### 2.3.1 CPU Only
 
 The following simple command starts preinstalled container.
 
@@ -97,7 +106,7 @@ container `/mount/point`
 $ docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
 ```
 
-#### GPU Support (Linux Only, Experimental)
+#### 2.3.2 GPU Support (Linux Only, Experimental)
 
 WARNING: We encountered unsolved errors when running ApeX multiprocess learning.
 
@@ -131,7 +140,7 @@ $ nvidia-smi
 ```
 
 
-## Getting started
+## 3. Getting started
 Here is a quick example of how to train DDPG agent on a Pendulum environment:
 
 ```python
@@ -175,7 +184,68 @@ You can see the training progress/results from TensorBoard as follows:
 $ tensorboard --logdir results
 ```
 
-## Citation
+## 4. Usage
+In basic usage, what you need is initializing one of the policy
+classes and `Trainer` class.
+
+As a option, tf2rl supports command line program style, so that you
+can also pass configuration parameters from command line arguments.
+
+
+### 4.1 Command Line Program Style
+
+`Trainer` class and policy classes have class method `get_argument`,
+which creates or updates
+[ArgParser](https://docs.python.org/3/library/argparse.html) object.
+
+You can parse the command line arguments with the
+`ArgParser.parse_args` method, which returns `Namespace` object.
+
+Policy's constructor option can be extracted from the `Namespace`
+object explicitly. `Trainer` constructor accepts the `Namespace`
+object.
+
+```python
+from tf2rl.algos import DQN
+from tf2rl.experiments import Trainer
+
+env = ... # Create gym.env like environment.
+
+parser = DQN.get_argument(Trainer.get_argument())
+args = parser.parse_args()
+
+policy = DQN(enable_double_dqn = args.enable_double_dqn,
+             enable_dueling_dqn = args.enable_dueling_dqn,
+			 enable_noisy_dqn = args.enable_noisy_dqn)
+trainer = Trainer(policy, env, args)
+trainer()
+```
+
+
+### 4.2 Non Command Line Program Style (e.g. on Jupyter Notebook)
+
+`ArgParser` doesn't fit the usage on Jupyter Notebook like
+envrionment. `Trainer` constructor can accept `dict` as `args`
+argument instead of `Namespace` object.
+
+```python
+from tf2rl.algos import DQN
+from tf2rl.experiments import Trainer
+
+env = ... # Create gym.env like environment.
+
+policy = DQN( ... )
+trainer = Trainer(policy, env, {"max_steps": int(1e+6), ... })
+trainer()
+```
+
+### 4.3 Results
+The `Trainer` class saves logs and models under
+`<logdir>/%Y%m%dT%H%M%S.%f`. The default `logdir` is `"results"`, and
+it can be changed by `--logdir` command argument or `"logdir"` key in
+constructor `args`.
+
+## 5. Citation
 ```
 @misc{ota2020tf2rl,
   author = {Kei Ota},
