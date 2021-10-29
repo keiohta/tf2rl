@@ -214,7 +214,9 @@ env = ... # Create gym.env like environment.
 parser = DQN.get_argument(Trainer.get_argument())
 args = parser.parse_args()
 
-policy = DQN( ... )
+policy = DQN(enable_double_dqn = args.enable_double_dqn,
+             enable_dueling_dqn = args.enable_dueling_dqn,
+			 enable_noisy_dqn = args.enable_noisy_dqn)
 trainer = Trainer(policy, env, args)
 trainer()
 ```
