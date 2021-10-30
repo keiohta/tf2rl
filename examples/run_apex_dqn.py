@@ -1,10 +1,10 @@
-import gym
 import tensorflow as tf
 
 from tf2rl.algos.apex import apex_argument, run
 from tf2rl.algos.dqn import DQN
 from tf2rl.misc.target_update_ops import update_target_variables
 from tf2rl.networks.atari_model import AtariQFunc
+from tf2rl.envs.utils import make
 
 
 # Prepare env and policy function
@@ -13,7 +13,7 @@ class env_fn:
         self.env_name = env_name
 
     def __call__(self):
-        return gym.make(self.env_name)
+        return make(self.env_name)
 
 
 class policy_fn:

@@ -1,9 +1,8 @@
 import unittest
 
-import gym
-
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.experiments.trainer import Trainer
+from tf2rl.envs.utils import make
 
 
 class TestTrainer(unittest.TestCase):
@@ -11,8 +10,8 @@ class TestTrainer(unittest.TestCase):
         """
         Test empty args {}
         """
-        env = gym.make("Pendulum-v0")
-        test_env = gym.make("Pendulum-v0")
+        env = make("Pendulum-v0")
+        test_env = make("Pendulum-v0")
         policy = DDPG(state_shape=env.observation_space.shape,
                       action_dim=env.action_space.high.size,
                       gpu=-1,
@@ -27,8 +26,8 @@ class TestTrainer(unittest.TestCase):
         Test with args
         """
         max_steps = 400
-        env = gym.make("Pendulum-v0")
-        test_env = gym.make("Pendulum-v0")
+        env = make("Pendulum-v0")
+        test_env = make("Pendulum-v0")
         policy = DDPG(state_shape=env.observation_space.shape,
                       action_dim=env.action_space.high.size,
                       gpu=-1,
@@ -43,8 +42,8 @@ class TestTrainer(unittest.TestCase):
         """
         Test with invalid args
         """
-        env = gym.make("Pendulum-v0")
-        test_env = gym.make("Pendulum-v0")
+        env = make("Pendulum-v0")
+        test_env = make("Pendulum-v0")
         policy = DDPG(state_shape=env.observation_space.shape,
                       action_dim=env.action_space.high.size,
                       gpu=-1,

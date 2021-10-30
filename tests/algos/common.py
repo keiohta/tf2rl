@@ -2,6 +2,8 @@ import unittest
 import numpy as np
 import gym
 
+from tf2rl.envs.utils import make
+
 
 class DummyImgEnv(gym.Env):
     def __init__(self, img_dim=84):
@@ -19,8 +21,8 @@ class CommonAlgos(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # TODO: Remove dependencies to gym
-        cls.discrete_env = gym.make("CartPole-v0")
-        cls.continuous_env = gym.make("Pendulum-v0")
+        cls.discrete_env = make("CartPole-v0")
+        cls.continuous_env = make("Pendulum-v0")
         cls.batch_size = 32
         cls.agent = None
 
