@@ -206,8 +206,8 @@ object explicitly. `Trainer` constructor accepts the `Namespace`
 object.
 
 ```python
-from tf2rl.algos import DQN
-from tf2rl.experiments import Trainer
+from tf2rl.algos.dqn import DQN
+from tf2rl.experiments.trainer import Trainer
 
 env = ... # Create gym.env like environment.
 
@@ -229,8 +229,8 @@ envrionment. `Trainer` constructor can accept `dict` as `args`
 argument instead of `Namespace` object.
 
 ```python
-from tf2rl.algos import DQN
-from tf2rl.experiments import Trainer
+from tf2rl.algos.dqn import DQN
+from tf2rl.experiments.trainer import Trainer
 
 env = ... # Create gym.env like environment.
 
