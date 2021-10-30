@@ -49,9 +49,9 @@ class DQN(OffPolicyAgent):
 
     DQN supports following algorithms;
 
-    * DDQN: https://arxiv.org/abs/1509.06461
-    * Dueling Network: https://arxiv.org/abs/1511.06581
-    * Noisy Network: https://arxiv.org/abs/1706.10295
+        * DDQN: https://arxiv.org/abs/1509.06461
+        * Dueling Network: https://arxiv.org/abs/1511.06581
+        * Noisy Network: https://arxiv.org/abs/1706.10295
 
     Command Line Args:
 
