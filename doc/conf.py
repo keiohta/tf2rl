@@ -10,6 +10,10 @@ html_theme = "sphinx_rtd_theme"
 
 autoclass_content = "both"
 autodoc_member_order = "bysource"
+autodoc_default_options = {
+    'member-order': 'bysource',
+    'special-members': '__init__'
+}
 
 
 def setup(app):
