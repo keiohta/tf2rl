@@ -54,12 +54,13 @@ class DQN(OffPolicyAgent):
     * Noisy Network: https://arxiv.org/abs/1706.10295
 
     Command Line Args:
-        --n-warmup (int): Number of warmup steps before training. The default is `1e4`
-        --batch-size (int): Batch size of training. The default is `32`
-        --gpu (int): GPU id. `-1` disables GPU. The default is `0`
-        --enable-double-dqn: Enable DDQN
-        --enable-dueling-dqn: Enable Dueling Network
-        --enable-noisy-dqn: Enable Noisy Network
+
+        * `--n-warmup` (int): Number of warmup steps before training. The default is `1e4`
+        * `--batch-size` (int): Batch size of training. The default is `32`
+        * `--gpu` (int): GPU id. `-1` disables GPU. The default is `0`
+        * `--enable-double-dqn`: Enable DDQN
+        * `--enable-dueling-dqn`: Enable Dueling Network
+        * `--enable-noisy-dqn`: Enable Noisy Network
     """
     def __init__(
             self,
