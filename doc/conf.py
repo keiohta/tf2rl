@@ -11,5 +11,6 @@ html_theme = "sphinx_rtd_theme"
 autoclass_content = "both"
 autodoc_member_order = "bysource"
 
+
 def setup(app):
     app.add_transform(AutoStructify)
