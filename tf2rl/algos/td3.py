@@ -40,6 +40,16 @@ class Critic(tf.keras.Model):
 
 
 class TD3(DDPG):
+    """
+    Twin Delayed Deep Deterministic policy gradient (TD3) Agent: https://arxiv.org/abs/1802.09477
+
+    Command Line Args:
+
+        * ``--n-warmup`` (int): Number of warmup steps before training. The default is ``1e4``.
+        * ``--batch-size`` (int): Batch size for training. The default is ``32``.
+        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        * ``--memory-capacity`` (int): Replay Buffer size. The default is ``1e6``.
+    """
     def __init__(
             self,
             state_shape,
@@ -50,6 +60,26 @@ class TD3(DDPG):
             noise_clip=0.5,
             critic_units=(400, 300),
             **kwargs):
+        """
+        Initialize TD3
+
+        Args:
+            shate_shape (iterable of ints): Observation state shape
+            action_dim (int): Action dimension
+            name (str): Network name. The default is ``"TD3"``.
+            actor_update_freq (int): Number of critic updates per one actor upate.
+            policy_noise (float):
+            noise_clip (float):
+            critic_units (iterable of int): Numbers of units at hidden layer of critic. The default is ``(400, 300)``
+            max_action (float): Size of maximum action. (``-max_action`` <= action <= ``max_action``). The degault is ``1``.
+            lr_actor (float): Learning rate for actor network. The default is ``0.001``.
+            lr_critic (float): Learning rage for critic network. The default is ``0.001``.
+            actor_units (iterable of int): Number of units at hidden layers of actor.
+            sigma (float): Standard deviation of Gaussian noise. The default is ``0.1``.
+            tau (float): Weight update ratio for target network. ``target = (1-tau)*target + tau*network`` The default is ``0.005``.
+            n_warmup (int): Number of warmup steps before training. The default is ``1e4``.
+            memory_capacity (int): Replay Buffer size. The default is ``1e4``.
+        """
         super().__init__(name=name, state_shape=state_shape, action_dim=action_dim, **kwargs)
 
         self.critic = Critic(state_shape, action_dim, critic_units)
@@ -100,6 +130,19 @@ class TD3(DDPG):
             return actor_loss, critic_loss, tf.abs(td_errors1) + tf.abs(td_errors2)
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
+        """
+        Compute TD error
+
+        Args:
+            states
+            actions
+            next_states
+            rewars
+            dones
+
+        Returns:
+            tf.Tensor: Sum of two TD errors.
+        """
         td_errors1, td_errors2 = self._compute_td_error_body(
             states, actions, next_states, rewards, dones)
         return np.squeeze(np.abs(td_errors1.numpy()) + np.abs(td_errors2.numpy()))
