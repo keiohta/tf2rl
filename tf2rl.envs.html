@@ -116,207 +116,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ClipRewardEnv">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">ClipRewardEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ClipRewardEnv" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.RewardWrapper</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ClipRewardEnv.reward">
-<span class="sig-name descname"><span class="pre">reward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reward</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ClipRewardEnv.reward" title="Permalink to this definition"></a></dt>
-<dd><p>Bin reward to {+1, 0, -1} by its sign.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.EpisodicLifeEnv">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">EpisodicLifeEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.EpisodicLifeEnv" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.EpisodicLifeEnv.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.EpisodicLifeEnv.reset" title="Permalink to this definition"></a></dt>
-<dd><p>Reset only when lives are exhausted.
-This way all states are still reachable even though lives are episodic,
-and the learner need not know about any of this behind-the-scenes.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.EpisodicLifeEnv.step">
-<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.EpisodicLifeEnv.step" title="Permalink to this definition"></a></dt>
-<dd><p>Run one timestep of the environment’s dynamics. When end of
-episode is reached, you are responsible for calling <cite>reset()</cite>
-to reset this environment’s state.</p>
-<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
-</dd>
-<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
-reward (float) : amount of reward returned after previous action
-done (bool): whether the episode has ended, in which case further step() calls will return undefined results
-info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FireResetEnv">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">FireResetEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FireResetEnv" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FireResetEnv.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FireResetEnv.reset" title="Permalink to this definition"></a></dt>
-<dd><p>Resets the environment to an initial state and returns an initial
-observation.</p>
-<p>Note that this function should not reset the environment’s random
-number generator(s); random variables in the environment’s state should
-be sampled independently between multiple calls to <cite>reset()</cite>. In other
-words, each call of <cite>reset()</cite> should yield an environment suitable for
-a new episode, independent of previous episodes.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>observation (object): the initial observation.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FireResetEnv.step">
-<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ac</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FireResetEnv.step" title="Permalink to this definition"></a></dt>
-<dd><p>Run one timestep of the environment’s dynamics. When end of
-episode is reached, you are responsible for calling <cite>reset()</cite>
-to reset this environment’s state.</p>
-<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
-</dd>
-<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
-reward (float) : amount of reward returned after previous action
-done (bool): whether the episode has ended, in which case further step() calls will return undefined results
-info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FrameStack">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">FrameStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FrameStack" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FrameStack.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FrameStack.reset" title="Permalink to this definition"></a></dt>
-<dd><p>Resets the environment to an initial state and returns an initial
-observation.</p>
-<p>Note that this function should not reset the environment’s random
-number generator(s); random variables in the environment’s state should
-be sampled independently between multiple calls to <cite>reset()</cite>. In other
-words, each call of <cite>reset()</cite> should yield an environment suitable for
-a new episode, independent of previous episodes.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>observation (object): the initial observation.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FrameStack.step">
-<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FrameStack.step" title="Permalink to this definition"></a></dt>
-<dd><p>Run one timestep of the environment’s dynamics. When end of
-episode is reached, you are responsible for calling <cite>reset()</cite>
-to reset this environment’s state.</p>
-<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
-</dd>
-<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
-reward (float) : amount of reward returned after previous action
-done (bool): whether the episode has ended, in which case further step() calls will return undefined results
-info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.LazyFrames">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">LazyFrames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frames</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.LazyFrames" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.MaxAndSkipEnv">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">MaxAndSkipEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.MaxAndSkipEnv" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.MaxAndSkipEnv.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.MaxAndSkipEnv.reset" title="Permalink to this definition"></a></dt>
-<dd><p>Resets the environment to an initial state and returns an initial
-observation.</p>
-<p>Note that this function should not reset the environment’s random
-number generator(s); random variables in the environment’s state should
-be sampled independently between multiple calls to <cite>reset()</cite>. In other
-words, each call of <cite>reset()</cite> should yield an environment suitable for
-a new episode, independent of previous episodes.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>observation (object): the initial observation.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.MaxAndSkipEnv.step">
-<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.MaxAndSkipEnv.step" title="Permalink to this definition"></a></dt>
-<dd><p>Repeat action, sum reward, and max over last observations.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.NdarrayFrames">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">NdarrayFrames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NdarrayFrames" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.NdarrayFrames.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NdarrayFrames.reset" title="Permalink to this definition"></a></dt>
-<dd><p>Resets the environment to an initial state and returns an initial
-observation.</p>
-<p>Note that this function should not reset the environment’s random
-number generator(s); random variables in the environment’s state should
-be sampled independently between multiple calls to <cite>reset()</cite>. In other
-words, each call of <cite>reset()</cite> should yield an environment suitable for
-a new episode, independent of previous episodes.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>observation (object): the initial observation.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.NdarrayFrames.step">
-<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NdarrayFrames.step" title="Permalink to this definition"></a></dt>
-<dd><p>Run one timestep of the environment’s dynamics. When end of
-episode is reached, you are responsible for calling <cite>reset()</cite>
-to reset this environment’s state.</p>
-<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
-</dd>
-<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
-reward (float) : amount of reward returned after previous action
-done (bool): whether the episode has ended, in which case further step() calls will return undefined results
-info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.NoopResetEnv">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">NoopResetEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noop_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NoopResetEnv" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.NoopResetEnv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noop_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NoopResetEnv.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Sample initial states by taking random number of no-ops on reset.
+No-op is assumed to be action 0.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.NoopResetEnv.reset">
 <span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NoopResetEnv.reset" title="Permalink to this definition"></a></dt>
@@ -330,13 +139,18 @@ info (dict): contains auxiliary diagnostic information (helpful for debugging, a
 episode is reached, you are responsible for calling <cite>reset()</cite>
 to reset this environment’s state.</p>
 <p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>action</strong> (<em>object</em>) – an action provided by the agent</p>
 </dd>
-<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>agent’s observation of the current environment
 reward (float) : amount of reward returned after previous action
 done (bool): whether the episode has ended, in which case further step() calls will return undefined results
 info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>observation (object)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -344,9 +158,187 @@ info (dict): contains auxiliary diagnostic information (helpful for debugging, a
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FireResetEnv">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">FireResetEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FireResetEnv" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FireResetEnv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FireResetEnv.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Take action on reset for environments that are fixed until firing.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FireResetEnv.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FireResetEnv.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Resets the environment to an initial state and returns an initial
+observation.</p>
+<p>Note that this function should not reset the environment’s random
+number generator(s); random variables in the environment’s state should
+be sampled independently between multiple calls to <cite>reset()</cite>. In other
+words, each call of <cite>reset()</cite> should yield an environment suitable for
+a new episode, independent of previous episodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the initial observation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>observation (object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FireResetEnv.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ac</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FireResetEnv.step" title="Permalink to this definition"></a></dt>
+<dd><p>Run one timestep of the environment’s dynamics. When end of
+episode is reached, you are responsible for calling <cite>reset()</cite>
+to reset this environment’s state.</p>
+<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>action</strong> (<em>object</em>) – an action provided by the agent</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>agent’s observation of the current environment
+reward (float) : amount of reward returned after previous action
+done (bool): whether the episode has ended, in which case further step() calls will return undefined results
+info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>observation (object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.EpisodicLifeEnv">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">EpisodicLifeEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.EpisodicLifeEnv" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.EpisodicLifeEnv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.EpisodicLifeEnv.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Make end-of-life == end-of-episode, but only reset on true game over.
+Done by DeepMind for the DQN and co. since it helps value estimation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.EpisodicLifeEnv.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.EpisodicLifeEnv.step" title="Permalink to this definition"></a></dt>
+<dd><p>Run one timestep of the environment’s dynamics. When end of
+episode is reached, you are responsible for calling <cite>reset()</cite>
+to reset this environment’s state.</p>
+<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>action</strong> (<em>object</em>) – an action provided by the agent</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>agent’s observation of the current environment
+reward (float) : amount of reward returned after previous action
+done (bool): whether the episode has ended, in which case further step() calls will return undefined results
+info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>observation (object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.EpisodicLifeEnv.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.EpisodicLifeEnv.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Reset only when lives are exhausted.
+This way all states are still reachable even though lives are episodic,
+and the learner need not know about any of this behind-the-scenes.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.MaxAndSkipEnv">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">MaxAndSkipEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.MaxAndSkipEnv" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.MaxAndSkipEnv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.MaxAndSkipEnv.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Return only every <cite>skip</cite>-th frame</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.MaxAndSkipEnv.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.MaxAndSkipEnv.step" title="Permalink to this definition"></a></dt>
+<dd><p>Repeat action, sum reward, and max over last observations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.MaxAndSkipEnv.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.MaxAndSkipEnv.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Resets the environment to an initial state and returns an initial
+observation.</p>
+<p>Note that this function should not reset the environment’s random
+number generator(s); random variables in the environment’s state should
+be sampled independently between multiple calls to <cite>reset()</cite>. In other
+words, each call of <cite>reset()</cite> should yield an environment suitable for
+a new episode, independent of previous episodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the initial observation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>observation (object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ClipRewardEnv">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">ClipRewardEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ClipRewardEnv" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.RewardWrapper</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ClipRewardEnv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ClipRewardEnv.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ClipRewardEnv.reward">
+<span class="sig-name descname"><span class="pre">reward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reward</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ClipRewardEnv.reward" title="Permalink to this definition"></a></dt>
+<dd><p>Bin reward to {+1, 0, -1} by its sign.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.WarpFrame">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">WarpFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">84</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">84</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grayscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict_space_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.WarpFrame" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.ObservationWrapper</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.WarpFrame.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">84</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">84</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grayscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict_space_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.WarpFrame.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Warp frames to 84x84 as done in the Nature paper and later work.
+If the environment uses dictionary observations, <cite>dict_space_key</cite> can be specified which indicates which
+observation should be warped.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.WarpFrame.observation">
+<span class="sig-name descname"><span class="pre">observation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.WarpFrame.observation" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ProcessFrame84">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">ProcessFrame84</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ProcessFrame84" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.ObservationWrapper</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ProcessFrame84.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ProcessFrame84.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ProcessFrame84.observation">
 <span class="sig-name descname"><span class="pre">observation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ProcessFrame84.observation" title="Permalink to this definition"></a></dt>
@@ -360,9 +352,71 @@ info (dict): contains auxiliary diagnostic information (helpful for debugging, a
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FrameStack">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">FrameStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FrameStack" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FrameStack.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FrameStack.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Stack k last frames.
+Returns lazy array, which is much more memory efficient.
+See also baselines.common.atari_wrappers.LazyFrames</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FrameStack.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FrameStack.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Resets the environment to an initial state and returns an initial
+observation.</p>
+<p>Note that this function should not reset the environment’s random
+number generator(s); random variables in the environment’s state should
+be sampled independently between multiple calls to <cite>reset()</cite>. In other
+words, each call of <cite>reset()</cite> should yield an environment suitable for
+a new episode, independent of previous episodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the initial observation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>observation (object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.FrameStack.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.FrameStack.step" title="Permalink to this definition"></a></dt>
+<dd><p>Run one timestep of the environment’s dynamics. When end of
+episode is reached, you are responsible for calling <cite>reset()</cite>
+to reset this environment’s state.</p>
+<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>action</strong> (<em>object</em>) – an action provided by the agent</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>agent’s observation of the current environment
+reward (float) : amount of reward returned after previous action
+done (bool): whether the episode has ended, in which case further step() calls will return undefined results
+info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>observation (object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ScaledFloatFrame">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">ScaledFloatFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ScaledFloatFrame" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.ObservationWrapper</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ScaledFloatFrame.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ScaledFloatFrame.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.ScaledFloatFrame.observation">
 <span class="sig-name descname"><span class="pre">observation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.ScaledFloatFrame.observation" title="Permalink to this definition"></a></dt>
@@ -371,13 +425,72 @@ info (dict): contains auxiliary diagnostic information (helpful for debugging, a
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.WarpFrame">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">WarpFrame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">84</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">84</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grayscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict_space_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.WarpFrame" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.ObservationWrapper</span></code></p>
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.LazyFrames">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">LazyFrames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frames</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.LazyFrames" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.WarpFrame.observation">
-<span class="sig-name descname"><span class="pre">observation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.WarpFrame.observation" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.LazyFrames.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frames</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.LazyFrames.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>This object ensures that common frames between the observations are only stored once.
+It exists purely to optimize memory usage which can be huge for DQN’s 1M frames replay
+buffers.
+This object should only be converted to numpy array before being passed to the model.
+You’d not believe how complex the previous solution was.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.NdarrayFrames">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.atari_wrapper.</span></span><span class="sig-name descname"><span class="pre">NdarrayFrames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NdarrayFrames" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.NdarrayFrames.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NdarrayFrames.__init__" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.NdarrayFrames.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NdarrayFrames.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Resets the environment to an initial state and returns an initial
+observation.</p>
+<p>Note that this function should not reset the environment’s random
+number generator(s); random variables in the environment’s state should
+be sampled independently between multiple calls to <cite>reset()</cite>. In other
+words, each call of <cite>reset()</cite> should yield an environment suitable for
+a new episode, independent of previous episodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the initial observation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>observation (object)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.atari_wrapper.NdarrayFrames.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.atari_wrapper.NdarrayFrames.step" title="Permalink to this definition"></a></dt>
+<dd><p>Run one timestep of the environment’s dynamics. When end of
+episode is reached, you are responsible for calling <cite>reset()</cite>
+to reset this environment’s state.</p>
+<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>action</strong> (<em>object</em>) – an action provided by the agent</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>agent’s observation of the current environment
+reward (float) : amount of reward returned after previous action
+done (bool): whether the episode has ended, in which case further step() calls will return undefined results
+info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>observation (object)</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -407,6 +520,11 @@ info (dict): contains auxiliary diagnostic information (helpful for debugging, a
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.envs.frame_stack_wrapper.FrameStack" title="tf2rl.envs.frame_stack_wrapper.FrameStack"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.envs.frame_stack_wrapper.FrameStack</span></code></a></p>
 <p>Wrapper class to visualize DMC environments.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.dmc_wrapper.DMCWrapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">33.333333333333336</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.dmc_wrapper.DMCWrapper.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.envs.dmc_wrapper.DMCWrapper.render">
 <span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.dmc_wrapper.DMCWrapper.render" title="Permalink to this definition"></a></dt>
 <dd><p>Renders the environment.</p>
@@ -423,14 +541,17 @@ for turning into a video.</p></li>
 terminal-style text representation. The text can include newlines
 and ANSI escape sequences (e.g. for colors).</p></li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <dl class="simple">
-<dt>Note:</dt><dd><dl class="simple">
 <dt>Make sure that your class’s metadata ‘render.modes’ key includes</dt><dd><p>the list of supported modes. It’s recommended to call super()
 in implementations to use the functionality of this method.</p>
 </dd>
 </dl>
-</dd>
-<dt>Args:</dt><dd><p>mode (str): the mode to render with</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mode</strong> (<em>str</em>) – the mode to render with</p>
 </dd>
 </dl>
 <p>Example:</p>
@@ -469,6 +590,11 @@ in implementations to use the functionality of this method.</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.frame_stack_wrapper.</span></span><span class="sig-name descname"><span class="pre">FrameStack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.frame_stack_wrapper.FrameStack" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Wrapper</span></code></p>
 <dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.frame_stack_wrapper.FrameStack.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.frame_stack_wrapper.FrameStack.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.envs.frame_stack_wrapper.FrameStack.reset">
 <span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.frame_stack_wrapper.FrameStack.reset" title="Permalink to this definition"></a></dt>
 <dd><p>Resets the environment to an initial state and returns an initial
@@ -478,8 +604,12 @@ number generator(s); random variables in the environment’s state should
 be sampled independently between multiple calls to <cite>reset()</cite>. In other
 words, each call of <cite>reset()</cite> should yield an environment suitable for
 a new episode, independent of previous episodes.</p>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>observation (object): the initial observation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the initial observation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>observation (object)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -491,13 +621,18 @@ a new episode, independent of previous episodes.</p>
 episode is reached, you are responsible for calling <cite>reset()</cite>
 to reset this environment’s state.</p>
 <p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
-<dl class="simple">
-<dt>Args:</dt><dd><p>action (object): an action provided by the agent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>action</strong> (<em>object</em>) – an action provided by the agent</p>
 </dd>
-<dt>Returns:</dt><dd><p>observation (object): agent’s observation of the current environment
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>agent’s observation of the current environment
 reward (float) : amount of reward returned after previous action
 done (bool): whether the episode has ended, in which case further step() calls will return undefined results
 info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>observation (object)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -514,20 +649,78 @@ info (dict): contains auxiliary diagnostic information (helpful for debugging, a
 <p>This contains multiple environments.
 When step() is called, all of them forward one-step.</p>
 <p>This serve tensorflow operators to manipulate multiple environments.</p>
-<dl class="py property">
-<dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.max_action">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">max_action</span></span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.max_action" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.min_action">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">min_action</span></span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.min_action" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_pool</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_episode_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.__init__" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env_fn</strong> – function
+Function to make an environment</p></li>
+<li><p><strong>batch_size</strong> – int
+Batch size</p></li>
+<li><p><strong>thread_pool</strong> – int
+Thread pool size</p></li>
+<li><p><strong>max_episode_steps</strong> – int
+Maximum step of an episode</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.original_env">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">original_env</span></span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.original_env" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.step">
+<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.step" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>actions</strong> – tf.Tensor
+Actions whose shape is float32[batch_size, dim_action]</p></li>
+<li><p><strong>name</strong> – str
+Operator name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>tf.Tensor</dt><dd><p>[batch_size, dim_obs]</p>
+</dd>
+<dt>reward: tf.Tensor</dt><dd><p>[batch_size]</p>
+</dd>
+<dt>done: tf.Tensor</dt><dd><p>[batch_size]</p>
+</dd>
+</dl>
+<p>env_info: None</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>obs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.py_step">
+<span class="sig-name descname"><span class="pre">py_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.py_step" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>actions</strong> – np.array
+Actions whose shape is [batch_size, dim_action]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>np.array
+reward: np.array
+done: np.array</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>obs</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.py_observation">
@@ -539,50 +732,20 @@ When step() is called, all of them forward one-step.</p>
 <span class="sig-name descname"><span class="pre">py_reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.py_reset" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.py_step">
-<span class="sig-name descname"><span class="pre">py_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.py_step" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>actions: np.array</dt><dd><p>Actions whose shape is [batch_size, dim_action]</p>
-</dd>
-</dl>
-</dd>
-<dt>Returns:</dt><dd><p>obs: np.array
-reward: np.array
-done: np.array</p>
-</dd>
-</dl>
-</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.max_action">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">max_action</span></span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.max_action" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.min_action">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">min_action</span></span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.min_action" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.state_dim">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">state_dim</span></span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.state_dim" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.multi_thread_env.MultiThreadEnv.step">
-<span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.multi_thread_env.MultiThreadEnv.step" title="Permalink to this definition"></a></dt>
-<dd><dl>
-<dt>Args:</dt><dd><dl class="simple">
-<dt>actions: tf.Tensor</dt><dd><p>Actions whose shape is float32[batch_size, dim_action]</p>
-</dd>
-<dt>name: str</dt><dd><p>Operator name</p>
-</dd>
-</dl>
-</dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>obs: tf.Tensor</dt><dd><p>[batch_size, dim_obs]</p>
-</dd>
-<dt>reward: tf.Tensor</dt><dd><p>[batch_size]</p>
-</dd>
-<dt>done: tf.Tensor</dt><dd><p>[batch_size]</p>
-</dd>
-</dl>
-<p>env_info: None</p>
-</dd>
-</dl>
-</dd></dl>
 
 </dd></dl>
 
@@ -611,26 +774,23 @@ SOFTWARE.</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.envs.normalizer.</span></span><span class="sig-name descname"><span class="pre">EmpiricalNormalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">shape</span></em>, <em class="sig-param"><span class="pre">batch_axis=0</span></em>, <em class="sig-param"><span class="pre">eps=0.01</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">until=None</span></em>, <em class="sig-param"><span class="pre">clip_threshold=None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Normalize mean and variance of values based on emprical values.
-Args:</p>
-<blockquote>
-<div><p>shape (int or tuple of int): Shape of input values except batch axis.
-batch_axis (int): Batch axis.
-eps (float): Small value for stability.
-dtype (dtype): Dtype of input values.
-until (int or None): If this arg is specified, the link learns input</p>
+:param shape: Shape of input values except batch axis.
+:type shape: int or tuple of int
+:param batch_axis: Batch axis.
+:type batch_axis: int
+:param eps: Small value for stability.
+:type eps: float
+:param dtype: Dtype of input values.
+:type dtype: dtype
+:param until: If this arg is specified, the link learns input</p>
 <blockquote>
 <div><p>values until the sum of batch sizes exceeds it.</p>
 </div></blockquote>
-</div></blockquote>
+<dl class="field-list simple">
+</dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.normalizer.EmpiricalNormalizer.experience">
-<span class="sig-name descname"><span class="pre">experience</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer.experience" title="Permalink to this definition"></a></dt>
-<dd><p>Learn input values without computing the output values of them</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.envs.normalizer.EmpiricalNormalizer.inverse">
-<span class="sig-name descname"><span class="pre">inverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer.inverse" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tf2rl.envs.normalizer.EmpiricalNormalizer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">shape</span></em>, <em class="sig-param"><span class="pre">batch_axis=0</span></em>, <em class="sig-param"><span class="pre">eps=0.01</span></em>, <em class="sig-param"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></em>, <em class="sig-param"><span class="pre">until=None</span></em>, <em class="sig-param"><span class="pre">clip_threshold=None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer.__init__" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -643,24 +803,30 @@ until (int or None): If this arg is specified, the link learns input</p>
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">std</span></span><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer.std" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.normalizer.EmpiricalNormalizer.experience">
+<span class="sig-name descname"><span class="pre">experience</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer.experience" title="Permalink to this definition"></a></dt>
+<dd><p>Learn input values without computing the output values of them</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.envs.normalizer.EmpiricalNormalizer.inverse">
+<span class="sig-name descname"><span class="pre">inverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.normalizer.EmpiricalNormalizer.inverse" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
 <section id="module-tf2rl.envs.utils">
 <span id="tf2rl-envs-utils-module"></span><h2>tf2rl.envs.utils module<a class="headerlink" href="#module-tf2rl.envs.utils" title="Permalink to this headline"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="tf2rl.envs.utils.get_act_dim">
-<span class="sig-prename descclassname"><span class="pre">tf2rl.envs.utils.</span></span><span class="sig-name descname"><span class="pre">get_act_dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.utils.get_act_dim" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tf2rl.envs.utils.is_atari_env">
-<span class="sig-prename descclassname"><span class="pre">tf2rl.envs.utils.</span></span><span class="sig-name descname"><span class="pre">is_atari_env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.utils.is_atari_env" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="tf2rl.envs.utils.is_discrete">
 <span class="sig-prename descclassname"><span class="pre">tf2rl.envs.utils.</span></span><span class="sig-name descname"><span class="pre">is_discrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.utils.is_discrete" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.envs.utils.get_act_dim">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.envs.utils.</span></span><span class="sig-name descname"><span class="pre">get_act_dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.utils.get_act_dim" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -669,17 +835,25 @@ until (int or None): If this arg is specified, the link learns input</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.envs.utils.is_atari_env">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.envs.utils.</span></span><span class="sig-name descname"><span class="pre">is_atari_env</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.utils.is_atari_env" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="tf2rl.envs.utils.make">
 <span class="sig-prename descclassname"><span class="pre">tf2rl.envs.utils.</span></span><span class="sig-name descname"><span class="pre">make</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.envs.utils.make" title="Permalink to this definition"></a></dt>
 <dd><p>Make gym.Env with version tolerance</p>
-<dl>
-<dt>Args:</dt><dd><dl>
-<dt>id (str)<span class="classifier">Id specifying <cite>gym.Env</cite> registered to <cite>gym.env.registry</cite>.</span></dt><dd><p>Valid format is <cite>“^(?:[w:-]+/)?([w:.-]+)-v(d+)$”</cite>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>str</em>) – Id specifying <cite>gym.Env</cite> registered to <cite>gym.env.registry</cite>.
+Valid format is <cite>“^(?:[w:-]+/)?([w:.-]+)-v(d+)$”</cite>
 See <a class="reference external" href="https://github.com/openai/gym/blob/v0.21.0/gym/envs/registration.py#L17-L19">https://github.com/openai/gym/blob/v0.21.0/gym/envs/registration.py#L17-L19</a></p>
 </dd>
-</dl>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Environment</p>
 </dd>
-<dt>Returns:</dt><dd><p>gym.Env : Environment</p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>gym.Env</p>
 </dd>
 </dl>
 </dd></dl>

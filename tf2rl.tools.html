@@ -93,15 +93,32 @@
 <section id="module-tf2rl.tools.img_tools">
 <span id="tf2rl-tools-img-tools-module"></span><h2>tf2rl.tools.img_tools module<a class="headerlink" href="#module-tf2rl.tools.img_tools" title="Permalink to this headline"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="tf2rl.tools.img_tools.center_crop">
-<span class="sig-prename descclassname"><span class="pre">tf2rl.tools.img_tools.</span></span><span class="sig-name descname"><span class="pre">center_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.img_tools.center_crop" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>img: np.ndarray</dt><dd><p>Input image array. The shape is (width, height, channel)</p>
-</dd>
-<dt>output_size: int</dt><dd><p>Width and height size for output image</p>
+<dt class="sig sig-object py" id="tf2rl.tools.img_tools.random_crop">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.tools.img_tools.</span></span><span class="sig-name descname"><span class="pre">random_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.img_tools.random_crop" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_imgs</strong> – np.ndarray
+Images whose shape is (batch_size, width, height, channels)</p></li>
+<li><p><strong>output_size</strong> – Int
+Output width and height size.</p></li>
+</ul>
 </dd>
 </dl>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.tools.img_tools.center_crop">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.tools.img_tools.</span></span><span class="sig-name descname"><span class="pre">center_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.img_tools.center_crop" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> – np.ndarray
+Input image array. The shape is (width, height, channel)</p></li>
+<li><p><strong>output_size</strong> – int
+Width and height size for output image</p></li>
+</ul>
 </dd>
 </dl>
 <p>Returns:</p>
@@ -113,21 +130,6 @@
 <dd><p>Preprocessing image, see <a class="reference external" href="https://arxiv.org/abs/1807.03039">https://arxiv.org/abs/1807.03039</a>.</p>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="tf2rl.tools.img_tools.random_crop">
-<span class="sig-prename descclassname"><span class="pre">tf2rl.tools.img_tools.</span></span><span class="sig-name descname"><span class="pre">random_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.img_tools.random_crop" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>input_imgs: np.ndarray</dt><dd><p>Images whose shape is (batch_size, width, height, channels)</p>
-</dd>
-<dt>output_size: Int</dt><dd><p>Output width and height size.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p>Returns:</p>
-</dd></dl>
-
 </section>
 <section id="module-tf2rl.tools.vae">
 <span id="tf2rl-tools-vae-module"></span><h2>tf2rl.tools.vae module<a class="headerlink" href="#module-tf2rl.tools.vae" title="Permalink to this headline"></a></h2>
@@ -136,18 +138,13 @@
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.tools.vae.</span></span><span class="sig-name descname"><span class="pre">VAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.compute_apply_gradients">
-<span class="sig-name descname"><span class="pre">compute_apply_gradients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.compute_apply_gradients" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inference_net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generative_net</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.__init__" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.compute_loss">
-<span class="sig-name descname"><span class="pre">compute_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.compute_loss" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.decode">
-<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_sigmoid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.decode" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.sample" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -161,8 +158,18 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.sample">
-<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.sample" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_sigmoid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.decode" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.compute_loss">
+<span class="sig-name descname"><span class="pre">compute_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.compute_loss" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.tools.vae.VAE.compute_apply_gradients">
+<span class="sig-name descname"><span class="pre">compute_apply_gradients</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.tools.vae.VAE.compute_apply_gradients" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

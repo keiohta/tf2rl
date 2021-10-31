@@ -103,20 +103,22 @@
 <dt class="sig sig-object py" id="tf2rl.misc.discount_cumsum.discount_cumsum">
 <span class="sig-prename descclassname"><span class="pre">tf2rl.misc.discount_cumsum.</span></span><span class="sig-name descname"><span class="pre">discount_cumsum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discount</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.discount_cumsum.discount_cumsum" title="Permalink to this definition"></a></dt>
 <dd><p>Forked from rllab for computing discounted cumulative sums of vectors.</p>
-<dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>x: np.ndarray or tf.Tensor</dt><dd><p>Vector of inputs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – np.ndarray or tf.Tensor
+Vector of inputs</p></li>
+<li><p><strong>discount</strong> – float
+Discount factor</p></li>
+</ul>
 </dd>
-<dt>discount: float</dt><dd><p>Discount factor</p>
-</dd>
-</dl>
-</dd>
-<dt>Returns:</dt><dd><dl class="simple">
-<dt>Discounted cumulative summation. If input is [x0, x1, x2], then the output is:</dt><dd><p>[x0 + discount * x1 + discount^2 * x2,
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>[x0 + discount * x1 + discount^2 * x2,
 x1 + discount * x2,
 x2]</p>
 </dd>
-</dl>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Discounted cumulative summation. If input is [x0, x1, x2], then the output is</p>
 </dd>
 </dl>
 </dd></dl>
@@ -124,6 +126,11 @@ x2]</p>
 </section>
 <section id="module-tf2rl.misc.get_replay_buffer">
 <span id="tf2rl-misc-get-replay-buffer-module"></span><h2>tf2rl.misc.get_replay_buffer module<a class="headerlink" href="#module-tf2rl.misc.get_replay_buffer" title="Permalink to this headline"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.misc.get_replay_buffer.get_space_size">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.misc.get_replay_buffer.</span></span><span class="sig-name descname"><span class="pre">get_space_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.get_replay_buffer.get_space_size" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="tf2rl.misc.get_replay_buffer.get_default_rb_dict">
 <span class="sig-prename descclassname"><span class="pre">tf2rl.misc.get_replay_buffer.</span></span><span class="sig-name descname"><span class="pre">get_default_rb_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.get_replay_buffer.get_default_rb_dict" title="Permalink to this definition"></a></dt>
@@ -134,26 +141,24 @@ x2]</p>
 <span class="sig-prename descclassname"><span class="pre">tf2rl.misc.get_replay_buffer.</span></span><span class="sig-name descname"><span class="pre">get_replay_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_prioritized_rb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_nstep_rb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.get_replay_buffer.get_replay_buffer" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="tf2rl.misc.get_replay_buffer.get_space_size">
-<span class="sig-prename descclassname"><span class="pre">tf2rl.misc.get_replay_buffer.</span></span><span class="sig-name descname"><span class="pre">get_space_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.get_replay_buffer.get_space_size" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
 </section>
 <section id="module-tf2rl.misc.huber_loss">
 <span id="tf2rl-misc-huber-loss-module"></span><h2>tf2rl.misc.huber_loss module<a class="headerlink" href="#module-tf2rl.misc.huber_loss" title="Permalink to this headline"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="tf2rl.misc.huber_loss.huber_loss">
 <span class="sig-prename descclassname"><span class="pre">tf2rl.misc.huber_loss.</span></span><span class="sig-name descname"><span class="pre">huber_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.huber_loss.huber_loss" title="Permalink to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>x: np.ndarray or tf.Tensor</dt><dd><p>Values to compute the huber loss.</p>
-</dd>
-<dt>delta: float</dt><dd><p>Positive floating point value. Represents the
-maximum possible gradient magnitude.</p>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – np.ndarray or tf.Tensor
+Values to compute the huber loss.</p></li>
+<li><p><strong>delta</strong> – float
+Positive floating point value. Represents the
+maximum possible gradient magnitude.</p></li>
+</ul>
 </dd>
 </dl>
-</dd>
+<dl class="simple">
 <dt>Returns: tf.Tensor</dt><dd><p>The huber loss.</p>
 </dd>
 </dl>
@@ -177,22 +182,26 @@ maximum possible gradient magnitude.</p>
 <p>Normalize input data online. This is based on following:
 <a class="reference external" href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm">https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm</a></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.misc.normalizer.Normalizer.normalize">
-<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.Normalizer.normalize" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tf2rl.misc.normalizer.Normalizer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.Normalizer.__init__" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.misc.normalizer.Normalizer.observe">
 <span class="sig-name descname"><span class="pre">observe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.Normalizer.observe" title="Permalink to this definition"></a></dt>
 <dd><p>Compute next mean and std</p>
-<dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>x: float</dt><dd><p>Input data.</p>
-</dd>
-</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – float
+Input data.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.misc.normalizer.Normalizer.normalize">
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.Normalizer.normalize" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -201,8 +210,13 @@ maximum possible gradient magnitude.</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.misc.normalizer.</span></span><span class="sig-name descname"><span class="pre">NormalizerNumpy</span></span><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.misc.normalizer.NormalizerNumpy.get_params">
-<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy.get_params" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tf2rl.misc.normalizer.NormalizerNumpy.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.misc.normalizer.NormalizerNumpy.observe">
+<span class="sig-name descname"><span class="pre">observe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy.observe" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -211,8 +225,8 @@ maximum possible gradient magnitude.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.misc.normalizer.NormalizerNumpy.observe">
-<span class="sig-name descname"><span class="pre">observe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy.observe" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tf2rl.misc.normalizer.NormalizerNumpy.get_params">
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.normalizer.NormalizerNumpy.get_params" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -342,34 +356,6 @@ script. If not specified, sys.argv is used instead.</p></li>
 This is used in agents such as DQN or DPG, which use a target network that
 changes more slowly than the online network, in order to improve stability.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="tf2rl.misc.target_update_ops.periodic_target_update">
-<span class="sig-prename descclassname"><span class="pre">tf2rl.misc.target_update_ops.</span></span><span class="sig-name descname"><span class="pre">periodic_target_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_locking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic_target_update'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.target_update_ops.periodic_target_update" title="Permalink to this definition"></a></dt>
-<dd><p>Returns an op to periodically update a list of target variables.</p>
-<p>The <cite>update_target_variables</cite> op is executed every <cite>update_period</cite>
-executions of the <cite>periodic_target_update</cite> op.</p>
-<p>The update rule is:
-<cite>target_variable = (1 - tau) * target_variable + tau * source_variable</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>target_variables</strong> – a list of the variables to be updated.</p></li>
-<li><p><strong>source_variables</strong> – a list of the variables used for the update.</p></li>
-<li><p><strong>update_period</strong> – inverse frequency with which to apply the update.</p></li>
-<li><p><strong>tau</strong> – weight used to gate the update. The permitted range is 0 &lt; tau &lt;= 1,
-with small tau representing an incremental update, and tau == 1
-representing a full update (that is, a straight copy).</p></li>
-<li><p><strong>use_locking</strong> – use <cite>tf.variable.Assign</cite>’s locking option when assigning
-source variable values to target variables.</p></li>
-<li><p><strong>name</strong> – sets the <cite>name_scope</cite> for this op.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An op that periodically updates <cite>target_variables</cite> with <cite>source_variables</cite>.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="tf2rl.misc.target_update_ops.update_target_variables">
 <span class="sig-prename descclassname"><span class="pre">tf2rl.misc.target_update_ops.</span></span><span class="sig-name descname"><span class="pre">update_target_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_locking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'update_target_variables'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.target_update_ops.update_target_variables" title="Permalink to this definition"></a></dt>
 <dd><p>Returns an op to update a list of target variables from source variables.</p>
@@ -397,6 +383,34 @@ have different numbers or shapes.</p></li>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>An op that executes all the variable updates.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tf2rl.misc.target_update_ops.periodic_target_update">
+<span class="sig-prename descclassname"><span class="pre">tf2rl.misc.target_update_ops.</span></span><span class="sig-name descname"><span class="pre">periodic_target_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_locking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic_target_update'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.misc.target_update_ops.periodic_target_update" title="Permalink to this definition"></a></dt>
+<dd><p>Returns an op to periodically update a list of target variables.</p>
+<p>The <cite>update_target_variables</cite> op is executed every <cite>update_period</cite>
+executions of the <cite>periodic_target_update</cite> op.</p>
+<p>The update rule is:
+<cite>target_variable = (1 - tau) * target_variable + tau * source_variable</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_variables</strong> – a list of the variables to be updated.</p></li>
+<li><p><strong>source_variables</strong> – a list of the variables used for the update.</p></li>
+<li><p><strong>update_period</strong> – inverse frequency with which to apply the update.</p></li>
+<li><p><strong>tau</strong> – weight used to gate the update. The permitted range is 0 &lt; tau &lt;= 1,
+with small tau representing an incremental update, and tau == 1
+representing a full update (that is, a straight copy).</p></li>
+<li><p><strong>use_locking</strong> – use <cite>tf.variable.Assign</cite>’s locking option when assigning
+source variable values to target variables.</p></li>
+<li><p><strong>name</strong> – sets the <cite>name_scope</cite> for this op.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An op that periodically updates <cite>target_variables</cite> with <cite>source_variables</cite>.</p>
 </dd>
 </dl>
 </dd></dl>

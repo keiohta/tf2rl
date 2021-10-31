@@ -98,24 +98,34 @@
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.policies.tfp_categorical_actor.</span></span><span class="sig-name descname"><span class="pre">CategoricalActor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActor" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.policies.tfp_categorical_actor.CategoricalActor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CategoricalActor'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActor.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.policies.tfp_categorical_actor.CategoricalActor.compute_prob">
+<span class="sig-name descname"><span class="pre">compute_prob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActor.compute_prob" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.policies.tfp_categorical_actor.CategoricalActor.call">
 <span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActor.call" title="Permalink to this definition"></a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
 (e.g. build a new computational graph from the provided inputs).</p>
-<dl>
-<dt>Arguments:</dt><dd><p>inputs: A tensor or list of tensors.
-training: Boolean or boolean scalar tensor, indicating whether to run</p>
-<blockquote>
-<div><p>the <cite>Network</cite> in training mode or inference mode.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>mask: A mask or list of masks. A mask can be</dt><dd><p>either a tensor or None (no mask).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputs</strong> – A tensor or list of tensors.</p></li>
+<li><p><strong>training</strong> – Boolean or boolean scalar tensor, indicating whether to run
+the <cite>Network</cite> in training mode or inference mode.</p></li>
+<li><p><strong>mask</strong> – A mask or list of masks. A mask can be
+either a tensor or None (no mask).</p></li>
+</ul>
 </dd>
-</dl>
-</dd>
-<dt>Returns:</dt><dd><p>A tensor if there is a single output, or
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A tensor if there is a single output, or
 a list of tensors if there are more than one outputs.</p>
 </dd>
 </dl>
@@ -130,24 +140,21 @@ a list of tensors if there are more than one outputs.</p>
 <dt class="sig sig-object py" id="tf2rl.policies.tfp_categorical_actor.CategoricalActor.compute_log_probs">
 <span class="sig-name descname"><span class="pre">compute_log_probs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActor.compute_log_probs" title="Permalink to this definition"></a></dt>
 <dd><p>Compute log probabilities of state-action pairs</p>
-<dl class="simple">
-<dt>Args:</dt><dd><dl class="simple">
-<dt>states: tf.Tensor</dt><dd><p>Tensors of inputs to NN</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – tf.Tensor
+Tensors of inputs to NN</p></li>
+<li><p><strong>actions</strong> – tf.Tensor
+Tensors of NOT one-hot vector.
+They will be converted to one-hot vector inside this function.</p></li>
+</ul>
 </dd>
-<dt>actions: tf.Tensor</dt><dd><p>Tensors of NOT one-hot vector.
-They will be converted to one-hot vector inside this function.</p>
-</dd>
-</dl>
-</dd>
-<dt>Returns:</dt><dd><p>Log probabilities</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Log probabilities</p>
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.policies.tfp_categorical_actor.CategoricalActor.compute_prob">
-<span class="sig-name descname"><span class="pre">compute_prob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActor.compute_prob" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -156,24 +163,29 @@ They will be converted to one-hot vector inside this function.</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.policies.tfp_categorical_actor.</span></span><span class="sig-name descname"><span class="pre">CategoricalActorCritic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActor" title="tf2rl.policies.tfp_categorical_actor.CategoricalActor"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.policies.tfp_categorical_actor.CategoricalActor</span></code></a></p>
 <dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic.call">
 <span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_categorical_actor.CategoricalActorCritic.call" title="Permalink to this definition"></a></dt>
 <dd><p>Calls the model on new inputs.</p>
 <p>In this case <cite>call</cite> just reapplies
 all ops in the graph to the new inputs
 (e.g. build a new computational graph from the provided inputs).</p>
-<dl>
-<dt>Arguments:</dt><dd><p>inputs: A tensor or list of tensors.
-training: Boolean or boolean scalar tensor, indicating whether to run</p>
-<blockquote>
-<div><p>the <cite>Network</cite> in training mode or inference mode.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>mask: A mask or list of masks. A mask can be</dt><dd><p>either a tensor or None (no mask).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputs</strong> – A tensor or list of tensors.</p></li>
+<li><p><strong>training</strong> – Boolean or boolean scalar tensor, indicating whether to run
+the <cite>Network</cite> in training mode or inference mode.</p></li>
+<li><p><strong>mask</strong> – A mask or list of masks. A mask can be
+either a tensor or None (no mask).</p></li>
+</ul>
 </dd>
-</dl>
-</dd>
-<dt>Returns:</dt><dd><p>A tensor if there is a single output, or
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A tensor if there is a single output, or
 a list of tensors if there are more than one outputs.</p>
 </dd>
 </dl>
@@ -189,11 +201,6 @@ a list of tensors if there are more than one outputs.</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.policies.tfp_gaussian_actor.</span></span><span class="sig-name descname"><span class="pre">GaussianActor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="tf2rl.policies.tfp_gaussian_actor.GaussianActor.EPS">
-<span class="sig-name descname"><span class="pre">EPS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1e-06</span></em><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor.EPS" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="tf2rl.policies.tfp_gaussian_actor.GaussianActor.LOG_STD_CAP_MAX">
 <span class="sig-name descname"><span class="pre">LOG_STD_CAP_MAX</span></span><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor.LOG_STD_CAP_MAX" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -203,6 +210,16 @@ a list of tensors if there are more than one outputs.</p>
 <span class="sig-name descname"><span class="pre">LOG_STD_CAP_MIN</span></span><em class="property"> <span class="pre">=</span> <span class="pre">-20</span></em><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor.LOG_STD_CAP_MIN" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="tf2rl.policies.tfp_gaussian_actor.GaussianActor.EPS">
+<span class="sig-name descname"><span class="pre">EPS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1e-06</span></em><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor.EPS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tf2rl.policies.tfp_gaussian_actor.GaussianActor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_independent_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squash</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gaussian_policy'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.policies.tfp_gaussian_actor.GaussianActor.call">
 <span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor.call" title="Permalink to this definition"></a></dt>
@@ -210,13 +227,13 @@ a list of tensors if there are more than one outputs.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.policies.tfp_gaussian_actor.GaussianActor.compute_entropy">
-<span class="sig-name descname"><span class="pre">compute_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor.compute_entropy" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tf2rl.policies.tfp_gaussian_actor.GaussianActor.compute_log_probs">
+<span class="sig-name descname"><span class="pre">compute_log_probs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor.compute_log_probs" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="tf2rl.policies.tfp_gaussian_actor.GaussianActor.compute_log_probs">
-<span class="sig-name descname"><span class="pre">compute_log_probs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor.compute_log_probs" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="tf2rl.policies.tfp_gaussian_actor.GaussianActor.compute_entropy">
+<span class="sig-name descname"><span class="pre">compute_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.policies.tfp_gaussian_actor.GaussianActor.compute_entropy" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
