@@ -79,7 +79,7 @@ class VPG(OnPolicyAgent):
             enable_gae (bool): Enable GAE. The default is ``True``.
             normalize_adv (bool): Normalize Advantage. The default is ``True``.
             entropy_coef (float): Entropy coefficient. The default is ``0.01``.
-            vfunc_coef (float):
+            vfunc_coef (float): Mixing ratio factor for actor and critic. ``actor_loss + vfunc_coef*critic_loss``
             batch_size (int): Batch size. The default is ``256``.
         """
         super().__init__(name=name, **kwargs)
