@@ -79,6 +79,10 @@ class TD3(DDPG):
             tau (float): Weight update ratio for target network. ``target = (1-tau)*target + tau*network`` The default is ``0.005``.
             n_warmup (int): Number of warmup steps before training. The default is ``1e4``.
             memory_capacity (int): Replay Buffer size. The default is ``1e4``.
+            batch_size (int): Batch size. The default is ``256``.
+            discount (float): Discount factor. The default is ``0.99``.
+            max_grad (float): Maximum gradient. The default is ``10``.
+            gpu (int): GPU id. ``-1`` disables GPU. The default is ``0``.
         """
         super().__init__(name=name, state_shape=state_shape, action_dim=action_dim, **kwargs)
 
