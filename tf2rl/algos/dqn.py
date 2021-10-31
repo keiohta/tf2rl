@@ -44,6 +44,25 @@ class QFunc(tf.keras.Model):
 
 
 class DQN(OffPolicyAgent):
+    """
+    DQN Agent: https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
+
+    DQN supports following algorithms;
+
+        * DDQN: https://arxiv.org/abs/1509.06461
+        * Dueling Network: https://arxiv.org/abs/1511.06581
+        * Noisy Network: https://arxiv.org/abs/1706.10295
+
+    Command Line Args:
+
+        * ``--n-warmup`` (int): Number of warmup steps before training. The default is ``1e4``.
+        * ``--batch-size`` (int): Batch size of training. The default is ``32``.
+        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        * ``--memory-capacity`` (int): Replay Buffer size. The default is ``1e6``.
+        * ``--enable-double-dqn``: Enable DDQN
+        * ``--enable-dueling-dqn``: Enable Dueling Network
+        * ``--enable-noisy-dqn``: Enable Noisy Network
+    """
     def __init__(
             self,
             state_shape,
@@ -64,6 +83,28 @@ class DQN(OffPolicyAgent):
             enable_noisy_dqn=False,
             optimizer=None,
             **kwargs):
+        """
+        Initialize DQN agent
+
+        Args:
+            state_shape (iterable of int): Observation space shape
+            action_dim (int): Dimension of discrete action
+            q_function (QFunc): Custom Q function class. If ``None`` (default), Q function is constructed with ``QFunc``.
+            name (str): Name of agent. The default is ``"DQN"``
+            lr (float): Learning rate. The default is ``0.001``.
+            adam_eps (float): Epsilon for Adam. The default is ``1e-7``
+            units (iterable of int): Units of hidden layers. The default is ``(32, 32)``
+            espilon (float): Initial epsilon of e-greedy. The default is ``0.1``
+            epsilon_min (float): Minimum epsilon of after decayed.
+            epsilon_decay_step (int): Number of steps decaying. The default is ``1e6``
+            n_warmup (int): Number of warmup steps befor training. The default is ``1e4``
+            target_replace_interval (int): Number of steps between target network update. The default is ``5e3``
+            memory_capacity (int): Size of replay buffer. The default is ``1e6``
+            enable_double_dqn (bool): Whether use Double DQN. The default is ``False``
+            enable_dueling_dqn (bool): Whether use Dueling network. The default is ``False``
+            enable_noisy_dqn (bool): Whether use noisy network. The default is ``False``
+            optimizer (tf.keras.optimizers.Optimizer): Custom optimizer
+        """
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
         q_func = q_func if q_func is not None else QFunc
@@ -104,6 +145,17 @@ class DQN(OffPolicyAgent):
         self._enable_noisy_dqn = enable_noisy_dqn
 
     def get_action(self, state, test=False, tensor=False):
+        """
+        Get action
+
+        Args:
+            state: Observation state
+            test (bool): When ``False`` (default), policy returns exploratory action.
+            tensor (bool): When ``True``, return type is ``tf.Tensor``
+
+        Returns:
+            tf.Tensor or np.ndarray or float: Selected action
+        """
         if isinstance(state, LazyFrames):
             state = np.array(state)
         if not tensor:
@@ -138,6 +190,17 @@ class DQN(OffPolicyAgent):
         return tf.argmax(q_values, axis=1)
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
+        """
+        Train DQN
+
+        Args:
+            states
+            actions
+            next_states
+            rewards
+            done
+            weights (optional): Weights for importance sampling
+        """
         if weights is None:
             weights = np.ones_like(rewards)
         td_errors, q_func_loss = self._train_body(
@@ -177,6 +240,19 @@ class DQN(OffPolicyAgent):
             return td_errors, q_func_loss
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
+        """
+        Compute TD error
+
+        Args:
+            states
+            actions
+            next_states
+            rewars
+            dones
+
+        Returns
+            tf.Tensor: TD error
+        """
         if isinstance(actions, tf.Tensor):
             actions = tf.expand_dims(actions, axis=1)
             rewards = tf.expand_dims(rewards, axis=1)
@@ -222,6 +298,15 @@ class DQN(OffPolicyAgent):
 
     @staticmethod
     def get_argument(parser=None):
+        """
+        Create or update argument parser for command line program
+
+        Args:
+            parser (argparse.ArgParser, optional): argument parser
+
+        Returns:
+            argparse.ArgParser: argument parser
+        """
         parser = OffPolicyAgent.get_argument(parser)
         parser.add_argument('--enable-double-dqn', action='store_true')
         parser.add_argument('--enable-dueling-dqn', action='store_true')
