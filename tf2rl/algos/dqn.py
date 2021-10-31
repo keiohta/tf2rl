@@ -55,9 +55,10 @@ class DQN(OffPolicyAgent):
 
     Command Line Args:
 
-        * ``--n-warmup`` (int): Number of warmup steps before training. The default is ``1e4``
-        * ``--batch-size`` (int): Batch size of training. The default is ``32``
-        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``
+        * ``--n-warmup`` (int): Number of warmup steps before training. The default is ``1e4``.
+        * ``--batch-size`` (int): Batch size of training. The default is ``32``.
+        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        * ``--memory-capacity`` (int): Replay Buffer size. The default is ``1e6``.
         * ``--enable-double-dqn``: Enable DDQN
         * ``--enable-dueling-dqn``: Enable Dueling Network
         * ``--enable-noisy-dqn``: Enable Noisy Network
