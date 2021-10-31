@@ -61,15 +61,15 @@ class VPG(OnPolicyAgent):
         Initialize VPG
 
         Args:
-           state_shape (iterable of int):
-           action_dim (int):
-           is_discrete (bool):
-           actor:
-           critic:
-           actor_critic:
-           max_action (float): maximum action size.
-           actor_units (iterable of int): Numbers of units at hidden layers of actor. The default is ``(256, 256)``.
-           critic_units (iterable of int): Numbers of units at hidden layers of critic. The default is ``(256, 256)``.
+            state_shape (iterable of int):
+            action_dim (int):
+            is_discrete (bool):
+            actor:
+            critic:
+            actor_critic:
+            max_action (float): maximum action size.
+            actor_units (iterable of int): Numbers of units at hidden layers of actor. The default is ``(256, 256)``.
+            critic_units (iterable of int): Numbers of units at hidden layers of critic. The default is ``(256, 256)``.
             lr_actor (float): Learning rate of actor. The default is ``1e-3``.
             lr_critic (float): Learning rate of critic. The default is ``3e-3``.
             hidden_activation_actor (str): Activation for actor. The default is ``"relu"``.
