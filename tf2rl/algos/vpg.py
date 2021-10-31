@@ -119,6 +119,17 @@ class VPG(OnPolicyAgent):
         self._state_ndim = np.array(state_shape).shape[0]
 
     def get_action(self, state, test=False):
+        """
+        Get action and probability
+
+        Args:
+            state: Observation state
+            test (bool): When ``False`` (default), policy returns exploratory action.
+
+        Returns:
+            np.ndarray or float: Selected action
+            np.ndarray or float: Log(p)
+        """
         if isinstance(state, LazyFrames):
             state = np.array(state)
         msg = "Input instance should be np.ndarray, not {}".format(type(state))
@@ -135,6 +146,18 @@ class VPG(OnPolicyAgent):
             return action.numpy(), logp.numpy()
 
     def get_action_and_val(self, state, test=False):
+        """
+        Get action, probability, and critic value
+
+        Args:
+            state: Observation state
+            test (bool): When ``False`` (default), policy returns exploratory action.
+
+        Returns:
+            np.ndarray: Selected action
+            np.ndarray: Log(p)
+            np.ndarray: Critic value
+        """
         if isinstance(state, LazyFrames):
             state = np.array(state)
         is_single_input = state.ndim == self._state_ndim
@@ -167,6 +190,16 @@ class VPG(OnPolicyAgent):
             return self.actor(state, test)
 
     def train(self, states, actions, advantages, logp_olds, returns):
+        """
+        Train VPG
+
+        Args:
+            states
+            actions
+            advantages
+            logp_olds
+            returns
+        """
         # Train actor and critic
         actor_loss, logp_news = self._train_actor_body(
             states, actions, advantages, logp_olds)
