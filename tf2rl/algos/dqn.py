@@ -55,9 +55,9 @@ class DQN(OffPolicyAgent):
 
     Command Line Args:
 
-        * ``--n-warmup`` (int): Number of warmup steps before training. The default is `1e4`
-        * ``--batch-size`` (int): Batch size of training. The default is `32`
-        * ``--gpu`` (int): GPU id. `-1` disables GPU. The default is `0`
+        * ``--n-warmup`` (int): Number of warmup steps before training. The default is ``1e4``
+        * ``--batch-size`` (int): Batch size of training. The default is ``32``
+        * ``--gpu`` (int): GPU id. `-1` disables GPU. The default is ``0``
         * ``--enable-double-dqn``: Enable DDQN
         * ``--enable-dueling-dqn``: Enable Dueling Network
         * ``--enable-noisy-dqn``: Enable Noisy Network
@@ -89,19 +89,19 @@ class DQN(OffPolicyAgent):
             state_shape (iterable of int): Observation space shape
             action_dim (int): Dimension of discrete action
             q_function (QFunc): Q function.
-            name (str): Name of agent. The default is "DQN"
-            lr (float): Learning rate. The default is `0.001`.
-            adam_eps (float): Epsilon for Adam. The default is `1e-7`
-            units (iterable of int): Units of hidden layers. The default is `(32, 32)`
-            espilon (float): Initial epsilon of e-greedy. The default is `0.1`
+            name (str): Name of agent. The default is ``"DQN"``
+            lr (float): Learning rate. The default is ``0.001``.
+            adam_eps (float): Epsilon for Adam. The default is ``1e-7``
+            units (iterable of int): Units of hidden layers. The default is ``(32, 32)``
+            espilon (float): Initial epsilon of e-greedy. The default is ``0.1``
             epsilon_min (float): Minimum epsilon of after decayed.
-            epsilon_decay_step (int): Number of steps decaying. The default is `1e6`
-            n_warmup (int): Number of warmup steps befor training. The default is `1e4`
-            target_replace_interval (int): Number of steps between target network update. The default is `5e3`
-            memory_capacity (int): Size of replay buffer. The default is `1e6`
-            enable_double_dqn (bool): Whether use Double DQN. The default is `False`
-            enable_dueling_dqn (bool): Whether use Dueling network. The default is `False`
-            enable_noisy_dqn (bool): Whether use noisy network. The default is `False`
+            epsilon_decay_step (int): Number of steps decaying. The default is ``1e6``
+            n_warmup (int): Number of warmup steps befor training. The default is ``1e4``
+            target_replace_interval (int): Number of steps between target network update. The default is ``5e3``
+            memory_capacity (int): Size of replay buffer. The default is ``1e6``
+            enable_double_dqn (bool): Whether use Double DQN. The default is ``False``
+            enable_dueling_dqn (bool): Whether use Dueling network. The default is ``False``
+            enable_noisy_dqn (bool): Whether use noisy network. The default is ``False``
             optimizer (tf.keras.optimizers.Optimizer): Custom optimizer
         """
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
