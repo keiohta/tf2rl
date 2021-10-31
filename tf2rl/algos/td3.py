@@ -145,7 +145,7 @@ class TD3(DDPG):
             dones
 
         Returns:
-            tf.Tensor: Sum of two TD errors.
+            np.ndarray: Sum of two TD errors.
         """
         td_errors1, td_errors2 = self._compute_td_error_body(
             states, actions, next_states, rewards, dones)
