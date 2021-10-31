@@ -149,8 +149,8 @@ class DQN(OffPolicyAgent):
 
         Args:
             state: Observation state
-            test (bool): When `False` (default), policy returns exploratory action.
-            tensor (bool): When `True`, return type is `tf.Tensor`
+            test (bool): When ``False`` (default), policy returns exploratory action.
+            tensor (bool): When ``True``, return type is ``tf.Tensor``
 
         Returns:
             tf.Tensor or np.ndarray or float: Selected action
