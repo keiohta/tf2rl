@@ -88,7 +88,7 @@ class DQN(OffPolicyAgent):
         Args:
             state_shape (iterable of int): Observation space shape
             action_dim (int): Dimension of discrete action
-            q_function (QFunc): Q function.
+            q_function (QFunc): Custom Q function class. If ``None`` (default), Q function is constructed with ``QFunc``.
             name (str): Name of agent. The default is ``"DQN"``
             lr (float): Learning rate. The default is ``0.001``.
             adam_eps (float): Epsilon for Adam. The default is ``1e-7``
