@@ -30,6 +30,18 @@ class CriticQ(tf.keras.Model):
 
 
 class SAC(OffPolicyAgent):
+    """
+    Soft Actor-Critic (SAC) Agent: https://arxiv.org/abs/1801.01290
+
+    Command Line Args:
+
+        * ``--n-warmup`` (int): Number of warmup steps before training. The default is ``1e4``.
+        * ``--batch-size`` (int): Batch size of training. The default is ``32``.
+        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        * ``--memory-capacity`` (int): Replay Buffer size. The default is ``1e6``.
+        * ``--alpha`` (float): Temperature parameter. The default is ``0.2``.
+        * ``--auto-alpha``: Automatic alpha tuning.
+    """
     def __init__(
             self,
             state_shape,
@@ -47,6 +59,29 @@ class SAC(OffPolicyAgent):
             n_warmup=int(1e4),
             memory_capacity=int(1e6),
             **kwargs):
+        """
+        Initialize SAC
+
+        Args:
+            state_shape (iterable of int):
+            action_dim (int):
+            name (str): Name of network. The default is ``"SAC"``
+            max_action (float):
+            lr (float): Learning rate. The default is ``3e-4``.
+            lr_alpha (alpha): Learning rate for alpha. The default is ``3e-4``.
+            actor_units (iterable of int): Numbers of units at hidden layers of actor. The default is ``(256, 256)``.
+            critic_units (iterable of int): Numbers of units at hidden layers of critic. The default is ``(256, 256)``.
+            tau (float): Target network update rate.
+            alpha (float): Temperature parameter. The default is ``0.2``.
+            auto_alpha (bool): Automatic alpha tuning.
+            init_temperature (float): Initial temperature
+            n_warmup (int): Number of warmup steps before training. The default is ``int(1e4)``.
+            memory_capacity (int): Replay Buffer size. The default is ``int(1e6)``.
+            batch_size (int): Batch size. The default is ``256``.
+            discount (float): Discount factor. The default is ``0.99``.
+            max_grad (float): Maximum gradient. The default is ``10``.
+            gpu (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        """
         super().__init__(
             name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
@@ -86,6 +121,16 @@ class SAC(OffPolicyAgent):
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
 
     def get_action(self, state, test=False):
+        """
+        Get action
+
+        Args:
+            state: Observation state
+            test (bool): When ``False`` (default), policy returns exploratory action.
+
+        Returns:
+            tf.Tensor or float: Selected action
+        """
         assert isinstance(state, np.ndarray)
         is_single_state = len(state.shape) == self.state_ndim
 
@@ -100,6 +145,17 @@ class SAC(OffPolicyAgent):
         return actions
 
     def train(self, states, actions, next_states, rewards, dones, weights=None):
+        """
+        Train SAC
+
+        Args:
+            states
+            actions
+            next_states
+            rewards
+            done
+            weights (optional): Weights for importance sampling
+        """
         if weights is None:
             weights = np.ones_like(rewards)
 
@@ -188,6 +244,19 @@ class SAC(OffPolicyAgent):
         return policy_loss, tf.reduce_min(logp), tf.reduce_max(logp), tf.reduce_mean(logp), alpha_loss
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
+        """
+        Compute TD error
+
+        Args:
+            states
+            actions
+            next_states
+            rewars
+            dones
+
+        Returns
+            np.ndarray: TD error
+        """
         if isinstance(actions, tf.Tensor):
             rewards = tf.expand_dims(rewards, axis=1)
             dones = tf.expand_dims(dones, 1)
@@ -216,6 +285,15 @@ class SAC(OffPolicyAgent):
 
     @staticmethod
     def get_argument(parser=None):
+        """
+        Create or update argument parser for command line program
+
+        Args:
+            parser (argparse.ArgParser, optional): argument parser
+
+        Returns:
+            argparse.ArgParser: argument parser
+        """
         parser = OffPolicyAgent.get_argument(parser)
         parser.add_argument('--alpha', type=float, default=0.2)
         parser.add_argument('--auto-alpha', action="store_true")
