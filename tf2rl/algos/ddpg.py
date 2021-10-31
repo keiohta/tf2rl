@@ -51,6 +51,16 @@ class Critic(tf.keras.Model):
 
 
 class DDPG(OffPolicyAgent):
+    """
+    DDPG agent: https://arxiv.org/abs/1509.02971
+
+    Command Line Args:
+
+        * ``--n-warmup`` (int): Number of warmup steps before training. The default is ``1e4``.
+        * ``--batch-size`` (int): Batch size for training. The default is ``32``.
+        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        * ``--memory-capacity`` (int): Replay Buffer size. The default is ``1e6``.
+    """
     def __init__(
             self,
             state_shape,
@@ -66,6 +76,23 @@ class DDPG(OffPolicyAgent):
             n_warmup=int(1e4),
             memory_capacity=int(1e6),
             **kwargs):
+        """
+        Initialize DDPG agent
+
+        Args:
+            state_shape (iterable of int):
+            action_dim (int):
+            name (str): Name of agent. The default is ``"DDPG"``.
+            max_action (float): Size of maximum action. (``-max_action`` <= action <= ``max_action``). The degault is ``1``.
+            lr_actor (float): Learning rate for actor network. The default is ``0.001``.
+            lr_critic (float): Learning rage for critic network. The default is ``0.001``.
+            actor_units (iterable of int): Number of units at hidden layers of actor.
+            critic_units (iterable of int): Number of units at hidden layers of critic.
+            sigma (float): Standard deviation of Gaussian noise. The default is ``0.1``.
+            tau (float): Weight update ratio for target network. ``target = (1-tau)*target + tau*network`` The default is ``0.005``.
+            n_warmup (int): Number of warmup steps before training. The default is ``1e4``.
+            memory_capacity (int): Replay Buffer size. The default is ``1e4``.
+        """
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 
         # Define and initialize Actor network
@@ -89,6 +116,17 @@ class DDPG(OffPolicyAgent):
         self.tau = tau
 
     def get_action(self, state, test=False, tensor=False):
+        """
+        Get action
+
+        Args:
+            state: Observation state
+            test (bool): When ``False`` (default), policy returns exploratory action.
+            tensor (bool): When ``True``, return type is ``tf.Tensor``
+
+        Returns:
+            tf.Tensor or np.ndarray or float: Selected action
+        """
         is_single_state = len(state.shape) == 1
         if not tensor:
             assert isinstance(state, np.ndarray)
@@ -112,6 +150,17 @@ class DDPG(OffPolicyAgent):
             return tf.clip_by_value(action, -max_action, max_action)
 
     def train(self, states, actions, next_states, rewards, done, weights=None):
+        """
+        Train DDPG
+
+        Args:
+            states
+            actions
+            next_states
+            rewards
+            done
+            weights (optional): Weights for importance sampling
+        """
         if weights is None:
             weights = np.ones_like(rewards)
         actor_loss, critic_loss, td_errors = self._train_body(
@@ -156,6 +205,19 @@ class DDPG(OffPolicyAgent):
             return actor_loss, critic_loss, td_errors
 
     def compute_td_error(self, states, actions, next_states, rewards, dones):
+        """
+        Compute TD error
+
+        Args:
+            states
+            actions
+            next_states
+            rewars
+            dones
+
+        Returns
+            tf.Tensor: TD error
+        """
         if isinstance(actions, tf.Tensor):
             rewards = tf.expand_dims(rewards, axis=1)
             dones = tf.expand_dims(dones, 1)
