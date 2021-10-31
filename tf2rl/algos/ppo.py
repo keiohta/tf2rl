@@ -5,17 +5,65 @@ from tf2rl.algos.vpg import VPG
 
 
 class PPO(VPG):
+    """
+    Proximal Policy Optimization (PPO) Agent: https://arxiv.org/abs/1707.06347
+
+    Command Line Args:
+
+        * ``--batch-size`` (int): Batch size of training. The default is ``32``.
+        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        * ``--horizon`` (int): The default is ``2048``.
+        * ``--normalize_adv``: Normalize Advantage.
+        * ``--enable-gae``: Enable GAE.
+    """
     def __init__(
             self,
             clip=True,
             clip_ratio=0.2,
             name="PPO",
             **kwargs):
+        """
+        Initialize PPO
+
+        Args:
+            clip (bool): Whether clip or not. The default is ``True``.
+            clip_ratio (float): Probability ratio is clipped between ``1-clip_ratio`` and ``1+clip_ratio``.
+            name (str): Name of agent. The default is ``"PPO"``.
+            state_shape (iterable of int):
+            action_dim (int):
+            is_discrete (bool):
+            actor:
+            critic:
+            actor_critic:
+            max_action (float): maximum action size.
+            actor_units (iterable of int): Numbers of units at hidden layers of actor. The default is ``(256, 256)``.
+            critic_units (iterable of int): Numbers of units at hidden layers of critic. The default is ``(256, 256)``.
+            lr_actor (float): Learning rate of actor. The default is ``1e-3``.
+            lr_critic (float): Learning rate of critic. The default is ``3e-3``.
+            hidden_activation_actor (str): Activation for actor. The default is ``"relu"``.
+            hidden_activation_critic (str): Activation for critic. The default is ``"relu"``.
+            horizon (int): Number of steps of online episode horizon. The horizon must be multiple of ``batch_size``. The default is ``2048``.
+            enable_gae (bool): Enable GAE. The default is ``True``.
+            normalize_adv (bool): Normalize Advantage. The default is ``True``.
+            entropy_coef (float): Entropy coefficient. The default is ``0.01``.
+            vfunc_coef (float): Mixing ratio factor for actor and critic. ``actor_loss + vfunc_coef*critic_loss``
+            batch_size (int): Batch size. The default is ``256``.
+        """
         super().__init__(name=name, **kwargs)
         self.clip = clip
         self.clip_ratio = clip_ratio
 
     def train(self, states, actions, advantages, logp_olds, returns):
+        """
+        Train PPO
+
+        Args:
+            states
+            actions
+            advantages
+            logp_olds
+            returns
+        """
         # Train actor and critic
         if self.actor_critic is not None:
             actor_loss, critic_loss, logp_news, ratio, ent = self._train_actor_critic_body(states, actions, advantages, logp_olds, returns)
