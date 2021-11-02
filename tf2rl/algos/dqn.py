@@ -104,6 +104,10 @@ class DQN(OffPolicyAgent):
             enable_dueling_dqn (bool): Whether use Dueling network. The default is ``False``
             enable_noisy_dqn (bool): Whether use noisy network. The default is ``False``
             optimizer (tf.keras.optimizers.Optimizer): Custom optimizer
+            batch_size (int): Batch size. The default is ``256``.
+            discount (float): Discount factor. The default is ``0.99``.
+            max_grad (float): Maximum gradient. The default is ``10``.
+            gpu (int): GPU id. ``-1`` disables GPU. The default is ``0``.
         """
         super().__init__(name=name, memory_capacity=memory_capacity, n_warmup=n_warmup, **kwargs)
 

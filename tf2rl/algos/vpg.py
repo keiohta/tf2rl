@@ -29,6 +29,17 @@ class CriticV(tf.keras.Model):
 
 
 class VPG(OnPolicyAgent):
+    """
+    VPG Agent: https://proceedings.neurips.cc/paper/1999/file/464d828b85b0bed98e80ade0a5c43b0f-Paper.pdf
+
+    Command Line Args:
+
+        * ``--batch-size`` (int): Batch size of training. The default is ``32``.
+        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        * ``--horizon`` (int): The default is ``2048``.
+        * ``--normalize_adv``: Normalize Advantage.
+        * ``--enable-gae``: Enable GAE.
+    """
     def __init__(
             self,
             state_shape,
@@ -46,6 +57,31 @@ class VPG(OnPolicyAgent):
             hidden_activation_critic="relu",
             name="VPG",
             **kwargs):
+        """
+        Initialize VPG
+
+        Args:
+            state_shape (iterable of int):
+            action_dim (int):
+            is_discrete (bool):
+            actor:
+            critic:
+            actor_critic:
+            max_action (float): maximum action size.
+            actor_units (iterable of int): Numbers of units at hidden layers of actor. The default is ``(256, 256)``.
+            critic_units (iterable of int): Numbers of units at hidden layers of critic. The default is ``(256, 256)``.
+            lr_actor (float): Learning rate of actor. The default is ``1e-3``.
+            lr_critic (float): Learning rate of critic. The default is ``3e-3``.
+            hidden_activation_actor (str): Activation for actor. The default is ``"relu"``.
+            hidden_activation_critic (str): Activation for critic. The default is ``"relu"``.
+            name (str): Name of agent. The default is ``"VPG"``.
+            horizon (int): Number of steps of online episode horizon. The horizon must be multiple of ``batch_size``. The default is ``2048``.
+            enable_gae (bool): Enable GAE. The default is ``True``.
+            normalize_adv (bool): Normalize Advantage. The default is ``True``.
+            entropy_coef (float): Entropy coefficient. The default is ``0.01``.
+            vfunc_coef (float): Mixing ratio factor for actor and critic. ``actor_loss + vfunc_coef*critic_loss``
+            batch_size (int): Batch size. The default is ``256``.
+        """
         super().__init__(name=name, **kwargs)
         self._is_discrete = is_discrete
 
@@ -83,6 +119,17 @@ class VPG(OnPolicyAgent):
         self._state_ndim = np.array(state_shape).shape[0]
 
     def get_action(self, state, test=False):
+        """
+        Get action and probability
+
+        Args:
+            state: Observation state
+            test (bool): When ``False`` (default), policy returns exploratory action.
+
+        Returns:
+            np.ndarray or float: Selected action
+            np.ndarray or float: Log(p)
+        """
         if isinstance(state, LazyFrames):
             state = np.array(state)
         msg = "Input instance should be np.ndarray, not {}".format(type(state))
@@ -99,6 +146,18 @@ class VPG(OnPolicyAgent):
             return action.numpy(), logp.numpy()
 
     def get_action_and_val(self, state, test=False):
+        """
+        Get action, probability, and critic value
+
+        Args:
+            state: Observation state
+            test (bool): When ``False`` (default), policy returns exploratory action.
+
+        Returns:
+            np.ndarray: Selected action
+            np.ndarray: Log(p)
+            np.ndarray: Critic value
+        """
         if isinstance(state, LazyFrames):
             state = np.array(state)
         is_single_input = state.ndim == self._state_ndim
@@ -131,6 +190,16 @@ class VPG(OnPolicyAgent):
             return self.actor(state, test)
 
     def train(self, states, actions, advantages, logp_olds, returns):
+        """
+        Train VPG
+
+        Args:
+            states
+            actions
+            advantages
+            logp_olds
+            returns
+        """
         # Train actor and critic
         actor_loss, logp_news = self._train_actor_body(
             states, actions, advantages, logp_olds)
