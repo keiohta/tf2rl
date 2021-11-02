@@ -257,18 +257,28 @@ If true, <cite>render</cite> will be called to visualize evaluation process.</p>
 <dt class="sig sig-object py" id="tf2rl.algos.bi_res_ddpg.BiResDDPG">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.bi_res_ddpg.</span></span><span class="sig-name descname"><span class="pre">BiResDDPG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.bi_res_ddpg.BiResDDPG" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.ddpg.DDPG" title="tf2rl.algos.ddpg.DDPG"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.ddpg.DDPG</span></code></a></p>
-<p>This is an implementation of Bi-Res-DDPG
-<a class="reference external" href="https://arxiv.org/abs/1905.01072">https://arxiv.org/abs/1905.01072</a></p>
+<p>Bi-Res-DDPG Agent: <a class="reference external" href="https://arxiv.org/abs/1905.01072">https://arxiv.org/abs/1905.01072</a></p>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-warmup</span></code> (int): Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--batch-size</span></code> (int): Batch size for training. The default is <code class="docutils literal notranslate"><span class="pre">32</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--gpu</span></code> (int): GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--memory-capacity</span></code> (int): Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">1e6</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--eta</span></code> (float): Gradient mixing factor. The default is <code class="docutils literal notranslate"><span class="pre">0.05</span></code>.</p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.bi_res_ddpg.BiResDDPG.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'BiResDDPG'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.bi_res_ddpg.BiResDDPG.__init__" title="Permalink to this definition"></a></dt>
-<dd><p>Initialize DDPG agent</p>
+<dd><p>Initialize BiResDDPG agent</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>eta</strong> (<em>float</em>) – Gradients mixing factor.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of agent. The default is <code class="docutils literal notranslate"><span class="pre">&quot;BiResDDPG&quot;</span></code>.</p></li>
 <li><p><strong>state_shape</strong> (<em>iterable of int</em>) – </p></li>
 <li><p><strong>action_dim</strong> (<em>int</em>) – </p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Name of agent. The default is <code class="docutils literal notranslate"><span class="pre">&quot;DDPG&quot;</span></code>.</p></li>
 <li><p><strong>max_action</strong> (<em>float</em>) – Size of maximum action. (<code class="docutils literal notranslate"><span class="pre">-max_action</span></code> &lt;= action &lt;= <code class="docutils literal notranslate"><span class="pre">max_action</span></code>). The degault is <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
 <li><p><strong>lr_actor</strong> (<em>float</em>) – Learning rate for actor network. The default is <code class="docutils literal notranslate"><span class="pre">0.001</span></code>.</p></li>
 <li><p><strong>lr_critic</strong> (<em>float</em>) – Learning rage for critic network. The default is <code class="docutils literal notranslate"><span class="pre">0.001</span></code>.</p></li>
@@ -278,6 +288,10 @@ If true, <cite>render</cite> will be called to visualize evaluation process.</p>
 <li><p><strong>tau</strong> (<em>float</em>) – Weight update ratio for target network. <code class="docutils literal notranslate"><span class="pre">target</span> <span class="pre">=</span> <span class="pre">(1-tau)*target</span> <span class="pre">+</span> <span class="pre">tau*network</span></code> The default is <code class="docutils literal notranslate"><span class="pre">0.005</span></code>.</p></li>
 <li><p><strong>n_warmup</strong> (<em>int</em>) – Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code>.</p></li>
 <li><p><strong>memory_capacity</strong> (<em>int</em>) – Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>discount</strong> (<em>float</em>) – Discount factor. The default is <code class="docutils literal notranslate"><span class="pre">0.99</span></code>.</p></li>
+<li><p><strong>max_grad</strong> (<em>float</em>) – Maximum gradient. The default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -297,9 +311,11 @@ If true, <cite>render</cite> will be called to visualize evaluation process.</p>
 <li><p><strong>dones</strong> – </p></li>
 </ul>
 </dd>
-</dl>
-<dl class="simple">
-<dt>Returns</dt><dd><p>tf.Tensor: TD error</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sum of two TD errors.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -307,7 +323,19 @@ If true, <cite>render</cite> will be called to visualize evaluation process.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.bi_res_ddpg.BiResDDPG.get_argument">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.bi_res_ddpg.BiResDDPG.get_argument" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Create or update argument parser for command line program</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> (<em>argparse.ArgParser</em><em>, </em><em>optional</em>) – argument parser</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>argument parser</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>argparse.ArgParser</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -358,30 +386,136 @@ a list of tensors if there are more than one outputs.</p>
 <dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.categorical_dqn.</span></span><span class="sig-name descname"><span class="pre">CategoricalDQN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.OffPolicyAgent" title="tf2rl.algos.policy_base.OffPolicyAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.OffPolicyAgent</span></code></a></p>
+<p>Categorical DQN Agent: <a class="reference external" href="https://arxiv.org/abs/1707.06887">https://arxiv.org/abs/1707.06887</a></p>
+<p>Categorical DQN supports following algorithms;</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>DDQN: <a class="reference external" href="https://arxiv.org/abs/1509.06461">https://arxiv.org/abs/1509.06461</a></p></li>
+<li><p>Dueling Network: <a class="reference external" href="https://arxiv.org/abs/1511.06581">https://arxiv.org/abs/1511.06581</a></p></li>
+<li><p>Noisy Network: <a class="reference external" href="https://arxiv.org/abs/1706.10295">https://arxiv.org/abs/1706.10295</a></p></li>
+</ul>
+</div></blockquote>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-warmup</span></code> (int): Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--batch-size</span></code> (int): Batch size of training. The default is <code class="docutils literal notranslate"><span class="pre">32</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--gpu</span></code> (int): GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--memory-capacity</span></code> (int): Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">1e6</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--enable-double-dqn</span></code>: Enable DDQN</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--enable-dueling-dqn</span></code>: Enable Dueling Network</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--enable-noisy-dqn</span></code>: Enable Noisy Network</p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DQN'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adam_eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(32,</span> <span class="pre">32)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsilon_decay_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_warmup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_replace_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_capacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_double_dqn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_dueling_dqn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_noisy_dqn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize Categorical DQN</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_shape</strong> (<em>iterable of int</em>) – Observation space shape</p></li>
+<li><p><strong>action_dim</strong> (<em>int</em>) – Dimension of discrete action</p></li>
+<li><p><strong>q_function</strong> (<a class="reference internal" href="#tf2rl.algos.categorical_dqn.QFunc" title="tf2rl.algos.categorical_dqn.QFunc"><em>QFunc</em></a>) – Custom Q function class. If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), Q function is constructed with <code class="docutils literal notranslate"><span class="pre">QFunc</span></code>.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of agent. The default is <code class="docutils literal notranslate"><span class="pre">&quot;DQN&quot;</span></code></p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate. The default is <code class="docutils literal notranslate"><span class="pre">0.001</span></code>.</p></li>
+<li><p><strong>adam_eps</strong> (<em>float</em>) – Epsilon for Adam. The default is <code class="docutils literal notranslate"><span class="pre">1e-7</span></code></p></li>
+<li><p><strong>units</strong> (<em>iterable of int</em>) – Units of hidden layers. The default is <code class="docutils literal notranslate"><span class="pre">(32,</span> <span class="pre">32)</span></code></p></li>
+<li><p><strong>espilon</strong> (<em>float</em>) – Initial epsilon of e-greedy. The default is <code class="docutils literal notranslate"><span class="pre">0.1</span></code></p></li>
+<li><p><strong>epsilon_min</strong> (<em>float</em>) – Minimum epsilon of after decayed.</p></li>
+<li><p><strong>epsilon_decay_step</strong> (<em>int</em>) – Number of steps decaying. The default is <code class="docutils literal notranslate"><span class="pre">1e6</span></code></p></li>
+<li><p><strong>n_warmup</strong> (<em>int</em>) – Number of warmup steps befor training. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code></p></li>
+<li><p><strong>target_replace_interval</strong> (<em>int</em>) – Number of steps between target network update. The default is <code class="docutils literal notranslate"><span class="pre">5e3</span></code></p></li>
+<li><p><strong>memory_capacity</strong> (<em>int</em>) – Size of replay buffer. The default is <code class="docutils literal notranslate"><span class="pre">1e6</span></code></p></li>
+<li><p><strong>enable_double_dqn</strong> (<em>bool</em>) – Whether use Double DQN. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>enable_dueling_dqn</strong> (<em>bool</em>) – Whether use Dueling network. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>enable_noisy_dqn</strong> (<em>bool</em>) – Whether use noisy network. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>optimizer</strong> (<em>tf.keras.optimizers.Optimizer</em>) – Custom optimizer</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>discount</strong> (<em>float</em>) – Discount factor. The default is <code class="docutils literal notranslate"><span class="pre">0.99</span></code>.</p></li>
+<li><p><strong>max_grad</strong> (<em>float</em>) – Maximum gradient. The default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN.get_action">
 <span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tensor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.get_action" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get action</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – Observation state</p></li>
+<li><p><strong>test</strong> (<em>bool</em>) – When <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), policy returns exploratory action.</p></li>
+<li><p><strong>tensor</strong> (<em>bool</em>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code>, return type is <code class="docutils literal notranslate"><span class="pre">tf.Tensor</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Selected action</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tf.Tensor or np.ndarray or float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN.train">
 <span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">done</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.train" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Train DQN</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>next_states</strong> – </p></li>
+<li><p><strong>rewards</strong> – </p></li>
+<li><p><strong>done</strong> – </p></li>
+<li><p><strong>weights</strong> (<em>optional</em>) – Weights for importance sampling</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN.compute_td_error">
 <span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.compute_td_error" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Compute TD error</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>next_states</strong> – </p></li>
+<li><p><strong>rewars</strong> – </p></li>
+<li><p><strong>dones</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns</dt><dd><p>tf.Tensor: TD error</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.categorical_dqn.CategoricalDQN.get_argument">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.categorical_dqn.CategoricalDQN.get_argument" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Create or update argument parser for command line program</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> (<em>argparse.ArgParser</em><em>, </em><em>optional</em>) – argument parser</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>argument parser</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>argparse.ArgParser</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -395,12 +529,50 @@ a list of tensors if there are more than one outputs.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.curl_sac.CURL.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.curl_sac.CURL.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize SAC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_shape</strong> (<em>iterable of int</em>) – </p></li>
+<li><p><strong>action_dim</strong> (<em>int</em>) – </p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of network. The default is <code class="docutils literal notranslate"><span class="pre">&quot;SAC&quot;</span></code></p></li>
+<li><p><strong>max_action</strong> (<em>float</em>) – </p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate. The default is <code class="docutils literal notranslate"><span class="pre">3e-4</span></code>.</p></li>
+<li><p><strong>lr_alpha</strong> (<em>alpha</em>) – Learning rate for alpha. The default is <code class="docutils literal notranslate"><span class="pre">3e-4</span></code>.</p></li>
+<li><p><strong>actor_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of actor. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>critic_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of critic. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – Target network update rate.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Temperature parameter. The default is <code class="docutils literal notranslate"><span class="pre">0.2</span></code>.</p></li>
+<li><p><strong>auto_alpha</strong> (<em>bool</em>) – Automatic alpha tuning.</p></li>
+<li><p><strong>init_temperature</strong> (<em>float</em>) – Initial temperature</p></li>
+<li><p><strong>n_warmup</strong> (<em>int</em>) – Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code>.</p></li>
+<li><p><strong>memory_capacity</strong> (<em>int</em>) – Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>discount</strong> (<em>float</em>) – Discount factor. The default is <code class="docutils literal notranslate"><span class="pre">0.99</span></code>.</p></li>
+<li><p><strong>max_grad</strong> (<em>float</em>) – Maximum gradient. The default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.curl_sac.CURL.train">
 <span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.curl_sac.CURL.train" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Train SAC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>next_states</strong> – </p></li>
+<li><p><strong>rewards</strong> – </p></li>
+<li><p><strong>done</strong> – </p></li>
+<li><p><strong>weights</strong> (<em>optional</em>) – Weights for importance sampling</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -450,7 +622,32 @@ a list of tensors if there are more than one outputs.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.d2rl_sac.D2RLSAC.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.d2rl_sac.D2RLSAC.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize SAC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_shape</strong> (<em>iterable of int</em>) – </p></li>
+<li><p><strong>action_dim</strong> (<em>int</em>) – </p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of network. The default is <code class="docutils literal notranslate"><span class="pre">&quot;SAC&quot;</span></code></p></li>
+<li><p><strong>max_action</strong> (<em>float</em>) – </p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate. The default is <code class="docutils literal notranslate"><span class="pre">3e-4</span></code>.</p></li>
+<li><p><strong>lr_alpha</strong> (<em>alpha</em>) – Learning rate for alpha. The default is <code class="docutils literal notranslate"><span class="pre">3e-4</span></code>.</p></li>
+<li><p><strong>actor_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of actor. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>critic_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of critic. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – Target network update rate.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Temperature parameter. The default is <code class="docutils literal notranslate"><span class="pre">0.2</span></code>.</p></li>
+<li><p><strong>auto_alpha</strong> (<em>bool</em>) – Automatic alpha tuning.</p></li>
+<li><p><strong>init_temperature</strong> (<em>float</em>) – Initial temperature</p></li>
+<li><p><strong>n_warmup</strong> (<em>int</em>) – Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code>.</p></li>
+<li><p><strong>memory_capacity</strong> (<em>int</em>) – Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>discount</strong> (<em>float</em>) – Discount factor. The default is <code class="docutils literal notranslate"><span class="pre">0.99</span></code>.</p></li>
+<li><p><strong>max_grad</strong> (<em>float</em>) – Maximum gradient. The default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -560,6 +757,10 @@ a list of tensors if there are more than one outputs.</p>
 <li><p><strong>tau</strong> (<em>float</em>) – Weight update ratio for target network. <code class="docutils literal notranslate"><span class="pre">target</span> <span class="pre">=</span> <span class="pre">(1-tau)*target</span> <span class="pre">+</span> <span class="pre">tau*network</span></code> The default is <code class="docutils literal notranslate"><span class="pre">0.005</span></code>.</p></li>
 <li><p><strong>n_warmup</strong> (<em>int</em>) – Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code>.</p></li>
 <li><p><strong>memory_capacity</strong> (<em>int</em>) – Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>discount</strong> (<em>float</em>) – Discount factor. The default is <code class="docutils literal notranslate"><span class="pre">0.99</span></code>.</p></li>
+<li><p><strong>max_grad</strong> (<em>float</em>) – Maximum gradient. The default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -714,6 +915,10 @@ a list of tensors if there are more than one outputs.</p>
 <li><p><strong>enable_dueling_dqn</strong> (<em>bool</em>) – Whether use Dueling network. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
 <li><p><strong>enable_noisy_dqn</strong> (<em>bool</em>) – Whether use noisy network. The default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
 <li><p><strong>optimizer</strong> (<em>tf.keras.optimizers.Optimizer</em>) – Custom optimizer</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>discount</strong> (<em>float</em>) – Discount factor. The default is <code class="docutils literal notranslate"><span class="pre">0.99</span></code>.</p></li>
+<li><p><strong>max_grad</strong> (<em>float</em>) – Maximum gradient. The default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -978,15 +1183,67 @@ a list of tensors if there are more than one outputs.</p>
 <dt class="sig sig-object py" id="tf2rl.algos.ppo.PPO">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.ppo.</span></span><span class="sig-name descname"><span class="pre">PPO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ppo.PPO" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.vpg.VPG" title="tf2rl.algos.vpg.VPG"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.vpg.VPG</span></code></a></p>
+<p>Proximal Policy Optimization (PPO) Agent: <a class="reference external" href="https://arxiv.org/abs/1707.06347">https://arxiv.org/abs/1707.06347</a></p>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--batch-size</span></code> (int): Batch size of training. The default is <code class="docutils literal notranslate"><span class="pre">32</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--gpu</span></code> (int): GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--horizon</span></code> (int): The default is <code class="docutils literal notranslate"><span class="pre">2048</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--normalize_adv</span></code>: Normalize Advantage.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--enable-gae</span></code>: Enable GAE.</p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.ppo.PPO.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PPO'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ppo.PPO.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize PPO</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clip</strong> (<em>bool</em>) – Whether clip or not. The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>clip_ratio</strong> (<em>float</em>) – Probability ratio is clipped between <code class="docutils literal notranslate"><span class="pre">1-clip_ratio</span></code> and <code class="docutils literal notranslate"><span class="pre">1+clip_ratio</span></code>.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of agent. The default is <code class="docutils literal notranslate"><span class="pre">&quot;PPO&quot;</span></code>.</p></li>
+<li><p><strong>state_shape</strong> (<em>iterable of int</em>) – </p></li>
+<li><p><strong>action_dim</strong> (<em>int</em>) – </p></li>
+<li><p><strong>is_discrete</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>actor</strong> – </p></li>
+<li><p><strong>critic</strong> – </p></li>
+<li><p><strong>actor_critic</strong> – </p></li>
+<li><p><strong>max_action</strong> (<em>float</em>) – maximum action size.</p></li>
+<li><p><strong>actor_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of actor. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>critic_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of critic. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>lr_actor</strong> (<em>float</em>) – Learning rate of actor. The default is <code class="docutils literal notranslate"><span class="pre">1e-3</span></code>.</p></li>
+<li><p><strong>lr_critic</strong> (<em>float</em>) – Learning rate of critic. The default is <code class="docutils literal notranslate"><span class="pre">3e-3</span></code>.</p></li>
+<li><p><strong>hidden_activation_actor</strong> (<em>str</em>) – Activation for actor. The default is <code class="docutils literal notranslate"><span class="pre">&quot;relu&quot;</span></code>.</p></li>
+<li><p><strong>hidden_activation_critic</strong> (<em>str</em>) – Activation for critic. The default is <code class="docutils literal notranslate"><span class="pre">&quot;relu&quot;</span></code>.</p></li>
+<li><p><strong>horizon</strong> (<em>int</em>) – Number of steps of online episode horizon. The horizon must be multiple of <code class="docutils literal notranslate"><span class="pre">batch_size</span></code>. The default is <code class="docutils literal notranslate"><span class="pre">2048</span></code>.</p></li>
+<li><p><strong>enable_gae</strong> (<em>bool</em>) – Enable GAE. The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>normalize_adv</strong> (<em>bool</em>) – Normalize Advantage. The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>entropy_coef</strong> (<em>float</em>) – Entropy coefficient. The default is <code class="docutils literal notranslate"><span class="pre">0.01</span></code>.</p></li>
+<li><p><strong>vfunc_coef</strong> (<em>float</em>) – Mixing ratio factor for actor and critic. <code class="docutils literal notranslate"><span class="pre">actor_loss</span> <span class="pre">+</span> <span class="pre">vfunc_coef*critic_loss</span></code></p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.ppo.PPO.train">
 <span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">advantages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logp_olds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.ppo.PPO.train" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Train PPO</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>advantages</strong> – </p></li>
+<li><p><strong>logp_olds</strong> – </p></li>
+<li><p><strong>returns</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -1032,30 +1289,123 @@ a list of tensors if there are more than one outputs.</p>
 <dt class="sig sig-object py" id="tf2rl.algos.sac.SAC">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.sac.</span></span><span class="sig-name descname"><span class="pre">SAC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.OffPolicyAgent" title="tf2rl.algos.policy_base.OffPolicyAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.OffPolicyAgent</span></code></a></p>
+<p>Soft Actor-Critic (SAC) Agent: <a class="reference external" href="https://arxiv.org/abs/1801.01290">https://arxiv.org/abs/1801.01290</a></p>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-warmup</span></code> (int): Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--batch-size</span></code> (int): Batch size of training. The default is <code class="docutils literal notranslate"><span class="pre">32</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--gpu</span></code> (int): GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--memory-capacity</span></code> (int): Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">1e6</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--alpha</span></code> (float): Temperature parameter. The default is <code class="docutils literal notranslate"><span class="pre">0.2</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--auto-alpha</span></code>: Automatic alpha tuning.</p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac.SAC.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SAC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0003</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0003</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actor_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critic_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_warmup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_capacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize SAC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_shape</strong> (<em>iterable of int</em>) – </p></li>
+<li><p><strong>action_dim</strong> (<em>int</em>) – </p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of network. The default is <code class="docutils literal notranslate"><span class="pre">&quot;SAC&quot;</span></code></p></li>
+<li><p><strong>max_action</strong> (<em>float</em>) – </p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate. The default is <code class="docutils literal notranslate"><span class="pre">3e-4</span></code>.</p></li>
+<li><p><strong>lr_alpha</strong> (<em>alpha</em>) – Learning rate for alpha. The default is <code class="docutils literal notranslate"><span class="pre">3e-4</span></code>.</p></li>
+<li><p><strong>actor_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of actor. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>critic_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of critic. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – Target network update rate.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Temperature parameter. The default is <code class="docutils literal notranslate"><span class="pre">0.2</span></code>.</p></li>
+<li><p><strong>auto_alpha</strong> (<em>bool</em>) – Automatic alpha tuning.</p></li>
+<li><p><strong>init_temperature</strong> (<em>float</em>) – Initial temperature</p></li>
+<li><p><strong>n_warmup</strong> (<em>int</em>) – Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code>.</p></li>
+<li><p><strong>memory_capacity</strong> (<em>int</em>) – Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>discount</strong> (<em>float</em>) – Discount factor. The default is <code class="docutils literal notranslate"><span class="pre">0.99</span></code>.</p></li>
+<li><p><strong>max_grad</strong> (<em>float</em>) – Maximum gradient. The default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac.SAC.get_action">
 <span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.get_action" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get action</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – Observation state</p></li>
+<li><p><strong>test</strong> (<em>bool</em>) – When <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), policy returns exploratory action.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Selected action</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tf.Tensor or float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac.SAC.train">
 <span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.train" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Train SAC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>next_states</strong> – </p></li>
+<li><p><strong>rewards</strong> – </p></li>
+<li><p><strong>done</strong> – </p></li>
+<li><p><strong>weights</strong> (<em>optional</em>) – Weights for importance sampling</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac.SAC.compute_td_error">
 <span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.compute_td_error" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Compute TD error</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>next_states</strong> – </p></li>
+<li><p><strong>rewars</strong> – </p></li>
+<li><p><strong>dones</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns</dt><dd><p>np.ndarray: TD error</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac.SAC.get_argument">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac.SAC.get_argument" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Create or update argument parser for command line program</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> (<em>argparse.ArgParser</em><em>, </em><em>optional</em>) – argument parser</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>argument parser</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>argparse.ArgParser</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -1069,27 +1419,108 @@ a list of tensors if there are more than one outputs.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac_ae.SACAE.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(84,</span> <span class="pre">84,</span> <span class="pre">9)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_conv_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_conv_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_critic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_sac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_decoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_critic_target_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_actor_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_q_grad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_latent_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_weight_lambda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_making_decoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SACAE'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_ae.SACAE.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize SAC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_shape</strong> (<em>iterable of int</em>) – </p></li>
+<li><p><strong>action_dim</strong> (<em>int</em>) – </p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of network. The default is <code class="docutils literal notranslate"><span class="pre">&quot;SAC&quot;</span></code></p></li>
+<li><p><strong>max_action</strong> (<em>float</em>) – </p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate. The default is <code class="docutils literal notranslate"><span class="pre">3e-4</span></code>.</p></li>
+<li><p><strong>lr_alpha</strong> (<em>alpha</em>) – Learning rate for alpha. The default is <code class="docutils literal notranslate"><span class="pre">3e-4</span></code>.</p></li>
+<li><p><strong>actor_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of actor. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>critic_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of critic. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – Target network update rate.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Temperature parameter. The default is <code class="docutils literal notranslate"><span class="pre">0.2</span></code>.</p></li>
+<li><p><strong>auto_alpha</strong> (<em>bool</em>) – Automatic alpha tuning.</p></li>
+<li><p><strong>init_temperature</strong> (<em>float</em>) – Initial temperature</p></li>
+<li><p><strong>n_warmup</strong> (<em>int</em>) – Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code>.</p></li>
+<li><p><strong>memory_capacity</strong> (<em>int</em>) – Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>discount</strong> (<em>float</em>) – Discount factor. The default is <code class="docutils literal notranslate"><span class="pre">0.99</span></code>.</p></li>
+<li><p><strong>max_grad</strong> (<em>float</em>) – Maximum gradient. The default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac_ae.SACAE.get_action">
 <span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_ae.SACAE.get_action" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get action</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – Observation state</p></li>
+<li><p><strong>test</strong> (<em>bool</em>) – When <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), policy returns exploratory action.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Selected action</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tf.Tensor or float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac_ae.SACAE.train">
 <span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_ae.SACAE.train" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Train SAC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>next_states</strong> – </p></li>
+<li><p><strong>rewards</strong> – </p></li>
+<li><p><strong>done</strong> – </p></li>
+<li><p><strong>weights</strong> (<em>optional</em>) – Weights for importance sampling</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac_ae.SACAE.get_argument">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_ae.SACAE.get_argument" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Create or update argument parser for command line program</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> (<em>argparse.ArgParser</em><em>, </em><em>optional</em>) – argument parser</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>argument parser</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>argparse.ArgParser</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac_ae.SACAE.compute_td_error">
 <span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_ae.SACAE.compute_td_error" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Compute TD error</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>next_states</strong> – </p></li>
+<li><p><strong>rewars</strong> – </p></li>
+<li><p><strong>dones</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns</dt><dd><p>np.ndarray: TD error</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -1143,22 +1574,88 @@ a list of tensors if there are more than one outputs.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac_discrete.SACDiscrete.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_dim</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actor_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critic_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_update_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize SAC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_shape</strong> (<em>iterable of int</em>) – </p></li>
+<li><p><strong>action_dim</strong> (<em>int</em>) – </p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of network. The default is <code class="docutils literal notranslate"><span class="pre">&quot;SAC&quot;</span></code></p></li>
+<li><p><strong>max_action</strong> (<em>float</em>) – </p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate. The default is <code class="docutils literal notranslate"><span class="pre">3e-4</span></code>.</p></li>
+<li><p><strong>lr_alpha</strong> (<em>alpha</em>) – Learning rate for alpha. The default is <code class="docutils literal notranslate"><span class="pre">3e-4</span></code>.</p></li>
+<li><p><strong>actor_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of actor. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>critic_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of critic. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – Target network update rate.</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – Temperature parameter. The default is <code class="docutils literal notranslate"><span class="pre">0.2</span></code>.</p></li>
+<li><p><strong>auto_alpha</strong> (<em>bool</em>) – Automatic alpha tuning.</p></li>
+<li><p><strong>init_temperature</strong> (<em>float</em>) – Initial temperature</p></li>
+<li><p><strong>n_warmup</strong> (<em>int</em>) – Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code>.</p></li>
+<li><p><strong>memory_capacity</strong> (<em>int</em>) – Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>discount</strong> (<em>float</em>) – Discount factor. The default is <code class="docutils literal notranslate"><span class="pre">0.99</span></code>.</p></li>
+<li><p><strong>max_grad</strong> (<em>float</em>) – Maximum gradient. The default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac_discrete.SACDiscrete.train">
 <span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete.train" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Train SAC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>next_states</strong> – </p></li>
+<li><p><strong>rewards</strong> – </p></li>
+<li><p><strong>done</strong> – </p></li>
+<li><p><strong>weights</strong> (<em>optional</em>) – Weights for importance sampling</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac_discrete.SACDiscrete.compute_td_error">
 <span class="sig-name descname"><span class="pre">compute_td_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dones</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete.compute_td_error" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Compute TD error</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>next_states</strong> – </p></li>
+<li><p><strong>rewars</strong> – </p></li>
+<li><p><strong>dones</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns</dt><dd><p>np.ndarray: TD error</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.sac_discrete.SACDiscrete.get_argument">
 <em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.sac_discrete.SACDiscrete.get_argument" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Create or update argument parser for command line program</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> (<em>argparse.ArgParser</em><em>, </em><em>optional</em>) – argument parser</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>argument parser</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>argparse.ArgParser</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -1204,25 +1701,42 @@ a list of tensors if there are more than one outputs.</p>
 <dt class="sig sig-object py" id="tf2rl.algos.td3.TD3">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.td3.</span></span><span class="sig-name descname"><span class="pre">TD3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.TD3" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.ddpg.DDPG" title="tf2rl.algos.ddpg.DDPG"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.ddpg.DDPG</span></code></a></p>
+<p>Twin Delayed Deep Deterministic policy gradient (TD3) Agent: <a class="reference external" href="https://arxiv.org/abs/1802.09477">https://arxiv.org/abs/1802.09477</a></p>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-warmup</span></code> (int): Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--batch-size</span></code> (int): Batch size for training. The default is <code class="docutils literal notranslate"><span class="pre">32</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--gpu</span></code> (int): GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--memory-capacity</span></code> (int): Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">1e6</span></code>.</p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.td3.TD3.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'TD3'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actor_update_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy_noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critic_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(400,</span> <span class="pre">300)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.td3.TD3.__init__" title="Permalink to this definition"></a></dt>
-<dd><p>Initialize DDPG agent</p>
+<dd><p>Initialize TD3</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>state_shape</strong> (<em>iterable of int</em>) – </p></li>
-<li><p><strong>action_dim</strong> (<em>int</em>) – </p></li>
-<li><p><strong>name</strong> (<em>str</em>) – Name of agent. The default is <code class="docutils literal notranslate"><span class="pre">&quot;DDPG&quot;</span></code>.</p></li>
+<li><p><strong>shate_shape</strong> (<em>iterable of ints</em>) – Observation state shape</p></li>
+<li><p><strong>action_dim</strong> (<em>int</em>) – Action dimension</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Network name. The default is <code class="docutils literal notranslate"><span class="pre">&quot;TD3&quot;</span></code>.</p></li>
+<li><p><strong>actor_update_freq</strong> (<em>int</em>) – Number of critic updates per one actor upate.</p></li>
+<li><p><strong>policy_noise</strong> (<em>float</em>) – </p></li>
+<li><p><strong>noise_clip</strong> (<em>float</em>) – </p></li>
+<li><p><strong>critic_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layer of critic. The default is <code class="docutils literal notranslate"><span class="pre">(400,</span> <span class="pre">300)</span></code></p></li>
 <li><p><strong>max_action</strong> (<em>float</em>) – Size of maximum action. (<code class="docutils literal notranslate"><span class="pre">-max_action</span></code> &lt;= action &lt;= <code class="docutils literal notranslate"><span class="pre">max_action</span></code>). The degault is <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
 <li><p><strong>lr_actor</strong> (<em>float</em>) – Learning rate for actor network. The default is <code class="docutils literal notranslate"><span class="pre">0.001</span></code>.</p></li>
 <li><p><strong>lr_critic</strong> (<em>float</em>) – Learning rage for critic network. The default is <code class="docutils literal notranslate"><span class="pre">0.001</span></code>.</p></li>
 <li><p><strong>actor_units</strong> (<em>iterable of int</em>) – Number of units at hidden layers of actor.</p></li>
-<li><p><strong>critic_units</strong> (<em>iterable of int</em>) – Number of units at hidden layers of critic.</p></li>
 <li><p><strong>sigma</strong> (<em>float</em>) – Standard deviation of Gaussian noise. The default is <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p></li>
 <li><p><strong>tau</strong> (<em>float</em>) – Weight update ratio for target network. <code class="docutils literal notranslate"><span class="pre">target</span> <span class="pre">=</span> <span class="pre">(1-tau)*target</span> <span class="pre">+</span> <span class="pre">tau*network</span></code> The default is <code class="docutils literal notranslate"><span class="pre">0.005</span></code>.</p></li>
 <li><p><strong>n_warmup</strong> (<em>int</em>) – Number of warmup steps before training. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code>.</p></li>
 <li><p><strong>memory_capacity</strong> (<em>int</em>) – Replay Buffer size. The default is <code class="docutils literal notranslate"><span class="pre">1e4</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>discount</strong> (<em>float</em>) – Discount factor. The default is <code class="docutils literal notranslate"><span class="pre">0.99</span></code>.</p></li>
+<li><p><strong>max_grad</strong> (<em>float</em>) – Maximum gradient. The default is <code class="docutils literal notranslate"><span class="pre">10</span></code>.</p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -1242,9 +1756,11 @@ a list of tensors if there are more than one outputs.</p>
 <li><p><strong>dones</strong> – </p></li>
 </ul>
 </dd>
-</dl>
-<dl class="simple">
-<dt>Returns</dt><dd><p>tf.Tensor: TD error</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sum of two TD errors.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1386,25 +1902,108 @@ a list of tensors if there are more than one outputs.</p>
 <dt class="sig sig-object py" id="tf2rl.algos.vpg.VPG">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.algos.vpg.</span></span><span class="sig-name descname"><span class="pre">VPG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.algos.policy_base.OnPolicyAgent" title="tf2rl.algos.policy_base.OnPolicyAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.algos.policy_base.OnPolicyAgent</span></code></a></p>
+<p>VPG Agent: <a class="reference external" href="https://proceedings.neurips.cc/paper/1999/file/464d828b85b0bed98e80ade0a5c43b0f-Paper.pdf">https://proceedings.neurips.cc/paper/1999/file/464d828b85b0bed98e80ade0a5c43b0f-Paper.pdf</a></p>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--batch-size</span></code> (int): Batch size of training. The default is <code class="docutils literal notranslate"><span class="pre">32</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--gpu</span></code> (int): GPU id. <code class="docutils literal notranslate"><span class="pre">-1</span></code> disables GPU. The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--horizon</span></code> (int): The default is <code class="docutils literal notranslate"><span class="pre">2048</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--normalize_adv</span></code>: Normalize Advantage.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--enable-gae</span></code>: Enable GAE.</p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.vpg.VPG.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_discrete</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actor_critic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_action</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actor_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">critic_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(256,</span> <span class="pre">256)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_actor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_critic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.003</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_activation_actor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_activation_critic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'relu'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'VPG'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize VPG</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_shape</strong> (<em>iterable of int</em>) – </p></li>
+<li><p><strong>action_dim</strong> (<em>int</em>) – </p></li>
+<li><p><strong>is_discrete</strong> (<em>bool</em>) – </p></li>
+<li><p><strong>actor</strong> – </p></li>
+<li><p><strong>critic</strong> – </p></li>
+<li><p><strong>actor_critic</strong> – </p></li>
+<li><p><strong>max_action</strong> (<em>float</em>) – maximum action size.</p></li>
+<li><p><strong>actor_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of actor. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>critic_units</strong> (<em>iterable of int</em>) – Numbers of units at hidden layers of critic. The default is <code class="docutils literal notranslate"><span class="pre">(256,</span> <span class="pre">256)</span></code>.</p></li>
+<li><p><strong>lr_actor</strong> (<em>float</em>) – Learning rate of actor. The default is <code class="docutils literal notranslate"><span class="pre">1e-3</span></code>.</p></li>
+<li><p><strong>lr_critic</strong> (<em>float</em>) – Learning rate of critic. The default is <code class="docutils literal notranslate"><span class="pre">3e-3</span></code>.</p></li>
+<li><p><strong>hidden_activation_actor</strong> (<em>str</em>) – Activation for actor. The default is <code class="docutils literal notranslate"><span class="pre">&quot;relu&quot;</span></code>.</p></li>
+<li><p><strong>hidden_activation_critic</strong> (<em>str</em>) – Activation for critic. The default is <code class="docutils literal notranslate"><span class="pre">&quot;relu&quot;</span></code>.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Name of agent. The default is <code class="docutils literal notranslate"><span class="pre">&quot;VPG&quot;</span></code>.</p></li>
+<li><p><strong>horizon</strong> (<em>int</em>) – Number of steps of online episode horizon. The horizon must be multiple of <code class="docutils literal notranslate"><span class="pre">batch_size</span></code>. The default is <code class="docutils literal notranslate"><span class="pre">2048</span></code>.</p></li>
+<li><p><strong>enable_gae</strong> (<em>bool</em>) – Enable GAE. The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>normalize_adv</strong> (<em>bool</em>) – Normalize Advantage. The default is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>entropy_coef</strong> (<em>float</em>) – Entropy coefficient. The default is <code class="docutils literal notranslate"><span class="pre">0.01</span></code>.</p></li>
+<li><p><strong>vfunc_coef</strong> (<em>float</em>) – Mixing ratio factor for actor and critic. <code class="docutils literal notranslate"><span class="pre">actor_loss</span> <span class="pre">+</span> <span class="pre">vfunc_coef*critic_loss</span></code></p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size. The default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.vpg.VPG.get_action">
 <span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG.get_action" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get action and probability</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – Observation state</p></li>
+<li><p><strong>test</strong> (<em>bool</em>) – When <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), policy returns exploratory action.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Selected action
+np.ndarray or float: Log(p)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray or float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.vpg.VPG.get_action_and_val">
 <span class="sig-name descname"><span class="pre">get_action_and_val</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG.get_action_and_val" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get action, probability, and critic value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – Observation state</p></li>
+<li><p><strong>test</strong> (<em>bool</em>) – When <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), policy returns exploratory action.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Selected action
+np.ndarray: Log(p)
+np.ndarray: Critic value</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.algos.vpg.VPG.train">
 <span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">states</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">advantages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logp_olds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returns</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.algos.vpg.VPG.train" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Train VPG</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>states</strong> – </p></li>
+<li><p><strong>actions</strong> – </p></li>
+<li><p><strong>advantages</strong> – </p></li>
+<li><p><strong>logp_olds</strong> – </p></li>
+<li><p><strong>returns</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
