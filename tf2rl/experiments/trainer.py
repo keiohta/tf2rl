@@ -27,6 +27,15 @@ class Trainer:
             env,
             args,
             test_env=None):
+        """
+        Initialize Trainer class
+
+        Args:
+            policy: Policy to be trained
+            env (gym.Env): Environment for train
+            args (Namespace or dict): config parameters
+            test_env (gym.Env): Environment for test.
+        """
         if isinstance(args, dict):
             _args = args
             args = policy.__class__.get_argument(Trainer.get_argument())
@@ -75,6 +84,9 @@ class Trainer:
             self.logger.info("Restored {}".format(self._latest_path_ckpt))
 
     def __call__(self):
+        """
+        Execute training
+        """
         if self._evaluate:
             self.evaluate_policy_continuously()
 
@@ -252,6 +264,15 @@ class Trainer:
 
     @staticmethod
     def get_argument(parser=None):
+        """
+        Create or update argument parser for command line program
+
+        Args:
+            parser (argparse.ArgParser, optional): argument parser
+
+        Returns:
+            argparse.ArgParser: argument parser
+        """
         if parser is None:
             parser = argparse.ArgumentParser(conflict_handler='resolve')
         # experiment settings
