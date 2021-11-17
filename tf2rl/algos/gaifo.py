@@ -27,6 +27,17 @@ class Discriminator(DiscriminatorGAIL):
 
 
 class GAIfO(GAIL):
+    """
+    Generative Adversarial Imitation from Observation (GAIfO) Agent: https://arxiv.org/abs/1807.06158
+
+    Command Line Args:
+
+        * ``--n-warmup`` (int): Number of warmup steps before training. The default is ``1e4``.
+        * ``--batch-size`` (int): Batch size of training. The default is ``32``.
+        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        * ``--memory-capacity`` (int): Replay Buffer size. The default is ``1e4``.
+        * ``--enable-sn``: Enable Spectral Normalization
+    """
     def __init__(
             self,
             state_shape,
@@ -35,6 +46,17 @@ class GAIfO(GAIL):
             enable_sn=False,
             name="GAIfO",
             **kwargs):
+        """
+        Initialize GAIfO
+
+        Args:
+            state_shape (iterable of int):
+            action_dim (int):
+            units (iterable of int): The default is ``(32, 32)``
+            lr (float): Learning rate. The default is ``0.001``
+            enable_sn (bool): Whether enable Spectral Normalization. The defailt is ``False``
+            name (str): The default is ``"GAIfO"``
+        """
         IRLPolicy.__init__(self, name=name, n_training=1, **kwargs)
         self.disc = Discriminator(
             state_shape=state_shape,
@@ -44,6 +66,15 @@ class GAIfO(GAIL):
 
     def train(self, agent_states, agent_next_states,
               expert_states, expert_next_states, **kwargs):
+        """
+        Train GAIfO
+
+        Args:
+            agent_states
+            agent_acts
+            expert_states
+            expected_acts
+        """
         loss, accuracy, js_divergence = self._train_body(
             agent_states, agent_next_states, expert_states, expert_next_states)
         tf.summary.scalar(name=self.policy_name+"/DiscriminatorLoss", data=loss)
@@ -70,6 +101,17 @@ class GAIfO(GAIL):
         return loss, accuracy, js_divergence
 
     def inference(self, states, actions, next_states):
+        """
+        Infer Reward with GAIfO
+
+        Args:
+            states
+            actions
+            next_states
+
+        Returns:
+            tf.Tensor: Reward
+        """
         assert states.shape == next_states.shape
         if states.ndim == 1:
             states = np.expand_dims(states, axis=0)
