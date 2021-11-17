@@ -18,7 +18,7 @@ class CURL(SACAE):
         * ``--memory-capacity`` (int): Replay Buffer size. The default is ``1e5``.
         * ``--alpha`` (float): Temperature parameter. The default is ``0.2``.
         * ``--auto-alpha``: Automatic alpha tuning.
-        * ``--stop-q-grad``: Whether stop gradient after convolutional layers at Encoder    
+        * ``--stop-q-grad``: Whether stop gradient after convolutional layers at Encoder
     """
     def __init__(self,
                  *args,
