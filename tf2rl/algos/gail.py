@@ -34,6 +34,17 @@ class Discriminator(tf.keras.Model):
 
 
 class GAIL(IRLPolicy):
+    """
+    Generative Adversarial Imitation Learning (GAIL) Agent: https://arxiv.org/abs/1606.03476
+
+    Command Line Args:
+
+        * ``--n-warmup`` (int): Number of warmup steps before training. The default is ``1e4``.
+        * ``--batch-size`` (int): Batch size of training. The default is ``32``.
+        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        * ``--memory-capacity`` (int): Replay Buffer size. The default is ``1e4``.
+        * ``--enable-sn``: Enable Spectral Normalization
+    """
     def __init__(
             self,
             state_shape,
@@ -43,6 +54,17 @@ class GAIL(IRLPolicy):
             enable_sn=False,
             name="GAIL",
             **kwargs):
+        """
+        Initialize GAIL
+
+        Args:
+            state_shape (iterable of int):
+            action_dim (int):
+            units (iterable of int): The default is ``[32, 32]``
+            lr (float): Learning rate. The default is ``0.001``
+            enable_sn (bool): Whether enable Spectral Normalization. The defailt is ``False``
+            name (str): The default is ``"GAIL"``
+        """
         super().__init__(name=name, n_training=1, **kwargs)
         self.disc = Discriminator(
             state_shape=state_shape, action_dim=action_dim,
@@ -52,6 +74,15 @@ class GAIL(IRLPolicy):
 
     def train(self, agent_states, agent_acts,
               expert_states, expert_acts, **kwargs):
+        """
+        Train GAIL
+
+        Args:
+            agent_states
+            agent_acts
+            expert_states
+            expected_acts
+        """
         loss, accuracy, js_divergence = self._train_body(
             agent_states, agent_acts, expert_states, expert_acts)
         tf.summary.scalar(name=self.policy_name+"/DiscriminatorLoss", data=loss)
@@ -83,6 +114,17 @@ class GAIL(IRLPolicy):
         return loss, accuracy, js_divergence
 
     def inference(self, states, actions, next_states):
+        """
+        Infer Reward with GAIL
+
+        Args:
+            states
+            actions
+            next_states
+
+        Returns:
+            tf.Tensor: Reward
+        """
         if states.ndim == actions.ndim == 1:
             states = np.expand_dims(states, axis=0)
             actions = np.expand_dims(actions, axis=0)
