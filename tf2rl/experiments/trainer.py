@@ -60,7 +60,7 @@ class Trainer:
         Args:
             policy: Policy to be trained
             env (gym.Env): Environment for train
-            args (Namespace or dict): config parameters
+            args (Namespace or dict): config parameters specified with command line
             test_env (gym.Env): Environment for test.
         """
         if isinstance(args, dict):
