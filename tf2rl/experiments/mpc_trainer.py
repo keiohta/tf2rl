@@ -9,6 +9,16 @@ from tf2rl.misc.get_replay_buffer import get_space_size
 
 class DynamicsModel(tf.keras.Model):
     def __init__(self, input_dim, output_dim, units=[32, 32], name="DymamicsModel", gpu=0):
+        """
+        Initialize DynamicsModel
+
+        Args:
+            input_dim (int)
+            output_dim (int)
+            units (iterable of int): The default is ``[32, 32]``
+            name (str): The default is ``"DynamicsModel"``
+            gpu (int): The default is ``0``.
+        """
         self.device = "/gpu:{}".format(gpu) if gpu >= 0 else "/cpu:0"
         super().__init__(name=name)
 
@@ -21,6 +31,15 @@ class DynamicsModel(tf.keras.Model):
 
     @tf.function
     def call(self, inputs):
+        """
+        Call Dynamics Model
+
+        Args:
+            inputs (tf.Tensor)
+
+        Returns:
+            tf.Tensor
+        """
         features = self.l1(inputs)
         features = self.l2(features)
         return self.l3(features)
@@ -41,17 +60,42 @@ class DynamicsModel(tf.keras.Model):
 
 class RandomPolicy:
     def __init__(self, max_action, act_dim):
+        """
+        Initialize RandomPolicy
+
+        Args:
+            max_action (float)
+            act_dim (int)
+        """
         self._max_action = max_action
         self._act_dim = act_dim
         self.policy_name = "RandomPolicy"
 
     def get_action(self, obs):
+        """
+        Get random action
+
+        Args:
+            obs
+
+        Returns:
+            float: action
+        """
         return np.random.uniform(
             low=-self._max_action,
             high=self._max_action,
             size=self._act_dim)
 
     def get_actions(self, obses):
+        """
+        Get batch actions
+
+        Args:
+            obses
+
+        Returns:
+            np.dnarray: batch actions
+        """
         batch_size = obses.shape[0]
         return np.random.uniform(
             low=-self._max_action,
@@ -60,6 +104,38 @@ class RandomPolicy:
 
 
 class MPCTrainer(Trainer):
+    """
+    Trainer class for Model Predictive Control (MPC): https://arxiv.org/abs/1708.02596
+
+    Command Line Args:
+
+        * ``--max-steps`` (int): The maximum steps for training. The default is ``int(1e6)``
+        * ``--episode-max-steps`` (int): The maximum steps for an episode. The default is ``int(1e3)``
+        * ``--n-experiments`` (int): Number of experiments. The default is ``1``
+        * ``--show-progress``: Call ``render`` function during training
+        * ``--save-model-interval`` (int): Interval to save model. The default is ``int(1e4)``
+        * ``--save-summary-interval`` (int): Interval to save summary. The default is ``int(1e3)``
+        * ``--model-dir`` (str): Directory to restore model.
+        * ``--dir-suffix`` (str): Suffix for directory that stores results.
+        * ``--normalize-obs``: Whether normalize observation
+        * ``--logdir`` (str): Output directory name. The default is ``"results"``
+        * ``--evaluate``: Whether evaluate trained model
+        * ``--test-interval`` (int): Interval to evaluate trained model. The default is ``int(1e4)``
+        * ``--show-test-progress``: Call ``render`` function during evaluation.
+        * ``--test-episodes`` (int): Number of episodes at test. The default is ``5``
+        * ``--save-test-path``: Save trajectories of evaluation.
+        * ``--show-test-images``: Show input images to neural networks when an episode finishes
+        * ``--save-test-movie``: Save rendering results.
+        * ``--use-prioritized-rb``: Use prioritized experience replay
+        * ``--use-nstep-rb``: Use Nstep experience replay
+        * ``--n-step`` (int): Number of steps for nstep experience reward. The default is ``4``
+        * ``--logging-level`` (DEBUG, INFO, WARNING): Choose logging level. The default is ``INFO``
+        * ``--gpu`` (int): The default is ``0``
+        * ``--max-iter`` (int): Maximum iteration. The default is ``100``
+        * ``--horizon`` (int): Number of steps to online horizon
+        * ``--n-sample`` (int): Number of samples. The default is ``1000``
+        * ``--batch-size`` (int): Batch size. The default is ``512``.
+    """
     def __init__(
             self,
             policy,
@@ -70,6 +146,19 @@ class MPCTrainer(Trainer):
             n_dynamics_model=1,
             lr=0.001,
             **kwargs):
+        """
+        Initialize MPCTrainer class
+
+        Args:
+            policy: Policy to be trained
+            env (gym.Env): Environment for train
+            args (Namespace or dict): config parameters specified with command line
+            test_env (gym.Env): Environment for test.
+            reward_fn (callable): Reward function
+            buffer_size (int): The default is ``int(1e6)``
+            n_dynamics_model (int): Number of dynamics models. The default is ``1``.
+            lr (float): Learning rate for dynamics model. The default is ``0.001``.
+        """
         super().__init__(policy, env, args, **kwargs)
 
         self.dynamics_buffer = ReplayBuffer(**self._prepare_dynamics_buffer_dict(buffer_size=buffer_size))
@@ -108,6 +197,9 @@ class MPCTrainer(Trainer):
             super()._set_check_point(model_dir)
 
     def __call__(self):
+        """
+        Execute Training
+        """
         total_steps = 0
         tf.summary.experimental.set_step(total_steps)
         # Gather dataset of random trajectories
@@ -138,6 +230,16 @@ class MPCTrainer(Trainer):
             self.logger.info("iter={0: 3d} total_rew: {1:4.4f} loss: {2:2.8f}".format(i, total_rew, mean_loss))
 
     def predict_next_state(self, obses, acts):
+        """
+        Predict Next State
+
+        Args:
+            obses
+            acts
+
+        Returns:
+            np.ndarray: next state
+        """
         obs_diffs = np.zeros_like(obses)
         inputs = np.concatenate([obses, acts], axis=1)
         for dynamics_model in self._dynamics_models:
@@ -174,6 +276,12 @@ class MPCTrainer(Trainer):
         self._batch_size = args.batch_size
 
     def collect_episodes(self, n_rollout=1):
+        """
+        Collect Episodes
+
+        Args:
+            n_rollout (int): Number of rollout. The default is ``1``
+        """
         for _ in range(n_rollout):
             obs = self._env.reset()
             for _ in range(self._episode_max_steps):
@@ -207,6 +315,12 @@ class MPCTrainer(Trainer):
         return inputs, labels
 
     def fit_dynamics(self, n_epoch=1):
+        """
+        Fit dynamics
+
+        Args:
+            n_epocs (int): Number of epocs to fit
+        """
         inputs, labels = self._make_inputs_output_pairs(n_epoch)
 
         dataset = tf.data.Dataset.from_tensor_slices((inputs, labels))
@@ -226,6 +340,15 @@ class MPCTrainer(Trainer):
 
     @staticmethod
     def get_argument(parser=None):
+        """
+        Create or update argument parser for command line program
+
+        Args:
+            parser (argparse.ArgParser, optional): argument parser
+
+        Returns:
+            argparse.ArgParser: argument parser
+        """
         parser = Trainer.get_argument(parser)
         parser.add_argument('--gpu', type=int, default=0,
                             help='GPU id')

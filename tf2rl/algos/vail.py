@@ -53,6 +53,17 @@ class Discriminator(tf.keras.Model):
 
 
 class VAIL(GAIL):
+    """
+    Variational Adversarial Imitation Learning (VAIL) Agent: https://arxiv.org/abs/1810.00821
+
+    Command Line Args:
+
+        * ``--n-warmup`` (int): Number of warmup steps before training. The default is ``1e4``.
+        * ``--batch-size`` (int): Batch size of training. The default is ``32``.
+        * ``--gpu`` (int): GPU id. ``-1`` disables GPU. The default is ``0``.
+        * ``--memory-capacity`` (int): Replay Buffer size. The default is ``1e4``.
+        * ``--enable-sn``: Enable Spectral Normalization
+    """
     def __init__(
             self,
             state_shape,
@@ -67,21 +78,18 @@ class VAIL(GAIL):
             name="VAIL",
             **kwargs):
         """
+        Initialize VAIL
 
         Args:
-            state_shape:
-            action_dim:
-            units:
-            n_latent_unit:
-            lr:
-            kl_target:
-            reg_param:
-            enable_sn: bool
-                If true, add spectral normalization in Dense layer
-            enable_gp: bool
-                If true, add gradient penalty to loss function
-            name:
-            **kwargs:
+            state_shape (iterable of int):
+            action_dim (int):
+            units (iterable of int): The default is ``(32, 32)``
+            lr (float): Learning rate. The default is ``5e-5``
+            kl_target (float): The default is ``0.5``
+            reg_param (float): The default is ``0``
+            enable_sn (bool): Whether enable Spectral Normalization. The defailt is ``False``
+            enable_gp (bool): Whether loss function includes gradient panalty
+            name (str): The default is ``"VAIL"``
         """
         IRLPolicy.__init__(
             self, name=name, n_training=10, **kwargs)
@@ -97,6 +105,15 @@ class VAIL(GAIL):
 
     def train(self, agent_states, agent_acts,
               expert_states, expert_acts, **kwargs):
+        """
+        Train VAIL
+
+        Args:
+            agent_states
+            agent_acts
+            expert_states
+            expected_acts
+        """
         loss, accuracy, real_kl, fake_kl, js_divergence = self._train_body(
             agent_states, agent_acts, expert_states, expert_acts)
         tf.summary.scalar(name=self.policy_name+"/DiscriminatorLoss", data=loss)

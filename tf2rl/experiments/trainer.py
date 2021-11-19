@@ -21,12 +21,48 @@ if tf.config.experimental.list_physical_devices('GPU'):
 
 
 class Trainer:
+    """
+    Trainer class for off-policy reinforce learning
+
+    Command Line Args:
+
+        * ``--max-steps`` (int): The maximum steps for training. The default is ``int(1e6)``
+        * ``--episode-max-steps`` (int): The maximum steps for an episode. The default is ``int(1e3)``
+        * ``--n-experiments`` (int): Number of experiments. The default is ``1``
+        * ``--show-progress``: Call ``render`` function during training
+        * ``--save-model-interval`` (int): Interval to save model. The default is ``int(1e4)``
+        * ``--save-summary-interval`` (int): Interval to save summary. The default is ``int(1e3)``
+        * ``--model-dir`` (str): Directory to restore model.
+        * ``--dir-suffix`` (str): Suffix for directory that stores results.
+        * ``--normalize-obs``: Whether normalize observation
+        * ``--logdir`` (str): Output directory name. The default is ``"results"``
+        * ``--evaluate``: Whether evaluate trained model
+        * ``--test-interval`` (int): Interval to evaluate trained model. The default is ``int(1e4)``
+        * ``--show-test-progress``: Call ``render`` function during evaluation.
+        * ``--test-episodes`` (int): Number of episodes at test. The default is ``5``
+        * ``--save-test-path``: Save trajectories of evaluation.
+        * ``--show-test-images``: Show input images to neural networks when an episode finishes
+        * ``--save-test-movie``: Save rendering results.
+        * ``--use-prioritized-rb``: Use prioritized experience replay
+        * ``--use-nstep-rb``: Use Nstep experience replay
+        * ``--n-step`` (int): Number of steps for nstep experience reward. The default is ``4``
+        * ``--logging-level`` (DEBUG, INFO, WARNING): Choose logging level. The default is ``INFO``
+    """
     def __init__(
             self,
             policy,
             env,
             args,
             test_env=None):
+        """
+        Initialize Trainer class
+
+        Args:
+            policy: Policy to be trained
+            env (gym.Env): Environment for train
+            args (Namespace or dict): config parameters specified with command line
+            test_env (gym.Env): Environment for test.
+        """
         if isinstance(args, dict):
             _args = args
             args = policy.__class__.get_argument(Trainer.get_argument())
@@ -75,6 +111,9 @@ class Trainer:
             self.logger.info("Restored {}".format(self._latest_path_ckpt))
 
     def __call__(self):
+        """
+        Execute training
+        """
         if self._evaluate:
             self.evaluate_policy_continuously()
 
@@ -252,6 +291,15 @@ class Trainer:
 
     @staticmethod
     def get_argument(parser=None):
+        """
+        Create or update argument parser for command line program
+
+        Args:
+            parser (argparse.ArgParser, optional): argument parser
+
+        Returns:
+            argparse.ArgParser: argument parser
+        """
         if parser is None:
             parser = argparse.ArgumentParser(conflict_handler='resolve')
         # experiment settings
