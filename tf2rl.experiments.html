@@ -99,17 +99,72 @@
 <span id="tf2rl-experiments-irl-trainer-module"></span><h2>tf2rl.experiments.irl_trainer module<a class="headerlink" href="#module-tf2rl.experiments.irl_trainer" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="tf2rl.experiments.irl_trainer.IRLTrainer">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.irl_trainer.</span></span><span class="sig-name descname"><span class="pre">IRLTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">irl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_next_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_act</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.irl_trainer.IRLTrainer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.irl_trainer.</span></span><span class="sig-name descname"><span class="pre">IRLTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">irl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_next_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_act</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.irl_trainer.IRLTrainer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.experiments.trainer.Trainer" title="tf2rl.experiments.trainer.Trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.experiments.trainer.Trainer</span></code></a></p>
+<p>Trainer class for inverse reinforce learning</p>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--max-steps</span></code> (int): The maximum steps for training. The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--episode-max-steps</span></code> (int): The maximum steps for an episode. The default is <code class="docutils literal notranslate"><span class="pre">int(1e3)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-experiments</span></code> (int): Number of experiments. The default is <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-progress</span></code>: Call <code class="docutils literal notranslate"><span class="pre">render</span></code> function during training</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-model-interval</span></code> (int): Interval to save model. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-summary-interval</span></code> (int): Interval to save summary. The default is <code class="docutils literal notranslate"><span class="pre">int(1e3)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--model-dir</span></code> (str): Directory to restore model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--dir-suffix</span></code> (str): Suffix for directory that stores results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--normalize-obs</span></code>: Whether normalize observation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--logdir</span></code> (str): Output directory name. The default is <code class="docutils literal notranslate"><span class="pre">&quot;results&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--evaluate</span></code>: Whether evaluate trained model</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-interval</span></code> (int): Interval to evaluate trained model. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-test-progress</span></code>: Call <code class="docutils literal notranslate"><span class="pre">render</span></code> function during evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-episodes</span></code> (int): Number of episodes at test. The default is <code class="docutils literal notranslate"><span class="pre">5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-test-path</span></code>: Save trajectories of evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-test-images</span></code>: Show input images to neural networks when an episode finishes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-test-movie</span></code>: Save rendering results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--use-prioritized-rb</span></code>: Use prioritized experience replay</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--use-nstep-rb</span></code>: Use Nstep experience replay</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-step</span></code> (int): Number of steps for nstep experience reward. The default is <code class="docutils literal notranslate"><span class="pre">4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--logging-level</span></code> (DEBUG, INFO, WARNING): Choose logging level. The default is <code class="docutils literal notranslate"><span class="pre">INFO</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--expert-path-dir</span></code> (str): Path to directory that contains expert trajectories</p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.irl_trainer.IRLTrainer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">irl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_next_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expert_act</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.irl_trainer.IRLTrainer.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize Trainer class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>policy</strong> – Policy to be trained</p></li>
+<li><p><strong>env</strong> (<em>gym.Env</em>) – Environment for train</p></li>
+<li><p><strong>args</strong> (<em>Namespace</em><em> or </em><em>dict</em>) – config parameters specified with command line</p></li>
+<li><p><strong>irl</strong> – </p></li>
+<li><p><strong>expert_obs</strong> – </p></li>
+<li><p><strong>expert_next_obs</strong> – </p></li>
+<li><p><strong>expert_act</strong> – </p></li>
+<li><p><strong>test_env</strong> (<em>gym.Env</em>) – Environment for test.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.irl_trainer.IRLTrainer.get_argument">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.irl_trainer.IRLTrainer.get_argument" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.irl_trainer.IRLTrainer.get_argument" title="Permalink to this definition"></a></dt>
+<dd><p>Create or update argument parser for command line program</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> (<em>argparse.ArgParser</em><em>, </em><em>optional</em>) – argument parser</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>argument parser</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>argparse.ArgParser</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -118,27 +173,94 @@
 <span id="tf2rl-experiments-me-trpo-trainer-module"></span><h2>tf2rl.experiments.me_trpo_trainer module<a class="headerlink" href="#module-tf2rl.experiments.me_trpo_trainer" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.me_trpo_trainer.</span></span><span class="sig-name descname"><span class="pre">MeTrpoTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_eval_episodes_per_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.me_trpo_trainer.</span></span><span class="sig-name descname"><span class="pre">MeTrpoTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_eval_episodes_per_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.experiments.mpc_trainer.MPCTrainer" title="tf2rl.experiments.mpc_trainer.MPCTrainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.experiments.mpc_trainer.MPCTrainer</span></code></a></p>
+<p>Trainer class for Model-Ensemble Trust-Region Policy Optimization (ME-TRPO):<a class="reference external" href="https://arxiv.org/abs/1802.10592">https://arxiv.org/abs/1802.10592</a></p>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--max-steps</span></code> (int): The maximum steps for training. The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--episode-max-steps</span></code> (int): The maximum steps for an episode. The default is <code class="docutils literal notranslate"><span class="pre">int(1e3)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-experiments</span></code> (int): Number of experiments. The default is <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-progress</span></code>: Call <code class="docutils literal notranslate"><span class="pre">render</span></code> function during training</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-model-interval</span></code> (int): Interval to save model. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-summary-interval</span></code> (int): Interval to save summary. The default is <code class="docutils literal notranslate"><span class="pre">int(1e3)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--model-dir</span></code> (str): Directory to restore model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--dir-suffix</span></code> (str): Suffix for directory that stores results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--normalize-obs</span></code>: Whether normalize observation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--logdir</span></code> (str): Output directory name. The default is <code class="docutils literal notranslate"><span class="pre">&quot;results&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--evaluate</span></code>: Whether evaluate trained model</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-interval</span></code> (int): Interval to evaluate trained model. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-test-progress</span></code>: Call <code class="docutils literal notranslate"><span class="pre">render</span></code> function during evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-episodes</span></code> (int): Number of episodes at test. The default is <code class="docutils literal notranslate"><span class="pre">5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-test-path</span></code>: Save trajectories of evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-test-images</span></code>: Show input images to neural networks when an episode finishes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-test-movie</span></code>: Save rendering results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--use-prioritized-rb</span></code>: Use prioritized experience replay</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--use-nstep-rb</span></code>: Use Nstep experience replay</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-step</span></code> (int): Number of steps for nstep experience reward. The default is <code class="docutils literal notranslate"><span class="pre">4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--logging-level</span></code> (DEBUG, INFO, WARNING): Choose logging level. The default is <code class="docutils literal notranslate"><span class="pre">INFO</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--gpu</span></code> (int): The default is <code class="docutils literal notranslate"><span class="pre">0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--max-iter</span></code> (int): Maximum iteration. The default is <code class="docutils literal notranslate"><span class="pre">100</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--horizon</span></code> (int): Number of steps to online horizon</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-sample</span></code> (int): Number of samples. The default is <code class="docutils literal notranslate"><span class="pre">1000</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--batch-size</span></code> (int): Batch size. The default is <code class="docutils literal notranslate"><span class="pre">512</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-collect-steps</span></code> (int): Number of steps to collect. The default is <code class="docutils literal notranslate"><span class="pre">100</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--debug</span></code>: Enable debug</p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_eval_episodes_per_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize ME-TRPO</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>policy</strong> – Policy to be trained</p></li>
+<li><p><strong>env</strong> (<em>gym.Env</em>) – Environment for train</p></li>
+<li><p><strong>args</strong> (<em>Namespace</em><em> or </em><em>dict</em>) – config parameters specified with command line</p></li>
+<li><p><strong>test_env</strong> (<em>gym.Env</em>) – Environment for test.</p></li>
+<li><p><strong>reward_fn</strong> (<em>callable</em>) – Reward function</p></li>
+<li><p><strong>buffer_size</strong> (<em>int</em>) – The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code></p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for dynamics model. The default is <code class="docutils literal notranslate"><span class="pre">0.001</span></code>.</p></li>
+<li><p><strong>n_eval_episode_per_model</strong> (<em>int</em>) – Number of evalation episodes per a model. The default is <code class="docutils literal notranslate"><span class="pre">5</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.predict_next_state">
 <span class="sig-name descname"><span class="pre">predict_next_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.predict_next_state" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Predict Next State</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obses</strong> – </p></li>
+<li><p><strong>acts</strong> – </p></li>
+<li><p><strong>idx</strong> (<em>int</em>) – Index number of dynamics mode to use. If <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), choose randomly.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>next state</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.update_policy">
 <span class="sig-name descname"><span class="pre">update_policy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.update_policy" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Update Policy</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.collect_transitions_real_env">
 <span class="sig-name descname"><span class="pre">collect_transitions_real_env</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.collect_transitions_real_env" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Collect Trandisions from Real Environment</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.collect_transitions_sim_env">
@@ -159,8 +281,20 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.get_argument">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.get_argument" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.me_trpo_trainer.MeTrpoTrainer.get_argument" title="Permalink to this definition"></a></dt>
+<dd><p>Create or update argument parser for command line program</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> (<em>argparse.ArgParser</em><em>, </em><em>optional</em>) – argument parser</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>argument parser</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>argparse.ArgParser</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -169,17 +303,38 @@
 <span id="tf2rl-experiments-mpc-trainer-module"></span><h2>tf2rl.experiments.mpc_trainer module<a class="headerlink" href="#module-tf2rl.experiments.mpc_trainer" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.DynamicsModel">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.mpc_trainer.</span></span><span class="sig-name descname"><span class="pre">DynamicsModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.DynamicsModel" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.mpc_trainer.</span></span><span class="sig-name descname"><span class="pre">DynamicsModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.DynamicsModel" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tensorflow.python.keras.engine.training.Model</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.DynamicsModel.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[32,</span> <span class="pre">32]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DymamicsModel'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.DynamicsModel.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize DynamicsModel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_dim</strong> (<em>int</em>) – </p></li>
+<li><p><strong>output_dim</strong> (<em>int</em>) – </p></li>
+<li><p><strong>units</strong> (<em>iterable of int</em>) – The default is <code class="docutils literal notranslate"><span class="pre">[32,</span> <span class="pre">32]</span></code></p></li>
+<li><p><strong>name</strong> (<em>str</em>) – The default is <code class="docutils literal notranslate"><span class="pre">&quot;DynamicsModel&quot;</span></code></p></li>
+<li><p><strong>gpu</strong> (<em>int</em>) – The default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.DynamicsModel.call">
 <span class="sig-name descname"><span class="pre">call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.DynamicsModel.call" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Call Dynamics Model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inputs</strong> (<em>tf.Tensor</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tf.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.DynamicsModel.predict">
@@ -265,53 +420,172 @@ three methods.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.RandomPolicy">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.mpc_trainer.</span></span><span class="sig-name descname"><span class="pre">RandomPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_dim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.RandomPolicy" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.mpc_trainer.</span></span><span class="sig-name descname"><span class="pre">RandomPolicy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_dim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.RandomPolicy" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.RandomPolicy.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act_dim</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.RandomPolicy.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize RandomPolicy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_action</strong> (<em>float</em>) – </p></li>
+<li><p><strong>act_dim</strong> (<em>int</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.RandomPolicy.get_action">
 <span class="sig-name descname"><span class="pre">get_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.RandomPolicy.get_action" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get random action</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>obs</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>action</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.RandomPolicy.get_actions">
 <span class="sig-name descname"><span class="pre">get_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obses</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.RandomPolicy.get_actions" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Get batch actions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>obses</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>batch actions</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.dnarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.mpc_trainer.</span></span><span class="sig-name descname"><span class="pre">MPCTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_dynamics_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.mpc_trainer.</span></span><span class="sig-name descname"><span class="pre">MPCTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_dynamics_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.experiments.trainer.Trainer" title="tf2rl.experiments.trainer.Trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.experiments.trainer.Trainer</span></code></a></p>
+<p>Trainer class for Model Predictive Control (MPC): <a class="reference external" href="https://arxiv.org/abs/1708.02596">https://arxiv.org/abs/1708.02596</a></p>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--max-steps</span></code> (int): The maximum steps for training. The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--episode-max-steps</span></code> (int): The maximum steps for an episode. The default is <code class="docutils literal notranslate"><span class="pre">int(1e3)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-experiments</span></code> (int): Number of experiments. The default is <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-progress</span></code>: Call <code class="docutils literal notranslate"><span class="pre">render</span></code> function during training</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-model-interval</span></code> (int): Interval to save model. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-summary-interval</span></code> (int): Interval to save summary. The default is <code class="docutils literal notranslate"><span class="pre">int(1e3)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--model-dir</span></code> (str): Directory to restore model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--dir-suffix</span></code> (str): Suffix for directory that stores results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--normalize-obs</span></code>: Whether normalize observation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--logdir</span></code> (str): Output directory name. The default is <code class="docutils literal notranslate"><span class="pre">&quot;results&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--evaluate</span></code>: Whether evaluate trained model</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-interval</span></code> (int): Interval to evaluate trained model. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-test-progress</span></code>: Call <code class="docutils literal notranslate"><span class="pre">render</span></code> function during evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-episodes</span></code> (int): Number of episodes at test. The default is <code class="docutils literal notranslate"><span class="pre">5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-test-path</span></code>: Save trajectories of evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-test-images</span></code>: Show input images to neural networks when an episode finishes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-test-movie</span></code>: Save rendering results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--use-prioritized-rb</span></code>: Use prioritized experience replay</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--use-nstep-rb</span></code>: Use Nstep experience replay</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-step</span></code> (int): Number of steps for nstep experience reward. The default is <code class="docutils literal notranslate"><span class="pre">4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--logging-level</span></code> (DEBUG, INFO, WARNING): Choose logging level. The default is <code class="docutils literal notranslate"><span class="pre">INFO</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--gpu</span></code> (int): The default is <code class="docutils literal notranslate"><span class="pre">0</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--max-iter</span></code> (int): Maximum iteration. The default is <code class="docutils literal notranslate"><span class="pre">100</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--horizon</span></code> (int): Number of steps to online horizon</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-sample</span></code> (int): Number of samples. The default is <code class="docutils literal notranslate"><span class="pre">1000</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--batch-size</span></code> (int): Batch size. The default is <code class="docutils literal notranslate"><span class="pre">512</span></code>.</p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reward_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_dynamics_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize MPCTrainer class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>policy</strong> – Policy to be trained</p></li>
+<li><p><strong>env</strong> (<em>gym.Env</em>) – Environment for train</p></li>
+<li><p><strong>args</strong> (<em>Namespace</em><em> or </em><em>dict</em>) – config parameters specified with command line</p></li>
+<li><p><strong>test_env</strong> (<em>gym.Env</em>) – Environment for test.</p></li>
+<li><p><strong>reward_fn</strong> (<em>callable</em>) – Reward function</p></li>
+<li><p><strong>buffer_size</strong> (<em>int</em>) – The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code></p></li>
+<li><p><strong>n_dynamics_model</strong> (<em>int</em>) – Number of dynamics models. The default is <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for dynamics model. The default is <code class="docutils literal notranslate"><span class="pre">0.001</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer.predict_next_state">
 <span class="sig-name descname"><span class="pre">predict_next_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer.predict_next_state" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Predict Next State</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obses</strong> – </p></li>
+<li><p><strong>acts</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>next state</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer.collect_episodes">
 <span class="sig-name descname"><span class="pre">collect_episodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_rollout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer.collect_episodes" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Collect Episodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n_rollout</strong> (<em>int</em>) – Number of rollout. The default is <code class="docutils literal notranslate"><span class="pre">1</span></code></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer.fit_dynamics">
 <span class="sig-name descname"><span class="pre">fit_dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer.fit_dynamics" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Fit dynamics</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n_epocs</strong> (<em>int</em>) – Number of epocs to fit</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.mpc_trainer.MPCTrainer.get_argument">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer.get_argument" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.mpc_trainer.MPCTrainer.get_argument" title="Permalink to this definition"></a></dt>
+<dd><p>Create or update argument parser for command line program</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> (<em>argparse.ArgParser</em><em>, </em><em>optional</em>) – argument parser</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>argument parser</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>argparse.ArgParser</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -320,22 +594,67 @@ three methods.</p>
 <span id="tf2rl-experiments-on-policy-trainer-module"></span><h2>tf2rl.experiments.on_policy_trainer module<a class="headerlink" href="#module-tf2rl.experiments.on_policy_trainer" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="tf2rl.experiments.on_policy_trainer.OnPolicyTrainer">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.on_policy_trainer.</span></span><span class="sig-name descname"><span class="pre">OnPolicyTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.on_policy_trainer.</span></span><span class="sig-name descname"><span class="pre">OnPolicyTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tf2rl.experiments.trainer.Trainer" title="tf2rl.experiments.trainer.Trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">tf2rl.experiments.trainer.Trainer</span></code></a></p>
+<p>Trainer class for on-policy reinforcement learning</p>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--max-steps</span></code> (int): The maximum steps for training. The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--episode-max-steps</span></code> (int): The maximum steps for an episode. The default is <code class="docutils literal notranslate"><span class="pre">int(1e3)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-experiments</span></code> (int): Number of experiments. The default is <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-progress</span></code>: Call <code class="docutils literal notranslate"><span class="pre">render</span></code> function during training</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-model-interval</span></code> (int): Interval to save model. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-summary-interval</span></code> (int): Interval to save summary. The default is <code class="docutils literal notranslate"><span class="pre">int(1e3)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--model-dir</span></code> (str): Directory to restore model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--dir-suffix</span></code> (str): Suffix for directory that stores results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--normalize-obs</span></code>: Whether normalize observation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--logdir</span></code> (str): Output directory name. The default is <code class="docutils literal notranslate"><span class="pre">&quot;results&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--evaluate</span></code>: Whether evaluate trained model</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-interval</span></code> (int): Interval to evaluate trained model. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-test-progress</span></code>: Call <code class="docutils literal notranslate"><span class="pre">render</span></code> function during evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-episodes</span></code> (int): Number of episodes at test. The default is <code class="docutils literal notranslate"><span class="pre">5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-test-path</span></code>: Save trajectories of evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-test-images</span></code>: Show input images to neural networks when an episode finishes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-test-movie</span></code>: Save rendering results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--use-prioritized-rb</span></code>: Use prioritized experience replay</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--use-nstep-rb</span></code>: Use Nstep experience replay</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-step</span></code> (int): Number of steps for nstep experience reward. The default is <code class="docutils literal notranslate"><span class="pre">4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--logging-level</span></code> (DEBUG, INFO, WARNING): Choose logging level. The default is <code class="docutils literal notranslate"><span class="pre">INFO</span></code></p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize On-Policy Trainer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>policy</strong> – Policy to be trained</p></li>
+<li><p><strong>env</strong> (<em>gym.Env</em>) – Environment for train</p></li>
+<li><p><strong>args</strong> (<em>Namespace</em><em> or </em><em>dict</em>) – config parameters specified with command line</p></li>
+<li><p><strong>test_env</strong> (<em>gym.Env</em>) – Environment for test.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.finish_horizon">
 <span class="sig-name descname"><span class="pre">finish_horizon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">last_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.finish_horizon" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Finish horizon</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.evaluate_policy">
 <span class="sig-name descname"><span class="pre">evaluate_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.on_policy_trainer.OnPolicyTrainer.evaluate_policy" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Evaluate policy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>total_steps</strong> (<em>int</em>) – Current total steps of training</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -344,12 +663,50 @@ three methods.</p>
 <span id="tf2rl-experiments-trainer-module"></span><h2>tf2rl.experiments.trainer module<a class="headerlink" href="#module-tf2rl.experiments.trainer" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="tf2rl.experiments.trainer.Trainer">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.trainer.</span></span><span class="sig-name descname"><span class="pre">Trainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.trainer.Trainer" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">tf2rl.experiments.trainer.</span></span><span class="sig-name descname"><span class="pre">Trainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.trainer.Trainer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Trainer class for off-policy reinforce learning</p>
+<p>Command Line Args:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--max-steps</span></code> (int): The maximum steps for training. The default is <code class="docutils literal notranslate"><span class="pre">int(1e6)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--episode-max-steps</span></code> (int): The maximum steps for an episode. The default is <code class="docutils literal notranslate"><span class="pre">int(1e3)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-experiments</span></code> (int): Number of experiments. The default is <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-progress</span></code>: Call <code class="docutils literal notranslate"><span class="pre">render</span></code> function during training</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-model-interval</span></code> (int): Interval to save model. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-summary-interval</span></code> (int): Interval to save summary. The default is <code class="docutils literal notranslate"><span class="pre">int(1e3)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--model-dir</span></code> (str): Directory to restore model.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--dir-suffix</span></code> (str): Suffix for directory that stores results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--normalize-obs</span></code>: Whether normalize observation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--logdir</span></code> (str): Output directory name. The default is <code class="docutils literal notranslate"><span class="pre">&quot;results&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--evaluate</span></code>: Whether evaluate trained model</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-interval</span></code> (int): Interval to evaluate trained model. The default is <code class="docutils literal notranslate"><span class="pre">int(1e4)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-test-progress</span></code>: Call <code class="docutils literal notranslate"><span class="pre">render</span></code> function during evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--test-episodes</span></code> (int): Number of episodes at test. The default is <code class="docutils literal notranslate"><span class="pre">5</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-test-path</span></code>: Save trajectories of evaluation.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--show-test-images</span></code>: Show input images to neural networks when an episode finishes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--save-test-movie</span></code>: Save rendering results.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--use-prioritized-rb</span></code>: Use prioritized experience replay</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--use-nstep-rb</span></code>: Use Nstep experience replay</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--n-step</span></code> (int): Number of steps for nstep experience reward. The default is <code class="docutils literal notranslate"><span class="pre">4</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--logging-level</span></code> (DEBUG, INFO, WARNING): Choose logging level. The default is <code class="docutils literal notranslate"><span class="pre">INFO</span></code></p></li>
+</ul>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.trainer.Trainer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.trainer.Trainer.__init__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialize Trainer class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>policy</strong> – Policy to be trained</p></li>
+<li><p><strong>env</strong> (<em>gym.Env</em>) – Environment for train</p></li>
+<li><p><strong>args</strong> (<em>Namespace</em><em> or </em><em>dict</em>) – config parameters specified with command line</p></li>
+<li><p><strong>test_env</strong> (<em>gym.Env</em>) – Environment for test.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.trainer.Trainer.evaluate_policy_continuously">
@@ -364,8 +721,20 @@ three methods.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tf2rl.experiments.trainer.Trainer.get_argument">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.trainer.Trainer.get_argument" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tf2rl.experiments.trainer.Trainer.get_argument" title="Permalink to this definition"></a></dt>
+<dd><p>Create or update argument parser for command line program</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> (<em>argparse.ArgParser</em><em>, </em><em>optional</em>) – argument parser</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>argument parser</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>argparse.ArgParser</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
