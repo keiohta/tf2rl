@@ -11,7 +11,7 @@ except ImportError:
     from gym.envs.atari.atari_env import AtariEnv
 
 
-logger = getLogger(__file__)
+logger = getLogger(__name__)
 
 
 def is_discrete(space):
