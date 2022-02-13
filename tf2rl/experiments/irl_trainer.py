@@ -1,3 +1,4 @@
+import random
 import time
 
 import numpy as np
@@ -8,6 +9,34 @@ from tf2rl.experiments.trainer import Trainer
 
 
 class IRLTrainer(Trainer):
+    """
+    Trainer class for inverse reinforce learning
+
+    Command Line Args:
+
+        * ``--max-steps`` (int): The maximum steps for training. The default is ``int(1e6)``
+        * ``--episode-max-steps`` (int): The maximum steps for an episode. The default is ``int(1e3)``
+        * ``--n-experiments`` (int): Number of experiments. The default is ``1``
+        * ``--show-progress``: Call ``render`` function during training
+        * ``--save-model-interval`` (int): Interval to save model. The default is ``int(1e4)``
+        * ``--save-summary-interval`` (int): Interval to save summary. The default is ``int(1e3)``
+        * ``--model-dir`` (str): Directory to restore model.
+        * ``--dir-suffix`` (str): Suffix for directory that stores results.
+        * ``--normalize-obs``: Whether normalize observation
+        * ``--logdir`` (str): Output directory name. The default is ``"results"``
+        * ``--evaluate``: Whether evaluate trained model
+        * ``--test-interval`` (int): Interval to evaluate trained model. The default is ``int(1e4)``
+        * ``--show-test-progress``: Call ``render`` function during evaluation.
+        * ``--test-episodes`` (int): Number of episodes at test. The default is ``5``
+        * ``--save-test-path``: Save trajectories of evaluation.
+        * ``--show-test-images``: Show input images to neural networks when an episode finishes
+        * ``--save-test-movie``: Save rendering results.
+        * ``--use-prioritized-rb``: Use prioritized experience replay
+        * ``--use-nstep-rb``: Use Nstep experience replay
+        * ``--n-step`` (int): Number of steps for nstep experience reward. The default is ``4``
+        * ``--logging-level`` (DEBUG, INFO, WARNING): Choose logging level. The default is ``INFO``
+        * ``--expert-path-dir`` (str): Path to directory that contains expert trajectories
+    """
     def __init__(
             self,
             policy,
@@ -18,6 +47,19 @@ class IRLTrainer(Trainer):
             expert_next_obs,
             expert_act,
             test_env=None):
+        """
+        Initialize Trainer class
+
+        Args:
+            policy: Policy to be trained
+            env (gym.Env): Environment for train
+            args (Namespace or dict): config parameters specified with command line
+            irl
+            expert_obs
+            expert_next_obs
+            expert_act
+            test_env (gym.Env): Environment for test.
+        """
         self._irl = irl
         args.dir_suffix = self._irl.policy_name + args.dir_suffix
         super().__init__(policy, env, args, test_env)
@@ -29,6 +71,9 @@ class IRLTrainer(Trainer):
         self._random_range = range(expert_obs.shape[0])
 
     def __call__(self):
+        """
+        Execute training
+        """
         total_steps = 0
         tf.summary.experimental.set_step(total_steps)
         episode_steps = 0
@@ -102,8 +147,8 @@ class IRLTrainer(Trainer):
                     for _ in range(self._irl.n_training):
                         samples = replay_buffer.sample(self._irl.batch_size)
                         # Do not allow duplication!!!
-                        indices = np.random.choice(
-                            self._random_range, self._irl.batch_size, replace=False)
+                        indices = random.sample(
+                            range(self._random_range), self._irl.batch_size)
                         self._irl.train(
                             agent_states=samples["obs"],
                             agent_acts=samples["act"],
@@ -113,14 +158,15 @@ class IRLTrainer(Trainer):
                             expert_next_states=self._expert_next_obs[indices])
 
             if total_steps % self._test_interval == 0:
-                avg_test_return = self.evaluate_policy(total_steps)
+                avg_test_return, avg_test_steps = self.evaluate_policy(total_steps)
                 self.logger.info("Evaluation Total Steps: {0: 7} Average Reward {1: 5.4f} over {2: 2} episodes".format(
                     total_steps, avg_test_return, self._test_episodes))
                 tf.summary.scalar(
                     name="Common/average_test_return", data=avg_test_return)
                 tf.summary.scalar(
+                    name="Common/average_test_episode_length", data=avg_test_steps)
+                tf.summary.scalar(
                     name="Common/fps", data=fps)
-                self.writer.flush()
 
             if total_steps % self._save_model_interval == 0:
                 self.checkpoint_manager.save()
@@ -129,6 +175,15 @@ class IRLTrainer(Trainer):
 
     @staticmethod
     def get_argument(parser=None):
+        """
+        Create or update argument parser for command line program
+
+        Args:
+            parser (argparse.ArgParser, optional): argument parser
+
+        Returns:
+            argparse.ArgParser: argument parser
+        """
         parser = Trainer.get_argument(parser)
         parser.add_argument('--expert-path-dir', default=None,
                             help='Path to directory that contains expert trajectories')

@@ -67,19 +67,10 @@ class SACDiscrete(SAC):
         self.qf2 = self.critic_fn(state_shape, action_dim, critic_units, name="qf2")
         self.qf1_target = self.critic_fn(state_shape, action_dim, critic_units, name="qf1_target")
         self.qf2_target = self.critic_fn(state_shape, action_dim, critic_units, name="qf2_target")
-        update_target_variables(self.qf1_target.weights,
-                                self.qf1.weights, tau=1.)
-        update_target_variables(self.qf2_target.weights,
-                                self.qf2.weights, tau=1.)
+        update_target_variables(self.qf1_target.weights, self.qf1.weights, tau=1.)
+        update_target_variables(self.qf2_target.weights, self.qf2.weights, tau=1.)
         self.qf1_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
         self.qf2_optimizer = tf.keras.optimizers.Adam(learning_rate=lr)
-
-    def _setup_critic_v(self, *args, **kwargs):
-        """
-        Do not need state-value function because it can be directly computed from Q-function.
-        See Eq.(10) in the paper.
-        """
-        pass
 
     def train(self, states, actions, next_states, rewards, dones, weights=None):
         if weights is None:
@@ -94,7 +85,7 @@ class SACDiscrete(SAC):
         tf.summary.scalar(name=self.policy_name + "/logp_meab", data=logp_mean)
         if self.auto_alpha:
             tf.summary.scalar(name=self.policy_name + "/log_ent", data=self.log_alpha)
-            tf.summary.scalar(name=self.policy_name+"/logp_mean+target", data=logp_mean+self.target_alpha)
+            tf.summary.scalar(name=self.policy_name + "/logp_mean+target", data=logp_mean + self.target_alpha)
         tf.summary.scalar(name=self.policy_name + "/ent", data=self.alpha)
 
     @tf.function
@@ -174,7 +165,6 @@ class SACDiscrete(SAC):
                 alpha_grad = tape.gradient(alpha_loss, [self.log_alpha])
                 self.alpha_optimizer.apply_gradients(
                     zip(alpha_grad, [self.log_alpha]))
-                self.alpha.assign(tf.exp(self.log_alpha))
 
         return ((td_loss1 + td_loss2) / 2.,
                 policy_loss, mean_ent,

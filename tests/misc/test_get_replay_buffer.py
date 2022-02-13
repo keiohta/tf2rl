@@ -1,12 +1,11 @@
 import unittest
 
-import gym
-
 from cpprb import ReplayBuffer
 from cpprb import PrioritizedReplayBuffer
 
 from tf2rl.misc.get_replay_buffer import get_replay_buffer
 from tf2rl.algos.policy_base import OnPolicyAgent, OffPolicyAgent
+from tf2rl.envs.utils import make
 
 
 class TestGetReplayBuffer(unittest.TestCase):
@@ -20,8 +19,8 @@ class TestGetReplayBuffer(unittest.TestCase):
         cls.off_policy_agent = OffPolicyAgent(
             name="OffPolicyAgent",
             memory_capacity=cls.memory_capacity)
-        cls.discrete_env = gym.make("CartPole-v0")
-        cls.continuous_env = gym.make("Pendulum-v0")
+        cls.discrete_env = make("CartPole-v0")
+        cls.continuous_env = make("Pendulum-v0")
 
     def test_get_replay_buffer(self):
         # Replay Buffer

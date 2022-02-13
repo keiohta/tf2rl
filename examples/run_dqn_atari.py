@@ -1,10 +1,8 @@
-import gym
-
 from tf2rl.algos.dqn import DQN
 from tf2rl.envs.atari_wrapper import wrap_dqn
 from tf2rl.experiments.trainer import Trainer
 from tf2rl.networks.atari_model import AtariQFunc as QFunc
-
+from tf2rl.envs.utils import make
 
 if __name__ == '__main__':
     parser = Trainer.get_argument()
@@ -20,8 +18,8 @@ if __name__ == '__main__':
     parser.set_defaults(memory_capacity=int(1e6))
     args = parser.parse_args()
 
-    env = wrap_dqn(gym.make(args.env_name))
-    test_env = wrap_dqn(gym.make(args.env_name), reward_clipping=False)
+    env = wrap_dqn(make(args.env_name))
+    test_env = wrap_dqn(make(args.env_name), reward_clipping=False)
     # Following parameters are equivalent to DeepMind DQN paper
     # https://www.nature.com/articles/nature14236
     policy = DQN(
@@ -44,4 +42,7 @@ if __name__ == '__main__':
         q_func=QFunc,
         gpu=args.gpu)
     trainer = Trainer(policy, env, args, test_env=test_env)
-    trainer()
+    if args.evaluate:
+        trainer.evaluate_policy_continuously()
+    else:
+        trainer()

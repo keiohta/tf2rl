@@ -1,7 +1,5 @@
-import gym
-
 from tf2rl.algos.ppo import PPO
-from tf2rl.envs.utils import is_discrete, get_act_dim
+from tf2rl.envs.utils import is_discrete, get_act_dim, make
 from tf2rl.experiments.me_trpo_trainer import MeTrpoTrainer
 from examples.run_mpc import reward_fn_pendulum
 
@@ -16,8 +14,8 @@ if __name__ == "__main__":
 
     args.n_generate_steps = args.horizon
 
-    env = gym.make("Pendulum-v0")
-    test_env = gym.make("Pendulum-v0")
+    env = make("Pendulum-v0")
+    test_env = make("Pendulum-v0")
 
     policy = PPO(
         state_shape=env.observation_space.shape,

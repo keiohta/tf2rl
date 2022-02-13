@@ -14,10 +14,49 @@ from tf2rl.envs.utils import is_discrete
 
 
 class OnPolicyTrainer(Trainer):
+    """
+    Trainer class for on-policy reinforcement learning
+
+    Command Line Args:
+
+        * ``--max-steps`` (int): The maximum steps for training. The default is ``int(1e6)``
+        * ``--episode-max-steps`` (int): The maximum steps for an episode. The default is ``int(1e3)``
+        * ``--n-experiments`` (int): Number of experiments. The default is ``1``
+        * ``--show-progress``: Call ``render`` function during training
+        * ``--save-model-interval`` (int): Interval to save model. The default is ``int(1e4)``
+        * ``--save-summary-interval`` (int): Interval to save summary. The default is ``int(1e3)``
+        * ``--model-dir`` (str): Directory to restore model.
+        * ``--dir-suffix`` (str): Suffix for directory that stores results.
+        * ``--normalize-obs``: Whether normalize observation
+        * ``--logdir`` (str): Output directory name. The default is ``"results"``
+        * ``--evaluate``: Whether evaluate trained model
+        * ``--test-interval`` (int): Interval to evaluate trained model. The default is ``int(1e4)``
+        * ``--show-test-progress``: Call ``render`` function during evaluation.
+        * ``--test-episodes`` (int): Number of episodes at test. The default is ``5``
+        * ``--save-test-path``: Save trajectories of evaluation.
+        * ``--show-test-images``: Show input images to neural networks when an episode finishes
+        * ``--save-test-movie``: Save rendering results.
+        * ``--use-prioritized-rb``: Use prioritized experience replay
+        * ``--use-nstep-rb``: Use Nstep experience replay
+        * ``--n-step`` (int): Number of steps for nstep experience reward. The default is ``4``
+        * ``--logging-level`` (DEBUG, INFO, WARNING): Choose logging level. The default is ``INFO``
+    """
     def __init__(self, *args, **kwargs):
+        """
+        Initialize On-Policy Trainer
+
+        Args:
+            policy: Policy to be trained
+            env (gym.Env): Environment for train
+            args (Namespace or dict): config parameters specified with command line
+            test_env (gym.Env): Environment for test.
+        """
         super().__init__(*args, **kwargs)
 
     def __call__(self):
+        """
+        Execute training
+        """
         # Prepare buffer
         self.replay_buffer = get_replay_buffer(
             self._policy, self._env)
@@ -128,6 +167,9 @@ class OnPolicyTrainer(Trainer):
         tf.summary.flush()
 
     def finish_horizon(self, last_val=0):
+        """
+        Finish horizon
+        """
         self.local_buffer.on_episode_end()
         samples = self.local_buffer._encode_sample(
             np.arange(self.local_buffer.get_stored_size()))
@@ -149,6 +191,12 @@ class OnPolicyTrainer(Trainer):
         self.local_buffer.clear()
 
     def evaluate_policy(self, total_steps):
+        """
+        Evaluate policy
+
+        Args:
+            total_steps (int): Current total steps of training
+        """
         avg_test_return = 0.
         avg_test_steps = 0
         if self._save_test_path:

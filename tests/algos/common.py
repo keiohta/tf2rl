@@ -2,13 +2,27 @@ import unittest
 import numpy as np
 import gym
 
+from tf2rl.envs.utils import make
+
+
+class DummyImgEnv(gym.Env):
+    def __init__(self, img_dim=84):
+        self.img_dim = img_dim
+        self.observation_space = gym.spaces.Box(
+            low=0, high=255, shape=(img_dim, img_dim, 9), dtype=np.uint8)
+        self.action_space = gym.spaces.Box(
+            low=-1, high=1, shape=(1,), dtype=np.float32)
+
+    def reset(self):
+        return np.zeros(shape=self.observation_space.shape, dtype=np.uint8)
+
 
 class CommonAlgos(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # TODO: Remove dependencies to gym
-        cls.discrete_env = gym.make("CartPole-v0")
-        cls.continuous_env = gym.make("Pendulum-v0")
+        cls.discrete_env = make("CartPole-v0")
+        cls.continuous_env = make("Pendulum-v0")
         cls.batch_size = 32
         cls.agent = None
 
@@ -25,7 +39,7 @@ class CommonOffPolAlgos(CommonAlgos):
         if self.agent is None:
             return
         # Single input
-        state = self.env.reset().astype(np.float32)
+        state = self.env.reset()
         action_train = self.agent.get_action(state, test=False)
         action_test = self.agent.get_action(state, test=True)
         if self.is_discrete:
@@ -37,7 +51,7 @@ class CommonOffPolAlgos(CommonAlgos):
 
         # Multiple inputs
         states = np.zeros(
-            shape=(self.batch_size, state.shape[0]), dtype=np.float32)
+            shape=(self.batch_size,) + state.shape, dtype=np.float32)
         actions_train = self.agent.get_action(states, test=False)
         actions_test = self.agent.get_action(states, test=True)
 
@@ -56,8 +70,9 @@ class CommonOffPolAlgos(CommonAlgos):
         if self.agent is None:
             return
         # Multiple inputs
+        state = self.env.reset()
         states = np.zeros(
-            shape=(self.batch_size, self.env.reset().astype(np.float32).shape[0]), dtype=np.float32)
+            shape=(self.batch_size,) + state.shape, dtype=state.dtype)
         actions_train = self.agent.get_action(states, test=False)
         actions_test = self.agent.get_action(states, test=True)
 
@@ -104,6 +119,15 @@ class CommonOffPolContinuousAlgos(CommonOffPolAlgos):
     def setUpClass(cls):
         super().setUpClass()
         cls.env = cls.continuous_env
+        cls.action_dim = cls.continuous_env.action_space.low.size
+        cls.is_discrete = False
+
+
+class CommonOffPolImgContinuousAlgos(CommonOffPolAlgos):
+    @classmethod
+    def setUpClass(cls, img_dim=84):
+        super().setUpClass()
+        cls.env = DummyImgEnv(img_dim=img_dim)
         cls.action_dim = cls.continuous_env.action_space.low.size
         cls.is_discrete = False
 

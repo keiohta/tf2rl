@@ -1,8 +1,6 @@
-import gym
-
 from tf2rl.algos.ppo import PPO
 from tf2rl.experiments.on_policy_trainer import OnPolicyTrainer
-from tf2rl.envs.utils import is_discrete, get_act_dim
+from tf2rl.envs.utils import is_discrete, get_act_dim, make
 
 
 if __name__ == '__main__':
@@ -18,8 +16,8 @@ if __name__ == '__main__':
     parser.set_defaults(gpu=-1)
     args = parser.parse_args()
 
-    env = gym.make(args.env_name)
-    test_env = gym.make(args.env_name)
+    env = make(args.env_name)
+    test_env = make(args.env_name)
 
     policy = PPO(
         state_shape=env.observation_space.shape,
@@ -43,4 +41,7 @@ if __name__ == '__main__':
         enable_gae=args.enable_gae,
         gpu=args.gpu)
     trainer = OnPolicyTrainer(policy, env, args, test_env=test_env)
-    trainer()
+    if args.evaluate:
+        trainer.evaluate_policy_continuously()
+    else:
+        trainer()

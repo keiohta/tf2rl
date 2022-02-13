@@ -1,6 +1,6 @@
-import gym
 import numpy as np
 from tf2rl.experiments.mpc_trainer import MPCTrainer, RandomPolicy
+from tf2rl.envs.utils import make
 
 
 def angle_normalize(x):
@@ -31,8 +31,8 @@ if __name__ == "__main__":
     parser.set_defaults(episode_max_steps=200)
     args = parser.parse_args()
 
-    env = gym.make("Pendulum-v0")
-    test_env = gym.make("Pendulum-v0")
+    env = make("Pendulum-v0")
+    test_env = make("Pendulum-v0")
 
     policy = RandomPolicy(
         max_action=env.action_space.high[0],

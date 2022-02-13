@@ -12,7 +12,54 @@ from tf2rl.misc.get_replay_buffer import get_replay_buffer
 
 
 class MeTrpoTrainer(MPCTrainer):
+    """
+    Trainer class for Model-Ensemble Trust-Region Policy Optimization (ME-TRPO):https://arxiv.org/abs/1802.10592
+
+    Command Line Args:
+
+        * ``--max-steps`` (int): The maximum steps for training. The default is ``int(1e6)``
+        * ``--episode-max-steps`` (int): The maximum steps for an episode. The default is ``int(1e3)``
+        * ``--n-experiments`` (int): Number of experiments. The default is ``1``
+        * ``--show-progress``: Call ``render`` function during training
+        * ``--save-model-interval`` (int): Interval to save model. The default is ``int(1e4)``
+        * ``--save-summary-interval`` (int): Interval to save summary. The default is ``int(1e3)``
+        * ``--model-dir`` (str): Directory to restore model.
+        * ``--dir-suffix`` (str): Suffix for directory that stores results.
+        * ``--normalize-obs``: Whether normalize observation
+        * ``--logdir`` (str): Output directory name. The default is ``"results"``
+        * ``--evaluate``: Whether evaluate trained model
+        * ``--test-interval`` (int): Interval to evaluate trained model. The default is ``int(1e4)``
+        * ``--show-test-progress``: Call ``render`` function during evaluation.
+        * ``--test-episodes`` (int): Number of episodes at test. The default is ``5``
+        * ``--save-test-path``: Save trajectories of evaluation.
+        * ``--show-test-images``: Show input images to neural networks when an episode finishes
+        * ``--save-test-movie``: Save rendering results.
+        * ``--use-prioritized-rb``: Use prioritized experience replay
+        * ``--use-nstep-rb``: Use Nstep experience replay
+        * ``--n-step`` (int): Number of steps for nstep experience reward. The default is ``4``
+        * ``--logging-level`` (DEBUG, INFO, WARNING): Choose logging level. The default is ``INFO``
+        * ``--gpu`` (int): The default is ``0``
+        * ``--max-iter`` (int): Maximum iteration. The default is ``100``
+        * ``--horizon`` (int): Number of steps to online horizon
+        * ``--n-sample`` (int): Number of samples. The default is ``1000``
+        * ``--batch-size`` (int): Batch size. The default is ``512``.
+        * ``--n-collect-steps`` (int): Number of steps to collect. The default is ``100``
+        * ``--debug``: Enable debug
+    """
     def __init__(self, *args, n_eval_episodes_per_model=5, **kwargs):
+        """
+        Initialize ME-TRPO
+
+        Args:
+            policy: Policy to be trained
+            env (gym.Env): Environment for train
+            args (Namespace or dict): config parameters specified with command line
+            test_env (gym.Env): Environment for test.
+            reward_fn (callable): Reward function
+            buffer_size (int): The default is ``int(1e6)``
+            lr (float): Learning rate for dynamics model. The default is ``0.001``.
+            n_eval_episode_per_model (int): Number of evalation episodes per a model. The default is ``5``
+        """
         kwargs["n_dynamics_model"] = 5
         super().__init__(*args, **kwargs)
         self._n_eval_episodes_per_model = n_eval_episodes_per_model
@@ -35,6 +82,17 @@ class MeTrpoTrainer(MPCTrainer):
         self.local_buffer = ReplayBuffer(**rb_dict)
 
     def predict_next_state(self, obses, acts, idx=None):
+        """
+        Predict Next State
+
+        Args:
+            obses
+            acts
+            idx (int): Index number of dynamics mode to use. If ``None`` (default), choose randomly.
+
+        Returns:
+            np.ndarray: next state
+        """
         is_single_input = obses.ndim == acts.ndim and acts.ndim == 1
         if is_single_input:
             obses = np.expand_dims(obses, axis=0)
@@ -57,6 +115,9 @@ class MeTrpoTrainer(MPCTrainer):
         return inputs, labels
 
     def __call__(self):
+        """
+        Execute Training
+        """
         total_steps = 0
         tf.summary.experimental.set_step(total_steps)
 
@@ -138,6 +199,9 @@ class MeTrpoTrainer(MPCTrainer):
         return ret_real_env, ret_sim_env
 
     def update_policy(self):
+        """
+        Update Policy
+        """
         # Compute mean and std for normalizing advantage
         if self._policy.normalize_adv:
             samples = self.replay_buffer.get_all_transitions()
@@ -195,6 +259,9 @@ class MeTrpoTrainer(MPCTrainer):
             obs = next_obs
 
     def collect_transitions_real_env(self):
+        """
+        Collect Trandisions from Real Environment
+        """
         total_steps = 0
         episode_steps = 0
         obs = self._env.reset()

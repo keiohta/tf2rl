@@ -1,11 +1,9 @@
-import gym
-
 from tf2rl.algos.sac_discrete import SACDiscrete
 from tf2rl.experiments.trainer import Trainer
 from tf2rl.envs.utils import is_atari_env
 from tf2rl.envs.atari_wrapper import wrap_dqn
 from tf2rl.networks.atari_model import AtariQFunc, AtariCategoricalActor
-
+from tf2rl.envs.utils import make
 
 if __name__ == '__main__':
     parser = Trainer.get_argument()
@@ -20,8 +18,8 @@ if __name__ == '__main__':
                         default="SpaceInvadersNoFrameskip-v4")
     args = parser.parse_args()
 
-    env = gym.make(args.env_name)
-    test_env = gym.make(args.env_name)
+    env = make(args.env_name)
+    test_env = make(args.env_name)
 
     if is_atari_env(env):
         # Parameters come from Appendix.B in original paper.
@@ -64,4 +62,7 @@ if __name__ == '__main__':
             auto_alpha=args.auto_alpha,
             gpu=args.gpu)
     trainer = Trainer(policy, env, args, test_env=test_env)
-    trainer()
+    if args.evaluate:
+        trainer.evaluate_policy_continuously()
+    else:
+        trainer()

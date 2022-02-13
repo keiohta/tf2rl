@@ -1,13 +1,13 @@
-[![Build Status](https://travis-ci.org/keiohta/tf2rl.svg?branch=master)](https://travis-ci.org/keiohta/tf2rl)
+[![Test](https://github.com/keiohta/tf2rl/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/keiohta/tf2rl/actions/workflows/test.yml)
 [![Coverage Status](https://coveralls.io/repos/github/keiohta/tf2rl/badge.svg?branch=master)](https://coveralls.io/github/keiohta/tf2rl?branch=master)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 [![GitHub issues open](https://img.shields.io/github/issues/keiohta/tf2rl.svg)]()
 [![PyPI version](https://badge.fury.io/py/tf2rl.svg)](https://badge.fury.io/py/tf2rl)
 
 # TF2RL
-TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using TensorFlow 2.x.
+TF2RL is a deep reinforcement learning library that implements various deep reinforcement learning algorithms using [TensorFlow 2.x](https://www.tensorflow.org/).
 
-## Algorithms
+## 1. Algorithms
 Following algorithms are supported:
 
 |                          Algorithm                           | Dicrete action | Continuous action |                  Support                   | Category                 |
@@ -16,7 +16,7 @@ Following algorithms are supported:
 | [DQN](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf) (including [DDQN](https://arxiv.org/abs/1509.06461), [Prior. DQN](https://arxiv.org/abs/1511.05952), [Duel. DQN](https://arxiv.org/abs/1511.06581), [Distrib. DQN](<https://arxiv.org/abs/1707.06887>), [Noisy DQN](<https://arxiv.org/abs/1706.10295>)) |       ✓        |         -         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
 | [DDPG](https://arxiv.org/abs/1509.02971) (including [TD3](<https://arxiv.org/abs/1802.09477>), [BiResDDPG](<https://arxiv.org/abs/1905.01072>)) |       -        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
 |          [SAC](<https://arxiv.org/abs/1801.01290>)           |       ✓        |         ✓         | [ApeX](<https://arxiv.org/abs/1803.00933>) | Model-free Off-policy RL |
-|           [CURL](https://arxiv.org/abs/2004.04136)           |       -        |         ✓         |                     -                      | Model-free Off-policy RL |
+| [CURL](https://arxiv.org/abs/2004.04136), [SAC-AE](https://arxiv.org/abs/1910.01741) |       -        |         ✓         |                     -                      | Model-free Off-policy RL |
 | [MPC](https://arxiv.org/abs/1708.02596), [ME-TRPO](https://arxiv.org/abs/1802.10592) |       ✓        |         ✓         |                     -                      | Model-base RL            |
 | [GAIL](<https://arxiv.org/abs/1606.03476>), [GAIfO](<https://arxiv.org/abs/1807.06158>), [VAIL](<https://arxiv.org/abs/1810.00821>) (including [Spectral Normalization](<https://arxiv.org/abs/1802.05957>)) |       ✓        |         ✓         |                     -                      | Imitation Learning       |
 
@@ -40,6 +40,7 @@ Following papers have been implemented in tf2rl:
   - [Addressing Function Approximation Error in Actor-Critic Methods](<https://arxiv.org/abs/1802.09477>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/td3.py>)
   - [Deep Residual Reinforcement Learning](<https://arxiv.org/abs/1905.01072>), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/bi_res_ddpg.py>)
   - [Soft Actor-Critic for Discrete Action Settings](https://arxiv.org/abs/1910.07207v1), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac_discrete.py>)
+  - [Improving Sample Efficiency in Model-Free Reinforcement Learning from Images](https://arxiv.org/abs/1910.01741), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/sac_ae.py)
   - [CURL: Contrastive Unsupervised Representations for Reinforcement Learning](https://arxiv.org/abs/2004.04136), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/curl_sac.py>)
 - Model-base RL
   - [Neural Network Dynamics for Model-Based Deep Reinforcement Learning with Model-Free Fine-Tuning](https://arxiv.org/abs/1708.02596), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/experiments/mpc_trainer.py)
@@ -55,15 +56,24 @@ Also, some useful techniques are implemented:
 - [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114), [code](https://github.com/keiohta/tf2rl/blob/master/tf2rl/tools/vae.py)
 - [D2RL](https://arxiv.org/abs/2010.09163), [code](<https://github.com/keiohta/tf2rl/blob/master/tf2rl/algos/d2rl_sac.py>)
 
-## Installation
+## 2. Installation
 
-You can install `tf2rl` from PyPI:
+There are several ways to install tf2rl.
+The recommended way is "2.1 Install from PyPI".
+
+If TensorFlow is already installed, we try to identify the best
+version of [TensorFlow Probability](https://www.tensorflow.org/probability).
+
+### 2.1 Install from PyPI
+
+You can install `tf2rl` from [PyPI](https://pypi.org/project/tf2rl/):
 
 ```bash
 $ pip install tf2rl
 ```
 
-or, you can also install from source:
+### 2.2 Install from Source Code
+You can also install from source:
 
 ```bash
 $ git clone https://github.com/keiohta/tf2rl.git tf2rl
@@ -71,7 +81,7 @@ $ cd tf2rl
 $ pip install .
 ```
 
-### Preinstalled Docker Container
+### 2.3 Preinstalled Docker Container
 Instead of installing tf2rl on your (virtual) system, you can use
 preinstalled Docker containers.
 
@@ -81,23 +91,22 @@ At the following commands, you need to replace `<version>` with the
 version tag which you want to use.
 
 
-#### CPU Only
+#### 2.3.1 CPU Only
 
 The following simple command starts preinstalled container.
 
 ```bash
-docker run -it ghcr.io/keiohta/tf2rl/cpu:<version> bash
+$ docker run -it ghcr.io/keiohta/tf2rl/cpu:<version> bash
 ```
-
 
 If you also want to mount your local directory `/local/dir/path` at
 container `/mount/point`
 
 ```bash
-docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
+$ docker run -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/cpu:<version> bash
 ```
 
-#### GPU Support (Linux Only, Experimental)
+#### 2.3.2 GPU Support (Linux Only, Experimental)
 
 WARNING: We encountered unsolved errors when running ApeX multiprocess learning.
 
@@ -111,7 +120,7 @@ Requirements
 The following simple command starts preinstalled container.
 
 ```bash
-docker run --gpus all -it ghcr.io/keiohta/tf2rl/nvidia:<version> bash
+$ docker run --gpus all -it ghcr.io/keiohta/tf2rl/nvidia:<version> bash
 ```
 
 If you also want to mount your local directory `/local/dir/path` at
@@ -119,7 +128,7 @@ container `/mount/point`
 
 
 ```bash
-docker run --gpus all -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/nvidia:<version> bash
+$ docker run --gpus all -it -v /local/dir/path:/mount/point ghcr.io/keiohta/tf2rl/nvidia:<version> bash
 ```
 
 
@@ -127,11 +136,11 @@ If your container can see GPU correctly, you can check inside
 container by the following comand;
 
 ```bash
-nvidia-smi
+$ nvidia-smi
 ```
 
 
-## Getting started
+## 3. Getting started
 Here is a quick example of how to train DDPG agent on a Pendulum environment:
 
 ```python
@@ -144,8 +153,8 @@ parser = Trainer.get_argument()
 parser = DDPG.get_argument(parser)
 args = parser.parse_args()
 
-env = gym.make("Pendulum-v0")
-test_env = gym.make("Pendulum-v0")
+env = gym.make("Pendulum-v1")
+test_env = gym.make("Pendulum-v1")
 policy = DDPG(
     state_shape=env.observation_space.shape,
     action_dim=env.action_space.high.size,
@@ -175,7 +184,68 @@ You can see the training progress/results from TensorBoard as follows:
 $ tensorboard --logdir results
 ```
 
-## Citation
+## 4. Usage
+In basic usage, what you need is initializing one of the policy
+classes and `Trainer` class.
+
+As a option, tf2rl supports command line program style, so that you
+can also pass configuration parameters from command line arguments.
+
+
+### 4.1 Command Line Program Style
+
+`Trainer` class and policy classes have class method `get_argument`,
+which creates or updates
+[ArgParser](https://docs.python.org/3/library/argparse.html) object.
+
+You can parse the command line arguments with the
+`ArgParser.parse_args` method, which returns `Namespace` object.
+
+Policy's constructor option can be extracted from the `Namespace`
+object explicitly. `Trainer` constructor accepts the `Namespace`
+object.
+
+```python
+from tf2rl.algos.dqn import DQN
+from tf2rl.experiments.trainer import Trainer
+
+env = ... # Create gym.env like environment.
+
+parser = DQN.get_argument(Trainer.get_argument())
+args = parser.parse_args()
+
+policy = DQN(enable_double_dqn = args.enable_double_dqn,
+             enable_dueling_dqn = args.enable_dueling_dqn,
+			 enable_noisy_dqn = args.enable_noisy_dqn)
+trainer = Trainer(policy, env, args)
+trainer()
+```
+
+
+### 4.2 Non Command Line Program Style (e.g. on Jupyter Notebook)
+
+`ArgParser` doesn't fit the usage on Jupyter Notebook like
+envrionment. `Trainer` constructor can accept `dict` as `args`
+argument instead of `Namespace` object.
+
+```python
+from tf2rl.algos.dqn import DQN
+from tf2rl.experiments.trainer import Trainer
+
+env = ... # Create gym.env like environment.
+
+policy = DQN( ... )
+trainer = Trainer(policy, env, {"max_steps": int(1e+6), ... })
+trainer()
+```
+
+### 4.3 Results
+The `Trainer` class saves logs and models under
+`<logdir>/%Y%m%dT%H%M%S.%f`. The default `logdir` is `"results"`, and
+it can be changed by `--logdir` command argument or `"logdir"` key in
+constructor `args`.
+
+## 5. Citation
 ```
 @misc{ota2020tf2rl,
   author = {Kei Ota},

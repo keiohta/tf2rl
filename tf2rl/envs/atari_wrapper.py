@@ -30,6 +30,8 @@ import cv2
 from gym import spaces
 import gym
 
+from tf2rl.envs.utils import make
+
 os.environ.setdefault('PATH', '')
 cv2.ocl.setUseOpenCL(False)
 
@@ -343,7 +345,7 @@ class NdarrayFrames(gym.Wrapper):
 
 
 def make_atari(env_id, max_episode_steps=None):
-    env = gym.make(env_id)
+    env = make(env_id)
     assert 'NoFrameskip' in env.spec.id
     env = NoopResetEnv(env, noop_max=30)
     env = MaxAndSkipEnv(env, skip=4)

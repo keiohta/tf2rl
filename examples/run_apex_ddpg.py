@@ -1,8 +1,7 @@
-import gym
-
 from tf2rl.algos.apex import apex_argument, run
 from tf2rl.algos.ddpg import DDPG
 from tf2rl.misc.target_update_ops import update_target_variables
+from tf2rl.envs.utils import make
 
 
 # Prepare env and policy function
@@ -11,7 +10,7 @@ class env_fn:
         self.env_name = env_name
 
     def __call__(self):
-        return gym.make(self.env_name)
+        return make(self.env_name)
 
 
 def policy_fn(env, name, memory_capacity=int(1e6),

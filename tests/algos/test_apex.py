@@ -1,10 +1,10 @@
 # Hard to test each function, so just execute shortly
 
 import unittest
-import gym
 
 from tf2rl.algos.apex import apex_argument, run
 from tf2rl.misc.target_update_ops import update_target_variables
+from tf2rl.envs.utils import make
 
 
 class TestApeX(unittest.TestCase):
@@ -38,7 +38,7 @@ class TestApeX(unittest.TestCase):
 
 
 def env_fn_discrete():
-    return gym.make("CartPole-v0")
+    return make("CartPole-v0")
 
 
 def policy_fn_discrete(env, name, memory_capacity=int(1e6), gpu=-1, *args, **kwargs):
@@ -69,7 +69,7 @@ def set_weights_fn_discrete(policy, weights):
 
 
 def env_fn_continuous():
-    return gym.make('Pendulum-v0')
+    return make('Pendulum-v0')
 
 
 def policy_fn_continuous(env, name, memory_capacity=int(1e6), gpu=-1, *args, **kwargs):
